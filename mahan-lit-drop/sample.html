@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Lit Drop — Palo Alto Event</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #1a56db;
+      --blue-dark: #1344b0;
+      --blue-light: #e8eefb;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100dvh;
+    }
+
+    .header {
+      background: var(--blue);
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .header p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+    .content {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; color: var(--blue); font-weight: 500;
+      text-decoration: none; margin-bottom: 24px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .page-title {
+      font-size: 24px; font-weight: 700; letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 14px; color: var(--gray-500); line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .event-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-light); color: var(--blue);
+      font-size: 13px; font-weight: 600;
+      padding: 8px 14px; border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .photo-grid {
+      display: flex; flex-direction: column; gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .photo-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: white;
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .photo-caption {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+    .photo-caption strong { color: var(--gray-900); }
+
+    .cta-section {
+      text-align: center;
+      padding: 32px 20px;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+    }
+    .cta-section h3 {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .cta-section p {
+      font-size: 14px; color: var(--gray-500);
+      margin-bottom: 20px; line-height: 1.5;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: var(--radius); cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-primary:hover { background: var(--blue-dark); }
+
+    @media (max-width: 600px) {
+      .page-title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Mahan Lit Drop</h1>
+    <p>Help Matt reach every door</p>
+  </div>
+
+  <div class="content">
+    <a class="back-link" href="/mahan-lit-drop/">← Back to prototype</a>
+
+    <h2 class="page-title">Sample Lit Drop Material</h2>
+    <p class="page-subtitle">These are the flyers used during the first Mahan lit drop event in Palo Alto. Volunteers walked their assigned routes and left these at each doorstep.</p>
+
+    <div class="event-badge">
+      📍 First Event — Palo Alto, CA
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-card">
+        <img src="images/lit-drop-sample-1.jpg" alt="Mahan lit drop flyer - front">
+        <div class="photo-caption">
+          <strong>Lit drop flyer</strong> — the material left at each home during the Palo Alto volunteer event.
+        </div>
+      </div>
+
+      <div class="photo-card">
+        <img src="images/lit-drop-sample-2.jpg" alt="Mahan lit drop flyer - detail">
+        <div class="photo-caption">
+          <strong>Flyer detail</strong> — a closer look at the campaign messaging used for neighborhood outreach.
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h3>Ready to make an impact?</h3>
+      <p>See how the viral lit drop tool works and sign up for a route near your home.</p>
+      <a class="btn btn-primary" href="/mahan-lit-drop/">Try the prototype →</a>
+    </div>
+  </div>
+
+</body>
+</html>

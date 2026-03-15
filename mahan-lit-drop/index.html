@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lit Drop for Mahan</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #1a56db;
+      --blue-dark: #1344b0;
+      --blue-light: #e8eefb;
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: var(--blue);
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .header p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+    .step { display: none; padding: 24px 20px; animation: fadeIn 0.3s ease; }
+    .step.active { display: block; }
+
+    /* ============ INTRO SCREEN ============ */
+    .intro-screen {
+      display: none; padding: 0; animation: fadeIn 0.4s ease;
+      background: white; min-height: calc(100dvh - 60px);
+    }
+    .intro-screen.active { display: block; }
+    .intro-hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+      color: white; padding: 36px 24px 28px; text-align: center;
+    }
+    .intro-badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      background: rgba(255,255,255,0.15); padding: 4px 12px;
+      border-radius: 20px; margin-bottom: 16px;
+    }
+    .intro-hero h2 {
+      font-size: 24px; font-weight: 700; line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .intro-hero p {
+      font-size: 14px; opacity: 0.85; line-height: 1.6;
+      max-width: 340px; margin: 0 auto;
+    }
+
+    .intro-body { padding: 24px; }
+
+    /* Context section: what's a lit drop */
+    .litdrop-context {
+      margin-bottom: 24px;
+    }
+    .litdrop-context h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 12px;
+    }
+    .litdrop-context p {
+      font-size: 14px; color: var(--gray-600); line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .litdrop-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .litdrop-photos img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      border-radius: 8px;
+      border: 1px solid var(--gray-200);
+      object-fit: cover;
+      display: block;
+    }
+    .litdrop-photos-caption {
+      font-size: 12px; color: var(--gray-400); text-align: center;
+      margin-bottom: 4px;
+    }
+
+    /* Impact callout */
+    .impact-callout {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #86efac;
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .impact-callout-stat {
+      font-size: 36px; font-weight: 800; color: var(--green);
+      line-height: 1;
+    }
+    .impact-callout-label {
+      font-size: 14px; font-weight: 600; color: var(--gray-700);
+      margin-top: 4px;
+    }
+    .impact-callout-sub {
+      font-size: 12px; color: var(--gray-500); margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* Prototype section */
+    .proto-section {
+      margin-bottom: 24px;
+    }
+    .proto-section h3 {
+      font-size: 16px; font-weight: 700; margin-bottom: 12px;
+    }
+    .proto-steps {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .proto-step {
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .proto-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--blue-light); color: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .proto-text {
+      font-size: 14px; color: var(--gray-600); line-height: 1.5;
+      padding-top: 2px;
+    }
+    .proto-text strong { color: var(--gray-900); }
+
+    .intro-context {
+      margin-top: 20px; padding: 14px;
+      background: var(--gray-50); border-radius: var(--radius);
+      font-size: 12px; color: var(--gray-500); line-height: 1.6;
+    }
+    .intro-context strong { color: var(--gray-700); }
+
+    .intro-cta { padding: 0 24px 32px; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ PROGRESS BAR ============ */
+    .progress-bar { display: flex; gap: 6px; padding: 16px 20px 0; }
+    .progress-dot {
+      flex: 1; height: 4px; border-radius: 2px;
+      background: var(--gray-200); transition: background 0.3s;
+    }
+    .progress-dot.done { background: var(--blue); }
+    .progress-dot.current { background: var(--blue); opacity: 0.5; }
+
+    /* ============ FORM ELEMENTS ============ */
+    label {
+      display: block; font-size: 14px; font-weight: 600;
+      color: var(--gray-700); margin-bottom: 6px;
+    }
+    input[type="email"],
+    input[type="text"],
+    input[type="tel"] {
+      width: 100%; padding: 14px 16px; font-size: 16px;
+      border: 2px solid var(--gray-200); border-radius: var(--radius);
+      background: white; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus { border-color: var(--blue); }
+    .field-group { margin-bottom: 20px; }
+
+    /* ============ TIME OPTIONS ============ */
+    .time-options {
+      display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
+    }
+    .time-option {
+      background: white; border: 2px solid var(--gray-200); border-radius: var(--radius);
+      padding: 16px 20px; cursor: pointer;
+      transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .time-option:active { transform: scale(0.98); }
+    .time-option.selected { border-color: var(--blue); background: var(--blue-light); }
+    .time-option .time-val { font-size: 28px; font-weight: 700; color: var(--gray-900); line-height: 1; min-width: 50px; }
+    .time-option .time-meta { flex: 1; }
+    .time-option .time-label { font-size: 14px; color: var(--gray-600); font-weight: 500; }
+    .time-option .time-houses { font-size: 13px; color: var(--blue); font-weight: 600; margin-top: 2px; }
+
+    /* ============ BUTTONS ============ */
+    .btn {
+      width: 100%; padding: 16px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: var(--radius); cursor: pointer;
+      transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-primary:not(:disabled):hover { background: var(--blue-dark); }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+    .btn-green { background: var(--green); color: white; }
+    .btn-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+    .step-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .step-subtitle { font-size: 14px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.4; }
+
+    /* ============ ROUTE OPTIONS ============ */
+    .route-card {
+      border: 2px solid var(--gray-200); border-radius: var(--radius);
+      padding: 16px; margin-bottom: 10px;
+      cursor: pointer; transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .route-card:active { transform: scale(0.98); }
+    .route-card.selected { border-color: var(--blue); background: var(--blue-light); }
+    .route-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .route-card-name { font-size: 15px; font-weight: 700; }
+    .route-card-tag {
+      font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 20px; background: var(--green-light); color: var(--green);
+    }
+    .route-card-stats {
+      display: flex; gap: 16px; font-size: 13px; color: var(--gray-500);
+    }
+    .route-card-stats span { display: flex; align-items: center; gap: 4px; }
+    .route-card-stats strong { color: var(--gray-700); font-weight: 600; }
+
+    /* Matching spinner */
+    .matching-status {
+      background: white; border: 2px solid var(--gray-200);
+      border-radius: var(--radius); padding: 20px; margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+    .matching-status.matched {
+      border-color: var(--green); background: var(--green-light);
+    }
+    .matching-spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 3px solid var(--gray-200); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 10px;
+    }
+    .matching-text {
+      font-size: 14px; font-weight: 500; color: var(--gray-600);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .matching-text.done { color: var(--green); font-weight: 600; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ WALKING ANIMATION ============ */
+    .walk-scene {
+      position: relative;
+      width: 100%; height: 280px;
+      background: linear-gradient(180deg, #dbeafe 0%, #e0f2fe 40%, #86efac 40%, #4ade80 100%);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .walk-road {
+      position: absolute; top: 38%; left: 0; right: 0;
+      height: 3px; background: rgba(0,0,0,0.08);
+    }
+    .walk-houses {
+      position: absolute; bottom: 50px; left: 0;
+      display: flex; gap: 60px;
+      animation: scrollHouses 12s linear infinite;
+    }
+    @keyframes scrollHouses {
+      from { transform: translateX(100px); }
+      to { transform: translateX(-600px); }
+    }
+    .walk-house {
+      position: relative; width: 40px; flex-shrink: 0;
+    }
+    .walk-house-body { width: 40px; height: 30px; border-radius: 3px; }
+    .walk-house-roof {
+      width: 0; height: 0;
+      border-left: 24px solid transparent; border-right: 24px solid transparent;
+      position: absolute; top: -14px; left: -4px;
+    }
+    .walk-house-check {
+      position: absolute; top: -8px; right: -8px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .walk-house-check.show { opacity: 1; }
+    .walk-house-check svg { width: 10px; height: 10px; }
+
+    .walk-person {
+      position: absolute;
+      left: 50%; top: 22%;
+      transform: translateX(-50%);
+    }
+    .walk-person-body { animation: walkBounce 0.5s ease-in-out infinite; }
+    @keyframes walkBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .walk-progress-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 6px; background: rgba(0,0,0,0.1);
+    }
+    .walk-progress-fill {
+      height: 100%; background: var(--green); width: 0;
+      transition: width 0.3s ease;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .walk-status { text-align: center; margin-bottom: 16px; }
+    .walk-status-text { font-size: 16px; font-weight: 600; color: var(--gray-900); }
+    .walk-status-sub { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+
+    .walk-skip {
+      display: block; margin: 0 auto; background: none; border: none;
+      color: var(--gray-400); font-size: 14px; cursor: pointer;
+      padding: 8px 16px;
+    }
+    .walk-skip:hover { color: var(--gray-600); }
+
+    /* ============ GMAIL INBOX MOCK ============ */
+    .gmail-mock {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      background: white;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .gmail-toolbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: #f6f8fc;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .gmail-logo {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 16px; font-weight: 500; color: var(--gray-600);
+    }
+    .gmail-search {
+      flex: 1; height: 32px; border-radius: 8px;
+      background: white; border: 1px solid var(--gray-200);
+      padding: 0 10px; font-size: 12px; color: var(--gray-400);
+      display: flex; align-items: center;
+    }
+    .gmail-tabs {
+      display: flex; border-bottom: 1px solid var(--gray-200);
+    }
+    .gmail-tab {
+      flex: 1; text-align: center; padding: 10px 0;
+      font-size: 12px; font-weight: 500; color: var(--gray-400);
+    }
+    .gmail-tab.active {
+      color: var(--blue); border-bottom: 2px solid var(--blue);
+    }
+    .gmail-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .gmail-row:hover { background: var(--gray-50); }
+    .gmail-row.unread { background: #edf2fc; }
+    .gmail-row.unread:hover { background: #e3ebf9; }
+    .gmail-row.unread .gmail-sender,
+    .gmail-row.unread .gmail-subject { font-weight: 700; }
+    .gmail-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; color: white; flex-shrink: 0;
+    }
+    .gmail-content { flex: 1; min-width: 0; }
+    .gmail-sender { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+    .gmail-subject {
+      font-size: 12px; color: var(--gray-700);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .gmail-preview {
+      font-size: 12px; color: var(--gray-400); font-weight: 400;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .gmail-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
+    .gmail-time.unread { color: var(--blue); font-weight: 600; }
+    .gmail-new-badge {
+      display: inline-block; background: var(--blue); color: white;
+      font-size: 10px; font-weight: 700; padding: 1px 6px;
+      border-radius: 8px; margin-left: 6px;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Email Detail View */
+    .email-detail { display: none; animation: fadeIn 0.3s ease; }
+    .email-detail.active { display: block; }
+    .email-header-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; background: #f6f8fc;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .email-back {
+      background: none; border: none; cursor: pointer;
+      color: var(--gray-500); font-size: 18px; padding: 4px;
+    }
+    .email-header-bar h3 { font-size: 14px; font-weight: 600; flex: 1; }
+    .email-from-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px; border-bottom: 1px solid var(--gray-100);
+    }
+    .email-from-info { flex: 1; }
+    .email-from-name { font-size: 14px; font-weight: 600; }
+    .email-from-addr { font-size: 11px; color: var(--gray-400); }
+    .email-from-time { font-size: 11px; color: var(--gray-400); }
+    .email-body {
+      padding: 20px 14px; font-size: 14px;
+      line-height: 1.7; color: var(--gray-700);
+    }
+    .email-body strong { color: var(--gray-900); }
+    .email-body .email-cta {
+      display: inline-block; margin-top: 16px;
+      padding: 12px 24px; background: var(--blue); color: white;
+      text-decoration: none; border-radius: var(--radius);
+      font-weight: 600; font-size: 14px;
+    }
+
+    /* Leaderboard in email */
+    .email-leaderboard {
+      margin: 20px 0; background: var(--gray-50);
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+    .leaderboard-title {
+      padding: 12px 14px; font-size: 13px; font-weight: 700;
+      color: var(--gray-700); border-bottom: 1px solid var(--gray-200);
+    }
+    .leaderboard-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-bottom: 1px solid var(--gray-100);
+      font-size: 13px;
+    }
+    .leaderboard-row:last-child { border-bottom: none; }
+    .leaderboard-row.you { background: var(--blue-light); font-weight: 600; }
+    .leaderboard-rank { width: 24px; text-align: center; font-weight: 700; }
+    .leaderboard-name { flex: 1; }
+    .leaderboard-doors { font-weight: 600; color: var(--gray-700); }
+
+    /* Social share in email */
+    .share-prompt {
+      margin: 20px 0; padding: 16px;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #86efac;
+      border-radius: var(--radius); text-align: center;
+    }
+    .share-prompt h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .share-prompt p { font-size: 13px; color: var(--gray-600); margin-bottom: 12px; }
+    .share-prompt-btns {
+      display: flex; gap: 8px; justify-content: center;
+    }
+    .share-btn {
+      padding: 8px 16px; border-radius: 20px; border: none;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .share-btn-ig {
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: white;
+    }
+    .share-btn-link {
+      background: var(--gray-200); color: var(--gray-700);
+    }
+
+    .email-footer {
+      padding: 14px; border-top: 1px solid var(--gray-100);
+      font-size: 11px; color: var(--gray-400); line-height: 1.5;
+    }
+
+    .inbox-time-label {
+      text-align: center; font-size: 13px; color: var(--gray-500);
+      margin-bottom: 12px;
+    }
+    .inbox-time-label span {
+      background: var(--gray-100); padding: 4px 12px; border-radius: 20px;
+      font-weight: 500;
+    }
+
+    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 600px) {
+      .intro-hero h2 { font-size: 20px; }
+      .litdrop-photos img { max-height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Mahan Lit Drop</h1>
+    <p>Help Matt reach every door</p>
+  </div>
+
+  <!-- ============ INTRO SCREEN ============ -->
+  <div class="intro-screen active" id="intro-screen">
+    <div class="intro-hero">
+      <div class="intro-badge">Prototype</div>
+      <h2>Mahan Lit Drop:<br>A Viral Volunteer Tool</h2>
+      <p>This prototype explores how to turn a single lit drop into a self-spreading network of neighborhood volunteers.</p>
+    </div>
+
+    <div class="intro-body">
+
+      <!-- What's a lit drop -->
+      <div class="litdrop-context">
+        <h3>What's a lit drop?</h3>
+        <p>The Mahan campaign uses <strong>door hanger flyers</strong> to spread the word across neighborhoods. Volunteers walk their area and hang them on doorknobs — it's personal, visible, and effective.</p>
+      </div>
+
+      <!-- Impact callout -->
+      <div class="impact-callout">
+        <div class="impact-callout-stat">~10 houses = 1 vote</div>
+        <div class="impact-callout-label">Every lit drop counts</div>
+        <div class="impact-callout-sub">By signing up, you'll drive more votes for the campaign and help change California.</div>
+      </div>
+
+      <!-- The prototype -->
+      <div class="proto-section">
+        <h3>This prototype shows how it works</h3>
+        <div class="proto-steps">
+          <div class="proto-step">
+            <div class="proto-num">1</div>
+            <div class="proto-text"><strong>Sign up</strong> — enter your info to get lit drops sent to you</div>
+          </div>
+          <div class="proto-step">
+            <div class="proto-num">2</div>
+            <div class="proto-text"><strong>Get set up</strong> — download the app, pick your time and starting point</div>
+          </div>
+          <div class="proto-step">
+            <div class="proto-num">3</div>
+            <div class="proto-text"><strong>Pick a route</strong> — choose from the best options near you</div>
+          </div>
+          <div class="proto-step">
+            <div class="proto-num">4</div>
+            <div class="proto-text"><strong>Walk & deliver</strong> — complete the lit drop at your own pace</div>
+          </div>
+          <div class="proto-step">
+            <div class="proto-num">5</div>
+            <div class="proto-text"><strong>See your impact</strong> — leaderboard, social sharing, and invite friends</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="intro-context">
+        <strong>Context:</strong> This is a concept prototype for Matt Mahan's 2026 gubernatorial campaign. The goal is to maximize lit drop coverage across California by making it dead simple for one volunteer to recruit the next.
+      </div>
+    </div>
+
+    <div class="intro-cta">
+      <button class="btn btn-primary" id="btn-start-demo">Walk through the demo →</button>
+    </div>
+  </div>
+
+  <!-- ============ PROGRESS BAR ============ -->
+  <div class="progress-bar" id="progress-bar" style="display:none;">
+    <div class="progress-dot" id="dot-0"></div>
+    <div class="progress-dot" id="dot-1"></div>
+    <div class="progress-dot" id="dot-2"></div>
+    <div class="progress-dot" id="dot-3"></div>
+    <div class="progress-dot" id="dot-4"></div>
+  </div>
+
+  <!-- ============ STEP 0: SIGNUP ============ -->
+  <div class="step" id="step-0">
+    <h2 class="step-title">Sign up to lit drop</h2>
+    <p class="step-subtitle">We'll send you a pack of door hangers and match you with nearby routes.</p>
+
+    <div class="field-group">
+      <label>Email</label>
+      <input type="email" id="signup-email" placeholder="you@email.com">
+    </div>
+
+    <div class="field-group">
+      <label>Mailing address</label>
+      <input type="text" id="signup-address" placeholder="123 Main St, City, CA 94301">
+      <div style="font-size:12px; color:var(--gray-400); margin-top:4px;">We'll mail you a lit drop kit with flyers</div>
+    </div>
+
+    <div class="field-group">
+      <label>Phone number</label>
+      <input type="tel" id="signup-phone" placeholder="(555) 123-4567">
+    </div>
+
+    <button class="btn btn-primary" id="btn-signup" disabled>Continue →</button>
+  </div>
+
+  <!-- ============ STEP 1: INSTRUCTIONS / SETUP ============ -->
+  <div class="step" id="step-1">
+    <h2 class="step-title">Get set up</h2>
+    <p class="step-subtitle">Download the MiniVAN app, then tell us your availability and starting point.</p>
+
+    <!-- MiniVAN download prompt -->
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="width:64px; height:64px; border-radius:16px; background:linear-gradient(135deg, #2563eb, #1d4ed8); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 4px 16px rgba(37,99,235,0.3);">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" stroke="white" stroke-width="2"/><circle cx="12" cy="18" r="1" fill="white"/></svg>
+      </div>
+      <div style="font-size:15px; font-weight:700; margin-bottom:4px;">Download MiniVAN</div>
+      <div style="font-size:13px; color:var(--gray-500);">You'll use it to navigate your route</div>
+    </div>
+
+    <div class="field-group">
+      <label>How much time do you have?</label>
+      <div class="time-options">
+        <div class="time-option" data-time="30" data-houses="10">
+          <div class="time-val">30<span style="font-size:14px;font-weight:400;">m</span></div>
+          <div class="time-meta"><div class="time-label">Quick session</div><div class="time-houses">~10 houses · ~1 vote</div></div>
+        </div>
+        <div class="time-option" data-time="60" data-houses="20">
+          <div class="time-val">1<span style="font-size:14px;font-weight:400;">hr</span></div>
+          <div class="time-meta"><div class="time-label">Standard session</div><div class="time-houses">~20 houses · ~2 votes</div></div>
+        </div>
+        <div class="time-option" data-time="90" data-houses="30">
+          <div class="time-val">1.5<span style="font-size:14px;font-weight:400;">hr</span></div>
+          <div class="time-meta"><div class="time-label">Extended session</div><div class="time-houses">~30 houses · ~3 votes</div></div>
+        </div>
+        <div class="time-option" data-time="120" data-houses="40">
+          <div class="time-val">2<span style="font-size:14px;font-weight:400;">hr</span></div>
+          <div class="time-meta"><div class="time-label">Full session</div><div class="time-houses">~40 houses · ~4 votes</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Starting point</label>
+      <input type="text" id="starting-address" placeholder="Enter your starting address">
+    </div>
+
+    <button class="btn btn-primary" id="btn-setup-continue" disabled>Find routes near me →</button>
+  </div>
+
+  <!-- ============ STEP 2: ROUTE SELECTION ============ -->
+  <div class="step" id="step-2">
+    <h2 class="step-title">Pick your route</h2>
+    <p class="step-subtitle">Here are the top 3 options near your starting point.</p>
+
+    <div class="matching-status" id="route-matching">
+      <div class="matching-text" id="route-matching-text">
+        <div class="matching-spinner"></div>
+        <span>Finding best routes near you...</span>
+      </div>
+    </div>
+
+    <div id="route-options" style="display:none;">
+      <div class="route-card" data-route="1">
+        <div class="route-card-header">
+          <div class="route-card-name">Midtown Loop</div>
+          <div class="route-card-tag">Best match</div>
+        </div>
+        <div class="route-card-stats">
+          <span>🏠 <strong>20 houses</strong></span>
+          <span>📏 <strong>0.8 mi</strong></span>
+          <span>⏱ <strong>~55 min</strong></span>
+        </div>
+      </div>
+      <div class="route-card" data-route="2">
+        <div class="route-card-header">
+          <div class="route-card-name">College Terrace</div>
+        </div>
+        <div class="route-card-stats">
+          <span>🏠 <strong>18 houses</strong></span>
+          <span>📏 <strong>0.6 mi</strong></span>
+          <span>⏱ <strong>~50 min</strong></span>
+        </div>
+      </div>
+      <div class="route-card" data-route="3">
+        <div class="route-card-header">
+          <div class="route-card-name">Professorville</div>
+        </div>
+        <div class="route-card-stats">
+          <span>🏠 <strong>22 houses</strong></span>
+          <span>📏 <strong>1.0 mi</strong></span>
+          <span>⏱ <strong>~65 min</strong></span>
+        </div>
+      </div>
+
+      <button class="btn btn-green" id="btn-letsgo" disabled style="margin-top:16px;">Let's go! 🚀</button>
+    </div>
+  </div>
+
+  <!-- ============ STEP 3: WALKING ANIMATION ============ -->
+  <div class="step" id="step-3">
+    <h2 class="step-title" style="text-align:center;">Delivering lit drops…</h2>
+    <p class="step-subtitle" style="text-align:center;">Walking your route and hanging flyers on doors.</p>
+
+    <div class="walk-scene">
+      <div class="walk-road"></div>
+      <div class="walk-houses" id="walk-houses"></div>
+      <div class="walk-person">
+        <div class="walk-person-body">
+          <svg width="24" height="40" viewBox="0 0 24 40">
+            <circle cx="12" cy="6" r="5" fill="#1a56db"/>
+            <rect x="8" y="12" width="8" height="14" rx="3" fill="#1a56db"/>
+            <rect x="6" y="26" width="5" height="12" rx="2" fill="#1e40af"/>
+            <rect x="13" y="26" width="5" height="12" rx="2" fill="#1e40af"/>
+          </svg>
+        </div>
+      </div>
+      <div class="walk-progress-bar">
+        <div class="walk-progress-fill" id="walk-progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="walk-status">
+      <div class="walk-status-text" id="walk-status-text">Starting route…</div>
+      <div class="walk-status-sub" id="walk-status-sub">0 of 20 doors reached</div>
+    </div>
+
+    <button class="walk-skip" id="btn-skip-walk">Skip animation →</button>
+  </div>
+
+  <!-- ============ STEP 4: EMAIL WITH LEADERBOARD + SHARE ============ -->
+  <div class="step" id="step-4">
+    <div class="inbox-time-label"><span>A moment later…</span></div>
+
+    <div class="gmail-mock" id="gmail-inbox">
+      <div class="gmail-toolbar">
+        <div class="gmail-logo">
+          <svg width="20" height="16" viewBox="0 0 20 16"><path d="M18 0H2C.9 0 0 .9 0 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z" fill="#EA4335"/><path d="M0 2l10 6 10-6v12c0 1.1-.9 2-2 2H2c-1.1 0-2-.9-2-2V2z" fill="#FBBC05"/><path d="M20 2l-10 6L0 2C0 .9.9 0 2 0h16c1.1 0 2 .9 2 2z" fill="#34A853"/><path d="M20 2v1l-10 6L0 3V2C0 .9.9 0 2 0h16c1.1 0 2 .9 2 2z" fill="#C5221F"/></svg>
+          Gmail
+        </div>
+        <div class="gmail-search">Search mail</div>
+      </div>
+      <div class="gmail-tabs">
+        <div class="gmail-tab active">Primary</div>
+        <div class="gmail-tab">Social</div>
+        <div class="gmail-tab">Promotions</div>
+      </div>
+      <div class="gmail-row unread" id="campaign-email-row">
+        <div class="gmail-avatar" style="background:#1a56db;">M</div>
+        <div class="gmail-content">
+          <div class="gmail-sender">Mahan Campaign <span class="gmail-new-badge">New</span></div>
+          <div class="gmail-subject">🎉 You're making a difference!</div>
+          <div class="gmail-preview">See where you rank in your neighborhood…</div>
+        </div>
+        <div class="gmail-time unread">now</div>
+      </div>
+      <div class="gmail-row">
+        <div class="gmail-avatar" style="background:#9ca3af;">G</div>
+        <div class="gmail-content">
+          <div class="gmail-sender">Google</div>
+          <div class="gmail-subject">Security alert</div>
+          <div class="gmail-preview">New sign-in from Chrome on Mac…</div>
+        </div>
+        <div class="gmail-time">11:30 AM</div>
+      </div>
+      <div class="gmail-row">
+        <div class="gmail-avatar" style="background:#6b7280;">A</div>
+        <div class="gmail-content">
+          <div class="gmail-sender">Amazon</div>
+          <div class="gmail-subject">Your order has shipped</div>
+          <div class="gmail-preview">Track your package…</div>
+        </div>
+        <div class="gmail-time">9:15 AM</div>
+      </div>
+    </div>
+
+    <!-- Email detail (shown when they click the email) -->
+    <div class="gmail-mock email-detail" id="email-detail">
+      <div class="email-header-bar">
+        <button class="email-back" id="btn-email-back">←</button>
+        <h3>🎉 You're making a difference!</h3>
+      </div>
+      <div class="email-from-row">
+        <div class="gmail-avatar" style="background:#1a56db;">M</div>
+        <div class="email-from-info">
+          <div class="email-from-name">Mahan Campaign</div>
+          <div class="email-from-addr">volunteer@mahanforcalifornia.com</div>
+        </div>
+        <div class="email-from-time">Just now</div>
+      </div>
+      <div class="email-body" id="email-body-content">
+        <!-- Filled by JS -->
+      </div>
+      <div class="email-footer">
+        Mahan for California · 250 Hamilton Ave, Palo Alto, CA 94301<br>
+        Unsubscribe · Privacy Policy
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============ STATE ============
+    let currentStep = -1;
+    let selectedTime = 0;
+    let selectedHouses = 0;
+    let selectedRoute = null;
+    let walkInterval = null;
+
+    const introScreen = document.getElementById('intro-screen');
+    const progressBar = document.getElementById('progress-bar');
+    const steps = document.querySelectorAll('.step');
+    const dots = document.querySelectorAll('.progress-dot');
+
+    // ============ INTRO → STEP 0 ============
+    document.getElementById('btn-start-demo').addEventListener('click', () => {
+      introScreen.classList.remove('active');
+      progressBar.style.display = 'flex';
+      goToStep(0);
+    });
+
+    function goToStep(n) {
+      introScreen.classList.remove('active');
+      progressBar.style.display = 'flex';
+      steps.forEach((s, i) => s.classList.toggle('active', i === n));
+      dots.forEach((d, i) => {
+        d.classList.toggle('done', i < n);
+        d.classList.toggle('current', i === n);
+      });
+      currentStep = n;
+      window.scrollTo(0, 0);
+      if (n === 1) simulateGeolocation();
+      if (n === 2) startRouteMatching();
+      if (n === 3) startWalkingAnimation();
+      if (n === 4) showGmailInbox();
+    }
+
+    // ============ STEP 0: SIGNUP VALIDATION ============
+    const signupEmail = document.getElementById('signup-email');
+    const signupAddress = document.getElementById('signup-address');
+    const signupPhone = document.getElementById('signup-phone');
+    const btnSignup = document.getElementById('btn-signup');
+
+    function validateSignup() {
+      const emailValid = signupEmail.value.includes('@') && signupEmail.value.includes('.');
+      const addressValid = signupAddress.value.length > 5;
+      const phoneValid = signupPhone.value.replace(/\D/g, '').length >= 7;
+      btnSignup.disabled = !(emailValid && addressValid && phoneValid);
+    }
+
+    signupEmail.addEventListener('input', validateSignup);
+    signupAddress.addEventListener('input', validateSignup);
+    signupPhone.addEventListener('input', validateSignup);
+
+    // Simulate filling for prototype
+    setTimeout(() => {
+      signupEmail.value = 'sam@example.com';
+      signupEmail.dispatchEvent(new Event('input'));
+    }, 800);
+    setTimeout(() => {
+      signupAddress.value = '2160 High St, Palo Alto, CA 94301';
+      signupAddress.dispatchEvent(new Event('input'));
+    }, 1200);
+    setTimeout(() => {
+      signupPhone.value = '(555) 867-5309';
+      signupPhone.dispatchEvent(new Event('input'));
+    }, 1600);
+
+    btnSignup.addEventListener('click', () => {
+      if (!btnSignup.disabled) goToStep(1);
+    });
+
+    // ============ STEP 1: TIME + ADDRESS ============
+    const timeOptions = document.querySelectorAll('.time-option');
+    const startingAddress = document.getElementById('starting-address');
+    const btnSetup = document.getElementById('btn-setup-continue');
+
+    timeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        timeOptions.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedTime = parseInt(opt.dataset.time);
+        selectedHouses = parseInt(opt.dataset.houses);
+        checkSetupReady();
+      });
+    });
+
+    startingAddress.addEventListener('input', checkSetupReady);
+
+    function checkSetupReady() {
+      btnSetup.disabled = !(selectedTime > 0 && startingAddress.value.length > 5);
+    }
+
+    function simulateGeolocation() {
+      setTimeout(() => {
+        startingAddress.value = '2160 High St, Palo Alto, CA 94301';
+        startingAddress.dispatchEvent(new Event('input'));
+      }, 1200);
+    }
+
+    btnSetup.addEventListener('click', () => {
+      if (!btnSetup.disabled) goToStep(2);
+    });
+
+    // ============ STEP 2: ROUTE SELECTION ============
+    function startRouteMatching() {
+      const matching = document.getElementById('route-matching');
+      const matchingText = document.getElementById('route-matching-text');
+      const routeOptions = document.getElementById('route-options');
+
+      matching.style.display = 'block';
+      matching.classList.remove('matched');
+      matchingText.classList.remove('done');
+      matchingText.innerHTML = '<div class="matching-spinner"></div><span>Finding best routes near you...</span>';
+      routeOptions.style.display = 'none';
+
+      setTimeout(() => {
+        matching.classList.add('matched');
+        matchingText.classList.add('done');
+        matchingText.innerHTML = '✓ 3 routes found near 2160 High St';
+        routeOptions.style.display = 'block';
+      }, 2000);
+    }
+
+    const routeCards = document.querySelectorAll('.route-card');
+    const btnLetsgo = document.getElementById('btn-letsgo');
+
+    routeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        routeCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedRoute = card.dataset.route;
+        btnLetsgo.disabled = false;
+        // Update house count based on route
+        if (selectedRoute === '1') selectedHouses = 20;
+        else if (selectedRoute === '2') selectedHouses = 18;
+        else selectedHouses = 22;
+      });
+    });
+
+    btnLetsgo.addEventListener('click', () => {
+      if (!btnLetsgo.disabled) goToStep(3);
+    });
+
+    // ============ STEP 3: WALKING ANIMATION ============
+    function startWalkingAnimation() {
+      const total = selectedHouses || 20;
+      const colors = ['#fca5a5','#fcd34d','#86efac','#93c5fd','#c4b5fd','#f9a8d4','#fda4af','#a5b4fc'];
+      const housesContainer = document.getElementById('walk-houses');
+      housesContainer.innerHTML = '';
+      for (let i = 0; i < 12; i++) {
+        const c = colors[i % colors.length];
+        const roof = colors[(i + 3) % colors.length];
+        housesContainer.innerHTML += `
+          <div class="walk-house">
+            <div class="walk-house-roof" style="border-bottom:14px solid ${roof}"></div>
+            <div class="walk-house-body" style="background:${c}"></div>
+            <div class="walk-house-check" id="walk-check-${i}">
+              <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+          </div>`;
+      }
+
+      document.getElementById('walk-status-text').textContent = 'Delivering flyers…';
+      document.getElementById('walk-status-sub').textContent = `0 of ${total} doors reached`;
+      document.getElementById('walk-progress-fill').style.width = '0%';
+
+      let delivered = 0;
+      walkInterval = setInterval(() => {
+        delivered++;
+        const pct = Math.min(100, (delivered / total) * 100);
+        document.getElementById('walk-progress-fill').style.width = pct + '%';
+        document.getElementById('walk-status-sub').textContent = `${delivered} of ${total} doors reached`;
+
+        const checkIdx = Math.floor((delivered / total) * 12);
+        for (let i = 0; i < checkIdx; i++) {
+          const check = document.getElementById(`walk-check-${i}`);
+          if (check) check.classList.add('show');
+        }
+
+        if (delivered >= total) {
+          clearInterval(walkInterval);
+          document.getElementById('walk-status-text').textContent = 'Route complete! 🎉';
+          document.getElementById('walk-status-sub').textContent = `All ${total} doors reached`;
+          for (let i = 0; i < 12; i++) {
+            const check = document.getElementById(`walk-check-${i}`);
+            if (check) check.classList.add('show');
+          }
+          setTimeout(() => goToStep(4), 1500);
+        }
+      }, 300);
+    }
+
+    // Skip animation
+    document.getElementById('btn-skip-walk').addEventListener('click', () => {
+      if (walkInterval) clearInterval(walkInterval);
+      const total = selectedHouses || 20;
+      document.getElementById('walk-progress-fill').style.width = '100%';
+      document.getElementById('walk-status-text').textContent = 'Route complete! 🎉';
+      document.getElementById('walk-status-sub').textContent = `All ${total} doors reached`;
+      for (let i = 0; i < 12; i++) {
+        const check = document.getElementById(`walk-check-${i}`);
+        if (check) check.classList.add('show');
+      }
+      setTimeout(() => goToStep(4), 500);
+    });
+
+    // ============ STEP 4: GMAIL INBOX + LEADERBOARD + SHARE ============
+    function showGmailInbox() {
+      const inbox = document.getElementById('gmail-inbox');
+      const detail = document.getElementById('email-detail');
+      inbox.style.display = 'block';
+      detail.style.display = 'none';
+      detail.classList.remove('active');
+
+      const doorsText = selectedHouses || 20;
+      const votesEst = Math.round(doorsText / 10);
+
+      document.getElementById('email-body-content').innerHTML = `
+        <p>Hey Sam! 👋</p>
+        <p>You just covered <strong>${doorsText} doors</strong> in Palo Alto — that's an estimated <strong>+${votesEst} vote${votesEst > 1 ? 's' : ''}</strong> for Matt Mahan. Thank you!</p>
+
+        <div class="email-leaderboard">
+          <div class="leaderboard-title">🏆 Your Neighborhood Leaderboard</div>
+          <div class="leaderboard-row"><div class="leaderboard-rank">🥇</div><div class="leaderboard-name">Priya S.</div><div class="leaderboard-doors">85 doors</div></div>
+          <div class="leaderboard-row"><div class="leaderboard-rank">🥈</div><div class="leaderboard-name">Marcus T.</div><div class="leaderboard-doors">62 doors</div></div>
+          <div class="leaderboard-row"><div class="leaderboard-rank">🥉</div><div class="leaderboard-name">Jamie L.</div><div class="leaderboard-doors">48 doors</div></div>
+          <div class="leaderboard-row you"><div class="leaderboard-rank">#4</div><div class="leaderboard-name">You 🎯</div><div class="leaderboard-doors">${doorsText} doors</div></div>
+          <div class="leaderboard-row"><div class="leaderboard-rank">#5</div><div class="leaderboard-name">Alex K.</div><div class="leaderboard-doors">15 doors</div></div>
+        </div>
+
+        <p>Keep it up! Every 10 doors = approximately 1 more vote for Matt. You're ${85 - doorsText} doors away from #1.</p>
+
+        <div class="share-prompt">
+          <h4>Share your impact 🌟</h4>
+          <p>Inspire friends to sign up and start their own lit drop.</p>
+          <div class="share-prompt-btns">
+            <button class="share-btn share-btn-ig">📸 Instagram</button>
+            <button class="share-btn share-btn-link">🔗 Copy link</button>
+          </div>
+        </div>
+
+        <a class="email-cta" href="#" onclick="return false;">Invite friends to lit drop →</a>
+      `;
+    }
+
+    // Email click → detail
+    document.getElementById('campaign-email-row').addEventListener('click', () => {
+      document.getElementById('gmail-inbox').style.display = 'none';
+      const detail = document.getElementById('email-detail');
+      detail.style.display = 'block';
+      detail.classList.add('active');
+    });
+
+    // Back to inbox
+    document.getElementById('btn-email-back').addEventListener('click', () => {
+      document.getElementById('email-detail').style.display = 'none';
+      document.getElementById('email-detail').classList.remove('active');
+      document.getElementById('gmail-inbox').style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>

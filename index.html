@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam Finegold</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root{
+    --bg:#0b1622;
+    --bg-card:rgba(255,255,255,0.03);
+    --text:#e8ecf1;
+    --text-dim:rgba(232,236,241,0.5);
+    --accent:#6b8aad;
+    --accent-hover:#8fafc8;
+    --line:rgba(255,255,255,0.06);
+  }
+
+  html{font-size:16px}
+
+  body{
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:2rem;
+    position:relative;
+    overflow:hidden;
+    letter-spacing:0.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* subtle grid — inspired by tatami proportions */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:120px 120px;
+    pointer-events:none;
+    opacity:0.5;
+  }
+
+  /* horizon line — fjord / sea line */
+  body::after{
+    content:'';
+    position:fixed;
+    left:0;right:0;
+    top:62%;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(107,138,173,0.15) 30%,rgba(107,138,173,0.15) 70%,transparent);
+    pointer-events:none;
+  }
+
+  /* single floating circle — moon / enso */
+  .enso{
+    position:fixed;
+    top:14%;
+    right:12%;
+    width:90px;
+    height:90px;
+    border:1px solid rgba(107,138,173,0.12);
+    border-radius:50%;
+    pointer-events:none;
+    animation:drift 20s ease-in-out infinite;
+  }
+  @keyframes drift{
+    0%,100%{transform:translate(0,0)}
+    50%{transform:translate(-6px,10px)}
+  }
+
+  .container{
+    max-width:540px;
+    width:100%;
+    position:relative;
+    z-index:1;
+    animation:fadeUp 1s ease-out both;
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(24px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  .name{
+    font-size:2.4rem;
+    font-weight:300;
+    letter-spacing:0.08em;
+    margin-bottom:2.5rem;
+    line-height:1.2;
+  }
+
+  .divider{
+    width:40px;
+    height:1px;
+    background:var(--accent);
+    margin-bottom:2.5rem;
+    opacity:0.5;
+  }
+
+  .bio{
+    font-size:1.05rem;
+    line-height:1.85;
+    color:var(--text-dim);
+    font-weight:300;
+    margin-bottom:3rem;
+  }
+
+  .links{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+
+  .link-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:1rem 0;
+    border-top:1px solid var(--line);
+    text-decoration:none;
+    color:var(--text);
+    transition:all 0.3s ease;
+  }
+
+  .link-item:last-child{
+    border-bottom:1px solid var(--line);
+  }
+
+  .link-item:hover{
+    padding-left:0.5rem;
+  }
+
+  .link-item:hover .link-label{
+    color:var(--accent-hover);
+  }
+
+  .link-label{
+    font-size:0.88rem;
+    font-weight:400;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:color 0.3s ease;
+  }
+
+  .link-arrow{
+    font-size:0.8rem;
+    color:var(--text-dim);
+    transition:transform 0.3s ease, color 0.3s ease;
+  }
+
+  .link-item:hover .link-arrow{
+    transform:translateX(4px);
+    color:var(--accent-hover);
+  }
+
+  .footer{
+    position:fixed;
+    bottom:2rem;
+    font-size:0.7rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    opacity:0.3;
+  }
+
+  @media(max-width:600px){
+    .name{font-size:1.8rem}
+    .bio{font-size:0.95rem}
+    .enso{width:60px;height:60px;top:8%;right:8%}
+    body{padding:1.5rem;justify-content:flex-start;padding-top:20vh}
+  }
+</style>
+</head>
+<body>
+
+<div class="enso"></div>
+
+<div class="container">
+  <h1 class="name">Sam Finegold</h1>
+  <div class="divider"></div>
+  <p class="bio">
+    Builder at the intersection of technology and civic impact. Passionate about using software to solve real-world problems — from scaling startups to helping neighbors show up for the candidates and causes they believe in.
+  </p>
+  <nav class="links">
+    <a class="link-item" href="https://tryhone.ai" target="_blank" rel="noopener">
+      <span class="link-label">Hone AI</span>
+      <span class="link-arrow">&#8594;</span>
+    </a>
+    <a class="link-item" href="https://www.linkedin.com/in/sam-j-finegold-000/" target="_blank" rel="noopener">
+      <span class="link-label">LinkedIn</span>
+      <span class="link-arrow">&#8594;</span>
+    </a>
+    <a class="link-item" href="/mahan-lit-drop">
+      <span class="link-label">Mahan Lit Drop</span>
+      <span class="link-arrow">&#8594;</span>
+    </a>
+  </nav>
+</div>
+
+<div class="footer">San Francisco Bay Area</div>
+
+</body>
+</html>

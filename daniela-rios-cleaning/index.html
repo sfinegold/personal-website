@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniela Rios Cleaning Services | Marin County & San Francisco</title>
+<meta name="description" content="Professional residential and commercial cleaning services in Marin County and San Francisco. Weekly, bi-weekly, deep cleaning, move-in/out, and post-construction cleaning. 5-star rated with 227+ reviews.">
+<meta property="og:title" content="Daniela Rios Cleaning Services | Marin County & San Francisco">
+<meta property="og:description" content="Reliable, detail-oriented cleaning for homes and businesses in Marin County and San Francisco. Book your free estimate today.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Daniela Rios Cleaning Services",
+  "description": "Professional residential and commercial cleaning services in Marin County and San Francisco.",
+  "telephone": "+14156120530",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Sausalito",
+    "addressRegion": "CA",
+    "postalCode": "94965"
+  },
+  "areaServed": ["Marin County", "San Francisco"],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "227"
+  },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "16:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "07:00", "closes": "13:00" }
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --blue:#2e86de;
+  --blue-dark:#1b6ec2;
+  --blue-light:#54a0ff;
+  --blue-pale:#e8f4fd;
+  --blue-50:#f0f7ff;
+  --green:#10b981;
+  --green-light:#34d399;
+  --green-pale:#ecfdf5;
+  --yellow:#f59e0b;
+  --yellow-pale:#fffbeb;
+  --coral:#f97066;
+  --white:#ffffff;
+  --off-white:#f9fafb;
+  --cream:#fefdf8;
+  --gray-50:#f8fafc;
+  --gray-100:#f1f5f9;
+  --gray-200:#e2e8f0;
+  --gray-400:#94a3b8;
+  --gray-500:#64748b;
+  --gray-600:#475569;
+  --gray-800:#1e293b;
+  --text:#1e293b;
+  --text-light:#64748b;
+  --radius:16px;
+  --shadow:0 4px 20px rgba(46,134,222,0.08);
+  --shadow-lg:0 12px 40px rgba(46,134,222,0.12);
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+
+body{
+  font-family:'DM Sans',system-ui,-apple-system,sans-serif;
+  color:var(--text);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  background:var(--white);
+}
+
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+
+/* ─── NAV ─── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(46,134,222,0.08);
+  transition:box-shadow 0.3s;
+}
+.nav.scrolled{box-shadow:0 2px 20px rgba(46,134,222,0.1)}
+.nav-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.75rem 1.5rem;
+}
+.nav-brand{display:flex;align-items:center;gap:0.6rem}
+.nav-logo{
+  width:40px;height:40px;
+  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);font-weight:700;font-size:0.95rem;
+  box-shadow:0 2px 8px rgba(46,134,222,0.3);
+}
+.nav-name{
+  font-weight:700;font-size:0.95rem;color:var(--gray-800);
+  line-height:1.2;
+}
+.nav-name small{
+  display:block;font-weight:500;font-size:0.7rem;
+  color:var(--blue);letter-spacing:0.03em;
+}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{
+  font-size:0.88rem;font-weight:500;color:var(--gray-500);
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--blue)}
+.nav-cta{
+  background:var(--blue) !important;color:var(--white) !important;
+  padding:0.55rem 1.2rem;border-radius:10px;font-size:0.85rem !important;
+  font-weight:600 !important;transition:all 0.2s;
+  box-shadow:0 2px 8px rgba(46,134,222,0.3);
+}
+.nav-cta:hover{background:var(--blue-dark) !important;transform:translateY(-1px)}
+
+.hamburger{
+  display:none;background:none;border:none;cursor:pointer;
+  width:28px;height:20px;position:relative;
+}
+.hamburger span{
+  display:block;width:100%;height:2px;background:var(--blue);
+  position:absolute;left:0;transition:all 0.3s;border-radius:2px;
+}
+.hamburger span:nth-child(1){top:0}
+.hamburger span:nth-child(2){top:9px}
+.hamburger span:nth-child(3){top:18px}
+
+/* ─── HERO ─── */
+.hero{
+  padding:8rem 1.5rem 5rem;
+  background:linear-gradient(160deg, var(--blue-50) 0%, var(--white) 40%, var(--cream) 100%);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-100px;right:-100px;
+  width:500px;height:500px;
+  background:radial-gradient(circle, rgba(46,134,222,0.08) 0%, transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-80px;left:-80px;
+  width:350px;height:350px;
+  background:radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.hero-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:var(--yellow-pale);border:1px solid rgba(245,158,11,0.2);
+  padding:0.4rem 1rem;border-radius:24px;
+  font-size:0.8rem;font-weight:600;margin-bottom:1.5rem;
+  color:var(--gray-800);
+}
+.hero-badge .stars{color:var(--yellow);font-size:0.9rem}
+.hero h1{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:3.2rem;font-weight:400;line-height:1.2;margin-bottom:1.25rem;
+  color:var(--gray-800);
+}
+.hero h1 span{
+  color:var(--blue);
+  position:relative;
+}
+.hero h1 span::after{
+  content:'';position:absolute;bottom:2px;left:0;right:0;
+  height:6px;background:rgba(46,134,222,0.15);border-radius:3px;
+}
+.hero-sub{
+  font-size:1.1rem;line-height:1.8;color:var(--gray-500);
+  margin-bottom:2rem;font-weight:400;max-width:500px;
+}
+.hero-actions{display:flex;gap:0.75rem;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.9rem 1.6rem;border-radius:12px;
+  font-size:0.9rem;font-weight:600;border:none;cursor:pointer;
+  transition:all 0.25s;text-decoration:none;
+}
+.btn-primary{
+  background:var(--blue);color:var(--white);
+  box-shadow:0 4px 16px rgba(46,134,222,0.35);
+}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 6px 24px rgba(46,134,222,0.4)}
+.btn-secondary{
+  background:var(--white);color:var(--blue);
+  border:2px solid var(--blue);
+}
+.btn-secondary:hover{background:var(--blue-pale)}
+
+.hero-visual{display:flex;justify-content:center;align-items:center;position:relative}
+.hero-card{
+  background:var(--white);
+  border:1px solid var(--gray-200);
+  border-radius:20px;padding:2rem;
+  width:100%;max-width:380px;
+  box-shadow:var(--shadow-lg);
+  position:relative;
+}
+.hero-card::before{
+  content:'';position:absolute;top:-8px;right:-8px;
+  width:60px;height:60px;background:var(--green-pale);
+  border-radius:50%;z-index:-1;
+}
+.hero-card h3{
+  font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--blue);
+  display:flex;align-items:center;gap:0.4rem;
+}
+.hero-card h3::before{content:'';width:4px;height:20px;background:var(--blue);border-radius:2px}
+.hero-card ul{list-style:none;display:flex;flex-direction:column;gap:0.7rem}
+.hero-card li{
+  display:flex;align-items:center;gap:0.6rem;
+  font-size:0.9rem;color:var(--gray-600);font-weight:500;
+}
+.hero-card li .check{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--green-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;color:var(--green);flex-shrink:0;
+  font-weight:700;
+}
+
+/* ─── TRUST BAR ─── */
+.trust-bar{
+  background:var(--white);border-top:1px solid var(--gray-100);
+  border-bottom:1px solid var(--gray-100);
+  padding:1.5rem;
+}
+.trust-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;gap:3rem;
+  flex-wrap:wrap;
+}
+.trust-item{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.85rem;font-weight:600;color:var(--gray-600);
+}
+.trust-icon{font-size:1.3rem}
+
+/* ─── SECTION COMMON ─── */
+section{padding:5rem 1.5rem}
+.section-header{text-align:center;max-width:600px;margin:0 auto 3rem}
+.section-label{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  font-size:0.78rem;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:0.75rem;
+  background:var(--blue-pale);padding:0.3rem 0.8rem;border-radius:20px;
+}
+.section-title{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:2.3rem;font-weight:400;color:var(--gray-800);
+  line-height:1.25;margin-bottom:0.75rem;
+}
+.section-desc{font-size:1rem;color:var(--text-light);line-height:1.7}
+
+/* ─── SERVICES ─── */
+.services{background:var(--off-white)}
+.services-grid{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;
+}
+.service-card{
+  background:var(--white);border-radius:var(--radius);
+  padding:2rem;border:1px solid var(--gray-100);
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.service-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg, var(--blue), var(--blue-light));
+  transform:scaleX(0);transition:transform 0.3s;transform-origin:left;
+}
+.service-card:hover{
+  transform:translateY(-4px);box-shadow:var(--shadow-lg);
+}
+.service-card:hover::after{transform:scaleX(1)}
+.service-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:1.1rem;
+}
+.service-icon.house{background:var(--blue-pale)}
+.service-icon.sparkle{background:var(--yellow-pale)}
+.service-icon.move{background:var(--green-pale)}
+.service-icon.office{background:#f0e6ff}
+.service-icon.commercial{background:#fff1f0}
+.service-icon.construction{background:#fef3c7}
+.service-card h3{
+  font-size:1.05rem;font-weight:700;color:var(--gray-800);margin-bottom:0.5rem;
+}
+.service-card p{font-size:0.88rem;color:var(--text-light);line-height:1.7}
+
+/* ─── ABOUT ─── */
+.about{background:var(--white)}
+.about-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.about-image{
+  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+  border-radius:24px;aspect-ratio:4/3;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);position:relative;overflow:hidden;
+  box-shadow:0 20px 60px rgba(46,134,222,0.2);
+}
+.about-image::before{
+  content:'';position:absolute;top:20px;left:20px;right:20px;bottom:20px;
+  border:2px solid rgba(255,255,255,0.15);border-radius:16px;
+}
+.about-image::after{
+  content:'';position:absolute;bottom:-30px;right:-30px;
+  width:200px;height:200px;
+  background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius:50%;
+}
+.about-image-text{text-align:center;z-index:1}
+.about-image-text .big{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:4.5rem;font-weight:400;line-height:1;
+}
+.about-image-text .sub{
+  font-size:0.85rem;opacity:0.8;margin-top:0.5rem;text-transform:uppercase;
+  letter-spacing:0.12em;font-weight:500;
+}
+.about-content .section-label{text-align:left}
+.about-content h2{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:2rem;font-weight:400;color:var(--gray-800);
+  margin-bottom:1rem;line-height:1.3;
+}
+.about-content p{
+  font-size:0.95rem;color:var(--text-light);line-height:1.8;margin-bottom:1rem;
+}
+.about-stats{
+  display:flex;gap:2rem;margin-top:1.5rem;padding-top:1.5rem;
+  border-top:1px solid var(--gray-100);
+}
+.about-stat{text-align:center;flex:1}
+.about-stat strong{
+  display:block;font-size:1.8rem;color:var(--blue);font-weight:700;
+}
+.about-stat span{font-size:0.75rem;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
+
+/* ─── AREAS ─── */
+.areas{background:var(--off-white)}
+.areas-inner{max-width:1100px;margin:0 auto}
+.areas-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.area-card{
+  background:var(--white);border-radius:var(--radius);
+  padding:2rem;border:1px solid var(--gray-100);
+  transition:box-shadow 0.3s;
+}
+.area-card:hover{box-shadow:var(--shadow)}
+.area-card h3{
+  font-size:1.15rem;font-weight:700;color:var(--gray-800);margin-bottom:1rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.area-card h3 .pin{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--blue-pale);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
+.area-types{display:flex;flex-wrap:wrap;gap:0.4rem}
+.area-tag{
+  background:var(--gray-50);border:1px solid var(--gray-100);
+  padding:0.35rem 0.8rem;border-radius:8px;
+  font-size:0.82rem;color:var(--gray-600);font-weight:500;
+  transition:all 0.2s;
+}
+.area-tag:hover{background:var(--blue-pale);color:var(--blue);border-color:var(--blue-pale)}
+
+/* ─── REVIEWS ─── */
+.reviews{
+  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+  color:var(--white);text-align:center;padding:5rem 1.5rem;
+  position:relative;overflow:hidden;
+}
+.reviews::before{
+  content:'';position:absolute;top:50%;left:50%;
+  width:600px;height:600px;
+  background:radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.reviews-inner{max-width:700px;margin:0 auto;position:relative}
+.reviews .stars{
+  font-size:1.6rem;color:var(--yellow);letter-spacing:0.15em;margin-bottom:0.75rem;
+}
+.reviews h2{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:2.2rem;font-weight:400;margin-bottom:0.5rem;
+}
+.reviews p{opacity:0.8;font-size:0.95rem;margin-bottom:2.5rem}
+.review-quote{
+  font-size:1.2rem;font-style:italic;line-height:1.9;
+  opacity:0.95;max-width:550px;margin:0 auto 1rem;
+  font-weight:400;
+}
+.review-quote::before{
+  content:'\201C';display:block;
+  font-size:4rem;color:rgba(255,255,255,0.2);
+  font-family:'DM Serif Display',Georgia,serif;
+  line-height:1;margin-bottom:0.5rem;font-style:normal;
+}
+.review-source{
+  font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;
+  opacity:0.5;margin-top:1.5rem;font-weight:600;
+}
+
+/* ─── CONTACT / CTA ─── */
+.cta-section{background:var(--white);padding:5rem 1.5rem}
+.cta-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;
+}
+.cta-left h2{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:2.2rem;font-weight:400;color:var(--gray-800);
+  margin-bottom:0.75rem;line-height:1.3;
+}
+.cta-left p{font-size:0.95rem;color:var(--text-light);line-height:1.7;margin-bottom:1.5rem}
+.cta-phone{
+  display:inline-flex;align-items:center;gap:0.75rem;
+  font-size:1.5rem;font-weight:700;color:var(--blue);
+  margin-bottom:1.5rem;transition:color 0.2s;
+}
+.cta-phone:hover{color:var(--blue-dark)}
+.cta-phone .icon{
+  width:48px;height:48px;border-radius:14px;
+  background:var(--blue-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;
+}
+.cta-info{display:flex;flex-direction:column;gap:0.5rem}
+.cta-info-row{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.9rem;color:var(--gray-600);
+}
+.cta-info-row strong{color:var(--gray-800);font-weight:600}
+.cta-right{
+  background:var(--blue-50);border-radius:20px;padding:2rem;
+  border:1px solid rgba(46,134,222,0.1);
+}
+.cta-right h3{
+  font-size:1.1rem;font-weight:700;color:var(--gray-800);margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.cta-right h3::before{content:'';width:4px;height:18px;background:var(--blue);border-radius:2px}
+.hours-row{
+  display:flex;justify-content:space-between;
+  padding:0.7rem 0;border-bottom:1px solid rgba(46,134,222,0.08);
+  font-size:0.9rem;
+}
+.hours-row:last-child{border-bottom:none}
+.hours-row .day{font-weight:600;color:var(--gray-800)}
+.hours-row .time{color:var(--gray-500);font-weight:500}
+
+/* ─── FOOTER ─── */
+.footer{
+  background:var(--gray-800);color:var(--white);
+  padding:2.5rem 1.5rem;text-align:center;
+}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer p{font-size:0.82rem;opacity:0.5;line-height:1.6}
+.footer .brand{font-weight:700;opacity:0.9;margin-bottom:0.3rem;font-size:0.9rem}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .hero h1{font-size:2.6rem}
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+  .about-inner{grid-template-columns:1fr;gap:2rem}
+  .about-image{max-height:280px}
+  .cta-inner{grid-template-columns:1fr}
+  .areas-grid{grid-template-columns:1fr}
+  .trust-inner{gap:1.5rem}
+}
+
+@media(max-width:600px){
+  .hero{padding:7rem 1.25rem 3.5rem}
+  .hero h1{font-size:2.1rem}
+  .hero-sub{font-size:0.95rem}
+  .hero-actions{flex-direction:column}
+  .btn{justify-content:center;width:100%}
+  .services-grid{grid-template-columns:1fr}
+  section{padding:3.5rem 1.25rem}
+  .section-title{font-size:1.8rem}
+  .nav-links{
+    display:none;position:fixed;top:62px;left:0;right:0;
+    background:var(--white);flex-direction:column;
+    padding:1.5rem;gap:1rem;border-bottom:1px solid var(--gray-100);
+    box-shadow:var(--shadow-lg);
+  }
+  .nav-links.open{display:flex}
+  .hamburger{display:block}
+  .nav-cta{width:100%;text-align:center;justify-content:center}
+  .about-stats{gap:1rem}
+  .about-stat strong{font-size:1.4rem}
+  .cta-phone{font-size:1.2rem}
+  .trust-inner{gap:1rem}
+  .trust-item{font-size:0.78rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <div class="nav-logo"><svg viewBox="0 0 64 64" width="24" height="24" fill="none"><line x1="20" y1="10" x2="38" y2="44" stroke="#f5d9a0" stroke-width="5" stroke-linecap="round"/><path d="M30 40 Q32 38 46 42 Q48 43 48 45 L46 52 Q45 54 43 54 L29 50 Q27 49 27 47 Z" fill="#e8b84b"/><line x1="32" y1="42" x2="30" y2="52" stroke="#c8944a" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="43" x2="34" y2="53" stroke="#c8944a" stroke-width="2" stroke-linecap="round"/><line x1="40" y1="44" x2="38" y2="54" stroke="#c8944a" stroke-width="2" stroke-linecap="round"/><line x1="44" y1="45" x2="42" y2="53" stroke="#c8944a" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="18" r="2.5" fill="white" opacity="0.8"/><circle cx="48" cy="14" r="2" fill="white" opacity="0.6"/></svg></div>
+      <div class="nav-name">Daniela Rios<small>Cleaning Services</small></div>
+    </a>
+    <button class="hamburger" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#areas">Areas</a>
+      <a href="#contact" class="nav-cta">Get a Free Quote</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span>227 Reviews on Thumbtack</span>
+      </div>
+      <h1>Your Home Deserves to <span>Sparkle</span></h1>
+      <p class="hero-sub">Professional cleaning services for homes and businesses across Marin County and San Francisco. Detail-oriented, reliable, and trusted by hundreds of families.</p>
+      <div class="hero-actions">
+        <a href="tel:+14156120530" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          (415) 612-0530
+        </a>
+        <a href="#contact" class="btn btn-secondary">Request Free Estimate</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <h3>What We Handle</h3>
+        <ul>
+          <li><span class="check">&#10003;</span>Weekly &amp; bi-weekly home cleaning</li>
+          <li><span class="check">&#10003;</span>Deep spring cleaning</li>
+          <li><span class="check">&#10003;</span>Move-in &amp; move-out cleaning</li>
+          <li><span class="check">&#10003;</span>Office &amp; commercial spaces</li>
+          <li><span class="check">&#10003;</span>Post-construction cleanup</li>
+          <li><span class="check">&#10003;</span>Custom cleaning schedules</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── TRUST BAR ─── -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item"><span class="trust-icon">&#128170;</span> Insured & Bonded</div>
+    <div class="trust-item"><span class="trust-icon">&#9989;</span> Background Checked</div>
+    <div class="trust-item"><span class="trust-icon">&#127775;</span> 5-Star Rated</div>
+    <div class="trust-item"><span class="trust-icon">&#128155;</span> Eco-Friendly Products</div>
+  </div>
+</div>
+
+<!-- ─── SERVICES ─── -->
+<section class="services" id="services">
+  <div class="section-header">
+    <p class="section-label">Our Services</p>
+    <h2 class="section-title">Cleaning Solutions for Every Need</h2>
+    <p class="section-desc">From routine home cleaning to specialized post-construction cleanup, we tailor every visit to your space.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon house">&#127968;</div>
+      <h3>House Cleaning</h3>
+      <p>Weekly, bi-weekly, monthly, or one-time visits. Kitchens, bathrooms, bedrooms, and living areas cleaned to perfection.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon sparkle">&#10024;</div>
+      <h3>Spring Deep Cleaning</h3>
+      <p>Thorough top-to-bottom cleaning including inside ovens, refrigerators, cabinets, and hard-to-reach areas.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon move">&#128230;</div>
+      <h3>Move In / Move Out</h3>
+      <p>Get your deposit back or start fresh. We make sure every surface is spotless for the next chapter.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon office">&#127970;</div>
+      <h3>Office Cleaning</h3>
+      <p>Keep your workspace professional and hygienic. Regular or one-time cleaning for offices of all sizes.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon commercial">&#128722;</div>
+      <h3>Commercial Cleaning</h3>
+      <p>Retail stores, fitness facilities, schools, daycare centers, and places of worship. We handle it all.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon construction">&#128679;</div>
+      <h3>Post-Construction</h3>
+      <p>Dust, debris, and construction mess cleared away. We get your remodeled space move-in ready.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-image" role="img" aria-label="Daniela Rios Cleaning Services - years of experience">
+      <div class="about-image-text">
+        <div class="big">10+</div>
+        <div class="sub">Years of Experience</div>
+      </div>
+    </div>
+    <div class="about-content">
+      <p class="section-label">About Daniela</p>
+      <h2>A Great Eye for Details &amp; a Passion for Clean Spaces</h2>
+      <p>Daniela Rios brings a meticulous, detail-oriented approach to every home and business she cleans. Her team is serious, timely, proactive, and very thorough &mdash; qualities that have earned the trust of hundreds of clients across Marin County and San Francisco.</p>
+      <p>Whether it's a weekly visit to keep your home sparkling or a one-time deep clean before a big event, Daniela personally ensures every job meets her high standards.</p>
+      <div class="about-stats">
+        <div class="about-stat">
+          <strong>227+</strong>
+          <span>5-Star Reviews</span>
+        </div>
+        <div class="about-stat">
+          <strong>500+</strong>
+          <span>Happy Clients</span>
+        </div>
+        <div class="about-stat">
+          <strong>100%</strong>
+          <span>Satisfaction</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SERVICE AREAS ─── -->
+<section class="areas" id="areas">
+  <div class="section-header">
+    <p class="section-label">Service Areas</p>
+    <h2 class="section-title">Proudly Serving the Bay Area</h2>
+    <p class="section-desc">Based in Sausalito, we clean homes and businesses across Marin County and San Francisco.</p>
+  </div>
+  <div class="areas-inner">
+    <div class="areas-grid">
+      <div class="area-card">
+        <h3><span class="pin">&#128205;</span> Marin County</h3>
+        <div class="area-types">
+          <span class="area-tag">Sausalito</span>
+          <span class="area-tag">Mill Valley</span>
+          <span class="area-tag">Tiburon</span>
+          <span class="area-tag">Corte Madera</span>
+          <span class="area-tag">Larkspur</span>
+          <span class="area-tag">San Rafael</span>
+          <span class="area-tag">Novato</span>
+          <span class="area-tag">Kentfield</span>
+        </div>
+      </div>
+      <div class="area-card">
+        <h3><span class="pin">&#128205;</span> San Francisco</h3>
+        <div class="area-types">
+          <span class="area-tag">Pacific Heights</span>
+          <span class="area-tag">Marina</span>
+          <span class="area-tag">Presidio Heights</span>
+          <span class="area-tag">Nob Hill</span>
+          <span class="area-tag">Russian Hill</span>
+          <span class="area-tag">SOMA</span>
+          <span class="area-tag">Mission</span>
+          <span class="area-tag">Castro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── REVIEWS ─── -->
+<section class="reviews">
+  <div class="reviews-inner">
+    <div class="stars">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+    <h2>Loved by Our Clients</h2>
+    <p>5.0 rating from 227 reviews on Thumbtack</p>
+    <blockquote class="review-quote">
+      Daniela and her team are incredible. They have a great eye for details, are always on time, and leave our home spotless every single visit. We wouldn't trust anyone else.
+    </blockquote>
+    <div class="review-source">Verified Thumbtack Review</div>
+  </div>
+</section>
+
+<!-- ─── CONTACT / CTA ─── -->
+<section class="cta-section" id="contact">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <p class="section-label" style="text-align:left">Get in Touch</p>
+      <h2>Ready for a Cleaner, Happier Home?</h2>
+      <p>Call us today for a free, no-obligation estimate. We'll work with your schedule and customize a cleaning plan that fits your needs and budget.</p>
+      <a href="tel:+14156120530" class="cta-phone">
+        <span class="icon">&#128222;</span>
+        (415) 612-0530
+      </a>
+      <div class="cta-info">
+        <div class="cta-info-row"><strong>Address:</strong> Sausalito, CA 94965</div>
+        <div class="cta-info-row"><strong>Email:</strong> danielarioscleaning@gmail.com</div>
+      </div>
+    </div>
+    <div class="cta-right">
+      <h3>Business Hours</h3>
+      <div class="hours-row"><span class="day">Monday &ndash; Friday</span><span class="time">7:00 AM &ndash; 4:00 PM</span></div>
+      <div class="hours-row"><span class="day">Saturday</span><span class="time">7:00 AM &ndash; 1:00 PM</span></div>
+      <div class="hours-row"><span class="day">Sunday</span><span class="time">By Appointment</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <p class="brand">Daniela Rios Cleaning Services</p>
+    <p>&copy; 2026 Daniela Rios Cleaning Services. All rights reserved. Sausalito, CA.</p>
+  </div>
+</footer>
+
+<!-- ─── SCROLL NAV SHADOW ─── -->
+<script>
+window.addEventListener('scroll',()=>{
+  document.querySelector('.nav').classList.toggle('scrolled',window.scrollY>10);
+});
+</script>
+
+</body>
+</html>
