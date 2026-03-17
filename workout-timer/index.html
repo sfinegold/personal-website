@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sam's ATP Workout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff;
+      color: #061224;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .app { max-width: 480px; width: 100%; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-badge {
+      background: #00288B;
+      color: #FDD201;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #00288B;
+      margin: 0;
+    }
+    .log-link {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3C638E;
+      text-decoration: none;
+      border: 1px solid #c8cfe0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .log-link:hover { background: #f4f6fa; border-color: #3C638E; color: #00288B; }
+    .header-stripe {
+      height: 3px;
+      background: linear-gradient(90deg, #00288B 0%, #00288B 50%, #FDD201 50%, #FDD201 100%);
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Setup */
+    .exercise-row {
+      display: grid;
+      grid-template-columns: 1fr 60px 60px 50px 36px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .exercise-row input {
+      background: #f4f6fa;
+      border: 1px solid #c8cfe0;
+      border-radius: 6px;
+      color: #061224;
+      padding: 8px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+    }
+    .exercise-row input:focus { outline: none; border-color: #00288B; box-shadow: 0 0 0 2px rgba(0,40,139,0.15); }
+    .exercise-row input[type="number"] { text-align: center; padding: 8px 4px; }
+    .label-row {
+      display: grid;
+      grid-template-columns: 1fr 60px 60px 50px 36px;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .label-row span {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #3C638E;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #c8cfe0;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 4px;
+      height: 36px;
+    }
+    .remove-btn:hover { color: #e55; }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-add {
+      background: #f4f6fa;
+      color: #3C638E;
+      border: 1px dashed #c8cfe0;
+      width: 100%;
+      margin: 8px 0 1.5rem;
+    }
+    .btn-start { background: #00288B; color: #FDD201; width: 100%; font-size: 1.1rem; padding: 14px 20px; }
+    .btn-row { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .btn-row .btn { flex: 1; padding: 14px 20px; margin: 0; }
+    .btn-pause { background: #FDD201; color: #00288B; }
+    .btn-restart { background: #3C638E; color: #fff; }
+    .btn-stop { background: #e55; color: #fff; }
+    .btn-restart-round {
+      background: none;
+      border: 1px solid #c8cfe0;
+      color: #3C638E;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+    .btn-restart-round:hover { border-color: #3C638E; color: #00288B; }
+
+    /* Timer */
+    .timer-view { display: none; text-align: center; padding-top: 2rem; }
+    .timer-view.active { display: block; }
+    .setup-view.hidden { display: none; }
+    .phase {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .phase.work { color: #00288B; }
+    .phase.rest { color: #D4A800; }
+    .phase.ready { color: #3C638E; }
+    .phase.done { color: #FDD201; }
+    .exercise-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #061224;
+      margin-bottom: 0.3rem;
+    }
+    .set-info {
+      font-size: 0.9rem;
+      color: #3C638E;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+    .countdown {
+      font-family: 'Oswald', sans-serif;
+      font-size: 8rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin-bottom: 2rem;
+      color: #00288B;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: #e8ecf2;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #00288B;
+      transition: width 0.3s linear;
+    }
+    .upcoming { text-align: left; margin-top: 2rem; }
+    .upcoming h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      color: #3C638E;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .upcoming-item {
+      padding: 6px 0;
+      font-size: 0.85rem;
+      color: #7a8ba8;
+      border-bottom: 1px solid #e8ecf2;
+    }
+    .upcoming-item.current { color: #00288B; font-weight: 600; }
+
+    /* Completion toast */
+    .toast {
+      display: none;
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00288B;
+      color: #FDD201;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 100;
+      animation: toastIn 0.3s ease-out;
+    }
+    .toast.show { display: block; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Setup -->
+    <div class="setup-view" id="setup">
+      <div class="header">
+        <div class="header-left">
+          <h1>Sam's ATP Workout</h1>
+          <span class="header-badge">ATP</span>
+        </div>
+        <a href="log.html" class="log-link">Log</a>
+      </div>
+      <div class="header-stripe"></div>
+      <div class="label-row">
+        <span>Exercise</span>
+        <span>Work</span>
+        <span>Rest</span>
+        <span>Sets</span>
+        <span></span>
+      </div>
+      <div id="exercise-list"></div>
+      <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
+      <button class="btn btn-start" onclick="startWorkout()">Start Workout</button>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-view" id="timer">
+      <div class="btn-row" id="timer-btns">
+        <button class="btn btn-pause" id="pause-btn" onclick="togglePause()">Pause</button>
+        <button class="btn btn-restart" onclick="restartWorkout()">Restart</button>
+        <button class="btn btn-stop" onclick="stopWorkout()">Stop</button>
+      </div>
+      <div class="phase" id="phase">Work</div>
+      <div class="exercise-name" id="current-name">—</div>
+      <div class="set-info" id="set-info">Set 1 of 4</div>
+      <div class="countdown" id="countdown">30</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+      <button class="btn btn-go" id="go-btn" onclick="goPressed()" style="display:none; background:#00288B; color:#FDD201; width:100%; margin-top:1rem; font-size:1.2rem; padding:16px;">Go</button>
+      <button class="btn btn-restart-round" id="restart-round-btn" onclick="restartExercise()" style="display:none;">Restart Exercise</button>
+      <div class="upcoming" id="upcoming"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Workout logged ✓</div>
+
+  <script>
+    // ========== WORKOUT LOG DATABASE (localStorage) ==========
+    const DB_KEY = 'sam_workout_log';
+
+    function getWorkoutLog() {
+      try {
+        return JSON.parse(localStorage.getItem(DB_KEY)) || [];
+      } catch { return []; }
+    }
+
+    function logWorkout(data) {
+      const log = getWorkoutLog();
+      log.push({
+        id: Date.now(),
+        date: new Date().toISOString(),
+        exercises: data.exercises,
+        totalDuration: data.totalDuration,
+        completed: data.completed
+      });
+      localStorage.setItem(DB_KEY, JSON.stringify(log));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg || 'Workout logged ✓';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ========== TIMER STATE ==========
+    let exercises = [];
+    let timerInterval = null;
+    let paused = false;
+    let currentSeconds = 0;
+    let totalPhaseSeconds = 0;
+    let queue = [];
+    let queueIndex = 0;
+    let workoutStartTime = null;
+
+    // Audio beep using Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function beep(freq = 800, duration = 150, count = 1) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          gain.gain.value = 1.0;
+          osc.start(audioCtx.currentTime);
+          osc.stop(audioCtx.currentTime + duration / 1000);
+        }, i * (duration + 80));
+      }
+    }
+
+    function celebrationSound() {
+      const notes = [523, 659, 784, 1047, 784, 1047];
+      const durations = [150, 150, 150, 300, 150, 400];
+      let delay = 0;
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          gain.gain.value = 1.0;
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + durations[i] / 1000);
+          osc.start(audioCtx.currentTime);
+          osc.stop(audioCtx.currentTime + durations[i] / 1000);
+        }, delay);
+        delay += durations[i] + 50;
+      });
+    }
+
+    function addExercise(name = '', work = 30, rest = 15, sets = 4) {
+      const id = Date.now();
+      exercises.push({ id, name, work, rest, sets });
+      renderExercises();
+    }
+
+    function removeExercise(id) {
+      exercises = exercises.filter(e => e.id !== id);
+      renderExercises();
+    }
+
+    function renderExercises() {
+      const list = document.getElementById('exercise-list');
+      list.innerHTML = exercises.map((e, i) => `
+        <div class="exercise-row">
+          <input type="text" placeholder="Exercise ${i + 1}" value="${e.name}"
+            onchange="exercises[${i}].name = this.value">
+          <input type="number" value="${e.work}" min="5" step="5"
+            onchange="exercises[${i}].work = +this.value">
+          <input type="number" value="${e.rest}" min="0" step="5"
+            onchange="exercises[${i}].rest = +this.value">
+          <input type="number" value="${e.sets}" min="1"
+            onchange="exercises[${i}].sets = +this.value">
+          <button class="remove-btn" onclick="removeExercise(${e.id})">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    // Shift+Arrow to navigate between number inputs in the grid
+    document.addEventListener('keydown', (e) => {
+      if (!e.shiftKey || !e.target.matches('.exercise-row input[type="number"]')) return;
+      const row = e.target.closest('.exercise-row');
+      const rows = [...document.querySelectorAll('.exercise-row')];
+      const inputs = [...row.querySelectorAll('input[type="number"]')];
+      const colIdx = inputs.indexOf(e.target);
+      const rowIdx = rows.indexOf(row);
+
+      let target = null;
+      if (e.key === 'ArrowRight' && colIdx < inputs.length - 1) {
+        target = inputs[colIdx + 1];
+      } else if (e.key === 'ArrowLeft' && colIdx > 0) {
+        target = inputs[colIdx - 1];
+      } else if (e.key === 'ArrowDown' && rowIdx < rows.length - 1) {
+        target = [...rows[rowIdx + 1].querySelectorAll('input[type="number"]')][colIdx];
+      } else if (e.key === 'ArrowUp' && rowIdx > 0) {
+        target = [...rows[rowIdx - 1].querySelectorAll('input[type="number"]')][colIdx];
+      }
+      if (target) {
+        e.preventDefault();
+        target.focus();
+        target.select();
+      }
+    });
+
+    function buildQueue() {
+      queue = [];
+      const maxSets = Math.max(...exercises.map(e => e.sets));
+      for (let round = 1; round <= maxSets; round++) {
+        exercises.forEach((ex, idx) => {
+          if (round > ex.sets) return;
+          const name = ex.name || 'Exercise';
+          queue.push({ name, type: 'work', duration: ex.work, set: round, totalSets: ex.sets });
+          const isLastExInLastRound = round === maxSets && idx === exercises.length - 1;
+          if (ex.rest > 0 && !isLastExInLastRound) {
+            queue.push({ name, type: 'rest', duration: ex.rest, set: round, totalSets: ex.sets });
+          }
+        });
+      }
+    }
+
+    function startWorkout() {
+      if (exercises.length === 0) return;
+      // Sync input values
+      document.querySelectorAll('.exercise-row').forEach((row, i) => {
+        const inputs = row.querySelectorAll('input');
+        exercises[i].name = inputs[0].value;
+        exercises[i].work = +inputs[1].value;
+        exercises[i].rest = +inputs[2].value;
+        exercises[i].sets = +inputs[3].value;
+      });
+
+      workoutStartTime = new Date();
+      buildQueue();
+      queueIndex = 0;
+      paused = false;
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('timer').classList.add('active');
+      audioCtx.resume();
+      const phaseEl = document.getElementById('phase');
+      phaseEl.textContent = 'Up Next';
+      phaseEl.className = 'phase ready';
+      document.getElementById('current-name').textContent = queue[0]?.name || '';
+      document.getElementById('set-info').textContent = 'Round 1 of ' + queue[0]?.totalSets;
+      document.getElementById('countdown').textContent = '—';
+      document.getElementById('progress').style.width = '0%';
+      document.getElementById('go-btn').style.display = 'block';
+      document.getElementById('timer-btns').style.display = 'none';
+      document.getElementById('restart-round-btn').style.display = 'none';
+      renderUpcoming();
+    }
+
+    function startCountdown() {
+      const phaseEl = document.getElementById('phase');
+      phaseEl.textContent = 'Get Ready';
+      phaseEl.className = 'phase ready';
+      document.getElementById('current-name').textContent = queue[0]?.name || '';
+      document.getElementById('set-info').textContent = '';
+      document.getElementById('go-btn').style.display = 'none';
+      document.getElementById('timer-btns').style.display = 'none';
+      document.getElementById('restart-round-btn').style.display = 'none';
+      let secs = 5;
+      document.getElementById('countdown').textContent = secs;
+      document.getElementById('progress').style.width = '0%';
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secs--;
+        if (secs <= 3 && secs > 0) beep(600, 100, 1);
+        if (secs <= 0) {
+          clearInterval(timerInterval);
+          beep(800, 150, 2);
+          loadPhase();
+          return;
+        }
+        document.getElementById('countdown').textContent = secs;
+        document.getElementById('progress').style.width = ((5 - secs) / 5 * 100) + '%';
+      }, 1000);
+    }
+
+    function loadPhase() {
+      if (queueIndex >= queue.length) {
+        finishWorkout();
+        return;
+      }
+      const phase = queue[queueIndex];
+
+      const phaseEl = document.getElementById('phase');
+      phaseEl.textContent = phase.type;
+      phaseEl.className = 'phase ' + phase.type;
+      document.getElementById('current-name').textContent = phase.type === 'rest' ? 'Rest' : phase.name;
+      document.getElementById('set-info').textContent = `Round ${phase.set} of ${phase.totalSets}`;
+
+      renderUpcoming();
+
+      document.getElementById('go-btn').style.display = 'none';
+      document.getElementById('timer-btns').style.display = 'flex';
+      document.getElementById('restart-round-btn').style.display = 'block';
+      currentSeconds = phase.duration;
+      totalPhaseSeconds = phase.duration;
+
+      if (phase.type === 'work') {
+        beep(800, 150, 1);
+      } else {
+        beep(400, 200, 1);
+      }
+
+      updateDisplay();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    function goPressed() {
+      audioCtx.resume();
+      startCountdown();
+    }
+
+    function restartWorkout() {
+      clearInterval(timerInterval);
+      paused = false;
+      document.getElementById('pause-btn').textContent = 'Pause';
+      queueIndex = 0;
+      workoutStartTime = new Date();
+      const phaseEl = document.getElementById('phase');
+      phaseEl.textContent = 'Up Next';
+      phaseEl.className = 'phase ready';
+      document.getElementById('current-name').textContent = queue[0]?.name || '';
+      document.getElementById('set-info').textContent = 'Round 1 of ' + queue[0]?.totalSets;
+      document.getElementById('countdown').textContent = '—';
+      document.getElementById('progress').style.width = '0%';
+      document.getElementById('go-btn').style.display = 'block';
+      document.getElementById('timer-btns').style.display = 'none';
+      document.getElementById('restart-round-btn').style.display = 'none';
+      renderUpcoming();
+    }
+
+    function restartExercise() {
+      clearInterval(timerInterval);
+      paused = false;
+      document.getElementById('pause-btn').textContent = 'Pause';
+      if (queue[queueIndex]?.type === 'rest') {
+        queueIndex--;
+        while (queueIndex > 0 && queue[queueIndex].type !== 'work') queueIndex--;
+      } else {
+        while (queueIndex > 0 && queue[queueIndex - 1].type === 'work') queueIndex--;
+      }
+      loadPhase();
+    }
+
+    function tick() {
+      if (paused) return;
+      currentSeconds--;
+      if (currentSeconds <= 3 && currentSeconds > 0) beep(600, 100, 1);
+      if (currentSeconds <= 0) {
+        beep(800, 150, 3);
+        queueIndex++;
+        loadPhase();
+        return;
+      }
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById('countdown').textContent = currentSeconds;
+      const pct = ((totalPhaseSeconds - currentSeconds) / totalPhaseSeconds) * 100;
+      const fill = document.getElementById('progress');
+      fill.style.width = pct + '%';
+      fill.style.background = queue[queueIndex]?.type === 'rest' ? '#FDD201' : '#00288B';
+    }
+
+    function renderUpcoming() {
+      const container = document.getElementById('upcoming');
+      const currentRound = queue[queueIndex]?.set || 1;
+      const upcoming = queue.slice(queueIndex);
+      const roundItems = upcoming.filter(item => item.set === currentRound);
+      if (roundItems.length <= 1) { container.innerHTML = ''; return; }
+      container.innerHTML = `<h3>Round ${currentRound}</h3>` + roundItems.map((item, i) =>
+        `<div class="upcoming-item ${i === 0 ? 'current' : ''}">
+          ${item.type === 'rest' ? 'Rest' : item.name} — ${item.duration}s
+        </div>`
+      ).join('');
+    }
+
+    function togglePause() {
+      paused = !paused;
+      document.getElementById('pause-btn').textContent = paused ? 'Resume' : 'Pause';
+    }
+
+    function stopWorkout() {
+      clearInterval(timerInterval);
+      // Log as incomplete
+      const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
+      logWorkout({
+        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets })),
+        totalDuration: elapsed,
+        completed: false
+      });
+      showToast('Workout logged (stopped early)');
+      document.getElementById('setup').classList.remove('hidden');
+      document.getElementById('timer').classList.remove('active');
+    }
+
+    function finishWorkout() {
+      clearInterval(timerInterval);
+      const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
+
+      // Log completed workout
+      logWorkout({
+        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets })),
+        totalDuration: elapsed,
+        completed: true
+      });
+      showToast('Workout complete — logged ✓');
+
+      document.getElementById('phase').textContent = 'Done';
+      document.getElementById('phase').className = 'phase done';
+      document.getElementById('current-name').textContent = 'Workout Complete';
+      document.getElementById('set-info').textContent = '';
+      document.getElementById('countdown').textContent = '✓';
+      document.getElementById('progress').style.width = '100%';
+      document.getElementById('upcoming').innerHTML = '';
+      celebrationSound();
+    }
+
+    // Pre-fill with the tennis workout
+    addExercise('KB Rot. Press (L)', 20, 0, 4);
+    addExercise('KB Rot. Press (R)', 20, 15, 4);
+    addExercise('KB Single-Leg RDL (L)', 20, 0, 4);
+    addExercise('KB Single-Leg RDL (R)', 20, 20, 4);
+    addExercise('KB Half-Kneel Chop (L)', 15, 0, 4);
+    addExercise('KB Half-Kneel Chop (R)', 15, 15, 4);
+    addExercise('KB Goblet Squat Hold', 40, 20, 4);
+    addExercise('Dead Bugs', 45, 15, 4);
+  </script>
+</body>
+</html>

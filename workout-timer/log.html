@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff;
+      color: #061224;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .app { max-width: 540px; width: 100%; }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #00288B;
+    }
+    .back-link {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3C638E;
+      text-decoration: none;
+      border: 1px solid #c8cfe0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .back-link:hover { background: #f4f6fa; border-color: #3C638E; color: #00288B; }
+    .header-stripe {
+      height: 3px;
+      background: linear-gradient(90deg, #00288B 0%, #00288B 50%, #FDD201 50%, #FDD201 100%);
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Stats bar */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #f4f6fa;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00288B;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3C638E;
+      margin-top: 4px;
+    }
+
+    /* Streak calendar */
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #3C638E;
+      margin-bottom: 12px;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 2rem;
+    }
+    .cal-header {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: #7a8ba8;
+      text-align: center;
+      padding: 4px 0;
+      letter-spacing: 1px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #7a8ba8;
+      background: #f9fafb;
+    }
+    .cal-day.empty { background: transparent; }
+    .cal-day.today { border: 2px solid #00288B; color: #00288B; font-weight: 700; }
+    .cal-day.has-workout { background: #00288B; color: #FDD201; font-weight: 600; }
+    .cal-day.has-workout.partial { background: #3C638E; color: #fff; }
+    .cal-day.future { background: transparent; color: #c8cfe0; }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .month-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #061224;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .month-btn {
+      background: none;
+      border: 1px solid #c8cfe0;
+      color: #3C638E;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .month-btn:hover { border-color: #3C638E; color: #00288B; }
+
+    /* Log entries */
+    .log-entry {
+      border: 1px solid #e8ecf2;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 10px;
+      transition: all 0.15s;
+    }
+    .log-entry:hover { border-color: #c8cfe0; }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .log-date {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #00288B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .log-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .log-status.complete { background: #00288B; color: #FDD201; }
+    .log-status.partial { background: #f4f6fa; color: #3C638E; }
+    .log-duration {
+      font-size: 0.85rem;
+      color: #3C638E;
+      margin-bottom: 8px;
+    }
+    .log-exercises {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .log-exercise-tag {
+      font-size: 0.7rem;
+      background: #f4f6fa;
+      color: #3C638E;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #7a8ba8;
+    }
+    .empty-state p {
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .empty-state a {
+      color: #00288B;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #c8cfe0;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .delete-btn:hover { color: #e55; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="header-left">
+        <h1>Workout Log</h1>
+      </div>
+      <a href="index.html" class="back-link">← Timer</a>
+    </div>
+    <div class="header-stripe"></div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="total-count">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="this-month">0</div>
+        <div class="stat-label">This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="streak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="month-nav">
+      <button class="month-btn" onclick="prevMonth()">← Prev</button>
+      <span class="month-label" id="month-label">March 2026</span>
+      <button class="month-btn" onclick="nextMonth()">Next →</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
+
+    <!-- Workout history -->
+    <div class="section-title">History</div>
+    <div id="log-list"></div>
+  </div>
+
+  <script>
+    const DB_KEY = 'sam_workout_log';
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    let viewYear = new Date().getFullYear();
+    let viewMonth = new Date().getMonth();
+
+    function getLog() {
+      try {
+        return JSON.parse(localStorage.getItem(DB_KEY)) || [];
+      } catch { return []; }
+    }
+
+    function deleteEntry(id) {
+      let log = getLog();
+      log = log.filter(e => e.id !== id);
+      localStorage.setItem(DB_KEY, JSON.stringify(log));
+      render();
+    }
+
+    function formatDuration(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      if (m === 0) return `${s}s`;
+      return s > 0 ? `${m}m ${s}s` : `${m}m`;
+    }
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const day = d.getDate();
+      const month = MONTHS[d.getMonth()];
+      const year = d.getFullYear();
+      const hours = d.getHours();
+      const mins = d.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h = hours % 12 || 12;
+      return `${month} ${day}, ${year} · ${h}:${mins} ${ampm}`;
+    }
+
+    function getDateKey(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    }
+
+    function calcStreak(log) {
+      if (log.length === 0) return 0;
+      const completedDates = [...new Set(
+        log.filter(e => e.completed).map(e => getDateKey(e.date))
+      )].sort().reverse();
+
+      if (completedDates.length === 0) return 0;
+
+      const today = getDateKey(new Date().toISOString());
+      const yesterday = getDateKey(new Date(Date.now() - 86400000).toISOString());
+
+      // Streak must include today or yesterday
+      if (completedDates[0] !== today && completedDates[0] !== yesterday) return 0;
+
+      let streak = 1;
+      for (let i = 1; i < completedDates.length; i++) {
+        const prev = new Date(completedDates[i - 1]);
+        const curr = new Date(completedDates[i]);
+        const diff = (prev - curr) / 86400000;
+        if (diff === 1) streak++;
+        else break;
+      }
+      return streak;
+    }
+
+    function renderCalendar(log) {
+      const cal = document.getElementById('calendar');
+      document.getElementById('month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+      const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const today = new Date();
+
+      // Build set of workout days for this month
+      const workoutDays = {};
+      log.forEach(entry => {
+        const d = new Date(entry.date);
+        if (d.getMonth() === viewMonth && d.getFullYear() === viewYear) {
+          const day = d.getDate();
+          if (!workoutDays[day]) workoutDays[day] = { complete: false, partial: false };
+          if (entry.completed) workoutDays[day].complete = true;
+          else workoutDays[day].partial = true;
+        }
+      });
+
+      let html = DAYS.map(d => `<div class="cal-header">${d}</div>`).join('');
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="cal-day empty"></div>';
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isToday = viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate();
+        const isFuture = new Date(viewYear, viewMonth, day) > today;
+        const workout = workoutDays[day];
+
+        let cls = 'cal-day';
+        if (isToday) cls += ' today';
+        if (isFuture) cls += ' future';
+        if (workout?.complete) cls += ' has-workout';
+        else if (workout?.partial) cls += ' has-workout partial';
+
+        html += `<div class="${cls}">${day}</div>`;
+      }
+
+      cal.innerHTML = html;
+    }
+
+    function renderLog(log) {
+      const list = document.getElementById('log-list');
+      const sorted = [...log].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      if (sorted.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <p>No workouts logged yet.</p>
+            <a href="index.html">Start a workout →</a>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = sorted.map(entry => `
+        <div class="log-entry">
+          <div class="log-header">
+            <span class="log-date">${formatDate(entry.date)}</span>
+            <span>
+              <span class="log-status ${entry.completed ? 'complete' : 'partial'}">
+                ${entry.completed ? 'Complete' : 'Stopped'}
+              </span>
+              <button class="delete-btn" onclick="deleteEntry(${entry.id})" title="Delete">✕</button>
+            </span>
+          </div>
+          <div class="log-duration">${formatDuration(entry.totalDuration)}</div>
+          <div class="log-exercises">
+            ${(entry.exercises || []).map(ex =>
+              `<span class="log-exercise-tag">${ex.name || 'Exercise'} · ${ex.sets}×${ex.work}s</span>`
+            ).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderStats(log) {
+      document.getElementById('total-count').textContent = log.filter(e => e.completed).length;
+      const thisMonth = log.filter(e => {
+        const d = new Date(e.date);
+        const now = new Date();
+        return e.completed && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).length;
+      document.getElementById('this-month').textContent = thisMonth;
+      document.getElementById('streak').textContent = calcStreak(log);
+    }
+
+    function prevMonth() {
+      viewMonth--;
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      render();
+    }
+
+    function nextMonth() {
+      viewMonth++;
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      render();
+    }
+
+    function render() {
+      const log = getLog();
+      renderStats(log);
+      renderCalendar(log);
+      renderLog(log);
+    }
+
+    render();
+  </script>
+</body>
+</html>
