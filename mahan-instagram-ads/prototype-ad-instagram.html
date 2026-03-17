@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mahan for CA — Instagram Ad Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Figtree', sans-serif;
+    gap: 20px;
+  }
+  .label {
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Oswald', sans-serif;
+  }
+  .phone-frame {
+    width: 375px;
+    height: 667px;
+    border-radius: 40px;
+    border: 3px solid #333;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .ad {
+    width: 375px;
+    height: 667px;
+    position: relative;
+    overflow: hidden;
+    background: #204ce5;
+  }
+
+  /* Background elements */
+  .bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, #001AB3 0%, #204ce5 40%, #527EFF 100%);
+    z-index: 0;
+  }
+  .bg-grid {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 1;
+  }
+  .bg-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    top: -50px;
+    right: -80px;
+    z-index: 1;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* Content layers */
+  .content {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 28px 32px;
+  }
+
+  /* Top bar */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+    opacity: 0;
+    animation: fadeSlideDown 0.6s ease-out 0.3s forwards;
+  }
+  .logo-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+  .logo-name {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+  .logo-office {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    color: #7EE068;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .tag {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-family: 'Figtree', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  /* Hook — the problem/question */
+  .hook {
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeSlideUp 0.7s ease-out 0.8s forwards;
+    font-family: 'Figtree', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff8a8a;
+    line-height: 1.3;
+  }
+
+  /* Main headline */
+  .headline {
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeSlideUp 0.7s ease-out 1.2s forwards;
+  }
+  .headline h2 {
+    font-family: 'Figtree', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+  .headline h2 .gold {
+    color: #7EE068;
+  }
+
+  /* Subtext */
+  .subtext {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeSlideUp 0.6s ease-out 1.6s forwards;
+  }
+
+  /* CTA */
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    opacity: 0;
+    animation: fadeSlideUp 0.6s ease-out 2.0s forwards;
+  }
+  .cta-label {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.3px;
+  }
+  .cta-btn {
+    background: #fff;
+    color: #204ce5;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Bottom stripe */
+  .bottom-stripe {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #7EE068 0%, #7EE068 50%, #fff 50%, #fff 100%);
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-out 2.4s forwards;
+  }
+
+  /* Accent line removed */
+  .accent-line {
+    display: none;
+  }
+
+  /* Animations */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* Variant selector */
+  .variants {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .variant-btn {
+    background: #222;
+    border: 1px solid #444;
+    color: #aaa;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .variant-btn:hover, .variant-btn.active {
+    border-color: #527EFF;
+    color: #527EFF;
+    background: #1a1a1a;
+  }
+</style>
+</head>
+<body>
+
+<div class="label">Instagram Feed Ad — Prototype for Jake Heller</div>
+
+<div class="phone-frame">
+  <div class="ad" id="ad">
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="accent-line" id="accent-line"></div>
+
+    <div class="content" id="content">
+      <div class="top-bar">
+        <div class="logo-block">
+          <span class="logo-name">Matt Mahan</span>
+          <span class="logo-office">for Governor</span>
+        </div>
+        <div class="tag" id="tag">Young Renters</div>
+      </div>
+
+      <div class="hook" id="hook">
+        Can't afford a home in California? You're not alone.
+      </div>
+
+      <div class="headline">
+        <h2 id="headline">Matt built<br><span class="gold" id="headline-gold">4,000 new homes in San Jose.</span></h2>
+      </div>
+
+      <div class="subtext" id="subtext">
+        As mayor, he cut fees, streamlined permits, and got housing built. Now he's running to do it statewide.
+      </div>
+
+      <div class="cta">
+        <span class="cta-label" id="cta-label">&#x1F5D3; June 2nd is the primary</span>
+        <button class="cta-btn" id="cta-btn">Get your mail-in ballot →</button>
+      </div>
+    </div>
+
+    <div class="bottom-stripe"></div>
+  </div>
+</div>
+
+<div class="label" style="margin-top: 20px;">Get the Vote Out</div>
+<div class="variants">
+  <button class="variant-btn active" onclick="setVariant('housing')">Housing</button>
+  <button class="variant-btn" onclick="setVariant('schools')">Schools</button>
+  <button class="variant-btn" onclick="setVariant('taxes')">Taxes</button>
+  <button class="variant-btn" onclick="setVariant('safety')">Public Safety</button>
+</div>
+
+<div class="label" style="margin-top: 16px;">Drive to Events</div>
+<div class="variants">
+  <button class="variant-btn" onclick="setVariant('litdrop')">Lit Drop</button>
+  <button class="variant-btn" onclick="setVariant('townhall')">Town Hall</button>
+</div>
+
+<script>
+const variants = {
+  // --- GET THE VOTE OUT ---
+  housing: {
+    tag: 'Young Renters',
+    hook: 'Can\'t afford a home in California? You\'re not alone.',
+    headline: 'Matt built<br>',
+    headlineGold: '4,000 new homes in San Jose.',
+    subtext: 'As mayor, he cut fees, streamlined permits, and got housing built. Now he\'s running to do it statewide.',
+    ctaLabel: '\uD83D\uDDD3 June 2nd is the primary',
+    cta: 'Get your mail-in ballot →'
+  },
+  schools: {
+    tag: 'Parents',
+    hook: 'Want better schools for your kids? So does Matt.',
+    headline: 'A public school kid himself, Matt demanded<br>',
+    headlineGold: 'results for every dollar in SJ.',
+    subtext: 'He believes accountability matters as much as funding. As governor, he\'ll fight for world-class schools across California.',
+    ctaLabel: '\uD83D\uDDD3 June 2nd is the primary',
+    cta: 'Get your mail-in ballot →'
+  },
+  taxes: {
+    tag: 'Small Business',
+    hook: 'Tired of California taxing you out of business?',
+    headline: 'Matt promised<br>',
+    headlineGold: '$0 new taxes in San Jose.',
+    subtext: 'No wealth tax. No new business taxes. Root out waste first, then earn the right to ask for more. That\'s his record.',
+    ctaLabel: '\uD83D\uDDD3 June 2nd is the primary',
+    cta: 'Get your mail-in ballot →'
+  },
+  safety: {
+    tag: 'Public Safety',
+    hook: 'Tired of stepping over tents on your block?',
+    headline: 'Matt got 1,100+ people<br>',
+    headlineGold: 'off the streets — at 90% less cost.',
+    subtext: '7 shelters to 23. $100K per bed vs. $1M. Sheltered rate from 16% to 40% — the highest of any big city in CA. The only candidate with a real record.',
+    ctaLabel: '\uD83D\uDDD3 June 2nd is the primary',
+    cta: 'Get your mail-in ballot →'
+  },
+  // --- DRIVE TO EVENTS ---
+  litdrop: {
+    tag: 'This Weekend',
+    hook: 'Want to make a real difference in this election?',
+    headline: 'Join our lit drop<br>',
+    headlineGold: 'this Saturday.',
+    subtext: 'Walk your neighborhood, knock on doors, and help spread the word. Takes 2 hours. Makes a huge impact.',
+    ctaLabel: '',
+    cta: 'Sign Up Now'
+  },
+  townhall: {
+    tag: 'Town Hall',
+    hook: 'Got questions about California\'s future? Ask Matt directly.',
+    headline: 'Come to a<br>',
+    headlineGold: 'town hall near you.',
+    subtext: 'Matt is holding open town halls across the state. No scripts, no BS — just straight answers from the candidate.',
+    ctaLabel: '',
+    cta: 'RSVP Free'
+  }
+};
+
+function setVariant(key) {
+  const v = variants[key];
+  document.getElementById('tag').textContent = v.tag;
+  document.getElementById('hook').textContent = v.hook;
+  document.getElementById('headline').innerHTML = v.headline + '<span class="gold" id="headline-gold">' + v.headlineGold + '</span>';
+  document.getElementById('subtext').textContent = v.subtext;
+  document.getElementById('cta-btn').textContent = v.cta;
+  document.getElementById('cta-label').textContent = v.ctaLabel || '';
+
+  // Reset animations
+  const ad = document.getElementById('ad');
+  ad.style.display = 'none';
+  ad.offsetHeight; // force reflow
+  ad.style.display = '';
+
+  // Update active button
+  document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
