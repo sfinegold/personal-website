@@ -259,7 +259,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-number" id="streak">0</div>
-        <div class="stat-label">Day Streak</div>
+        <div class="stat-label">Week Streak</div>
       </div>
     </div>
 
@@ -321,26 +321,50 @@
       return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
     }
 
+    // Get Monday-based ISO week key: "YYYY-WW"
+    function getWeekKey(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      // Adjust to Monday as start of week (ISO)
+      const day = d.getDay() || 7; // Sunday = 7
+      d.setDate(d.getDate() + 4 - day); // Thursday of the week
+      const yearStart = new Date(d.getFullYear(), 0, 1);
+      const weekNum = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+      return `${d.getFullYear()}-${weekNum.toString().padStart(2, '0')}`;
+    }
+
+    // Get the Monday-based week key offset by N weeks from now
+    function getWeekKeyOffset(weeksAgo) {
+      const d = new Date();
+      d.setDate(d.getDate() - weeksAgo * 7);
+      return getWeekKey(d);
+    }
+
     function calcStreak(log) {
       if (log.length === 0) return 0;
-      const completedDates = [...new Set(
-        log.filter(e => e.completed).map(e => getDateKey(e.date))
-      )].sort().reverse();
 
-      if (completedDates.length === 0) return 0;
+      // Count completed workouts per week
+      const weekCounts = {};
+      log.filter(e => e.completed).forEach(e => {
+        const wk = getWeekKey(new Date(e.date));
+        weekCounts[wk] = (weekCounts[wk] || 0) + 1;
+      });
 
-      const today = getDateKey(new Date().toISOString());
-      const yesterday = getDateKey(new Date(Date.now() - 86400000).toISOString());
+      // A qualifying week has 2+ completed workouts
+      const thisWeek = getWeekKeyOffset(0);
+      const lastWeek = getWeekKeyOffset(1);
 
-      // Streak must include today or yesterday
-      if (completedDates[0] !== today && completedDates[0] !== yesterday) return 0;
+      // Streak must include this week or last week
+      const startOffset = (weekCounts[thisWeek] || 0) >= 2 ? 0
+        : (weekCounts[lastWeek] || 0) >= 2 ? 1
+        : -1;
 
-      let streak = 1;
-      for (let i = 1; i < completedDates.length; i++) {
-        const prev = new Date(completedDates[i - 1]);
-        const curr = new Date(completedDates[i]);
-        const diff = (prev - curr) / 86400000;
-        if (diff === 1) streak++;
+      if (startOffset === -1) return 0;
+
+      let streak = 0;
+      for (let i = startOffset; ; i++) {
+        const wk = getWeekKeyOffset(i);
+        if ((weekCounts[wk] || 0) >= 2) streak++;
         else break;
       }
       return streak;
