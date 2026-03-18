@@ -254,6 +254,77 @@
       from { opacity: 0; transform: translateX(-50%) translateY(20px); }
       to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
+
+    /* Celebration confetti */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 90;
+      overflow: hidden;
+    }
+    .confetti {
+      position: absolute;
+      top: -20px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg) scale(0.5); opacity: 0; }
+    }
+
+    /* Completion overlay */
+    .completion-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 40, 139, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .completion-overlay.show { opacity: 1; }
+    .completion-check {
+      font-size: 5rem;
+      color: #FDD201;
+      animation: checkPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+    }
+    .completion-text {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-top: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.3s forwards;
+    }
+    .completion-subtext {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.4s ease 0.8s forwards;
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -626,6 +697,38 @@
       document.getElementById('timer').classList.remove('active');
     }
 
+    function launchConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+      const colors = ['#FDD201', '#00288B', '#3C638E', '#fff', '#e55', '#4CAF50'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (Math.random() * 8 + 6) + 'px';
+        piece.style.height = (Math.random() * 8 + 6) + 'px';
+        piece.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+        piece.style.animationDelay = (Math.random() * 0.8) + 's';
+        container.appendChild(piece);
+      }
+      setTimeout(() => container.remove(), 4000);
+    }
+
+    function showCompletionOverlay() {
+      const overlay = document.createElement('div');
+      overlay.className = 'completion-overlay';
+      overlay.innerHTML = `
+        <div class="completion-check">✓</div>
+        <div class="completion-text">Workout Complete</div>
+        <div class="completion-subtext">Heading to your log…</div>
+      `;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('show'));
+      return overlay;
+    }
+
     function finishWorkout() {
       clearInterval(timerInterval);
       const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
@@ -636,16 +739,16 @@
         totalDuration: elapsed,
         completed: true
       });
-      showToast('Workout complete — logged ✓');
 
-      document.getElementById('phase').textContent = 'Done';
-      document.getElementById('phase').className = 'phase done';
-      document.getElementById('current-name').textContent = 'Workout Complete';
-      document.getElementById('set-info').textContent = '';
-      document.getElementById('countdown').textContent = '✓';
-      document.getElementById('progress').style.width = '100%';
-      document.getElementById('upcoming').innerHTML = '';
+      // Celebration sequence
       celebrationSound();
+      launchConfetti();
+      const overlay = showCompletionOverlay();
+
+      // Redirect to log after celebration
+      setTimeout(() => {
+        window.location.href = '/workout-timer/log';
+      }, 3000);
     }
 
     // Pre-fill with the tennis workout
