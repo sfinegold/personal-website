@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tennis Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#E6BE00" stroke-width="1"/>
+        <path d="M6 6 C10 12, 14 12, 18 18 M6 18 C10 12, 14 12, 18 6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-brand-text">SwingVision</span>
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="coaching.html" class="nav-link">Coaching</a>
+      <a href="#" class="nav-refer-btn">Refer</a>
+      <a href="profile.html" class="nav-user-avatar" title="Profile &amp; Settings">SF</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Stats Grid -->
+  <section class="page-section">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value">4 wk</div>
+        <div class="stat-detail">Since Jan 27</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sessions (Feb)</div>
+        <div class="stat-value">6</div>
+        <div class="stat-detail">Avg 3/week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Hours (Feb)</div>
+        <div class="stat-value">9.5h</div>
+        <div class="stat-detail">Avg 1.5h/session</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value">75%</div>
+        <div class="stat-detail">6W &ndash; 2L</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shot Analysis -->
+  <section class="page-section">
+    <h2 class="section-title">Shot Analysis <span class="section-subtitle">(Last 6 sessions)</span></h2>
+
+    <div class="toggle-group">
+      <button class="toggle-btn active" data-target="forehand">Forehand</button>
+      <button class="toggle-btn" data-target="backhand">Backhand</button>
+      <button class="toggle-btn" data-target="serve">Serve</button>
+    </div>
+
+    <!-- Forehand Panel -->
+    <div class="analysis-panel active" data-panel="forehand">
+      <div id="summary-forehand"></div>
+      <div class="metric-toggles">
+        <button class="metric-btn active" data-metric="pctIn">% In</button>
+        <button class="metric-btn" data-metric="speed">Speed</button>
+        <button class="metric-btn" data-metric="crossCourt">Cross-court</button>
+        <button class="metric-btn" data-metric="dtl">Down the Line</button>
+      </div>
+      <div class="chart-container" id="chart-forehand"></div>
+    </div>
+
+    <!-- Backhand Panel -->
+    <div class="analysis-panel" data-panel="backhand">
+      <div id="summary-backhand"></div>
+      <div class="metric-toggles">
+        <button class="metric-btn active" data-metric="pctIn">% In</button>
+        <button class="metric-btn" data-metric="speed">Speed</button>
+        <button class="metric-btn" data-metric="crossCourt">Cross-court</button>
+        <button class="metric-btn" data-metric="dtl">Down the Line</button>
+      </div>
+      <div class="chart-container" id="chart-backhand"></div>
+    </div>
+
+    <!-- Serve Panel -->
+    <div class="analysis-panel" data-panel="serve">
+      <div id="summary-serve"></div>
+      <div class="metric-toggles">
+        <button class="metric-btn active" data-metric="firstIn">1st In %</button>
+        <button class="metric-btn" data-metric="speed">Speed</button>
+        <button class="metric-btn" data-metric="secondIn">2nd In %</button>
+        <button class="metric-btn" data-metric="secondSpeed">2nd Speed</button>
+      </div>
+      <div class="chart-container" id="chart-serve"></div>
+    </div>
+  </section>
+
+  <!-- AI Recommendations -->
+  <section class="page-section">
+    <h2 class="section-title">SwingVision AI Recommendations</h2>
+    <div class="rec-card">
+      <h3>Based on your last 6 sessions</h3>
+      <ul class="rec-list">
+        <li><strong>Forehand cross-court is your most reliable shot</strong> (78% in). Keep building points around it. Your down-the-line forehand (61% in) is the clear area to improve &mdash; work on depth control before going for pace.</li>
+        <li><strong>Backhand consistency is costing you points</strong> &mdash; 65% in overall, dropping to 54% down the line. Prioritize getting the ball deep cross-court in neutral rallies rather than changing direction under pressure.</li>
+        <li><strong>First serve percentage needs work</strong> (62%). At your level, aim for 65%+. Your second serve is solid at 85% and the 5% double fault rate is manageable. Try reducing first serve speed slightly to gain consistency.</li>
+        <li><strong>Overall:</strong> You&rsquo;re winning 75% of matches by being patient cross-court. Resist the urge to go down the line too early &mdash; wait for a shorter ball before changing direction.</li>
+      </ul>
+    </div>
+
+    <!-- Coach Upsell -->
+    <div class="coach-upsell-card">
+      <div class="coach-upsell-icon">&#127934;</div>
+      <div class="coach-upsell-body">
+        <h3 class="coach-upsell-title">Get expert coaching feedback</h3>
+        <p class="coach-upsell-text">Coach Dylan reviews your sessions and gives personalized drills to improve your game.</p>
+        <a href="coaching.html" class="coach-upsell-cta">View Coaching &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Recent Coach Feedback -->
+    <h3 class="section-subtitle-heading">Latest from Coach Dylan</h3>
+
+    <div class="coach-preview-card">
+      <div class="review-date">February 15, 2026</div>
+      <div class="review-focus">Cross-court consistency &amp; footwork</div>
+      <p class="review-text-preview">Forehand cross-court depth has improved noticeably. Still pulling the backhand short under pressure. Footwork is better on approach shots &mdash; the split step timing is more consistent.</p>
+      <a href="coaching.html" class="coach-preview-link">Read full review &rarr;</a>
+    </div>
+
+    <div class="coach-preview-card">
+      <div class="review-date">February 1, 2026</div>
+      <div class="review-focus">Point construction &amp; shot selection</div>
+      <p class="review-text-preview">Good progress on building points with the forehand cross-court. The attack pattern is becoming more natural. Need more patience in neutral rallies &mdash; still going for too much too early on the backhand side.</p>
+      <a href="coaching.html" class="coach-preview-link">Read full review &rarr;</a>
+    </div>
+  </section>
+
+  <!-- Recent Videos -->
+  <section class="page-section">
+    <h2 class="section-title">Recent Videos</h2>
+    <div class="videos-scroll">
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Full Match</div>
+          <div class="video-meta">Feb 20 &middot; vs Nathan</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Full Match</div>
+          <div class="video-meta">Feb 17 &middot; vs DK</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Practice</div>
+          <div class="video-meta">Feb 13 &middot; vs Yuning</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Full Match</div>
+          <div class="video-meta">Feb 10 &middot; vs Shaun</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Highlights Reel</div>
+          <div class="video-meta">Feb 7 &middot; vs Nathan</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb"><div class="video-play-icon">&#9654;</div></div>
+        <div class="video-body">
+          <div class="video-title">Full Match</div>
+          <div class="video-meta">Feb 3 &middot; vs DK</div>
+          <div class="video-location">Margaret Hayward Tennis Courts</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sessions Feed -->
+  <section class="page-section">
+    <h2 class="section-title">Sessions</h2>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 20, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 30m</strong></span>
+        <span class="session-stat"><strong>342</strong> shots</span>
+        <span class="session-stat"><strong>2.1 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Nathan &nbsp; 6-4, 6-3 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>52 mph</strong></span>
+        <span class="session-stat">BH avg <strong>45 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 17, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 45m</strong></span>
+        <span class="session-stat"><strong>410</strong> shots</span>
+        <span class="session-stat"><strong>2.5 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs DK &nbsp; 3-6, 6-7(5) &nbsp; <span class="badge badge-loss">L</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>51 mph</strong></span>
+        <span class="session-stat">BH avg <strong>44 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 13, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 45m</strong></span>
+        <span class="session-stat"><strong>380</strong> shots</span>
+        <span class="session-stat"><strong>2.3 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Yuning &nbsp; 6-2, 6-1 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>54 mph</strong></span>
+        <span class="session-stat">BH avg <strong>46 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 10, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 30m</strong></span>
+        <span class="session-stat"><strong>315</strong> shots</span>
+        <span class="session-stat"><strong>1.9 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Shaun &nbsp; 6-3, 4-6, 7-5 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>50 mph</strong></span>
+        <span class="session-stat">BH avg <strong>43 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 7, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 30m</strong></span>
+        <span class="session-stat"><strong>290</strong> shots</span>
+        <span class="session-stat"><strong>1.8 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Nathan &nbsp; 6-4, 6-2 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>53 mph</strong></span>
+        <span class="session-stat">BH avg <strong>45 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Feb 3, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 30m</strong></span>
+        <span class="session-stat"><strong>355</strong> shots</span>
+        <span class="session-stat"><strong>2.2 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs DK &nbsp; 7-5, 3-6, 6-4 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>49 mph</strong></span>
+        <span class="session-stat">BH avg <strong>42 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Jan 30, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 15m</strong></span>
+        <span class="session-stat"><strong>268</strong> shots</span>
+        <span class="session-stat"><strong>1.6 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Yuning &nbsp; 6-1, 6-3 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>52 mph</strong></span>
+        <span class="session-stat">BH avg <strong>44 mph</strong></span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-header">
+        <span class="session-date">Jan 27, 2026</span>
+        <span class="session-location">Margaret Hayward Tennis Courts</span>
+      </div>
+      <div class="session-stats">
+        <span class="session-stat"><strong>1h 30m</strong></span>
+        <span class="session-stat"><strong>310</strong> shots</span>
+        <span class="session-stat"><strong>1.9 mi</strong></span>
+      </div>
+      <div class="session-score">
+        vs Sharan &nbsp; 4-6, 6-3, 6-4 &nbsp; <span class="badge badge-win">W</span>
+      </div>
+      <div class="session-stats" style="margin-top: 6px">
+        <span class="session-stat">FH avg <strong>50 mph</strong></span>
+        <span class="session-stat">BH avg <strong>43 mph</strong></span>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script src="frappe-charts.min.js"></script>
+<script>
+const LABELS = ["Jan 27", "Jan 30", "Feb 3", "Feb 7", "Feb 10", "Feb 13", "Feb 17", "Feb 20"];
+
+const DATA = {
+  forehand: {
+    pctIn:      { name: "% In",          unit: "%",   values: [68, 70, 74, 69, 73, 75, 71, 72], b40: 70, b45: 78 },
+    speed:      { name: "Avg Speed",     unit: "mph", values: [50, 51, 53, 52, 54, 52, 53, 52], b40: 65, b45: 75 },
+    crossCourt: { name: "Cross-court %", unit: "%",   values: [72, 75, 78, 74, 80, 76, 79, 78], b40: 54, b45: 60 },
+    dtl:        { name: "Down the Line %", unit: "%", values: [55, 58, 60, 57, 63, 62, 59, 61], b40: 50, b45: 56 }
+  },
+  backhand: {
+    pctIn:      { name: "% In",          unit: "%",   values: [60, 62, 64, 61, 66, 67, 63, 65], b40: 65, b45: 74 },
+    speed:      { name: "Avg Speed",     unit: "mph", values: [42, 43, 44, 42, 45, 44, 43, 44], b40: 58, b45: 68 },
+    crossCourt: { name: "Cross-court %", unit: "%",   values: [65, 68, 70, 67, 72, 73, 69, 71], b40: 50, b45: 57 },
+    dtl:        { name: "Down the Line %", unit: "%", values: [48, 50, 52, 49, 55, 56, 52, 54], b40: 48, b45: 54 }
+  },
+  serve: {
+    firstIn:  { name: "1st Serve In %",  unit: "%",   values: [58, 60, 63, 59, 64, 61, 60, 62], b40: 55, b45: 62 },
+    speed:    { name: "1st Serve Speed",  unit: "mph", values: [92, 93, 95, 91, 96, 94, 93, 94], b40: 90, b45: 105 },
+    secondIn:    { name: "2nd Serve In %",    unit: "%",   values: [82, 83, 85, 84, 86, 85, 84, 85], b40: 80, b45: 85 },
+    secondSpeed: { name: "2nd Serve Speed",  unit: "mph", values: [68, 70, 71, 69, 72, 70, 71, 72], b40: 65, b45: 75 }
+  }
+};
+
+const charts = {};
+let currentMetric = { forehand: "pctIn", backhand: "pctIn", serve: "firstIn" };
+
+function getNtrpLevel(value, b40, b45) {
+  if (value < b40) return { label: "< 4.0", cls: "below" };
+  if (value >= b45) return { label: "> 4.5", cls: "above" };
+  return { label: "4.0–4.5", cls: "mid" };
+}
+
+function formatValue(value, unit) {
+  return unit === "%" ? value + "%" : value + " " + unit;
+}
+
+function renderSummary(shotType) {
+  const container = document.getElementById(`summary-${shotType}`);
+  const metrics = DATA[shotType];
+  let html = `<table class="summary-table"><thead><tr><th>Metric</th><th>Current</th><th>NTRP Level</th></tr></thead><tbody>`;
+  for (const [key, d] of Object.entries(metrics)) {
+    const current = d.values[d.values.length - 1];
+    const level = getNtrpLevel(current, d.b40, d.b45);
+    const selected = currentMetric[shotType] === key ? " selected" : "";
+    html += `<tr data-metric="${key}" class="${selected}">`;
+    html += `<td class="metric-name">${d.name}</td>`;
+    html += `<td class="metric-value">${formatValue(current, d.unit)}</td>`;
+    html += `<td><span class="ntrp-badge ${level.cls}">${level.label}</span></td>`;
+    html += `</tr>`;
+  }
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+
+  // Click handler for rows
+  container.querySelectorAll("tr[data-metric]").forEach(row => {
+    row.addEventListener("click", () => {
+      const metric = row.dataset.metric;
+      selectMetric(shotType, metric);
+    });
+  });
+}
+
+function selectMetric(shotType, metric) {
+  const panel = document.querySelector(`[data-panel="${shotType}"]`);
+  // Update metric sub-toggle
+  panel.querySelectorAll(".metric-btn").forEach(b => b.classList.remove("active"));
+  const btn = panel.querySelector(`.metric-btn[data-metric="${metric}"]`);
+  if (btn) btn.classList.add("active");
+  // Update summary table row highlight
+  panel.querySelectorAll(".summary-table tr").forEach(r => r.classList.remove("selected"));
+  const row = panel.querySelector(`.summary-table tr[data-metric="${metric}"]`);
+  if (row) row.classList.add("selected");
+  // Render chart
+  renderChart(shotType, metric);
+}
+
+function renderChart(shotType, metric) {
+  const d = DATA[shotType][metric];
+  const containerId = `chart-${shotType}`;
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  charts[shotType] = new frappe.Chart(`#${containerId}`, {
+    type: "line",
+    height: 280,
+    data: {
+      labels: LABELS,
+      datasets: [{ name: d.name, values: d.values }],
+      yMarkers: [
+        { label: "NTRP 4.0", value: d.b40, options: { labelPos: "right" } },
+        { label: "NTRP 4.5", value: d.b45, options: { labelPos: "right" } }
+      ]
+    },
+    colors: ["#00C9B7"],
+    lineOptions: { regionFill: 1, spline: 1, dotSize: 4 },
+    axisOptions: { xIsSeries: true },
+    tooltipOptions: {
+      formatTooltipY: v => v + (d.unit === "%" ? "%" : " " + d.unit)
+    }
+  });
+
+  currentMetric[shotType] = metric;
+  // Update summary row highlight
+  const panel = document.querySelector(`[data-panel="${shotType}"]`);
+  panel.querySelectorAll(".summary-table tr").forEach(r => r.classList.remove("selected"));
+  const row = panel.querySelector(`.summary-table tr[data-metric="${metric}"]`);
+  if (row) row.classList.add("selected");
+}
+
+// Shot-type toggle
+document.querySelectorAll(".toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".analysis-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    const panel = document.querySelector(`[data-panel="${btn.dataset.target}"]`);
+    panel.classList.add("active");
+    const shotType = btn.dataset.target;
+    renderSummary(shotType);
+    renderChart(shotType, currentMetric[shotType]);
+  });
+});
+
+// Metric sub-toggle
+document.querySelectorAll(".metric-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const panel = btn.closest(".analysis-panel");
+    panel.querySelectorAll(".metric-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const shotType = panel.dataset.panel;
+    selectMetric(shotType, btn.dataset.metric);
+  });
+});
+
+// Initial render
+renderSummary("forehand");
+renderChart("forehand", "pctIn");
+</script>
+
+</body>
+</html>

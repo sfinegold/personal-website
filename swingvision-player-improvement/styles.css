@@ -1,0 +1,500 @@
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #fafafa;
+  color: #333;
+  line-height: 1.5;
+}
+a { color: #00C9B7; text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3 { color: #264653; margin: 0 0 8px; }
+
+/* === Layout === */
+.container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+.page-section { margin: 32px 0; }
+.section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+.section-subtitle { font-size: 13px; color: #999; font-weight: 400; }
+
+/* === Nav Bar (Dark) === */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  border-bottom: none;
+  z-index: 100;
+  padding: 0 20px;
+}
+.nav-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+}
+
+/* Brand (left) */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.nav-brand:hover { text-decoration: none; }
+.nav-logo { flex-shrink: 0; }
+.nav-brand-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+/* Actions (right) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.nav-link {
+  font-size: 14px;
+  color: #aaa;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-link:hover { color: #fff; text-decoration: none; }
+.nav-link.active { color: #00C9B7; border-bottom-color: #00C9B7; }
+
+/* Refer button */
+.nav-refer-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: #00C9B7;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-refer-btn:hover { background: #00b5a5; text-decoration: none; }
+
+/* User avatar (right) */
+.nav-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #00C9B7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.nav-user-avatar:hover { border-color: #00C9B7; text-decoration: none; }
+.nav-user-avatar.active { border-color: #00C9B7; }
+
+/* === Stats Grid === */
+.stats-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.stat-card {
+  flex: 1 1 140px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+  min-width: 140px;
+}
+.stat-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 28px; font-weight: 700; color: #264653; margin: 4px 0 2px; }
+.stat-detail { font-size: 12px; color: #999; }
+
+/* === Toggle Buttons === */
+.toggle-group {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  width: fit-content;
+}
+.toggle-btn {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  border-right: 1px solid #e5e5e5;
+  transition: background 0.15s, color 0.15s;
+}
+.toggle-btn:last-child { border-right: none; }
+.toggle-btn:hover { background: #f5f5f5; color: #333; }
+.toggle-btn.active { background: #00C9B7; color: #fff; }
+
+/* === Analysis Panels === */
+.analysis-panel { display: none; }
+.analysis-panel.active { display: block; }
+
+/* === Metric Sub-Toggles === */
+.metric-toggles {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.metric-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.metric-btn:hover { color: #333; }
+.metric-btn.active { color: #00C9B7; border-bottom-color: #00C9B7; font-weight: 600; }
+
+/* === Summary Stats Table === */
+.summary-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.summary-table th {
+  text-align: left;
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.summary-table td {
+  padding: 8px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.summary-table tr { cursor: pointer; transition: background 0.1s; }
+.summary-table tr:hover { background: #f8f8f8; }
+.summary-table tr.selected { background: #f0faf8; }
+.summary-table .metric-name { color: #333; font-weight: 500; }
+.summary-table .metric-value { font-weight: 600; color: #264653; }
+.ntrp-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ntrp-badge.below { background: #fde8ea; color: #E63946; }
+.ntrp-badge.mid { background: #f0f0f0; color: #666; }
+.ntrp-badge.above { background: #e0f7f4; color: #00C9B7; }
+
+/* === Chart Container === */
+.chart-container { min-height: 280px; }
+
+/* Frappe Charts theme overrides */
+.chart-container .frappe-chart .title { display: none; }
+.chart-container .frappe-chart .chart-legend { display: none; }
+
+/* === Bar Chart === */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bar-label { font-size: 13px; color: #666; width: 140px; flex-shrink: 0; }
+.bar-track {
+  flex: 1;
+  height: 24px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: #00C9B7;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.bar-value { font-size: 13px; color: #333; font-weight: 600; width: 60px; text-align: right; flex-shrink: 0; }
+
+/* === Inline Stats Row (for serve extras) === */
+.stat-pills {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+.stat-pill {
+  font-size: 13px;
+  color: #666;
+}
+.stat-pill strong { color: #264653; }
+.stat-pill.danger strong { color: #E63946; }
+
+/* === Recommendation Card === */
+.rec-card {
+  background: #f0faf8;
+  border: 1px solid #d0ece8;
+  border-left: 4px solid #00C9B7;
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+.rec-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #264653;
+  margin: 0 0 10px;
+}
+.rec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.rec-list li {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  padding: 4px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.rec-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #00C9B7;
+  font-weight: 600;
+}
+
+/* === Video Cards (horizontal scroll) === */
+.videos-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+}
+.videos-scroll::-webkit-scrollbar { height: 4px; }
+.videos-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+.video-card {
+  flex: 0 0 200px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.video-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.video-thumb {
+  height: 112px;
+  background: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.video-play-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.15s;
+}
+.video-card:hover .video-play-icon { background: rgba(0,201,183,0.8); }
+.video-body { padding: 10px 12px; }
+.video-title { font-size: 13px; font-weight: 600; color: #264653; }
+.video-meta { font-size: 12px; color: #666; margin-top: 2px; }
+.video-location { font-size: 11px; color: #999; margin-top: 2px; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-win { background: #e0f7f4; color: #00C9B7; }
+.badge-loss { background: #fde8ea; color: #E63946; }
+
+/* === Session Cards === */
+.session-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.session-date { font-size: 14px; font-weight: 600; color: #264653; }
+.session-location { font-size: 12px; color: #999; }
+.session-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.session-stat { font-size: 13px; color: #666; }
+.session-stat strong { color: #333; }
+.session-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* === Profile === */
+.profile-header { text-align: center; padding: 32px 0 16px; }
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #00C9B7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 auto 12px;
+}
+.profile-name { font-size: 24px; font-weight: 700; color: #264653; }
+.profile-location { font-size: 14px; color: #999; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0;
+}
+.info-grid dt {
+  font-size: 13px;
+  color: #999;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.info-grid dd {
+  margin: 0;
+  font-size: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.partners-list { list-style: none; padding: 0; margin: 0; }
+.partners-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.partner-note { color: #999; font-size: 13px; }
+
+/* === Coaching === */
+.coach-header {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.coach-name { font-size: 20px; font-weight: 700; color: #264653; }
+.coach-detail { font-size: 13px; color: #999; margin-top: 4px; }
+
+.review-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.review-date { font-size: 13px; color: #999; margin-bottom: 4px; }
+.review-focus { font-size: 14px; font-weight: 600; color: #264653; margin-bottom: 8px; }
+.review-text { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 10px; }
+.review-drills { font-size: 13px; color: #666; }
+.review-drills strong { color: #333; }
+.review-rating { font-size: 13px; color: #00C9B7; font-weight: 600; margin-top: 8px; }
+
+/* === Coach Upsell Card === */
+.coach-upsell-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 16px;
+}
+.coach-upsell-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+.coach-upsell-body { flex: 1; }
+.coach-upsell-title { font-size: 15px; font-weight: 600; color: #264653; margin: 0 0 6px; }
+.coach-upsell-text { font-size: 14px; color: #666; margin: 0 0 10px; line-height: 1.5; }
+.coach-upsell-cta {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: #00C9B7;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.coach-upsell-cta:hover { background: #00b5a5; text-decoration: none; }
+
+/* === Coach Preview Cards (index.html) === */
+.section-subtitle-heading { font-size: 15px; font-weight: 600; color: #264653; margin: 24px 0 12px; }
+.coach-preview-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.review-text-preview {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin: 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.coach-preview-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #00C9B7;
+  text-decoration: none;
+}
+.coach-preview-link:hover { text-decoration: underline; }
+
+/* === Utilities === */
+.text-muted { color: #999; }
+.text-success { color: #00C9B7; }
+.text-danger { color: #E63946; }
+.mt-0 { margin-top: 0; }
