@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpotsNow | Your Podcast Advertising Campaign, End to End</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1a1a2e;
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ff6b6b;
+    }
+    .nav-logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      font-size: 14px;
+      color: #555;
+    }
+    .nav-links a:hover { color: #1a1a2e; }
+    .nav-cta {
+      border: 1.5px solid #1a1a2e;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .nav-cta:hover { background: #1a1a2e; color: #fff; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: #ff6b6b; }
+    .hero .subtitle {
+      font-size: 19px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .value-props {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 36px;
+      font-size: 14px;
+      color: #777;
+    }
+    .value-props span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .value-props .icon {
+      width: 18px;
+      height: 18px;
+      color: #ff6b6b;
+    }
+    .email-cta {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .email-cta input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .email-cta input:focus { border-color: #ff6b6b; }
+    .btn-primary {
+      background: #ff6b6b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: #e55a5a; }
+
+    /* How it works */
+    .how-section {
+      padding: 80px 48px;
+      background: #fafafa;
+    }
+    .how-section h2 {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .how-section .section-sub {
+      text-align: center;
+      font-size: 17px;
+      color: #666;
+      margin-bottom: 56px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .step {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px 28px;
+      border: 1px solid #eee;
+      transition: box-shadow 0.2s;
+    }
+    .step:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ff6b6b;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+    .step h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .step p {
+      font-size: 14px;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* Social proof / stats */
+    .stats-section {
+      padding: 64px 48px;
+      text-align: center;
+    }
+    .stats-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 48px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .stat {
+      padding: 24px;
+    }
+    .stat .number {
+      font-size: 40px;
+      font-weight: 800;
+      color: #ff6b6b;
+    }
+    .stat .label {
+      font-size: 14px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    /* Categories */
+    .categories-section {
+      padding: 64px 48px;
+      background: #fafafa;
+    }
+    .categories-section h2 {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 40px;
+    }
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .category-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .category-card:hover {
+      border-color: #ff6b6b;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.1);
+    }
+    .category-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .category-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .category-card p {
+      font-size: 13px;
+      color: #999;
+    }
+
+    /* Dark CTA */
+    .dark-cta {
+      background: #1a1a2e;
+      padding: 80px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 64px;
+      max-width: 100%;
+    }
+    .dark-cta-text {
+      max-width: 500px;
+    }
+    .dark-cta h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .dark-cta p {
+      font-size: 16px;
+      color: #aaa;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .dark-cta .btn-primary {
+      display: inline-block;
+      padding: 16px 36px;
+      font-size: 16px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-top: 1px solid #f0f0f0;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .footer-brand .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff6b6b;
+    }
+    .footer-brand .tagline {
+      font-size: 14px;
+      color: #888;
+    }
+    .footer-links {
+      display: flex;
+      gap: 64px;
+    }
+    .footer-col h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 10px;
+    }
+    .footer-col a:hover { color: #1a1a2e; }
+    .footer-bottom {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #bbb;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 48px 20px 40px; }
+      .hero h1 { font-size: 32px; }
+      .value-props { flex-direction: column; align-items: center; gap: 12px; }
+      .email-cta { flex-direction: column; }
+      .steps { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .categories-grid { grid-template-columns: repeat(2, 1fr); }
+      .dark-cta { flex-direction: column; padding: 48px 24px; text-align: center; }
+      .footer { flex-direction: column; gap: 32px; padding: 32px 24px; }
+      .footer-links { gap: 32px; }
+      .how-section, .stats-section, .categories-section { padding: 48px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2z" stroke="#ff6b6b" stroke-width="2.5" fill="none"/>
+        <path d="M10 16.5l4 4 8-9" stroke="#ff6b6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      SpotsNow
+    </div>
+    <div class="nav-links">
+      <a href="#">How It Works</a>
+      <a href="#">Pricing</a>
+      <a href="#">Browse Shows</a>
+      <a href="#">For Publishers</a>
+      <a href="#">Login</a>
+      <a href="#" class="nav-cta">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1><span>Plan, launch, and optimize</span> your podcast ad campaign.</h1>
+    <p class="subtitle">SpotsNow is your one-stop shop for podcast advertising. Define your audience, set your budget, pick your shows, and go live &mdash; all in one place.</p>
+    <div class="value-props">
+      <span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Full campaign planning
+      </span>
+      <span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Premium show access
+      </span>
+      <span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Real-time analytics
+      </span>
+    </div>
+    <div class="email-cta">
+      <input type="email" placeholder="Enter email">
+      <button class="btn-primary">Start your campaign</button>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-section">
+    <h2>Six steps. One platform.</h2>
+    <p class="section-sub">Everything you need to run a podcast campaign from start to finish &mdash; no media buyers, no spreadsheets.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Define Your Audience</h3>
+        <p>Tell us who you're trying to reach &mdash; demographics, interests, geography. We'll match you with the right shows.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Set Your Budget</h3>
+        <p>Whether it's $5K or $500K, set your spend and see what's possible. Transparent CPMs, no hidden fees.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Build Your Plan</h3>
+        <p>We generate a campaign plan across shows and episodes. See projected reach, frequency, and timing before you commit.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>Tune Your Shows</h3>
+        <p>Swap shows in and out, adjust ad unit mix, and dial in your lineup until the plan fits your goals perfectly.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">5</div>
+        <h3>Go Live</h3>
+        <p>Upload your creative, choose your ad style (host-read, pre-produced, dynamic), and launch. We handle placement and trafficking.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">6</div>
+        <h3>Track &amp; Optimize</h3>
+        <p>Watch impressions, engagement, and attribution in real time. Shift budget to what's working mid-campaign.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-section">
+    <h2>Trusted by brands who move fast</h2>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="number">20K+</div>
+        <div class="label">Brands on the platform</div>
+      </div>
+      <div class="stat">
+        <div class="number">5,000+</div>
+        <div class="label">Shows available</div>
+      </div>
+      <div class="stat">
+        <div class="number">2B+</div>
+        <div class="label">Impressions delivered</div>
+      </div>
+      <div class="stat">
+        <div class="number">48hr</div>
+        <div class="label">Avg. time to go live</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories-section">
+    <h2>Shows across every category</h2>
+    <div class="categories-grid">
+      <div class="category-card">
+        <div class="category-icon">🏈</div>
+        <h3>Sports</h3>
+        <p>400+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">😂</div>
+        <h3>Comedy</h3>
+        <p>350+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">📰</div>
+        <h3>News</h3>
+        <p>300+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">💼</div>
+        <h3>Business</h3>
+        <p>250+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">🧬</div>
+        <h3>Health &amp; Fitness</h3>
+        <p>200+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">🎓</div>
+        <h3>Education</h3>
+        <p>180+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">🎭</div>
+        <h3>Society &amp; Culture</h3>
+        <p>300+ shows</p>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">🔍</div>
+        <h3>True Crime</h3>
+        <p>150+ shows</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dark CTA -->
+  <section class="dark-cta">
+    <div class="dark-cta-text">
+      <h2>Stop cobbling together campaigns. Start running them.</h2>
+      <p>SpotsNow replaces the back-and-forth with reps, the spreadsheet tracking, and the guesswork. One platform from first brief to final report.</p>
+      <a href="#" class="btn-primary">Get Started Free</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg viewBox="0 0 32 32" fill="none" width="28" height="28">
+            <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2z" stroke="#ff6b6b" stroke-width="2.5" fill="none"/>
+            <path d="M10 16.5l4 4 8-9" stroke="#ff6b6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          SpotsNow
+        </div>
+        <div class="tagline">Podcast advertising, end to end.</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="#">Browse Shows</a>
+          <a href="#">How It Works</a>
+          <a href="#">Pricing</a>
+          <a href="#">Resource Hub</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Terms of Service</a>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 SpotsNow. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>
