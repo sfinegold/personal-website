@@ -54,91 +54,121 @@
     }
     .nav-cta:hover { background: #1a1a2e; color: #fff; }
 
-    /* Hero */
+    /* Hero - Split Layout */
     .hero {
-      text-align: center;
-      padding: 80px 24px 64px;
-      max-width: 820px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 72px 64px;
+      max-width: 1200px;
       margin: 0 auto;
+      gap: 64px;
     }
-    .hero h1 {
-      font-size: 52px;
+    .hero-left {
+      flex: 1;
+      max-width: 540px;
+    }
+    .hero-left h1 {
+      font-size: 46px;
       font-weight: 800;
       line-height: 1.12;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
-    .hero h1 span { color: #ff6b6b; }
-    .hero .subtitle {
-      font-size: 19px;
+    .hero-left h1 span { color: #ff6b6b; }
+    .hero-left .subtitle {
+      font-size: 17px;
       color: #666;
-      margin-bottom: 36px;
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-bottom: 0;
     }
-    .email-cta {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      max-width: 520px;
-      margin: 0 auto;
+    .hero-right {
+      flex: 0 0 380px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 36px 32px;
     }
-    .email-cta input {
-      flex: 1;
-      padding: 16px 20px;
+    .hero-right h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .hero-right .form-sub {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 24px;
+    }
+    .hero-right label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .hero-right input, .hero-right select {
+      width: 100%;
+      padding: 12px 14px;
       border: 1.5px solid #ddd;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       outline: none;
       transition: border 0.2s;
+      margin-bottom: 16px;
+      background: #fff;
+      font-family: inherit;
     }
-    .email-cta input:focus { border-color: #ff6b6b; }
+    .hero-right input:focus, .hero-right select:focus { border-color: #ff6b6b; }
     .btn-primary {
       background: #ff6b6b;
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 16px 32px;
+      padding: 14px 28px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
+      width: 100%;
     }
     .btn-primary:hover { background: #e55a5a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,107,107,0.3); }
 
-    /* Brand Carousel */
+    /* Brand Carousel - Tight */
     .brands-section {
-      padding: 48px 48px 64px;
+      padding: 32px 48px;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f0f0f0;
       overflow: hidden;
     }
     .brands-section h2 {
       text-align: center;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #999;
-      margin-bottom: 32px;
+      color: #bbb;
+      margin-bottom: 20px;
     }
     .brand-carousel {
       display: flex;
-      gap: 24px;
-      max-width: 1100px;
+      gap: 12px;
+      max-width: 1200px;
       margin: 0 auto;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
-      padding-bottom: 8px;
+      padding-bottom: 4px;
     }
-    .brand-carousel::-webkit-scrollbar { height: 4px; }
-    .brand-carousel::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 2px; }
-    .brand-carousel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+    .brand-carousel::-webkit-scrollbar { height: 3px; }
+    .brand-carousel::-webkit-scrollbar-track { background: transparent; }
+    .brand-carousel::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
     .brand-card {
-      flex: 0 0 280px;
+      flex: 0 0 160px;
       scroll-snap-align: start;
       border: 1px solid #eee;
-      border-radius: 16px;
+      border-radius: 10px;
       overflow: hidden;
-      transition: all 0.25s;
+      transition: all 0.2s;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
@@ -146,145 +176,98 @@
     }
     .brand-card:hover {
       border-color: #ff6b6b;
-      box-shadow: 0 8px 24px rgba(255,107,107,0.12);
-      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(255,107,107,0.1);
+      transform: translateY(-2px);
     }
     .brand-card-header {
-      height: 120px;
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
+      font-size: 18px;
       font-weight: 800;
       color: #fff;
-      position: relative;
     }
     .brand-card-body {
-      padding: 20px;
+      padding: 10px 12px 12px;
     }
     .brand-card-body .brand-name {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #999;
-      margin-bottom: 4px;
-    }
-    .brand-card-body h3 {
-      font-size: 17px;
+      font-size: 11px;
       font-weight: 700;
-      margin-bottom: 8px;
+      color: #333;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .brand-card-body .campaign-stats {
-      display: flex;
-      gap: 16px;
-      font-size: 12px;
-      color: #888;
-    }
-    .brand-card-body .campaign-stats span {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .view-arrow {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #ff6b6b;
-      margin-top: 12px;
+    .brand-card-body .campaign-name {
+      font-size: 10px;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Timeline */
-    .timeline-section {
-      padding: 80px 48px;
+    /* Steps - Horizontal */
+    .steps-section {
+      padding: 64px 48px;
       background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%);
       color: #fff;
     }
-    .timeline-section h2 {
+    .steps-section h2 {
       text-align: center;
-      font-size: 40px;
+      font-size: 32px;
       font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .timeline-section .section-sub {
-      text-align: center;
-      font-size: 17px;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 64px;
-    }
-    .timeline {
-      max-width: 900px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 32px;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: linear-gradient(to bottom, #ff6b6b, #ff8e8e, #ffb4b4);
-      border-radius: 2px;
-    }
-    .timeline-item {
-      display: flex;
-      gap: 32px;
       margin-bottom: 48px;
-      position: relative;
-      align-items: flex-start;
     }
-    .timeline-item:last-child { margin-bottom: 0; }
-    .timeline-dot {
-      width: 64px;
-      height: 64px;
+    .steps-row {
+      display: flex;
+      align-items: flex-start;
+      max-width: 1100px;
+      margin: 0 auto;
+      gap: 0;
+    }
+    .step-item {
+      flex: 1;
+      text-align: center;
+      padding: 0 16px;
+      position: relative;
+    }
+    .step-icon {
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 20px rgba(255,107,107,0.3);
-      z-index: 1;
+      font-size: 22px;
+      margin: 0 auto 14px;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.3);
     }
-    .timeline-content {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 28px 32px;
-      flex: 1;
-      backdrop-filter: blur(10px);
-      transition: all 0.25s;
-    }
-    .timeline-content:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,107,107,0.3);
-    }
-    .timeline-content .step-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #ff8e8e;
+    .step-item h3 {
+      font-size: 16px;
+      font-weight: 700;
       margin-bottom: 6px;
     }
-    .timeline-content h3 {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 8px;
+    .step-item p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
     }
-    .timeline-content p {
-      font-size: 15px;
-      color: rgba(255,255,255,0.65);
-      line-height: 1.6;
+    .step-arrow {
+      flex: 0 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 16px;
+      color: rgba(255,255,255,0.25);
+      font-size: 20px;
     }
 
     /* Shows section */
     .shows-section {
-      padding: 80px 48px;
+      padding: 72px 48px;
     }
     .shows-section h2 {
       text-align: center;
@@ -317,11 +300,7 @@
       transition: all 0.2s;
     }
     .show-tab:hover { border-color: #ff6b6b; color: #ff6b6b; }
-    .show-tab.active {
-      background: #1a1a2e;
-      color: #fff;
-      border-color: #1a1a2e;
-    }
+    .show-tab.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
     .shows-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -335,98 +314,34 @@
       overflow: hidden;
       transition: all 0.2s;
     }
-    .show-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
-    }
-    .show-card-top {
-      display: flex;
-      padding: 16px;
-      gap: 12px;
-    }
+    .show-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .show-card-top { display: flex; padding: 16px; gap: 12px; }
     .show-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
+      width: 56px; height: 56px; border-radius: 10px;
       background: linear-gradient(135deg, #2d2d4a, #1a1a2e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
     }
     .show-info { flex: 1; min-width: 0; }
-    .show-info h4 {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
-    }
-    .show-discount {
-      font-size: 18px;
-      font-weight: 800;
-      color: #22c55e;
-    }
-    .show-discount span {
-      font-size: 12px;
-      font-weight: 500;
-      color: #999;
-      margin-left: 4px;
-    }
-    .show-meta {
-      padding: 0 16px 12px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .show-tag {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
+    .show-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .show-discount { font-size: 18px; font-weight: 800; color: #22c55e; }
+    .show-discount span { font-size: 12px; font-weight: 500; color: #999; margin-left: 4px; }
+    .show-meta { padding: 0 16px 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .show-tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
     .show-tag.category { background: #e8f5e9; color: #2e7d32; }
     .show-tag.time { background: #fff3e0; color: #e65100; }
-    .show-tag.audience { background: #e3f2fd; color: #1565c0; }
-    .show-details {
-      padding: 0 16px 12px;
-      font-size: 12px;
-      color: #888;
-      display: flex;
-      gap: 12px;
-    }
+    .show-details { padding: 0 16px 12px; font-size: 12px; color: #888; display: flex; gap: 12px; }
     .show-cta {
-      display: block;
-      text-align: center;
-      padding: 12px;
-      background: #1a1a2e;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
+      display: block; text-align: center; padding: 12px;
+      background: #1a1a2e; color: #fff; font-size: 14px; font-weight: 600;
       transition: background 0.2s;
     }
     .show-cta:hover { background: #2d2d4a; }
 
     /* Stats */
-    .stats-section {
-      padding: 64px 48px;
-      background: #fafafa;
-      text-align: center;
-    }
-    .stats-section h2 {
-      font-size: 36px;
-      font-weight: 800;
-      margin-bottom: 48px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
+    .stats-section { padding: 64px 48px; background: #fafafa; text-align: center; }
+    .stats-section h2 { font-size: 36px; font-weight: 800; margin-bottom: 48px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
     .stat { padding: 24px; }
     .stat .number { font-size: 40px; font-weight: 800; color: #ff6b6b; }
     .stat .label { font-size: 14px; color: #777; margin-top: 4px; }
@@ -437,85 +352,42 @@
       padding: 80px 48px;
       text-align: center;
     }
-    .dark-cta h2 {
-      font-size: 36px;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1.3;
-      margin-bottom: 16px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .dark-cta p {
-      font-size: 17px;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.6;
-      margin-bottom: 32px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .dark-cta .btn-primary {
-      display: inline-block;
-      padding: 18px 40px;
-      font-size: 16px;
-    }
+    .dark-cta h2 { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 16px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .dark-cta p { font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .dark-cta .btn-primary { display: inline-block; padding: 18px 40px; font-size: 16px; width: auto; }
 
     /* Footer */
-    .footer {
-      padding: 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-top: 1px solid #f0f0f0;
-    }
-    .footer-brand {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .footer-brand .logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 20px;
-      font-weight: 700;
-      color: #ff6b6b;
-    }
+    .footer { padding: 48px; display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid #f0f0f0; }
+    .footer-brand { display: flex; flex-direction: column; gap: 8px; }
+    .footer-brand .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; color: #ff6b6b; }
     .footer-brand .tagline { font-size: 14px; color: #888; }
     .footer-links { display: flex; gap: 64px; }
     .footer-col h4 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
     .footer-col a { display: block; font-size: 13px; color: #777; margin-bottom: 10px; }
     .footer-col a:hover { color: #1a1a2e; }
-    .footer-bottom {
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
-      color: #bbb;
-      border-top: 1px solid #f0f0f0;
-    }
+    .footer-bottom { text-align: center; padding: 20px; font-size: 13px; color: #bbb; border-top: 1px solid #f0f0f0; }
 
     /* Responsive */
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; padding: 48px 24px; gap: 32px; }
+      .hero-left { max-width: 100%; text-align: center; }
+      .hero-left h1 { font-size: 34px; }
+      .hero-right { flex: auto; width: 100%; max-width: 420px; }
+      .steps-row { flex-direction: column; gap: 24px; align-items: center; }
+      .step-arrow { display: none; }
+      .step-item { max-width: 300px; }
+    }
     @media (max-width: 768px) {
       .nav { padding: 12px 20px; }
       .nav-links { display: none; }
-      .hero { padding: 48px 20px 40px; }
-      .hero h1 { font-size: 34px; }
-      .email-cta { flex-direction: column; }
-      .brands-section { padding: 32px 20px 48px; }
-      .brand-card { flex: 0 0 240px; }
-      .timeline-section { padding: 48px 20px; }
-      .timeline::before { left: 24px; }
-      .timeline-dot { width: 48px; height: 48px; font-size: 18px; }
-      .timeline-content { padding: 20px; }
-      .timeline-content h3 { font-size: 18px; }
+      .brands-section { padding: 24px 20px; }
+      .brand-card { flex: 0 0 140px; }
       .shows-grid { grid-template-columns: repeat(2, 1fr); }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .dark-cta { padding: 48px 24px; }
       .dark-cta h2 { font-size: 28px; }
       .footer { flex-direction: column; gap: 32px; padding: 32px 24px; }
-      .shows-section, .stats-section { padding: 48px 20px; }
+      .shows-section, .stats-section, .steps-section { padding: 48px 20px; }
     }
   </style>
 </head>
@@ -540,131 +412,133 @@
     </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero - Split -->
   <section class="hero">
-    <h1><span>Plan, launch, and optimize</span> your podcast ad campaign.</h1>
-    <p class="subtitle">Your one-stop platform for podcast advertising. Define your audience, set your budget, pick your shows, and go live &mdash; all in one place.</p>
-    <div class="email-cta">
-      <input type="email" placeholder="Enter email">
-      <button class="btn-primary">Start building your campaign</button>
+    <div class="hero-left">
+      <h1><span>Plan, launch, and optimize</span> your podcast ad campaign.</h1>
+      <p class="subtitle">Your one-stop platform for podcast advertising. Define your audience, set your budget, pick your shows, and go live &mdash; all in one place.</p>
+    </div>
+    <div class="hero-right">
+      <h3>Start building your campaign</h3>
+      <p class="form-sub">Get matched with the right shows in minutes.</p>
+      <label>Work email</label>
+      <input type="email" placeholder="you@company.com">
+      <label>Monthly budget</label>
+      <select>
+        <option value="">Select range</option>
+        <option>Under $10K</option>
+        <option>$10K - $50K</option>
+        <option>$50K - $100K</option>
+        <option>$100K+</option>
+      </select>
+      <button class="btn-primary">Get started</button>
     </div>
   </section>
 
-  <!-- Brand Carousel -->
+  <!-- Brand Carousel - Tight, 10 brands -->
   <section class="brands-section">
-    <h2>Campaigns launched on SpotsNow</h2>
+    <h2>Trusted by leading brands</h2>
     <div class="brand-carousel">
-
       <a href="campaigns/athletic-greens.html" class="brand-card">
         <div class="brand-card-header" style="background: linear-gradient(135deg, #1b5e20, #43a047);">AG1</div>
         <div class="brand-card-body">
           <div class="brand-name">Athletic Greens</div>
-          <h3>AG1 Podcast Blitz</h3>
-          <div class="campaign-stats">
-            <span>12 shows</span>
-            <span>4.2M impressions</span>
-          </div>
-          <div class="view-arrow">View campaign &rarr;</div>
+          <div class="campaign-name">AG1 Podcast Blitz</div>
         </div>
       </a>
-
       <a href="campaigns/squarespace.html" class="brand-card">
         <div class="brand-card-header" style="background: linear-gradient(135deg, #111, #333);">&#9632;</div>
         <div class="brand-card-body">
           <div class="brand-name">Squarespace</div>
-          <h3>Build It Beautiful</h3>
-          <div class="campaign-stats">
-            <span>8 shows</span>
-            <span>2.8M impressions</span>
-          </div>
-          <div class="view-arrow">View campaign &rarr;</div>
+          <div class="campaign-name">Build It Beautiful</div>
         </div>
       </a>
-
       <a href="campaigns/shopify.html" class="brand-card">
         <div class="brand-card-header" style="background: linear-gradient(135deg, #4a7c3f, #96bf48);">S</div>
         <div class="brand-card-body">
           <div class="brand-name">Shopify</div>
-          <h3>Entrepreneur Reach</h3>
-          <div class="campaign-stats">
-            <span>15 shows</span>
-            <span>6.1M impressions</span>
-          </div>
-          <div class="view-arrow">View campaign &rarr;</div>
+          <div class="campaign-name">Entrepreneur Reach</div>
         </div>
       </a>
-
       <a href="campaigns/betterhelp.html" class="brand-card">
         <div class="brand-card-header" style="background: linear-gradient(135deg, #1565c0, #42a5f5);">BH</div>
         <div class="brand-card-body">
           <div class="brand-name">BetterHelp</div>
-          <h3>Mental Health Awareness</h3>
-          <div class="campaign-stats">
-            <span>20 shows</span>
-            <span>8.5M impressions</span>
-          </div>
-          <div class="view-arrow">View campaign &rarr;</div>
+          <div class="campaign-name">Mental Health Awareness</div>
         </div>
       </a>
-
       <a href="campaigns/nordvpn.html" class="brand-card">
         <div class="brand-card-header" style="background: linear-gradient(135deg, #1a237e, #5c6bc0);">N</div>
         <div class="brand-card-body">
           <div class="brand-name">NordVPN</div>
-          <h3>Privacy First</h3>
-          <div class="campaign-stats">
-            <span>10 shows</span>
-            <span>3.7M impressions</span>
-          </div>
-          <div class="view-arrow">View campaign &rarr;</div>
+          <div class="campaign-name">Privacy First</div>
         </div>
       </a>
-
+      <a href="#" class="brand-card">
+        <div class="brand-card-header" style="background: linear-gradient(135deg, #b71c1c, #e53935);">HM</div>
+        <div class="brand-card-body">
+          <div class="brand-name">HelloFresh</div>
+          <div class="campaign-name">Meal Kit Takeover</div>
+        </div>
+      </a>
+      <a href="#" class="brand-card">
+        <div class="brand-card-header" style="background: linear-gradient(135deg, #4a148c, #7c43bd);">CB</div>
+        <div class="brand-card-body">
+          <div class="brand-name">Calm</div>
+          <div class="campaign-name">Sleep Stories Push</div>
+        </div>
+      </a>
+      <a href="#" class="brand-card">
+        <div class="brand-card-header" style="background: linear-gradient(135deg, #e65100, #ff9800);">A</div>
+        <div class="brand-card-body">
+          <div class="brand-name">Audible</div>
+          <div class="campaign-name">Listener Growth Q1</div>
+        </div>
+      </a>
+      <a href="#" class="brand-card">
+        <div class="brand-card-header" style="background: linear-gradient(135deg, #006064, #00acc1);">ZS</div>
+        <div class="brand-card-body">
+          <div class="brand-name">ZipRecruiter</div>
+          <div class="campaign-name">Hiring Season Blitz</div>
+        </div>
+      </a>
+      <a href="#" class="brand-card">
+        <div class="brand-card-header" style="background: linear-gradient(135deg, #33691e, #689f38);">MN</div>
+        <div class="brand-card-body">
+          <div class="brand-name">Mint Mobile</div>
+          <div class="campaign-name">Unlimited Launch</div>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- Timeline: How It Works -->
-  <section class="timeline-section">
+  <!-- Steps - Horizontal with arrows -->
+  <section class="steps-section">
     <h2>How it works</h2>
-    <p class="section-sub">From first brief to final report &mdash; four steps, one platform.</p>
-    <div class="timeline">
-
-      <div class="timeline-item">
-        <div class="timeline-dot">🎯</div>
-        <div class="timeline-content">
-          <div class="step-label">Step 1</div>
-          <h3>Target &amp; Budget</h3>
-          <p>Tell us who you're reaching and what you want to spend. We match you with the right shows across demographics, interests, and geography &mdash; with transparent CPMs and no hidden fees.</p>
-        </div>
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-icon">🎯</div>
+        <h3>Target &amp; Budget</h3>
+        <p>Define your audience and set your spend. We match you to the right shows.</p>
       </div>
-
-      <div class="timeline-item">
-        <div class="timeline-dot">📋</div>
-        <div class="timeline-content">
-          <div class="step-label">Step 2</div>
-          <h3>Plan &amp; Tune</h3>
-          <p>We generate a campaign plan across shows and episodes. See projected reach, frequency, and timing &mdash; then swap shows, adjust your mix, and dial it in until it's perfect.</p>
-        </div>
+      <div class="step-arrow">&rarr;</div>
+      <div class="step-item">
+        <div class="step-icon">📋</div>
+        <h3>Plan &amp; Tune</h3>
+        <p>See projected reach and timing. Swap shows until the plan is perfect.</p>
       </div>
-
-      <div class="timeline-item">
-        <div class="timeline-dot">🚀</div>
-        <div class="timeline-content">
-          <div class="step-label">Step 3</div>
-          <h3>Launch</h3>
-          <p>Upload your creative, choose your ad style (host-read, pre-produced, or dynamic), and go live. We handle placement and trafficking &mdash; you just approve and launch.</p>
-        </div>
+      <div class="step-arrow">&rarr;</div>
+      <div class="step-item">
+        <div class="step-icon">🚀</div>
+        <h3>Launch</h3>
+        <p>Upload creative, pick your ad style, and go live. We handle the rest.</p>
       </div>
-
-      <div class="timeline-item">
-        <div class="timeline-dot">📊</div>
-        <div class="timeline-content">
-          <div class="step-label">Step 4</div>
-          <h3>Track &amp; Optimize</h3>
-          <p>Watch impressions, engagement, and attribution in real time. Shift budget to what's working mid-campaign and download reports when you're done.</p>
-        </div>
+      <div class="step-arrow">&rarr;</div>
+      <div class="step-item">
+        <div class="step-icon">📊</div>
+        <h3>Track &amp; Optimize</h3>
+        <p>Real-time analytics. Shift budget to what's working mid-campaign.</p>
       </div>
-
     </div>
   </section>
 
@@ -672,7 +546,6 @@
   <section class="shows-section">
     <h2>Browse 5,000+ shows</h2>
     <p class="section-sub">Premium inventory across every category, with real-time availability and pricing.</p>
-
     <div class="show-tabs">
       <div class="show-tab active">Trending</div>
       <div class="show-tab">Sports</div>
@@ -684,7 +557,6 @@
       <div class="show-tab">Education</div>
       <div class="show-tab">Society &amp; Culture</div>
     </div>
-
     <div class="shows-grid">
       <div class="show-card">
         <div class="show-card-top">
@@ -698,14 +570,9 @@
           <span class="show-tag category">News</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>35-54 yo</span>
-          <span>64% Male</span>
-        </div>
+        <div class="show-details"><span>US</span><span>35-54 yo</span><span>64% Male</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">😜</div>
@@ -718,14 +585,9 @@
           <span class="show-tag category">Society &amp; Culture</span>
           <span class="show-tag time">2d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>18-44 yo</span>
-          <span>87% Female</span>
-        </div>
+        <div class="show-details"><span>US</span><span>18-44 yo</span><span>87% Female</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">🏈</div>
@@ -738,13 +600,9 @@
           <span class="show-tag category">Sports</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>50% Male</span>
-        </div>
+        <div class="show-details"><span>US</span><span>50% Male</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">🎰</div>
@@ -757,14 +615,9 @@
           <span class="show-tag category">Sports</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US, CA, GB</span>
-          <span>25-54 yo</span>
-          <span>95% Male</span>
-        </div>
+        <div class="show-details"><span>US, CA, GB</span><span>25-54 yo</span><span>95% Male</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">🧠</div>
@@ -777,14 +630,9 @@
           <span class="show-tag category">Education</span>
           <span class="show-tag time">2d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>25-54 yo</span>
-          <span>69% Female</span>
-        </div>
+        <div class="show-details"><span>US</span><span>25-54 yo</span><span>69% Female</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">🎵</div>
@@ -797,14 +645,9 @@
           <span class="show-tag category">Music</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>35-65+ yo</span>
-          <span>70% Male</span>
-        </div>
+        <div class="show-details"><span>US</span><span>35-65+ yo</span><span>70% Male</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">💪</div>
@@ -817,14 +660,9 @@
           <span class="show-tag category">Health &amp; Fitness</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>25-54 yo</span>
-          <span>90% Female</span>
-        </div>
+        <div class="show-details"><span>US</span><span>25-54 yo</span><span>90% Female</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
-
       <div class="show-card">
         <div class="show-card-top">
           <div class="show-avatar">📞</div>
@@ -837,11 +675,7 @@
           <span class="show-tag category">Sports</span>
           <span class="show-tag time">6d left</span>
         </div>
-        <div class="show-details">
-          <span>US</span>
-          <span>25-54 yo</span>
-          <span>95% Male</span>
-        </div>
+        <div class="show-details"><span>US</span><span>25-54 yo</span><span>95% Male</span></div>
         <a href="#" class="show-cta">View Spot</a>
       </div>
     </div>
@@ -851,22 +685,10 @@
   <section class="stats-section">
     <h2>Trusted by brands who move fast</h2>
     <div class="stats-grid">
-      <div class="stat">
-        <div class="number">20K+</div>
-        <div class="label">Brands on the platform</div>
-      </div>
-      <div class="stat">
-        <div class="number">5,000+</div>
-        <div class="label">Shows available</div>
-      </div>
-      <div class="stat">
-        <div class="number">2B+</div>
-        <div class="label">Impressions delivered</div>
-      </div>
-      <div class="stat">
-        <div class="number">48hr</div>
-        <div class="label">Avg. time to go live</div>
-      </div>
+      <div class="stat"><div class="number">20K+</div><div class="label">Brands on the platform</div></div>
+      <div class="stat"><div class="number">5,000+</div><div class="label">Shows available</div></div>
+      <div class="stat"><div class="number">2B+</div><div class="label">Impressions delivered</div></div>
+      <div class="stat"><div class="number">48hr</div><div class="label">Avg. time to go live</div></div>
     </div>
   </section>
 
@@ -905,9 +727,7 @@
         </div>
       </div>
     </div>
-    <div class="footer-bottom">
-      &copy; 2026 SpotsNow. All rights reserved.
-    </div>
+    <div class="footer-bottom">&copy; 2026 SpotsNow. All rights reserved.</div>
   </footer>
 
 </body>
