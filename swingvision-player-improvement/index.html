@@ -653,6 +653,16 @@
       margin: 0;
     }
 
+    /* === SESSIONS TABLE === */
+    .session-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .session-row.open .session-detail {
+      max-height: 300px;
+    }
+
     /* === Responsive === */
     @media (max-width: 600px) {
       .hero h1 { font-size: 28px; }
@@ -673,6 +683,7 @@
     <a href="#goal" class="active">Goal</a>
     <a href="#summary">What I Want</a>
     <a href="#dashboard">Dashboard Vision</a>
+    <a href="#sessions">Sessions View</a>
     <a href="#critique">Site Critique</a>
   </div>
 </nav>
@@ -876,6 +887,195 @@
 
   <div class="dashboard-outro">
     <p style="margin-bottom:48px;">&#8593; This is what an improvement-first home screen could feel like. &#8593;</p>
+  </div>
+</section>
+
+<!-- ==================== SESSIONS VIEW MOCKUP ==================== -->
+<section class="content-section sessions-zone" id="sessions" style="border:none;padding:0;">
+  <div style="background:#f7f8fa;padding:64px 0;">
+    <div style="max-width:1100px;margin:0 auto;padding:0 24px;">
+      <div style="text-align:center;margin-bottom:12px;">
+        <span style="display:inline-block;background:#00C9B7;color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;">Power User View</span>
+      </div>
+      <h2 style="text-align:center;font-size:28px;font-weight:800;color:#1a1a1a;margin:0 0 6px;">What My Sessions Should Look Like</h2>
+      <p style="text-align:center;font-size:15px;color:#777;margin:0 auto 36px;max-width:560px;">A desktop-first table that treats every session as data. Click any row to expand AI summary, detailed stats, and coaching notes.</p>
+
+      <!-- Sessions Table -->
+      <div style="background:#fff;border-radius:12px;border:1px solid #e5e5e5;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+        <!-- Table Header -->
+        <div style="display:grid;grid-template-columns:200px 160px 1fr 180px;gap:0;padding:10px 20px;background:#fafafa;border-bottom:1px solid #eee;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">
+          <div>Session</div>
+          <div>Type</div>
+          <div>Key Stats</div>
+          <div>Coach</div>
+        </div>
+
+        <!-- Row 1 - Expandable -->
+        <div class="session-row" onclick="this.classList.toggle('open')">
+          <div style="display:grid;grid-template-columns:200px 160px 1fr 180px;gap:0;padding:14px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s;align-items:center;" onmouseover="this.style.background='#f8fafe'" onmouseout="this.style.background='transparent'">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#4a90d9,#67b26f);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🎾</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Sun, Mar 23</div>
+                <div style="font-size:11px;color:#999;">Margaret Hayward</div>
+              </div>
+            </div>
+            <div>
+              <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#e8f5e9;color:#2e7d32;">Rally</span>
+              <div style="font-size:11px;color:#999;margin-top:2px;">365 shots &middot; 59 min</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:12px;">
+              <div><span style="color:#999;">FH</span> <span style="font-weight:600;">52 mph</span> <span style="color:#2e7d32;font-size:10px;">72%</span></div>
+              <div><span style="color:#999;">BH</span> <span style="font-weight:600;">45 mph</span> <span style="color:#e65100;font-size:10px;">65%</span></div>
+              <div><span style="color:#999;">Sv</span> <span style="font-weight:600;">68 mph</span> <span style="color:#999;font-size:10px;">62% 1st</span></div>
+            </div>
+            <div style="font-size:12px;color:#777;display:flex;align-items:center;gap:6px;">
+              <span style="color:#00C9B7;">&#9679;</span> Reviewed
+              <span style="margin-left:auto;color:#ccc;font-size:14px;transition:transform 0.2s;">&#9662;</span>
+            </div>
+          </div>
+          <!-- Expanded detail -->
+          <div class="session-detail">
+            <div style="padding:16px 20px 20px;background:#f8fafe;border-bottom:1px solid #f0f0f0;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">AI Session Summary</div>
+                  <p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Strong rally session. Forehand cross-court was your most reliable pattern (78% in). Backhand consistency dropped to 65% &mdash; you're going for too much down the line under pressure. Try staying cross-court until you get a short ball.</p>
+                </div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">Coach Dylan's Notes</div>
+                  <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 8px;">Good session. Your forehand depth is improving but you're leaking errors on the backhand change-of-direction. Drill: 10-ball cross-court rally before going DTL.</p>
+                  <span style="font-size:11px;padding:3px 10px;border-radius:10px;background:#fff3e0;color:#e65100;font-weight:600;">Quick Review</span>
+                </div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:24px;font-size:12px;color:#777;">
+                <div><span style="color:#999;">FH cross %:</span> <strong>78%</strong></div>
+                <div><span style="color:#999;">FH DTL %:</span> <strong>61%</strong></div>
+                <div><span style="color:#999;">BH cross %:</span> <strong>54%</strong></div>
+                <div><span style="color:#999;">Rally len avg:</span> <strong>8.2</strong></div>
+                <div><span style="color:#999;">Unforced errors:</span> <strong>23</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="session-row" onclick="this.classList.toggle('open')">
+          <div style="display:grid;grid-template-columns:200px 160px 1fr 180px;gap:0;padding:14px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s;align-items:center;" onmouseover="this.style.background='#f8fafe'" onmouseout="this.style.background='transparent'">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#e65100,#ff9800);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏆</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Mon, Mar 17</div>
+                <div style="font-size:11px;color:#999;">Goldman Tennis Ctr</div>
+              </div>
+            </div>
+            <div>
+              <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#fff3e0;color:#e65100;">Match</span>
+              <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-top:2px;">W 6-4, 6-3</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:12px;">
+              <div><span style="color:#999;">FH</span> <span style="font-weight:600;">55 mph</span> <span style="color:#2e7d32;font-size:10px;">74%</span></div>
+              <div><span style="color:#999;">BH</span> <span style="font-weight:600;">47 mph</span> <span style="color:#2e7d32;font-size:10px;">70%</span></div>
+              <div><span style="color:#999;">Sv</span> <span style="font-weight:600;">72 mph</span> <span style="color:#2e7d32;font-size:10px;">68% 1st</span></div>
+            </div>
+            <div style="font-size:12px;color:#777;display:flex;align-items:center;gap:6px;">
+              <span style="color:#00C9B7;">&#9679;</span> Reviewed
+              <span style="margin-left:auto;color:#ccc;font-size:14px;transition:transform 0.2s;">&#9662;</span>
+            </div>
+          </div>
+          <div class="session-detail">
+            <div style="padding:16px 20px 20px;background:#f8fafe;border-bottom:1px solid #f0f0f0;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">AI Session Summary</div>
+                  <p style="font-size:13px;color:#555;line-height:1.6;margin:0;">Dominant win. You controlled rallies from the forehand side and served well in key moments (4/5 on break points). Second set was cleaner &mdash; only 6 unforced errors vs 14 in the first.</p>
+                </div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">Coach Dylan's Notes</div>
+                  <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 8px;">Nice match. You played within yourself in set 2. First set was loose &mdash; too many forehand winners attempted at 30-all. Keep building the point.</p>
+                  <span style="font-size:11px;padding:3px 10px;border-radius:10px;background:#e3f2fd;color:#1565c0;font-weight:600;">Full Review</span>
+                </div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:24px;font-size:12px;color:#777;">
+                <div><span style="color:#999;">Winners:</span> <strong>22</strong></div>
+                <div><span style="color:#999;">UE:</span> <strong>20</strong></div>
+                <div><span style="color:#999;">1st sv %:</span> <strong>68%</strong></div>
+                <div><span style="color:#999;">Break pts won:</span> <strong>4/5</strong></div>
+                <div><span style="color:#999;">Net pts won:</span> <strong>6/8</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="session-row" onclick="this.classList.toggle('open')">
+          <div style="display:grid;grid-template-columns:200px 160px 1fr 180px;gap:0;padding:14px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s;align-items:center;" onmouseover="this.style.background='#f8fafe'" onmouseout="this.style.background='transparent'">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#4a90d9,#67b26f);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🎾</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Wed, Mar 12</div>
+                <div style="font-size:11px;color:#999;">Bay Club</div>
+              </div>
+            </div>
+            <div>
+              <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#e8f5e9;color:#2e7d32;">Rally</span>
+              <div style="font-size:11px;color:#999;margin-top:2px;">429 shots &middot; 59 min</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:12px;">
+              <div><span style="color:#999;">FH</span> <span style="font-weight:600;">50 mph</span> <span style="color:#2e7d32;font-size:10px;">70%</span></div>
+              <div><span style="color:#999;">BH</span> <span style="font-weight:600;">43 mph</span> <span style="color:#e65100;font-size:10px;">62%</span></div>
+              <div><span style="color:#999;">Sv</span> <span style="font-weight:600;">65 mph</span> <span style="color:#999;font-size:10px;">58% 1st</span></div>
+            </div>
+            <div style="font-size:12px;color:#999;display:flex;align-items:center;gap:6px;">
+              <span style="color:#ddd;">&#9675;</span> Pending
+              <span style="margin-left:auto;color:#ccc;font-size:14px;">&#9662;</span>
+            </div>
+          </div>
+          <div class="session-detail">
+            <div style="padding:16px 20px 20px;background:#f8fafe;border-bottom:1px solid #f0f0f0;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">AI Session Summary</div>
+                  <p style="font-size:13px;color:#555;line-height:1.6;margin:0;">High-volume rally. Backhand consistency continues to be the weak spot at 62%. Your serve speed is down from last week &mdash; focus on a full trophy position. Cross-court forehand remains solid.</p>
+                </div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">Coach Notes</div>
+                  <p style="font-size:13px;color:#999;font-style:italic;margin:0;">Awaiting coach review&hellip;</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div style="display:grid;grid-template-columns:200px 160px 1fr 180px;gap:0;padding:14px 20px;border-bottom:1px solid #f0f0f0;align-items:center;opacity:0.5;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🎾</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Thu, Mar 6</div>
+              <div style="font-size:11px;color:#999;">Margaret Hayward</div>
+            </div>
+          </div>
+          <div>
+            <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#e8f5e9;color:#2e7d32;">Rally</span>
+            <div style="font-size:11px;color:#999;margin-top:2px;">190 shots &middot; 40 min</div>
+          </div>
+          <div style="font-size:12px;color:#ccc;">Stats not extracted (no score detected)</div>
+          <div style="font-size:12px;color:#ccc;">&mdash;</div>
+        </div>
+
+      </div><!-- end table -->
+
+      <!-- Coaching tier callout -->
+      <div style="margin-top:32px;background:#fff;border:2px solid #00C9B7;border-radius:12px;padding:24px 28px;display:flex;align-items:flex-start;gap:20px;">
+        <div style="font-size:28px;flex-shrink:0;">💡</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">I'd pay $30/mo more for coaching built into the app</div>
+          <p style="font-size:13px;color:#666;line-height:1.65;margin:0;">SwingVision + a human coach reviewing my sessions would be the killer combo. Quick reviews on every session (automated AI + coach spot-checks), with the option to request a full deep-dive review on bigger matches. It turns SwingVision from a recording tool into an actual coaching relationship &mdash; and I'd pay for that.</p>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
