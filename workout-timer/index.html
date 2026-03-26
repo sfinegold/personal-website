@@ -77,8 +77,8 @@
     /* Setup */
     .exercise-row {
       display: grid;
-      grid-template-columns: 1fr 60px 60px 50px 36px;
-      gap: 8px;
+      grid-template-columns: 1fr 60px 60px 50px 28px 28px;
+      gap: 6px;
       align-items: center;
       margin-bottom: 8px;
     }
@@ -95,8 +95,8 @@
     .exercise-row input[type="number"] { text-align: center; padding: 8px 4px; }
     .label-row {
       display: grid;
-      grid-template-columns: 1fr 60px 60px 50px 36px;
-      gap: 8px;
+      grid-template-columns: 1fr 60px 60px 50px 28px 28px;
+      gap: 6px;
       margin-bottom: 6px;
     }
     .label-row span {
@@ -159,6 +159,81 @@
       cursor: pointer;
     }
     .btn-restart-round:hover { border-color: #3C638E; color: #00288B; }
+
+    /* Total time calculator */
+    .total-time {
+      text-align: center;
+      padding: 10px 0;
+      margin-bottom: 12px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3C638E;
+    }
+    .total-time strong { color: #00288B; font-size: 1rem; }
+
+    /* Saved exercises */
+    .saved-section {
+      margin-top: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .saved-toggle {
+      background: none;
+      border: none;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3C638E;
+      cursor: pointer;
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .saved-toggle:hover { color: #00288B; }
+    .saved-list {
+      display: none;
+      margin-top: 8px;
+      border: 1px solid #e8ecf1;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .saved-list.open { display: block; }
+    .saved-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid #f4f6fa;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .saved-item:last-child { border-bottom: none; }
+    .saved-item:hover { background: #f4f6fa; }
+    .saved-item-info { color: #3C638E; font-size: 0.75rem; }
+    .saved-item-del {
+      background: none;
+      border: none;
+      color: #c8cfe0;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .saved-item-del:hover { color: #e55; }
+    .save-btn {
+      background: none;
+      border: none;
+      color: #c8cfe0;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0 4px;
+      title: "Save exercise";
+    }
+    .save-btn:hover { color: #00288B; }
 
     /* Timer */
     .timer-view { display: none; text-align: center; padding-top: 2rem; }
@@ -346,9 +421,17 @@
         <span>Rest</span>
         <span>Sets</span>
         <span></span>
+        <span></span>
       </div>
       <div id="exercise-list"></div>
       <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
+      <div class="saved-section">
+        <button class="saved-toggle" onclick="toggleSavedList()">
+          <span id="saved-arrow">&#9654;</span> Saved Exercises
+        </button>
+        <div class="saved-list" id="saved-list"></div>
+      </div>
+      <div class="total-time" id="total-time"></div>
       <button class="btn btn-start" onclick="startWorkout()">Start Workout</button>
     </div>
 
@@ -484,14 +567,16 @@
           <input type="text" placeholder="Exercise ${i + 1}" value="${e.name}"
             onchange="exercises[${i}].name = this.value">
           <input type="number" value="${e.work}" min="5" step="5"
-            onchange="exercises[${i}].work = +this.value">
+            onchange="exercises[${i}].work = +this.value; updateTotalTime()">
           <input type="number" value="${e.rest}" min="0" step="5"
-            onchange="exercises[${i}].rest = +this.value">
+            onchange="exercises[${i}].rest = +this.value; updateTotalTime()">
           <input type="number" value="${e.sets}" min="1"
-            onchange="exercises[${i}].sets = +this.value">
+            onchange="exercises[${i}].sets = +this.value; updateTotalTime()">
+          <button class="save-btn" onclick="saveExercise(${i})" title="Save for later">&#9733;</button>
           <button class="remove-btn" onclick="removeExercise(${e.id})">&times;</button>
         </div>
       `).join('');
+      updateTotalTime();
     }
 
     // Shift+Arrow to navigate between number inputs in the grid
@@ -519,6 +604,99 @@
         target.select();
       }
     });
+
+    // ========== TOTAL TIME CALCULATOR ==========
+    function updateTotalTime() {
+      // Sync input values first
+      document.querySelectorAll('.exercise-row').forEach((row, i) => {
+        const inputs = row.querySelectorAll('input');
+        if (exercises[i]) {
+          exercises[i].name = inputs[0].value;
+          exercises[i].work = +inputs[1].value;
+          exercises[i].rest = +inputs[2].value;
+          exercises[i].sets = +inputs[3].value;
+        }
+      });
+      let totalSec = 0;
+      const maxSets = exercises.length ? Math.max(...exercises.map(e => e.sets)) : 0;
+      for (let round = 1; round <= maxSets; round++) {
+        exercises.forEach((ex, idx) => {
+          if (round > ex.sets) return;
+          totalSec += ex.work;
+          const isLastExInLastRound = round === maxSets && idx === exercises.length - 1;
+          if (ex.rest > 0 && !isLastExInLastRound) totalSec += ex.rest;
+        });
+      }
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      const el = document.getElementById('total-time');
+      if (el) el.innerHTML = `Total workout time: <strong>${mins}:${secs.toString().padStart(2, '0')}</strong>`;
+    }
+
+    // ========== SAVED EXERCISES (localStorage) ==========
+    const SAVED_EX_KEY = 'sam_saved_exercises';
+
+    function getSavedExercises() {
+      try { return JSON.parse(localStorage.getItem(SAVED_EX_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function saveExercise(idx) {
+      const row = document.querySelectorAll('.exercise-row')[idx];
+      const inputs = row.querySelectorAll('input');
+      const name = inputs[0].value || 'Exercise';
+      const work = +inputs[1].value;
+      const rest = +inputs[2].value;
+      const sets = +inputs[3].value;
+      const saved = getSavedExercises();
+      if (saved.some(s => s.name === name)) {
+        showToast(`"${name}" already saved`);
+        return;
+      }
+      saved.push({ name, work, rest, sets });
+      localStorage.setItem(SAVED_EX_KEY, JSON.stringify(saved));
+      showToast(`Saved "${name}"`);
+      renderSavedList();
+    }
+
+    function deleteSavedExercise(idx) {
+      const saved = getSavedExercises();
+      saved.splice(idx, 1);
+      localStorage.setItem(SAVED_EX_KEY, JSON.stringify(saved));
+      renderSavedList();
+    }
+
+    function loadSavedExercise(idx) {
+      const saved = getSavedExercises();
+      const ex = saved[idx];
+      addExercise(ex.name, ex.work, ex.rest, ex.sets);
+    }
+
+    function toggleSavedList() {
+      const list = document.getElementById('saved-list');
+      const arrow = document.getElementById('saved-arrow');
+      list.classList.toggle('open');
+      arrow.innerHTML = list.classList.contains('open') ? '&#9660;' : '&#9654;';
+      if (list.classList.contains('open')) renderSavedList();
+    }
+
+    function renderSavedList() {
+      const saved = getSavedExercises();
+      const list = document.getElementById('saved-list');
+      if (saved.length === 0) {
+        list.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:0.8rem;">No saved exercises yet. Click the star next to an exercise to save it.</div>';
+        return;
+      }
+      list.innerHTML = saved.map((s, i) => `
+        <div class="saved-item" onclick="loadSavedExercise(${i})">
+          <div>
+            <div>${s.name}</div>
+            <span class="saved-item-info">${s.work}s work · ${s.rest}s rest · ${s.sets} sets</span>
+          </div>
+          <button class="saved-item-del" onclick="event.stopPropagation(); deleteSavedExercise(${i})">&times;</button>
+        </div>
+      `).join('');
+    }
 
     function buildQueue() {
       queue = [];
