@@ -410,6 +410,24 @@
     let queue = [];
     let queueIndex = 0;
     let workoutStartTime = null;
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) { /* browser may deny */ }
+    }
+    function releaseWakeLock() {
+      if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    }
+    // Re-acquire wake lock when tab becomes visible again
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && timerInterval && !paused) {
+        requestWakeLock();
+      }
+    });
 
     // Audio beep using Web Audio API
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -530,6 +548,7 @@
       });
 
       workoutStartTime = new Date();
+      requestWakeLock();
       buildQueue();
       queueIndex = 0;
       paused = false;
@@ -686,6 +705,7 @@
 
     function stopWorkout() {
       clearInterval(timerInterval);
+      releaseWakeLock();
       // Log as incomplete
       const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
       logWorkout({
@@ -732,6 +752,7 @@
 
     function finishWorkout() {
       clearInterval(timerInterval);
+      releaseWakeLock();
       const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
 
       // Log completed workout
