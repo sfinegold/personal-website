@@ -216,6 +216,26 @@
       overflow-y: auto;
     }
     .saved-list.open { display: block; }
+    .saved-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .saved-action-btn {
+      background: #f4f6fa;
+      border: 1px solid #c8cfe0;
+      border-radius: 6px;
+      color: #00288B;
+      cursor: pointer;
+      flex: 1;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 8px 10px;
+      text-transform: uppercase;
+    }
+    .saved-action-btn:hover { border-color: #00288B; }
     .saved-item {
       display: flex;
       align-items: center;
@@ -441,6 +461,15 @@
       <div id="exercise-list"></div>
       <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
       <div class="saved-section">
+        <button class="saved-toggle" onclick="toggleSavedWorkoutList()">
+          <span id="saved-workout-arrow">&#9654;</span> Saved Workouts
+        </button>
+        <div class="saved-actions">
+          <button class="saved-action-btn" onclick="saveCurrentWorkoutSet()">Save Current Workout</button>
+        </div>
+        <div class="saved-list" id="saved-workout-list"></div>
+      </div>
+      <div class="saved-section">
         <button class="saved-toggle" onclick="toggleSavedList()">
           <span id="saved-arrow">&#9654;</span> Saved Exercises
         </button>
@@ -497,6 +526,16 @@
       toast.textContent = msg || 'Workout logged ✓';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
     }
 
     // ========== TIMER STATE ==========
@@ -642,7 +681,7 @@
       list.innerHTML = exercises.map((e, i) => `
         <div class="exercise-row" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
           <button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder">&#8942;</button>
-          <input type="text" placeholder="Exercise ${i + 1}" value="${e.name}"
+          <input type="text" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}"
             onchange="exercises[${i}].name = this.value">
           <input type="number" value="${e.work}" min="5" step="5"
             onchange="exercises[${i}].work = +this.value; updateTotalTime()">
@@ -768,12 +807,108 @@
       list.innerHTML = saved.map((s, i) => `
         <div class="saved-item" onclick="loadSavedExercise(${i})">
           <div>
-            <div>${s.name}</div>
+            <div>${escapeHtml(s.name)}</div>
             <span class="saved-item-info">${s.work}s work · ${s.rest}s rest · ${s.sets} sets</span>
           </div>
           <button class="saved-item-del" onclick="event.stopPropagation(); deleteSavedExercise(${i})">&times;</button>
         </div>
       `).join('');
+    }
+
+    // ========== SAVED WORKOUTS (localStorage) ==========
+    const SAVED_WORKOUTS_KEY = 'sam_saved_workouts';
+
+    function getSavedWorkouts() {
+      try { return JSON.parse(localStorage.getItem(SAVED_WORKOUTS_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function getCurrentWorkoutSnapshot() {
+      syncExercisesFromRows();
+      return exercises.map(e => ({
+        name: e.name || 'Exercise',
+        work: e.work,
+        rest: e.rest,
+        sets: e.sets
+      }));
+    }
+
+    function saveCurrentWorkoutSet() {
+      const workoutExercises = getCurrentWorkoutSnapshot();
+      if (workoutExercises.length === 0) {
+        showToast('Add an exercise before saving a workout');
+        return;
+      }
+      const defaultName = `Workout ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      const name = prompt('Name this workout', defaultName);
+      if (!name) return;
+
+      const saved = getSavedWorkouts();
+      const existingIndex = saved.findIndex(w => w.name.toLowerCase() === name.trim().toLowerCase());
+      const workout = {
+        name: name.trim(),
+        exercises: workoutExercises,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (existingIndex >= 0) saved[existingIndex] = workout;
+      else saved.push(workout);
+
+      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      showToast(`Saved workout "${workout.name}"`);
+      renderSavedWorkoutList();
+    }
+
+    function loadSavedWorkout(idx) {
+      const saved = getSavedWorkouts();
+      const workout = saved[idx];
+      if (!workout) return;
+      exercises = workout.exercises.map(ex => ({
+        id: nextExerciseId++,
+        name: ex.name,
+        work: ex.work,
+        rest: ex.rest,
+        sets: ex.sets
+      }));
+      renderExercises();
+      showToast(`Loaded "${workout.name}"`);
+    }
+
+    function deleteSavedWorkout(idx) {
+      const saved = getSavedWorkouts();
+      const [removed] = saved.splice(idx, 1);
+      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      renderSavedWorkoutList();
+      if (removed) showToast(`Deleted "${removed.name}"`);
+    }
+
+    function toggleSavedWorkoutList() {
+      const list = document.getElementById('saved-workout-list');
+      const arrow = document.getElementById('saved-workout-arrow');
+      list.classList.toggle('open');
+      arrow.innerHTML = list.classList.contains('open') ? '&#9660;' : '&#9654;';
+      if (list.classList.contains('open')) renderSavedWorkoutList();
+    }
+
+    function renderSavedWorkoutList() {
+      const saved = getSavedWorkouts();
+      const list = document.getElementById('saved-workout-list');
+      if (saved.length === 0) {
+        list.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:0.8rem;">No saved workouts yet. Save the current exercise list to reuse it later.</div>';
+        return;
+      }
+      list.innerHTML = saved.map((workout, i) => {
+        const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.sets, 0);
+        return `
+          <div class="saved-item" onclick="loadSavedWorkout(${i})">
+            <div>
+              <div>${escapeHtml(workout.name)}</div>
+              <span class="saved-item-info">${workout.exercises.length} exercises · ${totalSets} total sets</span>
+            </div>
+            <button class="saved-item-del" onclick="event.stopPropagation(); deleteSavedWorkout(${i})">&times;</button>
+          </div>
+        `;
+      }).join('');
     }
 
     function buildQueue() {
