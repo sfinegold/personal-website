@@ -77,7 +77,7 @@
     /* Setup */
     .exercise-row {
       display: grid;
-      grid-template-columns: 1fr 60px 60px 50px 28px 28px;
+      grid-template-columns: 28px 1fr 60px 60px 50px 28px 28px;
       gap: 6px;
       align-items: center;
       margin-bottom: 8px;
@@ -93,9 +93,11 @@
     }
     .exercise-row input:focus { outline: none; border-color: #00288B; box-shadow: 0 0 0 2px rgba(0,40,139,0.15); }
     .exercise-row input[type="number"] { text-align: center; padding: 8px 4px; }
+    .exercise-row.drag-over { border-top: 2px solid #00288B; padding-top: 6px; }
+    .exercise-row.dragging { opacity: 0.45; }
     .label-row {
       display: grid;
-      grid-template-columns: 1fr 60px 60px 50px 28px 28px;
+      grid-template-columns: 28px 1fr 60px 60px 50px 28px 28px;
       gap: 6px;
       margin-bottom: 6px;
     }
@@ -117,6 +119,18 @@
       height: 36px;
     }
     .remove-btn:hover { color: #e55; }
+    .drag-handle {
+      background: none;
+      border: none;
+      color: #8a96ad;
+      cursor: grab;
+      font-size: 1rem;
+      height: 36px;
+      line-height: 1;
+      touch-action: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+    .drag-handle:hover { color: #00288B; }
     .btn {
       padding: 10px 20px;
       border: none;
@@ -416,6 +430,7 @@
       </div>
       <div class="header-stripe"></div>
       <div class="label-row">
+        <span></span>
         <span>Exercise</span>
         <span>Work</span>
         <span>Rest</span>
@@ -570,10 +585,62 @@
       renderExercises();
     }
 
+    let draggedExerciseIndex = null;
+
+    function syncExercisesFromRows() {
+      document.querySelectorAll('.exercise-row').forEach((row, i) => {
+        const inputs = row.querySelectorAll('input');
+        if (!exercises[i]) return;
+        exercises[i].name = inputs[0].value;
+        exercises[i].work = +inputs[1].value;
+        exercises[i].rest = +inputs[2].value;
+        exercises[i].sets = +inputs[3].value;
+      });
+    }
+
+    function moveExercise(fromIndex, toIndex) {
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return;
+      if (fromIndex >= exercises.length || toIndex >= exercises.length) return;
+      syncExercisesFromRows();
+      const [moved] = exercises.splice(fromIndex, 1);
+      exercises.splice(toIndex, 0, moved);
+      renderExercises();
+    }
+
+    function clearDragState() {
+      draggedExerciseIndex = null;
+      document.querySelectorAll('.exercise-row').forEach(row => {
+        row.classList.remove('dragging', 'drag-over');
+      });
+    }
+
+    function dragExerciseStart(event, index) {
+      draggedExerciseIndex = index;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(index));
+      event.currentTarget.closest('.exercise-row').classList.add('dragging');
+    }
+
+    function dragExerciseOver(event, index) {
+      event.preventDefault();
+      if (draggedExerciseIndex === null || draggedExerciseIndex === index) return;
+      event.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.exercise-row').forEach(row => row.classList.remove('drag-over'));
+      event.currentTarget.classList.add('drag-over');
+    }
+
+    function dropExercise(event, index) {
+      event.preventDefault();
+      const fromIndex = Number(event.dataTransfer.getData('text/plain'));
+      moveExercise(Number.isNaN(fromIndex) ? draggedExerciseIndex : fromIndex, index);
+      clearDragState();
+    }
+
     function renderExercises() {
       const list = document.getElementById('exercise-list');
       list.innerHTML = exercises.map((e, i) => `
-        <div class="exercise-row">
+        <div class="exercise-row" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
+          <button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder">&#8942;</button>
           <input type="text" placeholder="Exercise ${i + 1}" value="${e.name}"
             onchange="exercises[${i}].name = this.value">
           <input type="number" value="${e.work}" min="5" step="5"
