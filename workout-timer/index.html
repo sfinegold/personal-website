@@ -501,6 +501,7 @@
 
     // ========== TIMER STATE ==========
     let exercises = [];
+    let nextExerciseId = 1;
     let timerInterval = null;
     let paused = false;
     let currentSeconds = 0;
@@ -575,7 +576,7 @@
     }
 
     function addExercise(name = '', work = 30, rest = 15, sets = 4) {
-      const id = Date.now();
+      const id = nextExerciseId++;
       exercises.push({ id, name, work, rest, sets });
       renderExercises();
     }
