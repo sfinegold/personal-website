@@ -249,6 +249,30 @@
     .saved-item:last-child { border-bottom: none; }
     .saved-item:hover { background: #f4f6fa; }
     .saved-item-info { color: #3C638E; font-size: 0.75rem; }
+    .saved-item-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .saved-default-btn {
+      background: none;
+      border: 1px solid #c8cfe0;
+      border-radius: 999px;
+      color: #3C638E;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.5px;
+      padding: 3px 7px;
+      text-transform: uppercase;
+    }
+    .saved-default-btn.active {
+      background: #00288B;
+      border-color: #00288B;
+      color: #FDD201;
+    }
+    .saved-default-btn:hover { border-color: #00288B; color: #00288B; }
+    .saved-default-btn.active:hover { color: #FDD201; }
     .saved-item-del {
       background: none;
       border: none;
@@ -817,10 +841,15 @@
 
     // ========== SAVED WORKOUTS (localStorage) ==========
     const SAVED_WORKOUTS_KEY = 'sam_saved_workouts';
+    const DEFAULT_WORKOUT_KEY = 'sam_default_workout';
 
     function getSavedWorkouts() {
       try { return JSON.parse(localStorage.getItem(SAVED_WORKOUTS_KEY)) || []; }
       catch { return []; }
+    }
+
+    function getDefaultWorkoutName() {
+      return localStorage.getItem(DEFAULT_WORKOUT_KEY) || '';
     }
 
     function getCurrentWorkoutSnapshot() {
@@ -859,9 +888,7 @@
       renderSavedWorkoutList();
     }
 
-    function loadSavedWorkout(idx) {
-      const saved = getSavedWorkouts();
-      const workout = saved[idx];
+    function loadWorkout(workout, showLoadedToast = true) {
       if (!workout) return;
       exercises = workout.exercises.map(ex => ({
         id: nextExerciseId++,
@@ -871,13 +898,30 @@
         sets: ex.sets
       }));
       renderExercises();
-      showToast(`Loaded "${workout.name}"`);
+      if (showLoadedToast) showToast(`Loaded "${workout.name}"`);
+    }
+
+    function loadSavedWorkout(idx) {
+      const saved = getSavedWorkouts();
+      loadWorkout(saved[idx]);
+    }
+
+    function setDefaultWorkout(idx) {
+      const saved = getSavedWorkouts();
+      const workout = saved[idx];
+      if (!workout) return;
+      localStorage.setItem(DEFAULT_WORKOUT_KEY, workout.name);
+      showToast(`Default workout set to "${workout.name}"`);
+      renderSavedWorkoutList();
     }
 
     function deleteSavedWorkout(idx) {
       const saved = getSavedWorkouts();
       const [removed] = saved.splice(idx, 1);
       localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      if (removed && getDefaultWorkoutName() === removed.name) {
+        localStorage.removeItem(DEFAULT_WORKOUT_KEY);
+      }
       renderSavedWorkoutList();
       if (removed) showToast(`Deleted "${removed.name}"`);
     }
@@ -893,6 +937,7 @@
     function renderSavedWorkoutList() {
       const saved = getSavedWorkouts();
       const list = document.getElementById('saved-workout-list');
+      const defaultWorkoutName = getDefaultWorkoutName();
       if (saved.length === 0) {
         list.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:0.8rem;">No saved workouts yet. Save the current exercise list to reuse it later.</div>';
         return;
@@ -903,12 +948,26 @@
           <div class="saved-item" onclick="loadSavedWorkout(${i})">
             <div>
               <div>${escapeHtml(workout.name)}</div>
-              <span class="saved-item-info">${workout.exercises.length} exercises · ${totalSets} total sets</span>
+              <span class="saved-item-info">${workout.exercises.length} exercises · ${totalSets} total sets${defaultWorkoutName === workout.name ? ' · default' : ''}</span>
             </div>
-            <button class="saved-item-del" onclick="event.stopPropagation(); deleteSavedWorkout(${i})">&times;</button>
+            <div class="saved-item-actions">
+              <button class="saved-default-btn ${defaultWorkoutName === workout.name ? 'active' : ''}" onclick="event.stopPropagation(); setDefaultWorkout(${i})">${defaultWorkoutName === workout.name ? 'Default' : 'Set Default'}</button>
+              <button class="saved-item-del" onclick="event.stopPropagation(); deleteSavedWorkout(${i})">&times;</button>
+            </div>
           </div>
         `;
       }).join('');
+    }
+
+    function loadDefaultWorkout() {
+      const saved = getSavedWorkouts();
+      const defaultWorkoutName = getDefaultWorkoutName();
+      const defaultWorkout = saved.find(workout => workout.name === defaultWorkoutName);
+      if (defaultWorkout) {
+        loadWorkout(defaultWorkout, false);
+        return true;
+      }
+      return false;
     }
 
     function buildQueue() {
@@ -1167,15 +1226,18 @@
       }, 3000);
     }
 
-    // Pre-fill with the tennis workout
-    addExercise('KB Rot. Press (L)', 20, 0, 4);
-    addExercise('KB Rot. Press (R)', 20, 15, 4);
-    addExercise('KB Single-Leg RDL (L)', 20, 0, 4);
-    addExercise('KB Single-Leg RDL (R)', 20, 20, 4);
-    addExercise('KB Half-Kneel Chop (L)', 15, 0, 4);
-    addExercise('KB Half-Kneel Chop (R)', 15, 15, 4);
-    addExercise('KB Goblet Squat Hold', 40, 20, 4);
-    addExercise('Dead Bugs', 45, 15, 4);
+    function loadBuiltInWorkout() {
+      addExercise('KB Rot. Press (L)', 20, 0, 4);
+      addExercise('KB Rot. Press (R)', 20, 15, 4);
+      addExercise('KB Single-Leg RDL (L)', 20, 0, 4);
+      addExercise('KB Single-Leg RDL (R)', 20, 20, 4);
+      addExercise('KB Half-Kneel Chop (L)', 15, 0, 4);
+      addExercise('KB Half-Kneel Chop (R)', 15, 15, 4);
+      addExercise('KB Goblet Squat Hold', 40, 20, 4);
+      addExercise('Dead Bugs', 45, 15, 4);
+    }
+
+    if (!loadDefaultWorkout()) loadBuiltInWorkout();
   </script>
 </body>
 </html>
