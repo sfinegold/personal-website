@@ -10,35 +10,36 @@
 <style>
   :root{
     --blue:#1d4ed8; --blue-dark:#1e3a8a; --lime:#84cc16; --lime-ink:#4d7c0f;
-    --brand-blue:var(--blue);            /* drives V markers + yard signs */
+    --brand-blue:var(--blue);
     --ink:#0f172a; --muted:#64748b; --line:#e6eaf2; --bg:#f6f8fc;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:#0b1020;color:var(--ink);overflow:hidden}
   #deck{position:fixed;inset:0}
-  .slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg);padding:4.5vh 6vw;overflow:hidden}
+  /* slides fill the screen: content is vertically centered */
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;background:var(--bg);padding:5vh 6vw;overflow:hidden}
   .slide.active{display:flex;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .kicker{font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}
-  h1{font-size:46px;line-height:1.07;margin:.12em 0 .25em;color:var(--ink)}
-  h2{font-size:33px;line-height:1.12;margin:.05em 0 .15em;color:var(--ink)}
-  .sub{font-size:18px;color:#475569;max-width:62ch;line-height:1.5;margin:0}
-  ul.pts{font-size:18px;line-height:1.5;color:#1f2937;max-width:60ch;padding-left:1.05em;margin:14px 0 0}
-  ul.pts li{margin:.4em 0}
+  .kicker{font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}
+  h1{font-size:52px;line-height:1.06;margin:.12em 0 .25em;color:var(--ink)}
+  h2{font-size:36px;line-height:1.12;margin:.05em 0 .2em;color:var(--ink)}
+  .sub{font-size:19px;color:#475569;max-width:60ch;line-height:1.55;margin:0}
+  ul.pts{font-size:19px;line-height:1.55;color:#1f2937;max-width:60ch;padding-left:1.05em;margin:16px 0 0}
+  ul.pts li{margin:.5em 0}
   ul.pts li b{color:var(--ink)}
-  .tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:999px;padding:5px 12px;margin-bottom:14px}
+  .tag{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:999px;padding:5px 13px;margin-bottom:16px;align-self:flex-start}
   .tag.lime{background:var(--lime);color:#1a2e05}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;flex:1;min-height:0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;width:100%}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
   .muted{color:var(--muted)}
   .accent{color:var(--lime-ink)}
   /* title */
-  .title-slide{justify-content:center;background:linear-gradient(135deg,#eaf0ff 0%,var(--bg) 55%)}
-  .chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
-  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-weight:700;font-size:15px}
+  .title-slide{background:linear-gradient(135deg,#eaf0ff 0%,var(--bg) 55%)}
+  .chips{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:700;font-size:15px}
   .chip .d{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--lime);margin-right:7px}
-  .name{font-size:17px;color:#334155;margin-top:10px}
+  .name{font-size:18px;color:#334155;margin-top:12px}
   /* footer nav */
   #nav{position:fixed;left:0;right:0;bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;z-index:50}
   .nv{width:9px;height:9px;border-radius:50%;background:#cbd5e1;cursor:pointer;border:none;padding:0}
@@ -47,57 +48,53 @@
   .ftag{position:fixed;left:16px;bottom:30px;font-size:12px;color:#94a3b8;z-index:50}
   .ftag b{color:var(--blue)}
   /* metrics */
-  .metrics{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 4px}
-  .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 22px;flex:1;min-width:170px}
-  .metric .n{font-size:40px;font-weight:800;color:var(--blue);line-height:1}
-  .metric .l{font-size:14px;color:#475569;margin-top:6px}
+  .metrics{display:flex;gap:20px;flex-wrap:wrap;width:100%;margin:4px 0 6px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;flex:1;min-width:180px}
+  .metric .n{font-size:46px;font-weight:800;color:var(--blue);line-height:1}
+  .metric .l{font-size:15px;color:#475569;margin-top:8px}
   /* flow pills */
   .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
   .flow .p{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px}
   .flow .p.now{background:var(--blue);color:#fff;border-color:var(--blue)}
   .flow .ar{color:#94a3b8;font-weight:800}
-  /* AI take cards */
-  .ai-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:26px}
-  .ai-card{background:#fff;border:1px solid var(--line);border-top:4px solid #94a3b8;border-radius:16px;padding:20px 20px 22px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  /* 3-up cards */
+  .ai-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:30px;width:100%}
+  .ai-card{background:#fff;border:1px solid var(--line);border-top:4px solid #94a3b8;border-radius:16px;padding:26px 24px 28px;box-shadow:0 1px 3px rgba(15,23,42,.05);min-height:220px}
   .ai-card.good{border-top-color:#16a34a}.ai-card.pot{border-top-color:var(--blue)}.ai-card.no{border-top-color:#f59e0b}
   .ai-card .ai-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-  .ai-card .ai-t{font-size:21px;font-weight:800;color:var(--ink);margin:6px 0 9px}
-  .ai-card p{font-size:15px;line-height:1.5;color:#475569;margin:0}
+  .ai-card .ai-t{font-size:23px;font-weight:800;color:var(--ink);margin:8px 0 10px}
+  .ai-card p{font-size:16px;line-height:1.55;color:#475569;margin:0}
   /* phone frame */
-  .phone{width:230px;height:468px;background:#0b1020;border-radius:34px;padding:10px;box-shadow:0 18px 50px rgba(10,20,45,.28);flex-shrink:0}
-  .phone .scr{position:relative;width:100%;height:100%;background:#fff;border-radius:26px;overflow:hidden}
-  .phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:18px;background:#0b1020;border-radius:0 0 12px 12px;z-index:5}
-  .ph-row{display:flex;gap:22px;justify-content:center;align-items:flex-start}
+  .phone{width:248px;height:520px;background:#0b1020;border-radius:36px;padding:10px;box-shadow:0 18px 50px rgba(10,20,45,.28);flex-shrink:0}
+  .phone .scr{position:relative;width:100%;height:100%;background:#fff;border-radius:28px;overflow:hidden}
+  .phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:18px;background:#0b1020;border-radius:0 0 12px 12px;z-index:5}
+  .ph-row{display:flex;gap:20px;justify-content:center;align-items:flex-start}
   .ph-cap{text-align:center;font-size:13.5px;font-weight:700;color:#334155;margin-top:10px}
   .ph-cap span{display:block;font-weight:500;color:#94a3b8;font-size:12px;margin-top:2px}
   /* signup mock */
-  .su{padding:34px 18px 0;text-align:center;height:100%;display:flex;flex-direction:column}
-  .su .logo{width:42px;height:42px;border-radius:11px;background:var(--blue);color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin:6px auto 12px}
-  .su h3{margin:0 0 4px;font-size:18px}
-  .su p{margin:0 0 16px;font-size:12.5px;color:#64748b;line-height:1.4}
-  .su input{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:13px;margin-bottom:9px}
-  .su .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-weight:800;font-size:14px}
-  .su .ok{margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:10px;padding:10px;font-size:12.5px;font-weight:700}
+  .su{padding:40px 20px 0;text-align:center;height:100%;display:flex;flex-direction:column}
+  .su .logo{width:46px;height:46px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:24px;display:flex;align-items:center;justify-content:center;margin:8px auto 14px}
+  .su h3{margin:0 0 5px;font-size:19px}
+  .su p{margin:0 0 18px;font-size:13px;color:#64748b;line-height:1.45}
+  .su input{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:13px;margin-bottom:10px}
+  .su .btn{width:100%;padding:12px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-weight:800;font-size:14px}
+  .su .ok{margin-top:18px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:10px;padding:11px;font-size:13px;font-weight:700}
   .su .ok .c{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--lime);color:#1a2e05;align-items:center;justify-content:center;font-weight:800;margin-right:6px}
-  /* mini map (door-marking mock) */
-  .mini{position:absolute;inset:0;background:
-      repeating-linear-gradient(0deg,#eef2f7 0 1px,transparent 1px 46px),
-      repeating-linear-gradient(90deg,#eef2f7 0 1px,transparent 1px 52px),#f4f6fb}
-  .mini .pin{position:absolute;transform:translate(-50%,-100%)}
-  .mini .sheet{position:absolute;left:8px;right:8px;bottom:8px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 -2px 14px rgba(10,20,45,.12);padding:10px 11px}
-  .mini .sheet h4{margin:0;font-size:13px}
-  .mini .sheet .ad{font-size:10.5px;color:#94a3b8;margin:1px 0 7px}
-  .mini .sheet .opts{display:flex;gap:5px}
-  .mini .sheet .o{flex:1;text-align:center;border-radius:7px;padding:6px 0;font-size:10.5px;font-weight:800;border:1.5px solid}
+  /* phone leaflet map (walk a route) */
+  #m-map{position:absolute;inset:0;z-index:1;background:#e9eef5}
+  .m-chip{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:600;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:800;color:var(--blue);box-shadow:0 2px 10px rgba(10,20,45,.2);display:flex;align-items:center;gap:7px}
+  .m-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--lime)}
+  @keyframes wpulse{0%{box-shadow:0 0 0 0 rgba(29,78,216,.5),0 1px 4px rgba(0,0,0,.3)}70%{box-shadow:0 0 0 11px rgba(29,78,216,0),0 1px 4px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(29,78,216,0),0 1px 4px rgba(0,0,0,.3)}}
+  .wmk{width:14px;height:14px;border-radius:50%;background:#1d4ed8;border:3px solid #fff;animation:wpulse 1.2s infinite}
   /* MiniVAN "before" mock */
   .mv{height:100%;display:flex;flex-direction:column;background:#eef0f2}
-  .mv .bar{background:#3b4250;color:#fff;padding:10px 12px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .mv .bar{background:#3b4250;color:#fff;padding:11px 13px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
   .mv .bar .bat{font-size:11px;color:#fca5a5}
-  .mv .li{display:flex;align-items:center;gap:8px;padding:11px 12px;border-bottom:1px solid #dfe3e8;background:#fff;font-size:12px}
+  .mv .li{display:flex;align-items:center;gap:8px;padding:12px 13px;border-bottom:1px solid #dfe3e8;background:#fff;font-size:12px}
   .mv .li .nm{flex:1;min-width:0}
   .mv .li .nm small{color:#94a3b8;display:block;font-size:10px}
   .mv .li .b{font-size:9.5px;font-weight:700;border:1px solid #9aa3af;border-radius:5px;padding:4px 6px;color:#56607a}
-  .mv .sync{margin-top:auto;background:#dfe3e8;color:#56607a;text-align:center;font-size:11px;padding:9px;font-weight:700}
+  .mv .sync{margin-top:auto;background:#dfe3e8;color:#56607a;text-align:center;font-size:11px;padding:10px;font-weight:700}
   /* map slide */
   #map-slide{padding:0;background:#dfe3ea}
   #mapwrap{position:absolute;inset:0}
@@ -168,7 +165,7 @@
     </div>
   </section>
 
-  <!-- CONTEXT -->
+  <!-- 2 CONTEXT -->
   <section class="slide">
     <span class="tag">Context</span>
     <div class="two">
@@ -180,24 +177,24 @@
           <li><b>Background:</b> product management + data science / statistics.</li>
         </ul>
       </div>
-      <div class="card" style="padding:20px 22px">
+      <div class="card" style="padding:24px 26px">
         <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Name ID at entry</div>
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
           <div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Mahan</span><span>~37%</span></div>
-            <div style="height:16px;background:#eef2f7;border-radius:999px;overflow:hidden;margin-top:5px"><span style="display:block;height:100%;width:37%;background:var(--blue);border-radius:999px"></span></div>
+            <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700"><span>Mahan</span><span>~37%</span></div>
+            <div style="height:18px;background:#eef2f7;border-radius:999px;overflow:hidden;margin-top:6px"><span style="display:block;height:100%;width:37%;background:var(--blue);border-radius:999px"></span></div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#475569"><span>Top rivals</span><span>80%+</span></div>
-            <div style="height:16px;background:#eef2f7;border-radius:999px;overflow:hidden;margin-top:5px"><span style="display:block;height:100%;width:82%;background:#94a3b8;border-radius:999px"></span></div>
+            <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#475569"><span>Top rivals</span><span>80%+</span></div>
+            <div style="height:18px;background:#eef2f7;border-radius:999px;overflow:hidden;margin-top:6px"><span style="display:block;height:100%;width:82%;background:#94a3b8;border-radius:999px"></span></div>
           </div>
         </div>
-        <div class="muted" style="font-size:12.5px;margin-top:14px;line-height:1.5">Low name ID, late start — every efficient voter contact mattered.</div>
+        <div class="muted" style="font-size:13px;margin-top:16px;line-height:1.5">Low name ID, late start — every efficient voter contact mattered.</div>
       </div>
     </div>
   </section>
 
-  <!-- THREE WORKSTREAMS -->
+  <!-- 3 THREE WORKSTREAMS -->
   <section class="slide">
     <span class="tag">What I worked on</span>
     <h2>Three workstreams</h2>
@@ -206,41 +203,41 @@
       <div class="ai-card pot"><div class="ai-h">2 · Build</div><div class="ai-t">Internal web apps</div><p>Tools for the team — field planning and modeling output in rich reports.</p></div>
       <div class="ai-card good"><div class="ai-h">3 · Organize</div><div class="ai-t">Field organizing</div><p>A volunteer field app on top of NGP — the swing with the most traction.</p></div>
     </div>
-    <p class="sub" style="margin-top:26px">Field organizing was <b>one</b> component — and the one that took off. The next slides walk through it, then zoom back out.</p>
+    <p class="sub" style="margin-top:30px">Field organizing was <b>one</b> component — and the one that took off. The next slides walk through it, then zoom back out.</p>
   </section>
 
-  <!-- POLL ANALYSIS -->
+  <!-- 4 POLL ANALYSIS -->
   <section class="slide">
     <span class="tag">Workstream 1 · Analyze</span>
-    <h2>AI-accelerated polling → ad targeting</h2>
     <div class="two">
       <div>
+        <h2>AI-accelerated polling → ad targeting</h2>
         <ul class="pts">
           <li><b>AI was good at:</b> cleaning &amp; prepping data, writing model code, interpreting results, and shaping output files.</li>
           <li><b>Human judgment stayed essential:</b> which data to trust, how to combine poll methodologies, and pairing findings with the final ad copy.</li>
           <li><b>Lesson:</b> you're limited by your data — good polling is necessary — and you should structure questions to learn which message actually moves voters.</li>
         </ul>
       </div>
-      <div class="card" style="padding:20px 22px">
+      <div class="card" style="padding:24px 26px">
         <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Structure polls to measure persuasion</div>
-        <div class="flow" style="margin-top:16px">
+        <div class="flow" style="margin-top:18px">
           <span class="p">Baseline ID</span><span class="ar">→</span><span class="p now">Show a message</span><span class="ar">→</span><span class="p">Re-ask ID</span>
         </div>
-        <div class="muted" style="font-size:13px;margin-top:16px;line-height:1.55">The shift between the two IDs tells you which bio or ad copy is persuasive — then you run that as the ad.</div>
+        <div class="muted" style="font-size:14px;margin-top:18px;line-height:1.55">The shift between the two IDs tells you which bio or ad copy is persuasive — then you run that as the ad.</div>
       </div>
     </div>
   </section>
 
-  <!-- 2 PROBLEM -->
+  <!-- 5 FIELD: PROBLEM -->
   <section class="slide">
     <span class="tag">Workstream 3 · Field organizing</span>
     <div class="two">
       <div>
         <h2>The problem: capacity left on the table</h2>
         <ul class="pts">
-          <li>Volunteers can only canvass <b>when an organizer has cut turf</b> for them — so huge volunteer walking capacity goes unused.</li>
-          <li><b>MiniVAN is clunky:</b> a separate app that drains battery, takes lots of taps to mark a door, and isn't personalized to the campaign — or <em>fun</em>.</li>
-          <li>The result: people who want to help can't just <b>pick up their phone and go</b>.</li>
+          <li>Volunteers could only canvass <b>when an organizer cut turf</b> — leaving huge volunteer walking capacity unused.</li>
+          <li><b>MiniVAN is clunky:</b> a separate app that drains battery, takes lots of taps per door, and isn't personalized — or <em>fun</em>.</li>
+          <li>People who wanted to help couldn't just <b>pick up their phone and go</b>.</li>
         </ul>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center">
@@ -260,35 +257,45 @@
     </div>
   </section>
 
-  <!-- 3 SOLUTION / volunteer experience (mobile) -->
+  <!-- 6 FIELD: THE APP (text left, phones right) -->
   <section class="slide">
     <span class="tag lime">Workstream 3 · The app</span>
-    <h2>Volunteers walk on their own time</h2>
-    <p class="sub">An independent web app on top of NGP — opened right off the campaign website. Sign up in seconds, get a turf, mark doors, drop signs. Personalized to the campaign, built to feel good to use.</p>
-    <div class="ph-row" style="margin-top:18px">
+    <div class="two">
       <div>
-        <div class="phone"><div class="scr"><div class="notch"></div>
-          <div class="su">
-            <div class="logo">M</div>
-            <h3>Join the field team</h3>
-            <p>No app to install. Tap the link on the campaign site and you're in.</p>
-            <input value="volunteer@email.com" readonly />
-            <div class="btn">Send my magic link →</div>
-            <div class="ok"><span class="c">✓</span>You're in — here's your turf.</div>
-          </div>
-        </div></div>
-        <div class="ph-cap">1 · Sign up off the website</div>
+        <h2>Volunteers walk on their own time</h2>
+        <p class="sub">An independent web app on top of NGP — opened right off the campaign website.</p>
+        <ul class="pts">
+          <li><b>Sign up in seconds</b> — magic link, no app to install.</li>
+          <li><b>Walk your route</b> — mark doors and drop signs as you go.</li>
+          <li><b>On your own time</b> — no organizer needed to cut turf first.</li>
+        </ul>
       </div>
-      <div>
-        <div class="phone"><div class="scr"><div class="notch"></div>
-          <div class="mini" id="m-doors"></div>
-        </div></div>
-        <div class="ph-cap">2 · Mark doors &amp; drop signs</div>
+      <div class="ph-row">
+        <div>
+          <div class="phone"><div class="scr"><div class="notch"></div>
+            <div class="su">
+              <div class="logo">M</div>
+              <h3>Join the field team</h3>
+              <p>No app to install. Tap the link on the campaign site and you're in.</p>
+              <input value="volunteer@email.com" readonly />
+              <div class="btn">Send my magic link →</div>
+              <div class="ok"><span class="c">✓</span>You're in — here's your turf.</div>
+            </div>
+          </div></div>
+          <div class="ph-cap">1 · Sign up off the website</div>
+        </div>
+        <div>
+          <div class="phone"><div class="scr"><div class="notch"></div>
+            <div id="m-map"></div>
+            <div class="m-chip"><span class="dot"></span>Walking your route · on your own time</div>
+          </div></div>
+          <div class="ph-cap">2 · Walk &amp; mark doors</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 4 LIVE MAP -->
+  <!-- 7 LIVE MAP -->
   <section class="slide" id="map-slide">
     <div id="mapwrap">
       <div id="map"></div>
@@ -321,30 +328,7 @@
     </div>
   </section>
 
-  <!-- 5 IMPACT -->
-  <section class="slide">
-    <span class="tag">Impact · Mahan for California</span>
-    <h2>Real traction, in a few weeks</h2>
-    <div class="metrics" style="margin-top:14px">
-      <div class="metric"><div class="n">200+</div><div class="l">Volunteers signed up</div></div>
-      <div class="metric"><div class="n">14K+</div><div class="l">Houses reached</div></div>
-      <div class="metric"><div class="n">1.3K+</div><div class="l">Digital actions taken</div></div>
-    </div>
-    <div class="two" style="margin-top:6px">
-      <ul class="pts">
-        <li><b>Exponential growth</b> for the first weeks — volunteers self-serving turf with no organizer bottleneck.</li>
-        <li>Built and shipped on a lean stack (Claude Code · Supabase · Vercel), expanding features in near real-time.</li>
-        <li>Each door flows back to <b>NGP VAN</b> as a canvass response — no data left behind.</li>
-      </ul>
-      <div class="card" style="padding:16px 18px">
-        <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Of contacted voters</div>
-        <div id="a-support" style="margin-top:8px"></div>
-        <div class="muted" style="font-size:12px;margin-top:6px">Live from the demo canvass — the same breakdown organizers get.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AI POV -->
+  <!-- 8 AI TAKE -->
   <section class="slide">
     <span class="tag">AI in campaigns — my take</span>
     <h2>Where AI helps today — and where it doesn't</h2>
@@ -365,27 +349,36 @@
         <p>End-to-end creative — the finished ad still needs human voice, taste, and sign-off.</p>
       </div>
     </div>
-    <p class="sub" style="margin-top:28px"><strong class="accent">The pattern:</strong> AI expands productivity on rote and analytical work — humans keep the judgment, the voice, and the final call.</p>
+    <p class="sub" style="margin-top:30px"><strong class="accent">The pattern:</strong> AI expands productivity on rote and analytical work — humans keep the judgment, the voice, and the final call.</p>
   </section>
 
-  <!-- 6 WHAT'S NEXT / RELATIONAL -->
+  <!-- 9 IMPACT + WHERE IT GOES -->
   <section class="slide">
-    <span class="tag lime">Reflections &amp; where it goes</span>
-    <h2>From walking turf to a volunteer engine</h2>
-    <div class="flow">
-      <span class="p now">Independent lit drop</span><span class="ar">→</span>
-      <span class="p">Organized events</span><span class="ar">→</span>
-      <span class="p">Canvassing</span><span class="ar">→</span>
-      <span class="p">Gamification</span><span class="ar">→</span>
-      <span class="p">Digital tasks</span>
+    <span class="tag lime">Impact &amp; what's next</span>
+    <h2>Real traction — and where it goes</h2>
+    <div class="metrics">
+      <div class="metric"><div class="n">200+</div><div class="l">Volunteers signed up</div></div>
+      <div class="metric"><div class="n">14K+</div><div class="l">Houses reached</div></div>
+      <div class="metric"><div class="n">1.3K+</div><div class="l">Digital actions taken</div></div>
     </div>
-    <ul class="pts" style="margin-top:20px">
-      <li><b>Deeper NGP integration:</b> the API lets us read/write voters programmatically — e.g. spin up <b>phone banking</b> on the same base.</li>
-      <li><b>Relational organizing</b> is the big unlock to fine-tune: nudge volunteers to bring in their friends &amp; networks — the highest-trust, highest-converting outreach there is.</li>
-      <li>Because it's our own app, capabilities grow in near real-time — not limited to what VAN allows.</li>
-      <li><b>For the next campaign:</b> stand up a team/enterprise AI account rather than bespoke per-function apps — and treat <b>volunteer engagement</b> (field + digital) as the biggest opportunity.</li>
-    </ul>
-    <p class="sub" style="margin-top:18px"><strong class="accent">The bet:</strong> meet volunteers where they are, make helping feel good, and compound it through their networks.</p>
+    <div class="two" style="margin-top:12px">
+      <div class="card" style="padding:18px 20px">
+        <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Of contacted voters (live demo)</div>
+        <div id="a-support" style="margin-top:10px"></div>
+        <div class="muted" style="font-size:12.5px;margin-top:6px">Exponential growth the first weeks — volunteers self-serving turf, no organizer bottleneck.</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">Where it could go</div>
+        <div class="flow" style="margin-top:12px">
+          <span class="p now">Lit drop</span><span class="ar">→</span><span class="p">Events</span><span class="ar">→</span><span class="p">Canvassing</span><span class="ar">→</span><span class="p">Gamify</span><span class="ar">→</span><span class="p">Digital</span>
+        </div>
+        <ul class="pts" style="margin-top:16px;font-size:17px">
+          <li><b>Relational organizing</b> — nudge volunteers to bring in their networks.</li>
+          <li><b>Deeper NGP integration</b> — e.g. phone banking on the same base.</li>
+          <li><b>Volunteer engagement</b> (field + digital) is the biggest opportunity.</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
 </div>
@@ -410,20 +403,21 @@
       +'<div class="wm-pointer" style="width:8px;height:8px;"></div></div></div>';
   }
   function pinIcon(h){var b=layout(h.label);return L.divIcon({className:'',html:markerHtml(h.status,h.label,h.supporter?['✋']:[]),iconSize:[b.tapW,b.tapH],iconAnchor:[Math.round(b.tapW/2),b.tapH]});}
+  function pIcon(status,label){var b=layout(label);return L.divIcon({className:'',html:markerHtml(status,label,null),iconSize:[b.tapW,b.tapH],iconAnchor:[Math.round(b.tapW/2),b.tapH]});}
   function signHtml(){var e='var(--brand-blue,#1d4ed8)';return '<div style="position:relative;width:30px;height:40px;filter:drop-shadow(0 1px 2px rgba(10,37,64,.3));"><div style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:28px;height:20px;border-radius:3px;background:#fff;border:2px solid '+e+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:'+e+';">M</div><div style="position:absolute;left:50%;top:20px;transform:translateX(-50%);width:2.5px;height:18px;background:#9ca3af;"></div></div>';}
   function signIcon(){return L.divIcon({className:'',html:signHtml(),iconSize:[30,40],iconAnchor:[15,40]});}
   function vIcon(c){return L.divIcon({className:'',html:'<div style="position:relative;width:36px;height:36px;"><div style="position:absolute;left:3px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--brand-blue,#1d4ed8);border:2px solid #fff;box-shadow:0 2px 6px rgba(10,37,64,.35);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);color:#fff;font:800 15px system-ui;">V</span></div><div style="position:absolute;top:-7px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#fff;color:var(--brand-blue,#1d4ed8);border:1.5px solid var(--brand-blue,#1d4ed8);font:800 11px system-ui;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">'+c+'</div></div>',iconSize:[36,36],iconAnchor:[18,36]});}
 
-  /* ---------- synthetic SF data ---------- */
+  /* ---------- synthetic SF data (scattered, sparse) ---------- */
   var CENTER=[37.7765,-122.4255],ROWS=10,COLS=11,houses=[],id=0;
   for(var r=0;r<ROWS;r++){var lat=CENTER[0]-0.0034+r*0.00072;
     for(var c=0;c<COLS;c++){
-      if(Math.random()>0.58)continue;                       // scatter: keep ~58% so houses sit sparse around the neighborhood
+      if(Math.random()>0.58)continue;
       var lon=CENTER[1]-0.0052+c*0.00094+(Math.random()-0.5)*0.0006;
       houses.push({id:id++,lat:lat+(Math.random()-0.5)*0.00048,lon:lon,label:String(1100+r*100+c*2),status:'not_attempted',supporter:false,sign:false});}}
   var VOLS=[{lat:CENTER[0]+0.0018,lon:CENTER[1]-0.0030,n:5},{lat:CENTER[0]-0.0016,lon:CENTER[1]+0.0026,n:3},{lat:CENTER[0]+0.0006,lon:CENTER[1]+0.0008,n:8}];
 
-  /* ---------- live map ---------- */
+  /* ---------- live hero map ---------- */
   var map,pins=L.layerGroup(),signs=L.layerGroup(),vols=L.layerGroup();
   function initMap(){if(map)return;
     map=L.map('map',{zoomControl:true}).setView(CENTER,15);
@@ -450,6 +444,38 @@
   document.getElementById('play').addEventListener('click',function(){timer?stop():start();});
   document.getElementById('reset').addEventListener('click',function(){stop();resetDays();});
 
+  /* ---------- phone map: walk a route on your own time ---------- */
+  var P_ROUTE=[[37.7748,-122.4242],[37.7748,-122.4232],[37.7748,-122.4222],[37.7748,-122.4212],[37.7754,-122.4212],[37.7754,-122.4222],[37.7754,-122.4232],[37.7754,-122.4242]];
+  var P_STATUS=['likely','not_home','undecided','likely','not_home','likely','undecided','likely'];
+  var P_SIGN=[true,false,false,false,false,true,false,false];
+  var pmap,pMarkers=[],pSignLayer,pWalker,pAnim=null;
+  function walkerIcon(){return L.divIcon({className:'',html:'<div class="wmk"></div>',iconSize:[14,14],iconAnchor:[7,7]});}
+  function initPhoneMap(){
+    if(pmap){pmap.invalidateSize();return;}
+    pmap=L.map('m-map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,tap:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(pmap);
+    L.polyline(P_ROUTE,{color:'#1d4ed8',weight:4,opacity:.55,dashArray:'1 9',lineCap:'round'}).addTo(pmap);
+    pSignLayer=L.layerGroup().addTo(pmap);
+    P_ROUTE.forEach(function(pt,i){pMarkers.push(L.marker(pt,{icon:pIcon('not_attempted',String(12+i*2))}).addTo(pmap));});
+    pWalker=L.marker(P_ROUTE[0],{icon:walkerIcon(),zIndexOffset:1000}).addTo(pmap);
+    pmap.fitBounds(L.latLngBounds(P_ROUTE),{padding:[34,34]});
+    setTimeout(function(){if(pmap.getZoom()>15)pmap.setZoom(pmap.getZoom()-1);},20); // a bit zoomed out
+  }
+  function resetWalk(){P_ROUTE.forEach(function(pt,i){pMarkers[i].setIcon(pIcon('not_attempted',String(12+i*2)));});if(pSignLayer)pSignLayer.clearLayers();if(pWalker)pWalker.setLatLng(P_ROUTE[0]);}
+  function markP(i){pMarkers[i].setIcon(pIcon(P_STATUS[i],String(12+i*2)));if(P_SIGN[i])L.marker([P_ROUTE[i][0]+0.00012,P_ROUTE[i][1]+0.00012],{icon:signIcon()}).addTo(pSignLayer);}
+  function startWalk(){
+    if(!pmap||pAnim)return;
+    resetWalk();markP(0);
+    var i=0,t=0,STEPS=22;
+    pAnim=setInterval(function(){
+      if(i>=P_ROUTE.length-1){clearInterval(pAnim);pAnim=null;setTimeout(function(){resetWalk();markP(0);startWalk();},1500);return;}
+      t++;var a=P_ROUTE[i],b=P_ROUTE[i+1],f=t/STEPS;
+      pWalker.setLatLng([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);
+      if(t>=STEPS){t=0;i++;markP(i);}
+    },36);
+  }
+  function stopWalk(){if(pAnim){clearInterval(pAnim);pAnim=null;}}
+
   /* ---------- analytics (impact slide) ---------- */
   function bar(lab,val,denom,max,color){var pct=denom?Math.round(val/denom*100):0,w=max?Math.round(val/max*100):0;
     return '<div class="bk"><span class="lab">'+lab+'</span><span class="bar"><span style="width:'+w+'%;background:'+color+'"></span></span><span class="val"><b>'+val+'</b> · '+pct+'%</span></div>';}
@@ -457,25 +483,12 @@
     if(lk+un+op===0){lk=58;un=84;op=39;}var t=lk+un+op,mx=Math.max(lk,un,op,1);
     document.getElementById('a-support').innerHTML=bar('Likely support',lk,t,mx,'#16a34a')+bar('Undecided',un,t,mx,'#2563eb')+bar('Not supporting',op,t,mx,'#dc2626');}
 
-  /* ---------- mobile door-marking mock (slide 3) ---------- */
-  var mdHouses=[[18,30],[46,22],[72,34],[28,58],[58,52],[84,62],[20,84],[50,80],[80,86]];
-  var mdRunning=false;
-  function buildDoors(){var el=document.getElementById('m-doors');if(!el||el.dataset.built)return;el.dataset.built='1';
-    mdHouses.forEach(function(p,i){var d=document.createElement('div');d.className='pin';d.style.left=p[0]+'%';d.style.top=p[1]+'%';d.id='md'+i;d.innerHTML=markerHtml('not_attempted',String(12+i*2));el.appendChild(d);});
-    var sh=document.createElement('div');sh.className='sheet';sh.innerHTML='<h4>1424 Oak St</h4><div class="ad">2 voters · tap a result</div><div class="opts"><span class="o" style="border-color:#16a34a;color:#16a34a">Likely</span><span class="o" style="border-color:#2563eb;color:#2563eb">Undec.</span><span class="o" style="border-color:#dc2626;color:#dc2626">No</span></div>';el.appendChild(sh);}
-  function setDoor(i,status,sign){var d=document.getElementById('md'+i);if(!d)return;d.innerHTML=markerHtml(status,String(12+i*2),null);
-    if(sign){var s=document.createElement('div');s.className='pin md-sign';s.style.left=(mdHouses[i][0]+6)+'%';s.style.top=(mdHouses[i][1]-2)+'%';s.innerHTML=signHtml();d.parentElement.appendChild(s);}}
-  function playDoors(){buildDoors();if(mdRunning)return;mdRunning=true;
-    var seq=[[0,'likely',true],[1,'not_home',false],[2,'undecided',false],[4,'likely',false],[5,'not_home',false],[7,'likely',true],[8,'undecided',false]];var k=0;
-    function tick(){if(k>=seq.length){setTimeout(function(){mdHouses.forEach(function(_,i){setDoor(i,'not_attempted',false);});[].slice.call(document.querySelectorAll('#m-doors .md-sign')).forEach(function(s){s.remove();});k=0;setTimeout(tick,700);},1600);return;}var s=seq[k++];setDoor(s[0],s[1],s[2]);setTimeout(tick,640);}
-    tick();}
-
   /* ---------- deck nav ---------- */
   var slides=[].slice.call(document.querySelectorAll('.slide')),nav=document.getElementById('nav'),cur=0;
   slides.forEach(function(_,i){var b=document.createElement('button');b.className='nv'+(i===0?' on':'');b.onclick=function(){go(i);};nav.appendChild(b);});
-  function go(i){if(i<0||i>=slides.length)return;slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');
+  function go(i){if(i<0||i>=slides.length)return;stopWalk();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');
     if(slides[cur].id==='map-slide'){initMap();setTimeout(function(){map.invalidateSize();},60);if(day===0&&!timer)setTimeout(start,400);}
-    if(slides[cur].querySelector('#m-doors'))playDoors();
+    if(slides[cur].querySelector('#m-map')){initPhoneMap();setTimeout(function(){pmap.invalidateSize();startWalk();},140);}
     if(slides[cur].querySelector('#a-support'))renderAnalytics();}
   document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}else if(e.key==='ArrowLeft'){go(cur-1);}else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
 
