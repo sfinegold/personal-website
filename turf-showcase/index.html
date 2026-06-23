@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Turf — AI Open Mic showcase</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --brand-blue:#6d28d9;        /* Sam the Supreme Ruler — regal purple */
+    --brand-blue-dark:#5b21b6;
+    --brand-lime:#a78bfa;
+    --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --bg:#f6f5fb;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:#0b1020;color:var(--ink);overflow:hidden;}
+  /* Deck */
+  #deck{position:fixed;inset:0;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;
+    background:var(--bg);padding:5vh 7vw;overflow:hidden;}
+  .slide.active{display:flex;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .kicker{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-blue);}
+  h1{font-size:46px;line-height:1.08;margin:.15em 0 .25em;}
+  h2{font-size:34px;line-height:1.12;margin:.1em 0 .35em;}
+  p.lead{font-size:20px;color:#334155;max-width:60ch;line-height:1.5;}
+  ul.pts{font-size:19px;line-height:1.55;color:#1f2937;max-width:64ch;padding-left:1.1em;}
+  ul.pts li{margin:.42em 0;}
+  ul.pts li b{color:var(--ink);}
+  .beat{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#fff;background:var(--brand-blue);border-radius:999px;padding:4px 11px;margin-bottom:14px;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+  .muted{color:var(--muted);}
+  a{color:var(--brand-blue);}
+  /* Title slide */
+  .title-slide{justify-content:center;background:radial-gradient(120% 90% at 0% 0%,#efe9ff 0%,var(--bg) 55%);}
+  .title-slide .name{font-size:18px;color:#334155;margin-top:8px;}
+  .chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-weight:700;font-size:15px;}
+  .chip .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--brand-blue);margin-right:7px;}
+  /* footer nav */
+  #nav{position:fixed;left:0;right:0;bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;z-index:50;}
+  .nv{width:9px;height:9px;border-radius:50%;background:#cbd5e1;cursor:pointer;border:none;padding:0;}
+  .nv.on{background:var(--brand-blue);width:22px;border-radius:5px;}
+  #hint{position:fixed;right:16px;bottom:34px;font-size:12px;color:#94a3b8;z-index:50;}
+  .footer-tag{position:fixed;left:16px;bottom:30px;font-size:12px;color:#94a3b8;z-index:50;}
+  /* 5-function graphic */
+  .funcs{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .func{border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:700;color:#94a3b8;background:#fff;}
+  .func.on{color:#fff;background:var(--brand-blue);border-color:var(--brand-blue);}
+  /* MAP SLIDE */
+  #mapwrap{position:absolute;inset:0;}
+  #map{position:absolute;inset:0;background:#dfe3ea;z-index:1;}
+  .ov{position:absolute;z-index:600;background:rgba(255,255,255,.96);border-radius:14px;
+    box-shadow:0 4px 18px rgba(10,20,40,.18);}
+  #panel{top:16px;left:16px;width:255px;padding:14px 15px;}
+  #panel h3{margin:0 0 2px;font-size:16px;}
+  #panel .sub{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .row{display:flex;align-items:center;gap:8px;margin:7px 0;}
+  .btn{border:none;border-radius:9px;padding:9px 13px;font-weight:800;font-size:14px;cursor:pointer;}
+  .btn.primary{background:var(--brand-blue);color:#fff;flex:1;}
+  .btn.ghost{background:#fff;color:#334155;border:1px solid #cbd5e1;}
+  .toggles{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .tg{border:1.5px solid #e5e7eb;background:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:700;color:#334155;cursor:pointer;}
+  .tg.on{border-color:var(--brand-blue);background:#f3effd;color:var(--brand-blue);}
+  .progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden;margin:10px 0 2px;}
+  .progress > span{display:block;height:100%;width:0;background:var(--brand-blue);transition:width .4s ease;}
+  #counts{top:16px;right:16px;padding:12px 14px;min-width:150px;}
+  #counts .c{display:flex;justify-content:space-between;font-size:13px;margin:4px 0;}
+  #counts .c b{font-variant-numeric:tabular-nums;}
+  #legend{bottom:16px;left:16px;padding:11px 13px;}
+  #legend .li{display:flex;align-items:center;gap:7px;font-size:12.5px;margin:3px 0;color:#334155;}
+  #legend .sw{width:12px;height:12px;border-radius:3px;}
+  .badge-note{position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;border:1px solid var(--brand-blue);
+    color:var(--brand-blue);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .demo-flag{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:600;background:#fef9c3;border:1px solid #fde68a;
+    color:#854d0e;font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;}
+  /* marker base (ported from components/map/markerUtils.ts) */
+  .wm-pin-body{display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 1px 3px rgba(0,0,0,.28));}
+  .wm-dot{border:2px solid #fff;display:flex;align-items:center;justify-content:center;padding:0 4px;gap:1px;transition:background .15s ease;}
+  .wm-pointer{background:#fff;transform:rotate(45deg);margin-top:-4px;position:relative;z-index:-1;}
+  .wm-dot span{color:#fff;font-weight:600;line-height:1;user-select:none;white-space:nowrap;}
+  .wm-pin-label{font-family:inherit;}
+  .wm-na .wm-dot{background:#9ca3af;} .wm-nothome .wm-dot{background:#f59e0b;}
+  .wm-contacted .wm-dot{background:#2563eb;} .wm-likely .wm-dot{background:#16a34a;}
+  .wm-oppose .wm-dot{background:#dc2626;} .wm-noaccess .wm-dot{background:#475569;}
+  .wm-na,.wm-nothome,.wm-contacted,.wm-likely,.wm-oppose,.wm-noaccess{transform:scale(var(--wm-pin-scale,1));transform-origin:center center;}
+  .wm-flags{position:absolute;top:-11px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:3;}
+  .wm-flag{width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.12);
+    display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  /* house sheet popup */
+  .leaflet-popup-content{margin:12px 14px;}
+  .sheet h4{margin:0;font-size:17px;} .sheet .addr{font-size:12px;color:var(--muted);margin:2px 0 8px;}
+  .sheet .vt{font-size:13px;font-weight:600;color:#374151;margin:1px 0;}
+  .sheet .call{display:inline-flex;align-items:center;gap:5px;background:#f3effd;color:var(--brand-blue);
+    border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-top:6px;text-decoration:none;}
+  .sheet .dchip{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800;color:#fff;margin-top:8px;}
+  .sheet .nt{margin-top:8px;font-size:12.5px;color:#475569;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:6px 8px;}
+  .sheet .sup{margin-top:8px;font-size:12.5px;font-weight:700;color:#15803d;}
+  /* analytics bars */
+  .bk{display:flex;align-items:center;gap:10px;margin:9px 0;}
+  .bk .lab{flex:0 0 130px;font-size:14px;font-weight:600;color:#334155;}
+  .bk .bar{flex:1;height:14px;background:#eef2f7;border-radius:999px;overflow:hidden;}
+  .bk .bar > span{display:block;height:100%;border-radius:999px;}
+  .bk .val{flex:0 0 78px;text-align:right;font-size:14px;}
+  .big{font-size:30px;font-weight:800;}
+  /* door-sheet mock */
+  .door{max-width:380px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
+  .door .stepl{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 7px;}
+  .door .opt{display:inline-block;border:2px solid;border-radius:10px;padding:9px 13px;font-weight:800;font-size:13px;margin:0 6px 6px 0;}
+</style>
+</head>
+<body>
+
+<div id="pw-gate" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 0% 0%,#efe9ff,#f6f5fb 55%);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <form id="pw-form" style="width:min(92vw,380px);background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 8px 30px rgba(15,23,42,.10);padding:26px 24px;">
+    <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6d28d9;">Turf</div>
+    <h1 style="font-size:22px;margin:6px 0 4px;">Interactive showcase</h1>
+    <p style="color:#64748b;font-size:14px;margin:0 0 16px;">Enter the password to view the deck.</p>
+    <p id="pw-err" style="display:none;color:#dc2626;font-size:13px;font-weight:600;margin:0 0 12px;">Incorrect password &mdash; try again.</p>
+    <input id="pw-input" type="password" placeholder="Password" autocomplete="current-password" autofocus style="width:100%;padding:11px 13px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;box-sizing:border-box;" />
+    <button type="submit" style="width:100%;margin-top:12px;padding:11px;border:none;border-radius:10px;background:#6d28d9;color:#fff;font-weight:800;font-size:15px;cursor:pointer;">View showcase</button>
+  </form>
+</div>
+<script>
+(function(){var K="tg_show_pw";
+function unlock(){var g=document.getElementById("pw-gate");if(g)g.remove();}
+if(sessionStorage.getItem(K)==="ok"){unlock();}
+var f=document.getElementById("pw-form");
+if(f)f.addEventListener("submit",function(e){e.preventDefault();
+  if(document.getElementById("pw-input").value==="higherground"){sessionStorage.setItem(K,"ok");unlock();}
+  else{document.getElementById("pw-err").style.display="block";}});
+var i=document.getElementById("pw-input");
+if(i)i.addEventListener("keydown",function(e){e.stopPropagation();});
+})();
+</script>
+
+<div id="deck">
+
+  <!-- 1 TITLE -->
+  <section class="slide title-slide active">
+    <div class="kicker">AI Open Mic · California Primary Showcase</div>
+    <h1>Running tech &amp; AI for a<br>statewide primary</h1>
+    <p class="lead">What I tried, what I learned, what I'd do differently — and what I'd double down on.</p>
+    <div class="name">Sam Finegold · PM (Thumbtack, e:cue) · led tech &amp; AI for a statewide campaign (Mar–Jun 2026)</div>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span>Analyze</span>
+      <span class="chip"><span class="dot"></span>Build</span>
+      <span class="chip"><span class="dot"></span>Stay on message</span>
+    </div>
+  </section>
+
+  <!-- 2 WHAT I TRIED -->
+  <section class="slide">
+    <span class="beat">What I tried</span>
+    <h2>Led tech &amp; AI for the campaign</h2>
+    <ul class="pts">
+      <li>Reviewed vendors and supported internal tools.</li>
+      <li><b>Core job:</b> AI-accelerated poll analysis to guide <b>where &amp; how we spent ad dollars</b> (with our outside consultant).</li>
+      <li>A campaign is ~5 functions — I lived in <b>Data</b> and <b>Field</b>.</li>
+    </ul>
+    <div class="funcs">
+      <span class="func">Campaign mgmt</span><span class="func">Political</span>
+      <span class="func">Comms</span><span class="func on">Digital / Data</span><span class="func on">Field</span>
+    </div>
+  </section>
+
+  <!-- 3 WORKED #1 -->
+  <section class="slide">
+    <span class="beat">What worked · 1</span>
+    <h2>Poll analysis → ad targeting</h2>
+    <div class="two">
+      <ul class="pts">
+        <li>AI found <b>which voters were most persuadable</b> by the candidate's message.</li>
+        <li>It <b>structured the data, wrote the model code, set parameters, and ran cross-validation</b> to pick the best fit — a slow specialist task compressed into days.</li>
+        <li><b>The catch:</b> the binding input is a <b>good poll</b> — expensive and slow — and how you structure the data decides whether you can model <b>movement</b>.</li>
+      </ul>
+      <div class="card">
+        <div class="muted" style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Proof point</div>
+        <p style="font-size:16px;line-height:1.5;">Independent pollster memo (public) corroborated the movement we modeled.</p>
+        <div class="muted" style="font-size:13px">[link to public memo on the campaign site]</div>
+        <div class="muted" style="font-size:12px;margin-top:10px;font-style:italic">Methods shown here — no internal numbers.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 WORKED #2 — INTERACTIVE MAP -->
+  <section class="slide" id="slide-map" style="padding:0;background:#dfe3ea;">
+    <div id="mapwrap">
+      <div id="map"></div>
+      <div class="demo-flag">Demo · “Sam for Supreme Ruler” · synthetic data, no real voters</div>
+
+      <div class="ov" id="panel">
+        <h3>The canvassing map</h3>
+        <div class="sub">Watch the field data accumulate as volunteers work.</div>
+        <div class="row">
+          <button class="btn primary" id="play">▶ Play canvass</button>
+          <button class="btn ghost" id="reset">Reset</button>
+        </div>
+        <div class="progress"><span id="pbar"></span></div>
+        <div class="sub" id="daylabel" style="margin-top:6px;">Day 0 — universe loaded</div>
+        <div style="font-size:12px;font-weight:800;color:var(--muted);margin-top:10px;text-transform:uppercase;letter-spacing:.05em;">Layers</div>
+        <div class="toggles">
+          <button class="tg on" data-layer="volunteers">Volunteers (V)</button>
+          <button class="tg on" data-layer="signs">Yard signs</button>
+          <button class="tg on" data-layer="supporters">Supporters ✋</button>
+          <button class="tg" data-layer="sat">Satellite</button>
+        </div>
+        <div class="sub" style="margin-top:10px;">Tip: click any pin →</div>
+      </div>
+
+      <div class="ov" id="counts">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Accumulated</div>
+        <div class="c"><span>Doors knocked</span><b id="c-knocked">0</b></div>
+        <div class="c"><span style="color:#16a34a">Likely Sam</span><b id="c-likely">0</b></div>
+        <div class="c"><span style="color:#2563eb">Undecided</span><b id="c-und">0</b></div>
+        <div class="c"><span style="color:#dc2626">Not supporting</span><b id="c-opp">0</b></div>
+        <div class="c"><span>Yard signs</span><b id="c-signs">0</b></div>
+        <div class="c"><span>Supporters ✋</span><b id="c-sup">0</b></div>
+      </div>
+
+      <div class="ov" id="legend">
+        <div class="li"><span class="sw" style="background:#9ca3af"></span>Not attempted</div>
+        <div class="li"><span class="sw" style="background:#f59e0b"></span>Not home</div>
+        <div class="li"><span class="sw" style="background:#475569"></span>No access</div>
+        <div class="li"><span class="sw" style="background:#16a34a"></span>Likely Sam</div>
+        <div class="li"><span class="sw" style="background:#2563eb"></span>Undecided</div>
+        <div class="li"><span class="sw" style="background:#dc2626"></span>Not supporting</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 DO DIFFERENTLY -->
+  <section class="slide">
+    <span class="beat">What I'd do differently</span>
+    <h2>The hard-won lessons</h2>
+    <ul class="pts">
+      <li><b>Earn internal trust + nail reliability at key moments.</b> Field software cannot crap out on a GOTV weekend — that's how you lose the team.</li>
+      <li><b>Design data to model movement from day one.</b> Retrofitting polling data is painful.</li>
+    </ul>
+  </section>
+
+  <!-- 6 DOUBLE DOWN -->
+  <section class="slide">
+    <span class="beat">What I'd double down on</span>
+    <h2>The campaign AI stack</h2>
+    <ul class="pts">
+      <li><b>Managed Claude + a curated campaign Google Drive</b> — permission-aware, so people only get answers from what they're cleared to see.</li>
+      <li><b>Cheap mini-apps:</b> endorsement tracker · questionnaire answers in the candidate's voice (human-in-the-loop) · strategic calendar — <b>built on NGP</b> (read/write the voter file).</li>
+      <li><b>Relational organizing</b> (volunteers bring friends); <b>AI for message consistency</b>; <b>AI calling for GOTV</b> (others' win — my next experiment).</li>
+    </ul>
+    <div class="muted" style="margin-top:14px;font-size:14px;">Built on GitHub · Vercel · Supabase.</div>
+  </section>
+
+  <!-- 7 OPEN QUESTIONS -->
+  <section class="slide">
+    <span class="beat">Open questions</span>
+    <h2>What I'm still chewing on</h2>
+    <ul class="pts">
+      <li><b>Ad &amp; content <i>development</i></b> — we cracked ad <i>targeting</i>; using AI to help <i>make</i> the creative is still open.</li>
+      <li><b>Measuring voter response <i>beyond polls</i></b> — good polls are slow and expensive. What are faster, cheaper signals that a message is landing?</li>
+    </ul>
+  </section>
+
+  <!-- 8 CONSIDERATIONS + CLOSE -->
+  <section class="slide">
+    <span class="beat">For the room</span>
+    <h2>Considerations &amp; the bet</h2>
+    <ul class="pts">
+      <li><b>Put controls + budget around AI</b> — spend caps, governance, who-can-access-what.</li>
+      <li><b>Reset expectations of staff output</b> — when one person can build and analyze this much, it changes scope and hiring.</li>
+    </ul>
+    <p class="lead" style="margin-top:10px;">For '26/'28 the edge compounds: cheaper analysis, cheaper software, a consistent message, deeper volunteer relationships.</p>
+    <div class="muted" style="margin-top:6px;">Happy to compare notes — [email]</div>
+  </section>
+
+  <!-- APPENDIX A — door view -->
+  <section class="slide">
+    <span class="beat">Appendix · feature tour</span>
+    <h2>What a volunteer sees at the door</h2>
+    <div class="two">
+      <div class="door">
+        <h4 style="margin:0;font-size:18px;">1242 Hayes St</h4>
+        <div class="muted" style="font-size:13px">2 voters · <span style="color:#15803d;font-weight:700">✋ Supporter</span></div>
+        <a class="sheet call" style="margin-top:8px;display:inline-flex">📞 (415) 555‑0142 · Copy</a>
+        <div class="stepl">Step 1 — reached the door?</div>
+        <span class="opt" style="border-color:#2563eb;color:#2563eb">Contacted</span>
+        <span class="opt" style="border-color:#f59e0b;color:#f59e0b">Not home</span>
+        <span class="opt" style="border-color:#475569;color:#475569">No access</span>
+        <div class="stepl">Step 2 — support for Sam?</div>
+        <span class="opt" style="border-color:#16a34a;color:#16a34a">Likely</span>
+        <span class="opt" style="border-color:#2563eb;color:#2563eb">Undecided</span>
+        <span class="opt" style="border-color:#dc2626;color:#dc2626">Not supporting</span>
+        <div class="stepl">Note</div>
+        <div class="nt" style="font-size:12.5px;color:#475569;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:6px 8px;">“Wants a lawn sign, cares about transit.”</div>
+      </div>
+      <ul class="pts">
+        <li>Two-step disposition marking (reach → support).</li>
+        <li>VAN <b>phone numbers</b> with tap-to-call &amp; copy.</li>
+        <li>A free-text <b>note</b>, saved no matter which button they tap.</li>
+        <li>Household <b>flags</b> — ✋ supporter, 🪧 yard sign, ✍️ petition.</li>
+        <li class="muted">Built for one campaign, reusable by any tenant.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- APPENDIX B — analytics -->
+  <section class="slide">
+    <span class="beat">Appendix · feature tour</span>
+    <h2>From the map to the numbers</h2>
+    <p class="muted" style="margin:0 0 14px">Computed live from the canvass you just watched accumulate.</p>
+    <div class="two">
+      <div class="card">
+        <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;">Doors marked</div>
+        <div class="big" id="a-total">0 <span style="color:var(--ink)">marked</span></div>
+        <div id="a-reach"></div>
+      </div>
+      <div class="card">
+        <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;">Of contacted</div>
+        <div class="big" id="a-rated">0 <span style="color:var(--ink)">rated</span></div>
+        <div id="a-support"></div>
+      </div>
+    </div>
+    <div class="muted" style="margin-top:12px;font-size:14px;">Admins can also filter the map to a single status, place yard signs, and plan turf — same data, different lens.</div>
+  </section>
+
+</div>
+
+<div id="nav"></div>
+<div id="hint">← → to move · F fullscreen</div>
+<div class="footer-tag">Turf — interactive showcase</div>
+
+<script>
+(function(){
+  // ---------- marker port (from components/map/markerUtils.ts) ----------
+  var W=[26,26,26,31,36,41,44], F=[11,11,11,10,10,9,9];
+  function layout(label){var n=label.length;var visW=W[Math.min(n,6)];var tapW=Math.max(44,visW+12);
+    return {tapW:tapW,tapH:34,visW:visW,fontSize:F[Math.min(n,6)]};}
+  var SCLS={not_attempted:'wm-na',not_home:'wm-nothome',no_access:'wm-noaccess',
+            likely:'wm-likely',undecided:'wm-contacted',not_supporting:'wm-oppose'};
+  function markerHtml(status,label,flags){
+    var b=layout(label),cls=SCLS[status]||'wm-na';
+    var badges=(flags&&flags.length)?'<div class="wm-flags">'+flags.map(function(e){return '<span class="wm-flag">'+e+'</span>';}).join('')+'</div>':'';
+    return '<div class="'+cls+'" style="width:'+b.tapW+'px;height:'+b.tapH+'px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">'
+      +'<div class="wm-pin-body" style="position:relative;">'+badges
+      +'<div class="wm-dot" style="width:'+b.visW+'px;height:20px;border-radius:10px;padding:0 4px;gap:1px;">'
+      +'<span class="wm-pin-label" style="font-size:'+b.fontSize+'px;">'+label+'</span></div>'
+      +'<div class="wm-pointer" style="width:8px;height:8px;"></div></div></div>';
+  }
+  function pinIcon(h){var b=layout(h.label);return L.divIcon({className:'',html:markerHtml(h.status,h.label,h.supporter?['✋']:[]),
+    iconSize:[b.tapW,b.tapH],iconAnchor:[Math.round(b.tapW/2),b.tapH]});}
+  // yard sign (from WalkMap.yardSignIconHtml) + volunteer V (volunteerZipIconHtml)
+  function signIcon(){var edge='var(--brand-blue,#1d4ed8)';
+    var html='<div style="position:relative;width:30px;height:40px;filter:drop-shadow(0 1px 2px rgba(10,37,64,.3));">'
+      +'<div style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:28px;height:20px;border-radius:3px;background:#fff;border:2px solid '+edge+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:'+edge+';">S</div>'
+      +'<div style="position:absolute;left:50%;top:20px;transform:translateX(-50%);width:2.5px;height:18px;background:#9ca3af;"></div></div>';
+    return L.divIcon({className:'',html:html,iconSize:[30,40],iconAnchor:[15,40]});}
+  function vIcon(count){var html='<div style="position:relative;width:36px;height:36px;">'
+      +'<div style="position:absolute;left:3px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--brand-blue,#1d4ed8);border:2px solid #fff;box-shadow:0 2px 6px rgba(10,37,64,.35);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);color:#fff;font:800 15px system-ui;">V</span></div>'
+      +'<div style="position:absolute;top:-7px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#fff;color:var(--brand-blue,#1d4ed8);border:1.5px solid var(--brand-blue,#1d4ed8);font:800 11px system-ui;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">'+count+'</div></div>';
+    return L.divIcon({className:'',html:html,iconSize:[36,36],iconAnchor:[18,36]});}
+
+  // ---------- synthetic SF data (anonymized) ----------
+  var CENTER=[37.7765,-122.4255];           // Hayes Valley-ish, SF
+  var STREETS=['Hayes St','Grove St','Fell St','Oak St','Page St','Haight St','Waller St','Linden St','Ivy St','Lily St','Rose St'];
+  var ROWS=11, COLS=13;
+  var houses=[];var id=0;
+  for(var r=0;r<ROWS;r++){
+    var lat=CENTER[0]-0.0030 + r*0.0006;
+    for(var c=0;c<COLS;c++){
+      var lon=CENTER[1]-0.0048 + c*0.00075 + (Math.random()-0.5)*0.00020;
+      houses.push({id:id++, lat:lat+(Math.random()-0.5)*0.00016, lon:lon,
+        label:String(1100+r*100+c*2), street:STREETS[r%STREETS.length],
+        status:'not_attempted', supporter:false, sign:false, note:null,
+        voters:1+(Math.random()<0.4?1:0)});
+    }
+  }
+  var VOLS=[{lat:CENTER[0]+0.0018,lon:CENTER[1]-0.0030,n:5},
+            {lat:CENTER[0]-0.0016,lon:CENTER[1]+0.0026,n:3},
+            {lat:CENTER[0]+0.0006,lon:CENTER[1]+0.0008,n:8}];
+  var NOTES=['Wants a lawn sign.','Cares about transit + housing.','Call back after 6pm.','Kid in local schools.','Undecided — likes Sam on safety.','Already voted!'];
+
+  // ---------- map ----------
+  var map, pins=L.layerGroup(), signs=L.layerGroup(), vols=L.layerGroup(), markerById={};
+  var light, sat, satOn=false, show={volunteers:true,signs:true,supporters:true};
+  function initMap(){
+    if(map) return;
+    map=L.map('map',{zoomControl:true,attributionControl:true}).setView(CENTER,15);
+    light=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {maxZoom:20,attribution:'© OpenStreetMap © CARTO'}).addTo(map);
+    sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {maxZoom:20,attribution:'© Esri'});
+    vols.addTo(map); pins.addTo(map); signs.addTo(map);
+    map.on('zoomend',setScale); setScale();
+    renderVols(); renderPins();
+    var b=L.latLngBounds(houses.map(function(h){return [h.lat,h.lon];}));
+    map.fitBounds(b,{paddingTopLeft:[280,70],paddingBottomRight:[60,40],maxZoom:16});
+  }
+  function setScale(){var z=map.getZoom();var s=Math.min(2.15,1+Math.max(0,z-14)*0.13);
+    map.getContainer().style.setProperty('--wm-pin-scale',String(s));}
+  function popupHtml(h){
+    var sc={not_attempted:['#9ca3af','Not attempted'],not_home:['#f59e0b','Not home'],no_access:['#475569','No access'],
+            likely:['#16a34a','Likely Sam'],undecided:['#2563eb','Undecided'],not_supporting:['#dc2626','Not supporting']}[h.status];
+    var v=''; for(var i=0;i<h.voters;i++){v+='<div class="vt">'+(i===0?'Mr. Resident (sample)':'Ms. Resident (sample)')+' · '+(34+i*9)+'</div>';}
+    return '<div class="sheet"><h4>'+h.label+' '+h.street+'</h4><div class="addr">San Francisco · '+h.voters+' voter'+(h.voters>1?'s':'')+'</div>'
+      +v+'<a class="call">📞 (415) 555‑0'+(100+(h.id%800))+' · Copy</a>'
+      +'<div><span class="dchip" style="background:'+sc[0]+'">'+sc[1]+'</span></div>'
+      +(h.supporter?'<div class="sup">✋ Identified supporter</div>':'')
+      +(h.note?'<div class="nt">“'+h.note+'”</div>':'')+'</div>';
+  }
+  function renderPins(){
+    pins.clearLayers(); signs.clearLayers();
+    houses.forEach(function(h){
+      var m=L.marker([h.lat,h.lon],{icon:pinIcon({status:h.status,label:h.label,supporter:h.supporter&&show.supporters})});
+      m.bindPopup(popupHtml(h),{maxWidth:280});
+      m.addTo(pins); markerById[h.id]=m;
+      if(h.sign && show.signs){ L.marker([h.lat+0.00016,h.lon+0.00016],{icon:signIcon()}).addTo(signs); }
+    });
+  }
+  function renderVols(){ vols.clearLayers(); if(!show.volunteers) return;
+    VOLS.forEach(function(v){ L.marker([v.lat,v.lon],{icon:vIcon(v.n)}).addTo(vols); }); }
+
+  // ---------- accumulate player ----------
+  var DAYS=8, day=0, timer=null;
+  var DIST=[['not_home',.34],['no_access',.12],['likely',.22],['undecided',.20],['not_supporting',.12]];
+  function pick(){var x=Math.random(),a=0;for(var i=0;i<DIST.length;i++){a+=DIST[i][1];if(x<=a)return DIST[i][0];}return 'undecided';}
+  function stepDay(){
+    if(day>=DAYS){stopPlay();return;}
+    day++;
+    var todo=houses.filter(function(h){return h.status==='not_attempted';});
+    var n=Math.ceil(houses.length/DAYS)+Math.floor(Math.random()*4);
+    for(var i=0;i<n && todo.length;i++){
+      var idx=Math.floor(Math.random()*todo.length); var h=todo.splice(idx,1)[0];
+      h.status=pick();
+      if(h.status==='likely'){ if(Math.random()<0.45)h.supporter=true; if(Math.random()<0.35)h.sign=true; }
+      if(h.status!=='not_home'&&h.status!=='no_access'&&Math.random()<0.3) h.note=NOTES[Math.floor(Math.random()*NOTES.length)];
+    }
+    renderPins(); updateCounts();
+    document.getElementById('pbar').style.width=Math.round(day/DAYS*100)+'%';
+    document.getElementById('daylabel').textContent= day>=DAYS? 'Canvass complete · '+DAYS+' days' : 'Day '+day+' — volunteers knocking…';
+  }
+  function updateCounts(){
+    var k=0,lk=0,un=0,op=0,sg=0,su=0;
+    houses.forEach(function(h){ if(h.status!=='not_attempted')k++;
+      if(h.status==='likely')lk++; if(h.status==='undecided')un++; if(h.status==='not_supporting')op++;
+      if(h.sign)sg++; if(h.supporter)su++; });
+    set('c-knocked',k);set('c-likely',lk);set('c-und',un);set('c-opp',op);set('c-signs',sg);set('c-sup',su);
+  }
+  function set(idv,v){document.getElementById(idv).textContent=v;}
+  function startPlay(){ if(timer)return; if(day>=DAYS)resetDays();
+    document.getElementById('play').textContent='⏸ Pause';
+    timer=setInterval(stepDay,950); stepDay(); }
+  function stopPlay(){ clearInterval(timer);timer=null; document.getElementById('play').textContent= day>=DAYS?'▶ Replay':'▶ Play canvass'; }
+  function resetDays(){ day=0; houses.forEach(function(h){h.status='not_attempted';h.supporter=false;h.sign=false;h.note=null;});
+    renderPins();updateCounts(); document.getElementById('pbar').style.width='0%'; document.getElementById('daylabel').textContent='Day 0 — universe loaded'; }
+
+  document.getElementById('play').addEventListener('click',function(){ timer?stopPlay():startPlay(); });
+  document.getElementById('reset').addEventListener('click',function(){ stopPlay();resetDays(); });
+  Array.prototype.forEach.call(document.querySelectorAll('.tg'),function(t){
+    t.addEventListener('click',function(){
+      var L_=t.getAttribute('data-layer');
+      if(L_==='sat'){ satOn=!satOn; t.classList.toggle('on',satOn); if(satOn){map.removeLayer(light);sat.addTo(map);}else{map.removeLayer(sat);light.addTo(map);} return; }
+      show[L_]=!show[L_]; t.classList.toggle('on',show[L_]);
+      if(L_==='volunteers')renderVols(); else renderPins();
+    });
+  });
+
+  // ---------- analytics (appendix, computed live) ----------
+  function bar(lab,val,denom,max,color){
+    var pct=denom?Math.round(val/denom*100):0; var w=max?Math.round(val/max*100):0;
+    return '<div class="bk"><span class="lab">'+lab+'</span><span class="bar"><span style="width:'+w+'%;background:'+color+'"></span></span>'
+      +'<span class="val"><b>'+val+'</b> · '+pct+'%</span></div>';
+  }
+  function renderAnalytics(){
+    var lk=0,un=0,op=0,nh=0,na=0;
+    houses.forEach(function(h){ if(h.status==='likely')lk++; else if(h.status==='undecided')un++;
+      else if(h.status==='not_supporting')op++; else if(h.status==='not_home')nh++; else if(h.status==='no_access')na++; });
+    var contacted=lk+un+op, marked=contacted+nh+na;
+    var reachMax=Math.max(contacted,nh,na,1);
+    document.getElementById('a-total').innerHTML=marked+' <span style="color:var(--ink)">marked</span>';
+    document.getElementById('a-reach').innerHTML=
+      bar('Contacted',contacted,marked,reachMax,'#2563eb')+bar('Not home',nh,marked,reachMax,'#f59e0b')+bar('No access',na,marked,reachMax,'#475569');
+    var sMax=Math.max(lk,un,op,1);
+    document.getElementById('a-rated').innerHTML=contacted+' <span style="color:var(--ink)">rated</span>';
+    document.getElementById('a-support').innerHTML=
+      bar('Likely Sam',lk,contacted,sMax,'#16a34a')+bar('Undecided',un,contacted,sMax,'#2563eb')+bar('Not supporting',op,contacted,sMax,'#dc2626');
+  }
+
+  // ---------- deck navigation ----------
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var nav=document.getElementById('nav'); var cur=0;
+  slides.forEach(function(_,i){var b=document.createElement('button');b.className='nv'+(i===0?' on':'');
+    b.addEventListener('click',function(){go(i);}); nav.appendChild(b);});
+  function go(i){ if(i<0||i>=slides.length)return;
+    slides[cur].classList.remove('active'); nav.children[cur].classList.remove('on');
+    cur=i; slides[cur].classList.add('active'); nav.children[cur].classList.add('on');
+    if(slides[cur].id==='slide-map'){ initMap(); setTimeout(function(){map.invalidateSize();},60);
+      if(day===0 && !timer) setTimeout(startPlay,400); }
+    if(slides[cur].querySelector('#a-reach')) renderAnalytics();
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}
+    else if(e.key==='ArrowLeft'){go(cur-1);}
+    else if(e.key.toLowerCase()==='f'){ if(!document.fullscreenElement)document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+})();
+</script>
+</body>
+</html>
