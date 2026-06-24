@@ -96,6 +96,22 @@
   .mv .li .nm small{color:#94a3b8;display:block;font-size:10px}
   .mv .li .b{font-size:9.5px;font-weight:700;border:1px solid #9aa3af;border-radius:5px;padding:4px 6px;color:#56607a}
   .mv .sync{margin-top:auto;background:#dfe3e8;color:#56607a;text-align:center;font-size:11px;padding:10px;font-weight:700}
+  /* problem cards */
+  .probs{display:flex;flex-direction:column;gap:18px;width:100%}
+  .prob{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  .prob.main{border-left:4px solid #dc2626}
+  .prob .num{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fee2e2;color:#dc2626;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .prob .tagm{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:2px}
+  .prob h3{margin:0 0 5px;font-size:20px;color:var(--ink)}
+  .prob p{margin:0;font-size:16.5px;color:#475569;line-height:1.5}
+  /* MiniVAN map-view mock */
+  .mvtop{background:#3b4250;color:#fff;padding:11px 12px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .mvtop span{color:#fca5a5;font-size:11px}
+  .mvmap{position:relative;flex:1;background:repeating-linear-gradient(0deg,#e3e7ec 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,#e3e7ec 0 1px,transparent 1px 48px),#eef1f5}
+  .mvmap .cl{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#6b7280;color:#fff;font:800 14px system-ui;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .mvmap .mp{position:absolute;transform:translate(-50%,-100%) rotate(-45deg);width:15px;height:21px;background:#dc2626;border-radius:50% 50% 50% 0;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .mvtools{display:flex;background:#2f3540;padding:8px;gap:7px}
+  .mvtools span{flex:1;text-align:center;color:#cbd5e1;font-size:10.5px;font-weight:700;border:1px solid #56607a;border-radius:5px;padding:6px 0}
   /* map slide */
   #map-slide{padding:0;background:#dfe3ea}
   #mapwrap{position:absolute;inset:0}
@@ -226,28 +242,41 @@
   <!-- 5 FIELD: PROBLEM -->
   <section class="slide">
     <span class="tag">Workstream 2 · Field organizing</span>
+    <h2>Two problems with the status quo</h2>
     <div class="two">
-      <div>
-        <h2>The problem: capacity left on the table</h2>
-        <ul class="pts">
-          <li>Volunteers could only canvass <b>when an organizer cut turf</b> — leaving huge volunteer walking capacity unused.</li>
-          <li><b>MiniVAN is clunky:</b> a separate app that drains battery, takes lots of taps per door, and isn't personalized — or <em>fun</em>.</li>
-          <li>People who wanted to help couldn't just <b>pick up their phone and go</b>.</li>
-        </ul>
+      <div class="probs">
+        <div class="prob main">
+          <div class="num">1</div>
+          <div>
+            <div class="tagm">The main problem</div>
+            <h3>Volunteer capacity left on the table</h3>
+            <p>Volunteers couldn't just pick up their phone and go — they had to wait for an organizer to cut turf. So willing, motivated people sat idle.</p>
+          </div>
+        </div>
+        <div class="prob">
+          <div class="num">2</div>
+          <div>
+            <h3>Clunky, impersonal tooling</h3>
+            <p><b>NGP VAN</b>'s canvassing app (MiniVAN) isn't personalized to the campaign, and it takes several taps to mark a door done — painful when you're lit-dropping fast.</p>
+          </div>
+        </div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center">
         <div class="phone"><div class="scr"><div class="notch"></div>
-          <div class="mv">
-            <div class="bar"><span>☰ MiniVAN — List 4 of 9</span><span class="bat">🔋 14%</span></div>
-            <div class="li"><div class="nm">SMITH, John<small>1424 Oak St · tap to open</small></div><div class="b">NH</div></div>
-            <div class="li"><div class="nm">SMITH, Mary<small>1424 Oak St · tap to open</small></div><div class="b">NH</div></div>
-            <div class="li"><div class="nm">NGUYEN, T<small>1428 Oak St · tap to open</small></div><div class="b">NH</div></div>
-            <div class="li"><div class="nm">PEREZ, L<small>1432 Oak St · tap to open</small></div><div class="b">NH</div></div>
-            <div class="li"><div class="nm">OKAFOR, J<small>1436 Oak St · tap to open</small></div><div class="b">NH</div></div>
-            <div class="sync">⟳ Syncing to VAN… (offline)</div>
+          <div style="height:100%;display:flex;flex-direction:column">
+            <div class="mvtop">☰ MiniVAN — Turf 4 of 9 <span>🔋 14%</span></div>
+            <div class="mvmap">
+              <div class="cl" style="left:42%;top:30%">14</div>
+              <div class="mp" style="left:24%;top:58%"></div>
+              <div class="mp" style="left:64%;top:52%"></div>
+              <div class="mp" style="left:48%;top:74%"></div>
+              <div class="mp" style="left:74%;top:34%"></div>
+              <div class="mp" style="left:33%;top:82%"></div>
+            </div>
+            <div class="mvtools"><span>List</span><span>Map</span><span>Sync</span></div>
           </div>
         </div></div>
-        <div class="ph-cap">The status quo: MiniVAN<span>separate app · clunky · not yours</span></div>
+        <div class="ph-cap">NGP VAN's MiniVAN — map view<span>generic · many taps per door</span></div>
       </div>
     </div>
   </section>
