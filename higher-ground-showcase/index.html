@@ -344,7 +344,7 @@
       <div>
         <div class="phone"><div class="scr"><div class="notch"></div>
           <div class="brz">
-            <div class="brz-bar"><span class="brz-url" id="p1url">samscampaign.org</span></div>
+            <div class="brz-bar"><span class="brz-url" id="p1url">samforcongress.com</span></div>
             <div class="brz-body" id="p1body"></div>
           </div>
         </div></div>
@@ -507,11 +507,11 @@
   function initPhone1(){
     var url=document.getElementById('p1url'),body=document.getElementById('p1body');
     if(!url||!body||initPhone1.run)return;initPhone1.run=1;
-    var home='<div class="cw"><div class="cw-nav"><span class="cw-logo"><span class="cw-dot">SC</span>Sam\'s Campaign</span><span style="color:#94a3b8;font-size:14px">☰</span></div><div class="cw-hero"><div class="cw-eye">SAM FOR CONGRESS</div><div class="cw-h">A new voice for our district</div><div class="cw-cta"><span class="cw-b1">Donate</span><span class="cw-b2">Volunteer →</span></div></div><div class="cw-strip">★ Endorsed by local leaders</div></div>';
+    var home='<div class="cw"><div class="cw-nav"><span class="cw-logo"><span class="cw-dot">SC</span>Sam for Congress</span><span style="color:#94a3b8;font-size:14px">☰</span></div><div class="cw-hero"><div class="cw-eye">SAM FOR CONGRESS</div><div class="cw-h">A new voice for our district</div><div class="cw-cta"><span class="cw-b1">Donate</span><span class="cw-b2">Volunteer →</span></div></div><div class="cw-strip">★ Endorsed by local leaders</div></div>';
     var signup='<div class="su"><div class="logo">SC</div><h3>Join the field team</h3><p>No app to install.</p><input value="you@email.com" readonly /><div class="btn">Send my magic link →</div><div class="ok"><span class="c">✓</span>You\'re in — here\'s your turf.</div></div>';
     function loop(){
-      url.innerHTML='samscampaign.org';body.innerHTML=home;
-      setTimeout(function(){var suf='/volunteer',i=0,t=setInterval(function(){i++;url.innerHTML='samscampaign.org<b>'+suf.slice(0,i)+'</b>';
+      url.innerHTML='samforcongress.com';body.innerHTML=home;
+      setTimeout(function(){var suf='/volunteer',i=0,t=setInterval(function(){i++;url.innerHTML='samforcongress.com<b>'+suf.slice(0,i)+'</b>';
         if(i>=suf.length){clearInterval(t);setTimeout(function(){body.innerHTML=signup;setTimeout(loop,2900);},450);}},85);},1500);
     }
     loop();
