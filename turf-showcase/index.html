@@ -30,6 +30,8 @@
   ul.pts li b{color:var(--ink)}
   .tag{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:999px;padding:5px 13px;margin-bottom:16px;align-self:flex-start}
   .tag.lime{background:var(--lime);color:#1a2e05}
+  /* guidance pills pinned to top-center of every slide */
+  .slide .tag{position:absolute;top:4.5vh;left:50%;transform:translateX(-50%);margin:0;z-index:5}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;width:100%}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
   .muted{color:var(--muted)}
@@ -209,8 +211,8 @@
 
   <!-- 3 THREE WORKSTREAMS -->
   <section class="slide">
-    <span class="tag">What I worked on</span>
-    <h2>The Technology Team Portfolio</h2>
+    <span class="tag">Tech team portfolio</span>
+    <h2>Two workstreams</h2>
     <div class="ai-cols" style="grid-template-columns:repeat(2,1fr)">
       <div class="ai-card pot"><div class="ai-h">1 · Analyze</div><div class="ai-t">Poll analysis</div><p>AI-accelerated modeling to find persuadable voters and guide ad targeting — clean the data, fit many models fast, interpret the results.</p></div>
       <div class="ai-card pot"><div class="ai-h">2 · Organize</div><div class="ai-t">Field organizing</div><p>A volunteer field app on top of <b>NGP VAN</b> — the voter database Democratic campaigns run on — so volunteers can walk on their own time.</p></div>
