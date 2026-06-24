@@ -154,6 +154,57 @@
   .sheet h4{margin:0;font-size:17px}.sheet .addr{font-size:12px;color:var(--muted);margin:2px 0 8px}
   .sheet .vt{font-size:13px;font-weight:600;color:#374151;margin:1px 0}
   .sheet .dchip{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800;color:#fff;margin-top:8px}
+  /* ---- slide 6: four phones ---- */
+  .s6 .phone{width:214px;height:430px}
+  .s6 .ph-cap{font-size:12.5px}
+  .s6 .ph-cap span{font-size:11px}
+  /* phone 1: browser + signup */
+  .brz{height:100%;display:flex;flex-direction:column;background:#fff}
+  .brz-bar{background:#eef1f5;padding:26px 10px 8px;display:flex}
+  .brz-url{flex:1;background:#fff;border:1px solid #dbe0e8;border-radius:999px;padding:6px 11px;font-size:10.5px;color:#475569;white-space:nowrap;overflow:hidden}
+  .brz-url b{color:var(--blue)}
+  .brz-body{flex:1;overflow:hidden}
+  .hm{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 16px;background:linear-gradient(160deg,#eaf0ff,#fff)}
+  .hm-logo{width:44px;height:44px;border-radius:11px;background:var(--blue);color:#fff;font:800 22px system-ui;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .hm-h{font-size:20px;font-weight:800;color:var(--ink);line-height:1.15}
+  .hm-btn{margin-top:16px;background:var(--lime);color:#1a2e05;font-weight:800;font-size:13px;border-radius:9px;padding:9px 16px}
+  /* phone 2: event + routes */
+  .ev{height:100%;display:flex;flex-direction:column}
+  .ev-map{position:relative;height:150px;background:repeating-linear-gradient(0deg,#e3e7ec 0 1px,transparent 1px 38px),repeating-linear-gradient(90deg,#e3e7ec 0 1px,transparent 1px 44px),#eef1f5}
+  .ev-pin{position:absolute;left:50%;top:46%;transform:translate(-50%,-100%)}
+  .ev-pin .b{width:30px;height:30px;border-radius:50% 50% 50% 0;background:var(--blue);transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(10,37,64,.35);display:flex;align-items:center;justify-content:center}
+  .ev-pin .b span{transform:rotate(45deg);font-size:14px}
+  .ev-sheet{flex:1;padding:13px 14px;background:#fff;overflow:hidden}
+  .ev-title{font-size:15px;font-weight:800;color:var(--ink)}
+  .ev-sub{font-size:11px;color:var(--muted);margin:1px 0 10px}
+  .rt{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #f1f5f9}
+  .rt .rn{flex:1;font-size:12.5px;font-weight:700;color:#334155}
+  .rt .rn small{display:block;font-weight:500;color:#94a3b8;font-size:10.5px}
+  .rt .claim{background:var(--blue);color:#fff;font-size:10.5px;font-weight:800;border-radius:7px;padding:5px 10px}
+  /* phone 3: walk map + sheet */
+  .p3wrap{position:relative;height:100%}
+  #p3map{position:absolute;inset:0;background:#e9eef5}
+  .p3sheet{position:absolute;left:8px;right:8px;bottom:-150px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 -3px 16px rgba(10,20,45,.16);padding:11px 12px;transition:bottom .35s ease;z-index:600}
+  .p3sheet.show{bottom:9px}
+  .p3sheet h4{margin:0;font-size:13.5px}
+  .p3sheet .ad{font-size:10.5px;color:#94a3b8;margin:1px 0 8px}
+  .p3sheet .stp{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:6px 0 5px}
+  .p3sheet .ch{display:flex;gap:5px}
+  .p3sheet .c{flex:1;text-align:center;border-radius:7px;padding:6px 0;font-size:10.5px;font-weight:800;border:1.5px solid;transition:all .2s}
+  /* phone 4: leaderboard */
+  .lb{height:100%;display:flex;flex-direction:column;background:#fff}
+  .lb-h{background:var(--brand-blue);color:#fff;padding:26px 14px 12px;text-align:center}
+  .lb-h .t{font-size:16px;font-weight:800}
+  .lb-h .s{font-size:10.5px;opacity:.85;margin-top:1px}
+  .lb-list{flex:1;overflow:hidden;padding:6px 10px}
+  .lb-row{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px solid #f1f5f9}
+  .lb-row.you{background:var(--brand-lime);border-radius:10px;border-bottom:none;color:#fff}
+  .lb-rank{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font:800 12px system-ui;background:#eef2f7;color:#64748b}
+  .lb-rank.g{background:#f4c430;color:#5c4708}.lb-rank.s{background:#cbd5e1;color:#334155}.lb-rank.b{background:#cd7f32;color:#fff}
+  .lb-name{flex:1;font-size:12.5px;font-weight:700;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lb-row.you .lb-name,.lb-row.you .lb-rank{color:#fff}.lb-row.you .lb-rank{background:rgba(255,255,255,.3)}
+  .lb-pts{background:var(--brand-lime);color:#fff;font:800 11px system-ui;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .lb-row.you .lb-pts{background:#fff;color:var(--lime-ink)}
 </style>
 </head>
 <body>
@@ -252,7 +303,7 @@
           <div>
             <div class="tagm">The main problem</div>
             <h3>Volunteer capacity left on the table</h3>
-            <p>Volunteers couldn't just pick up their phone and go — they had to wait for an organizer to cut turf. So willing, motivated people sat idle.</p>
+            <p>Volunteers couldn't just pick up their phone and go — they had to wait for an organizer to cut turf, then <b>drive to a specific location</b> to canvass. And once there, it was frustrating they couldn't keep going on their <b>own time</b>. So willing, motivated people sat idle.</p>
           </div>
         </div>
         <div class="prob">
@@ -283,104 +334,86 @@
     </div>
   </section>
 
-  <!-- 6 FIELD: THE APP (text left, phones right) -->
-  <section class="slide">
-    <span class="tag lime">Workstream 2 · The app</span>
-    <div class="two">
+  <!-- 6 THE SOLUTION (four phones) -->
+  <section class="slide" style="justify-content:flex-start;padding-top:9.5vh">
+    <span class="tag lime">Workstream 2 · The solution</span>
+    <h2 style="text-align:center;font-size:29px;margin:0 0 6px">The solution — built a different volunteer experience</h2>
+    <p class="sub" style="text-align:center;font-size:16.5px;margin:0 auto;max-width:96ch">A different, independent web app that <b>syncs to NGP VAN</b> — reducing friction for volunteers and maximizing impact for the campaign.</p>
+    <div class="ph-row s6" style="margin-top:20px;gap:16px;align-items:flex-start">
       <div>
-        <h2>Volunteers walk on their own time</h2>
-        <p class="sub">An independent web app on top of <b>NGP VAN</b> (the standard Democratic voter file &amp; CRM) — opened right off the campaign website.</p>
-        <ul class="pts">
-          <li><b>Sign up in seconds</b> — magic link, no app to install.</li>
-          <li><b>Walk your route</b> — mark doors and drop signs as you go.</li>
-          <li><b>On your own time</b> — no organizer needed to cut turf first.</li>
-        </ul>
+        <div class="phone"><div class="scr"><div class="notch"></div>
+          <div class="brz">
+            <div class="brz-bar"><span class="brz-url" id="p1url">ericchungformichigan.com</span></div>
+            <div class="brz-body" id="p1body"></div>
+          </div>
+        </div></div>
+        <div class="ph-cap">1 · Sign up<span>off the campaign website</span></div>
       </div>
-      <div class="ph-row">
-        <div>
-          <div class="phone"><div class="scr"><div class="notch"></div>
-            <div class="su">
-              <div class="logo">M</div>
-              <h3>Join the field team</h3>
-              <p>No app to install. Tap the link on the campaign site and you're in.</p>
-              <input value="volunteer@email.com" readonly />
-              <div class="btn">Send my magic link →</div>
-              <div class="ok"><span class="c">✓</span>You're in — here's your turf.</div>
+      <div>
+        <div class="phone"><div class="scr"><div class="notch"></div>
+          <div class="ev">
+            <div class="ev-map"><div class="ev-pin"><div class="b"><span>📍</span></div></div></div>
+            <div class="ev-sheet">
+              <div class="ev-title">Hayes Valley Lit Drop</div>
+              <div class="ev-sub">Sat · 10:00am · 6 open routes</div>
+              <div class="rt"><div class="rn">Route A<small>32 doors · 0.6 mi</small></div><div class="claim">Claim</div></div>
+              <div class="rt"><div class="rn">Route B<small>28 doors · 0.4 mi</small></div><div class="claim">Claim</div></div>
+              <div class="rt"><div class="rn">Route C<small>41 doors · 0.9 mi</small></div><div class="claim">Claim</div></div>
             </div>
-          </div></div>
-          <div class="ph-cap">1 · Sign up off the website</div>
-        </div>
-        <div>
-          <div class="phone"><div class="scr"><div class="notch"></div>
-            <div id="m-map"></div>
-            <div class="m-chip"><span class="dot"></span>Walking your route · on your own time</div>
-          </div></div>
-          <div class="ph-cap">2 · Walk &amp; mark doors</div>
-        </div>
+          </div>
+        </div></div>
+        <div class="ph-cap">2 · Join an event<span>claim an open route</span></div>
+      </div>
+      <div>
+        <div class="phone"><div class="scr"><div class="notch"></div>
+          <div class="p3wrap">
+            <div id="p3map"></div>
+            <div class="p3sheet" id="p3sheet">
+              <h4 id="p3addr">1424 Oak St</h4><div class="ad">2 voters · tap a result</div>
+              <div class="stp">Step 1 — reached?</div>
+              <div class="ch"><span class="c" id="p3c1" style="border-color:#2563eb;color:#2563eb">Contacted</span><span class="c" style="border-color:#f59e0b;color:#f59e0b">Not home</span></div>
+              <div class="stp">Step 2 — support?</div>
+              <div class="ch"><span class="c" id="p3c2" style="border-color:#16a34a;color:#16a34a">Likely</span><span class="c" style="border-color:#2563eb;color:#2563eb">Undec.</span></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ph-cap">3 · Walk on your own time<span>mark doors in a tap</span></div>
+      </div>
+      <div>
+        <div class="phone"><div class="scr"><div class="notch"></div>
+          <div class="lb">
+            <div class="lb-h"><div class="t">Leaderboard</div><div class="s">Houses completed per volunteer</div></div>
+            <div class="lb-list">
+              <div class="lb-row"><span class="lb-rank g">1</span><span class="lb-name">Maria A.</span><span class="lb-pts">412 mp</span></div>
+              <div class="lb-row"><span class="lb-rank s">2</span><span class="lb-name">James O.</span><span class="lb-pts">388 mp</span></div>
+              <div class="lb-row"><span class="lb-rank b">3</span><span class="lb-name">Susan B.</span><span class="lb-pts">351 mp</span></div>
+              <div class="lb-row you"><span class="lb-rank">4</span><span class="lb-name">You</span><span class="lb-pts">336 mp</span></div>
+              <div class="lb-row"><span class="lb-rank">5</span><span class="lb-name">Darnell P.</span><span class="lb-pts">290 mp</span></div>
+              <div class="lb-row"><span class="lb-rank">6</span><span class="lb-name">Linda C.</span><span class="lb-pts">274 mp</span></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ph-cap">4 · Stay motivated<span>points &amp; leaderboard</span></div>
       </div>
     </div>
   </section>
 
-  <!-- 7 LIVE MAP -->
-  <section class="slide" id="map-slide">
-    <div id="mapwrap">
-      <div id="map"></div>
-      <div class="demo-flag">Live demo · synthetic data, no real voters</div>
-      <div class="ov" id="panel">
-        <h3>What the organizer sees</h3>
-        <div class="s">Field data accumulating as volunteers work — in real time.</div>
-        <div class="row">
-          <button class="btn primary" id="play">▶ Play canvass</button>
-          <button class="btn ghost" id="reset">Reset</button>
-        </div>
-        <div class="progress"><span id="pbar"></span></div>
-        <div class="s" id="daylabel" style="margin-top:6px">Day 0 — universe loaded</div>
-      </div>
-      <div class="ov" id="counts">
-        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Accumulated</div>
-        <div class="c"><span>Doors knocked</span><b id="c-knocked">0</b></div>
-        <div class="c"><span style="color:#16a34a">Likely support</span><b id="c-likely">0</b></div>
-        <div class="c"><span style="color:#2563eb">Undecided</span><b id="c-und">0</b></div>
-        <div class="c"><span>Yard signs</span><b id="c-signs">0</b></div>
-        <div class="c"><span>Supporters ✋</span><b id="c-sup">0</b></div>
-      </div>
-      <div class="ov" id="legend">
-        <div class="li"><span class="sw" style="background:#9ca3af"></span>Not attempted</div>
-        <div class="li"><span class="sw" style="background:#f59e0b"></span>Not home</div>
-        <div class="li"><span class="sw" style="background:#16a34a"></span>Likely support</div>
-        <div class="li"><span class="sw" style="background:#2563eb"></span>Undecided</div>
-        <div class="li"><span class="sw" style="background:#dc2626"></span>Not supporting</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- IMPACT + WHERE IT GOES -->
+  <!-- 7 IMPACT -->
   <section class="slide">
-    <span class="tag lime">Impact &amp; what's next</span>
-    <h2>Real traction — and where it goes</h2>
-    <div class="metrics">
+    <span class="tag">Impact</span>
+    <h2 style="text-align:center;font-size:33px;margin:0 0 4px">Significant impact achieved in a short time</h2>
+    <div class="metrics" style="margin-top:8px">
       <div class="metric"><div class="n">200+</div><div class="l">Volunteers signed up</div></div>
       <div class="metric"><div class="n">14K+</div><div class="l">Houses reached</div></div>
       <div class="metric"><div class="n">1.3K+</div><div class="l">Digital actions taken</div></div>
     </div>
-    <div class="two" style="margin-top:12px">
-      <div class="card" style="padding:18px 20px">
-        <div class="muted" style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em">Of contacted voters (live demo)</div>
-        <div id="a-support" style="margin-top:10px"></div>
-        <div class="muted" style="font-size:12.5px;margin-top:6px">Exponential growth the first weeks — volunteers self-serving turf, no organizer bottleneck.</div>
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">Where it could go</div>
-        <div class="flow" style="margin-top:12px">
-          <span class="p now">Lit drop</span><span class="ar">→</span><span class="p">Events</span><span class="ar">→</span><span class="p">Canvassing</span><span class="ar">→</span><span class="p">Gamify</span><span class="ar">→</span><span class="p">Digital</span>
-        </div>
-        <ul class="pts" style="margin-top:16px;font-size:17px">
-          <li><b>Relational organizing</b> — nudge volunteers to bring in their networks.</li>
-          <li><b>Deeper NGP integration</b> — e.g. phone banking on the same base.</li>
-          <li><b>Volunteer engagement</b> (field + digital) is the biggest opportunity.</li>
-        </ul>
-      </div>
-    </div>
+    <ul class="pts" style="margin:24px auto 0;max-width:92ch">
+      <li><b>Volunteers self-served turf</b> — exponential growth in the first weeks, with no organizer bottleneck.</li>
+      <li><b>Added digital actions</b>, not just doors.
+        <div style="font-size:16px;color:#64748b;line-height:1.5;margin-top:4px">Prompts for supporters to act beyond the field — on social media — including encouraging them to post on the candidate's behalf about why they support him.</div>
+      </li>
+      <li><b>Every door synced back to NGP VAN</b> as a canvass response — no data left behind.</li>
+    </ul>
   </section>
 
   <!-- AI TAKE (last) -->
@@ -467,8 +500,49 @@
   function start(){if(timer)return;if(day>=DAYS)resetDays();document.getElementById('play').textContent='⏸ Pause';timer=setInterval(step,950);step();}
   function stop(){clearInterval(timer);timer=null;var p=document.getElementById('play');if(p)p.textContent=day>=DAYS?'▶ Replay':'▶ Play canvass';}
   function resetDays(){day=0;houses.forEach(function(h){h.status='not_attempted';h.supporter=false;h.sign=false;});renderPins();counts();document.getElementById('pbar').style.width='0%';document.getElementById('daylabel').textContent='Day 0 — universe loaded';}
-  document.getElementById('play').addEventListener('click',function(){timer?stop():start();});
-  document.getElementById('reset').addEventListener('click',function(){stop();resetDays();});
+  /* ---------- phone 1: campaign site -> /volunteer -> sign up ---------- */
+  function initPhone1(){
+    var url=document.getElementById('p1url'),body=document.getElementById('p1body');
+    if(!url||!body||initPhone1.run)return;initPhone1.run=1;
+    var home='<div class="hm"><div class="hm-logo">EC</div><div class="hm-h">Eric Chung<br>for Congress</div><div class="hm-btn">Volunteer →</div></div>';
+    var signup='<div class="su"><div class="logo">EC</div><h3>Join the field team</h3><p>No app to install.</p><input value="you@email.com" readonly /><div class="btn">Send my magic link →</div><div class="ok"><span class="c">✓</span>You\'re in — here\'s your turf.</div></div>';
+    function loop(){
+      url.innerHTML='ericchungformichigan.com';body.innerHTML=home;
+      setTimeout(function(){var suf='/volunteer',i=0,t=setInterval(function(){i++;url.innerHTML='ericchungformichigan.com<b>'+suf.slice(0,i)+'</b>';
+        if(i>=suf.length){clearInterval(t);setTimeout(function(){body.innerHTML=signup;setTimeout(loop,2900);},450);}},85);},1500);
+    }
+    loop();
+  }
+  /* ---------- phone 3: walk on your own time — tap & mark doors ---------- */
+  var p3map,p3m=[],p3houses=[],p3anim=null,P3C=[37.7762,-122.4242];
+  (function(){var k=0;for(var r=0;r<6;r++)for(var c=0;c<6;c++){if(Math.random()>0.82)continue;
+    p3houses.push({lat:P3C[0]-0.0016+r*0.00064+(Math.random()-0.5)*0.00018,lon:P3C[1]-0.0021+c*0.00084+(Math.random()-0.5)*0.00022,label:String(10+k*2),status:'not_attempted'});k++;}})();
+  function p3icon(status,label){var b=layout(label);return L.divIcon({className:'',html:markerHtml(status,label,null),iconSize:[b.tapW,b.tapH],iconAnchor:[Math.round(b.tapW/2),b.tapH]});}
+  function p3render(i){p3m[i].setIcon(p3icon(p3houses[i].status,p3houses[i].label));}
+  function initPhone3(){
+    if(p3map){p3map.invalidateSize();return;}
+    p3map=L.map('p3map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,tap:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(p3map);
+    p3houses.forEach(function(h){p3m.push(L.marker([h.lat,h.lon],{icon:p3icon('not_attempted',h.label)}).addTo(p3map));});
+    p3map.fitBounds(L.latLngBounds(p3houses.map(function(h){return [h.lat,h.lon];})),{padding:[16,16]});
+  }
+  function p3reset(){p3houses.forEach(function(h,i){h.status='not_attempted';p3render(i);});}
+  function startPhone3(){
+    if(!p3map||p3anim)return;p3reset();
+    var order=p3houses.map(function(_,i){return i;}).sort(function(){return Math.random()-0.5;}).slice(0,4);
+    var sheet=document.getElementById('p3sheet'),addr=document.getElementById('p3addr'),c1=document.getElementById('p3c1'),c2=document.getElementById('p3c2'),step=0;
+    function clr(){c1.style.background='#fff';c1.style.color='#2563eb';c2.style.background='#fff';c2.style.color='#16a34a';}
+    function nx(){
+      if(step>=order.length){p3anim=setTimeout(function(){p3anim=null;p3reset();startPhone3();},1300);return;}
+      var idx=order[step];addr.textContent=p3houses[idx].label+' Oak St';clr();sheet.classList.add('show');
+      p3anim=setTimeout(function(){c1.style.background='#2563eb';c1.style.color='#fff';
+        p3anim=setTimeout(function(){c2.style.background='#16a34a';c2.style.color='#fff';
+          p3anim=setTimeout(function(){sheet.classList.remove('show');p3houses[idx].status='likely';p3render(idx);step++;
+            p3anim=setTimeout(nx,650);},950);},650);},650);
+    }
+    nx();
+  }
+  function stopPhone3(){if(p3anim){clearTimeout(p3anim);p3anim=null;}var s=document.getElementById('p3sheet');if(s)s.classList.remove('show');}
 
   /* ---------- phone map: walk a route on your own time ---------- */
   var P_ROUTE=[[37.7748,-122.4242],[37.7748,-122.4232],[37.7748,-122.4222],[37.7748,-122.4212],[37.7754,-122.4212],[37.7754,-122.4222],[37.7754,-122.4232],[37.7754,-122.4242]];
@@ -513,10 +587,8 @@
   var slides=[].slice.call(document.querySelectorAll('.slide')),nav=document.getElementById('nav'),cur=0,sn=document.getElementById('slideno');
   if(sn)sn.textContent='1 / '+slides.length;
   slides.forEach(function(_,i){var b=document.createElement('button');b.className='nv'+(i===0?' on':'');b.onclick=function(){go(i);};nav.appendChild(b);});
-  function go(i){if(i<0||i>=slides.length)return;stopWalk();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');if(sn)sn.textContent=(cur+1)+' / '+slides.length;
-    if(slides[cur].id==='map-slide'){initMap();setTimeout(function(){map.invalidateSize();},60);if(day===0&&!timer)setTimeout(start,400);}
-    if(slides[cur].querySelector('#m-map')){initPhoneMap();setTimeout(function(){pmap.invalidateSize();startWalk();},140);}
-    if(slides[cur].querySelector('#a-support'))renderAnalytics();}
+  function go(i){if(i<0||i>=slides.length)return;stopPhone3();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');if(sn)sn.textContent=(cur+1)+' / '+slides.length;
+    if(slides[cur].querySelector('#p3map')){initPhone1();initPhone3();setTimeout(function(){p3map.invalidateSize();startPhone3();},160);}}
   document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}else if(e.key==='ArrowLeft'){go(cur-1);}else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
 
   /* ---------- password gate ---------- */
