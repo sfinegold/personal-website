@@ -47,6 +47,7 @@
   #hint{position:fixed;right:16px;bottom:32px;font-size:12px;color:#94a3b8;z-index:50}
   .ftag{position:fixed;left:16px;bottom:30px;font-size:12px;color:#94a3b8;z-index:50}
   .ftag b{color:var(--blue)}
+  #slideno{position:fixed;right:18px;bottom:13px;font-size:12.5px;font-weight:700;color:#64748b;z-index:50}
   /* metrics */
   .metrics{display:flex;gap:20px;flex-wrap:wrap;width:100%;margin:4px 0 6px}
   .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;flex:1;min-width:180px}
@@ -328,31 +329,7 @@
     </div>
   </section>
 
-  <!-- 8 AI TAKE -->
-  <section class="slide">
-    <span class="tag">AI in campaigns — my take</span>
-    <h2>Where AI helps today — and where it doesn't</h2>
-    <div class="ai-cols">
-      <div class="ai-card good">
-        <div class="ai-h">✅ Good at</div>
-        <div class="ai-t">Data analysis</div>
-        <p>Cleaning, modeling, and interpreting polling &amp; field data — fast. Still needs human judgment on what data to trust and how to act on it.</p>
-      </div>
-      <div class="ai-card pot">
-        <div class="ai-h">◐ Potential</div>
-        <div class="ai-t">Campaign-lead workflows</div>
-        <p>Supporting the people running the campaign — e.g. the political lead sourcing and tracking endorsements.</p>
-      </div>
-      <div class="ai-card no">
-        <div class="ai-h">⛔ Not there yet</div>
-        <div class="ai-t">Full ad production</div>
-        <p>End-to-end creative — the finished ad still needs human voice, taste, and sign-off.</p>
-      </div>
-    </div>
-    <p class="sub" style="margin-top:30px"><strong class="accent">The pattern:</strong> AI expands productivity on rote and analytical work — humans keep the judgment, the voice, and the final call.</p>
-  </section>
-
-  <!-- 9 IMPACT + WHERE IT GOES -->
+  <!-- IMPACT + WHERE IT GOES -->
   <section class="slide">
     <span class="tag lime">Impact &amp; what's next</span>
     <h2>Real traction — and where it goes</h2>
@@ -381,10 +358,35 @@
     </div>
   </section>
 
+  <!-- AI TAKE (last) -->
+  <section class="slide">
+    <span class="tag">AI in campaigns — my take</span>
+    <h2>Where AI helps today — and where it doesn't</h2>
+    <div class="ai-cols">
+      <div class="ai-card good">
+        <div class="ai-h">✅ Good at</div>
+        <div class="ai-t">Data analysis</div>
+        <p>Cleaning, modeling, and interpreting polling &amp; field data — fast. Still needs human judgment on what data to trust and how to act on it.</p>
+      </div>
+      <div class="ai-card pot">
+        <div class="ai-h">◐ Potential</div>
+        <div class="ai-t">Campaign-lead workflows</div>
+        <p>Supporting the people running the campaign — e.g. the political lead sourcing and tracking endorsements.</p>
+      </div>
+      <div class="ai-card no">
+        <div class="ai-h">⛔ Not there yet</div>
+        <div class="ai-t">Full ad production</div>
+        <p>End-to-end creative — the finished ad still needs human voice, taste, and sign-off.</p>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:30px"><strong class="accent">The pattern:</strong> AI expands productivity on rote and analytical work — humans keep the judgment, the voice, and the final call.</p>
+  </section>
+
 </div>
 
 <div id="nav"></div>
 <div id="hint">← → to move · F fullscreen</div>
+<div id="slideno">1 / 9</div>
 <div class="ftag"><b>Turf</b> — interactive showcase</div>
 
 <script>
@@ -484,9 +486,10 @@
     document.getElementById('a-support').innerHTML=bar('Likely support',lk,t,mx,'#16a34a')+bar('Undecided',un,t,mx,'#2563eb')+bar('Not supporting',op,t,mx,'#dc2626');}
 
   /* ---------- deck nav ---------- */
-  var slides=[].slice.call(document.querySelectorAll('.slide')),nav=document.getElementById('nav'),cur=0;
+  var slides=[].slice.call(document.querySelectorAll('.slide')),nav=document.getElementById('nav'),cur=0,sn=document.getElementById('slideno');
+  if(sn)sn.textContent='1 / '+slides.length;
   slides.forEach(function(_,i){var b=document.createElement('button');b.className='nv'+(i===0?' on':'');b.onclick=function(){go(i);};nav.appendChild(b);});
-  function go(i){if(i<0||i>=slides.length)return;stopWalk();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');
+  function go(i){if(i<0||i>=slides.length)return;stopWalk();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');if(sn)sn.textContent=(cur+1)+' / '+slides.length;
     if(slides[cur].id==='map-slide'){initMap();setTimeout(function(){map.invalidateSize();},60);if(day===0&&!timer)setTimeout(start,400);}
     if(slides[cur].querySelector('#m-map')){initPhoneMap();setTimeout(function(){pmap.invalidateSize();startWalk();},140);}
     if(slides[cur].querySelector('#a-support'))renderAnalytics();}
