@@ -112,6 +112,13 @@
   .probs2 .prob{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:34px 36px;min-height:308px}
   .probs2 .prob.main{border-left-width:6px}
   .probs2 .prob .num{width:50px;height:50px;font-size:23px;margin-bottom:16px}
+  .field-split{display:grid;grid-template-columns:1fr 1fr;gap:34px;width:100%;max-width:1120px;margin:26px auto 0;align-items:center}
+  .field-split img{width:100%;height:auto;border-radius:16px;box-shadow:0 8px 30px rgba(10,20,45,.18);display:block}
+  .field-split .fstack{display:flex;flex-direction:column;gap:18px}
+  .field-split .prob{flex-direction:column;align-items:flex-start;gap:0;padding:22px 24px}
+  .field-split .prob .num{width:42px;height:42px;font-size:20px;margin-bottom:12px}
+  .field-split .prob h3{font-size:19px}
+  .field-split .prob p{font-size:15.5px}
   .probs2 .prob .tagm{font-size:13px;margin-bottom:7px}
   .probs2 .prob h3{font-size:28px;margin:0 0 13px}
   .probs2 .prob p{font-size:20px;line-height:1.55}
@@ -330,18 +337,21 @@
   <section class="slide">
     <span class="tag">Workstream 2 · Field organizing</span>
     <h2 style="text-align:center">Two problems with the status quo</h2>
-    <div class="probs2">
-      <div class="prob main">
-        <div class="num">1</div>
-        <div class="tagm">The main problem</div>
-        <h3>Volunteer capacity left on the table</h3>
-        <p>Volunteers couldn't just pick up their phone and go — they had to wait for an organizer to cut turf, then <b>drive to a specific location</b> to canvass. And once there, it was frustrating they couldn't keep going on their <b>own time</b>. So willing, motivated people sat idle.</p>
-      </div>
-      <div class="prob">
-        <div class="num">2</div>
-        <div class="tagm" style="color:#94a3b8">Also</div>
-        <h3>Tooling impersonal, not optimized for script/actions, and not &ldquo;fun&rdquo;</h3>
-        <p><b>NGP VAN</b>'s canvassing app (MiniVAN) isn't tailored to the campaign's script and actions, takes several taps to mark a door, and isn't engaging — nothing to keep motivated volunteers going.</p>
+    <div class="field-split">
+      <img src="/higher-ground-showcase/team-mahan.jpg" alt="Lit drop with Team Mahan — every weekend" />
+      <div class="fstack">
+        <div class="prob main">
+          <div class="num">1</div>
+          <div class="tagm">The main problem</div>
+          <h3>Volunteer capacity left on the table</h3>
+          <p>Volunteers couldn't just pick up their phone and go — they had to wait for an organizer to cut turf, then <b>drive to a specific location</b> to canvass. And once there, it was frustrating they couldn't keep going on their <b>own time</b>. So willing, motivated people sat idle.</p>
+        </div>
+        <div class="prob">
+          <div class="num">2</div>
+          <div class="tagm" style="color:#94a3b8">Also</div>
+          <h3>Tooling impersonal, not optimized for script/actions, and not &ldquo;fun&rdquo;</h3>
+          <p><b>NGP VAN</b>'s canvassing app (MiniVAN) isn't tailored to the campaign's script and actions, takes several taps to mark a door, and isn't engaging — nothing to keep motivated volunteers going.</p>
+        </div>
       </div>
     </div>
   </section>
