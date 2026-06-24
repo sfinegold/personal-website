@@ -178,15 +178,13 @@
   .hm-h{font-size:20px;font-weight:800;color:var(--ink);line-height:1.15}
   .hm-btn{margin-top:16px;background:var(--lime);color:#1a2e05;font-weight:800;font-size:13px;border-radius:9px;padding:9px 16px}
   /* phone 2: event + routes */
-  .ev{height:100%;display:flex;flex-direction:column}
-  .ev-map{position:relative;height:150px;background:repeating-linear-gradient(0deg,#e3e7ec 0 1px,transparent 1px 38px),repeating-linear-gradient(90deg,#e3e7ec 0 1px,transparent 1px 44px),#eef1f5}
-  .ev-pin{position:absolute;left:50%;top:46%;transform:translate(-50%,-100%)}
-  .ev-pin .b{width:30px;height:30px;border-radius:50% 50% 50% 0;background:var(--blue);transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(10,37,64,.35);display:flex;align-items:center;justify-content:center}
-  .ev-pin .b span{transform:rotate(45deg);font-size:14px}
-  .ev-sheet{flex:1;padding:13px 14px;background:#fff;overflow:hidden}
+  .p2wrap{position:relative;height:100%}
+  #p2map{position:absolute;inset:0;background:#e9eef5}
+  .p2sheet{position:absolute;left:0;right:0;bottom:0;height:42%;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 18px rgba(10,20,45,.14);padding:11px 14px 0;overflow:hidden;z-index:600}
+  .rdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
   .ev-title{font-size:15px;font-weight:800;color:var(--ink)}
-  .ev-sub{font-size:11px;color:var(--muted);margin:1px 0 10px}
-  .rt{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #f1f5f9}
+  .ev-sub{font-size:11px;color:var(--muted);margin:1px 0 8px}
+  .rt{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #f1f5f9}
   .rt .rn{flex:1;font-size:12.5px;font-weight:700;color:#334155}
   .rt .rn small{display:block;font-weight:500;color:#94a3b8;font-size:10.5px}
   .rt .claim{background:var(--blue);color:#fff;font-size:10.5px;font-weight:800;border-radius:7px;padding:5px 10px}
@@ -351,14 +349,14 @@
       </div>
       <div>
         <div class="phone"><div class="scr"><div class="notch"></div>
-          <div class="ev">
-            <div class="ev-map"><div class="ev-pin"><div class="b"><span>📍</span></div></div></div>
-            <div class="ev-sheet">
+          <div class="p2wrap">
+            <div id="p2map"></div>
+            <div class="p2sheet">
               <div class="ev-title">Hayes Valley Lit Drop</div>
               <div class="ev-sub">Sat · 10:00am · 6 open routes</div>
-              <div class="rt"><div class="rn">Route A<small>32 doors · 0.6 mi</small></div><div class="claim">Claim</div></div>
-              <div class="rt"><div class="rn">Route B<small>28 doors · 0.4 mi</small></div><div class="claim">Claim</div></div>
-              <div class="rt"><div class="rn">Route C<small>41 doors · 0.9 mi</small></div><div class="claim">Claim</div></div>
+              <div class="rt"><span class="rdot" style="background:#2563eb"></span><div class="rn">Route A<small>32 doors · 0.6 mi</small></div><div class="claim">Claim</div></div>
+              <div class="rt"><span class="rdot" style="background:#16a34a"></span><div class="rn">Route B<small>28 doors · 0.4 mi</small></div><div class="claim">Claim</div></div>
+              <div class="rt"><span class="rdot" style="background:#f59e0b"></span><div class="rn">Route C<small>41 doors · 0.9 mi</small></div><div class="claim">Claim</div></div>
             </div>
           </div>
         </div></div>
@@ -515,6 +513,28 @@
     }
     loop();
   }
+  /* ---------- phone 2: join an event — color-coded routes round a meeting point ---------- */
+  var p2map,p2bounds,P2C=[37.7762,-122.4242];
+  var P2_ROUTES=[
+    {color:'#2563eb',pts:[[37.7766,-122.4250],[37.7771,-122.4250],[37.7775,-122.4250],[37.7775,-122.4263],[37.7770,-122.4263]]},
+    {color:'#16a34a',pts:[[37.7762,-122.4233],[37.7762,-122.4221],[37.7768,-122.4221],[37.7768,-122.4209]]},
+    {color:'#f59e0b',pts:[[37.7757,-122.4244],[37.7751,-122.4244],[37.7751,-122.4231],[37.7745,-122.4231]]}
+  ];
+  function meetIcon(){return L.divIcon({className:'',html:'<div style="position:relative;width:30px;height:38px;filter:drop-shadow(0 2px 4px rgba(10,37,64,.35));"><div style="position:absolute;left:50%;top:0;transform:translateX(-50%) rotate(-45deg);width:26px;height:26px;border-radius:50% 50% 50% 0;background:#1d4ed8;border:2.5px solid #fff;"></div><div style="position:absolute;left:0;right:0;top:4px;text-align:center;font-size:13px;line-height:1;">🚩</div></div>',iconSize:[30,38],iconAnchor:[15,38]});}
+  function p2fit(){if(p2map)p2map.fitBounds(p2bounds,{paddingTopLeft:[18,14],paddingBottomRight:[18,150]});}
+  function initPhone2(){
+    if(p2map){p2map.invalidateSize();return;}
+    p2map=L.map('p2map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,tap:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(p2map);
+    var all=[];
+    P2_ROUTES.forEach(function(rt){
+      L.polyline(rt.pts,{color:rt.color,weight:4.5,opacity:.9,lineCap:'round',lineJoin:'round'}).addTo(p2map);
+      rt.pts.forEach(function(pt){all.push(pt);L.circleMarker(pt,{radius:3.5,color:'#fff',weight:1.5,fillColor:rt.color,fillOpacity:1}).addTo(p2map);});
+    });
+    all.push(P2C);
+    L.marker(P2C,{icon:meetIcon(),zIndexOffset:1000}).addTo(p2map);
+    p2bounds=L.latLngBounds(all);p2fit();
+  }
   /* ---------- phone 3: walk on your own time — tap & mark doors ---------- */
   var p3map,p3m=[],p3houses=[],p3anim=null,P3C=[37.7762,-122.4242];
   (function(){var k=0;for(var r=0;r<12;r++)for(var c=0;c<4;c++){if(Math.random()>0.55)continue;
@@ -590,7 +610,7 @@
   if(sn)sn.textContent='1 / '+slides.length;
   slides.forEach(function(_,i){var b=document.createElement('button');b.className='nv'+(i===0?' on':'');b.onclick=function(){go(i);};nav.appendChild(b);});
   function go(i){if(i<0||i>=slides.length)return;stopPhone3();slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=i;slides[cur].classList.add('active');nav.children[cur].classList.add('on');if(sn)sn.textContent=(cur+1)+' / '+slides.length;
-    if(slides[cur].querySelector('#p3map')){initPhone1();initPhone3();setTimeout(function(){p3map.invalidateSize();startPhone3();},160);}}
+    if(slides[cur].querySelector('#p3map')){initPhone1();initPhone2();initPhone3();setTimeout(function(){if(p2map){p2map.invalidateSize();p2fit();}p3map.invalidateSize();startPhone3();},160);}}
   document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}else if(e.key==='ArrowLeft'){go(cur-1);}else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
 
   /* ---------- password gate ---------- */
