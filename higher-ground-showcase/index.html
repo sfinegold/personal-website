@@ -294,25 +294,27 @@
   <section class="slide">
     <span class="tag">Workstream 1 · Analyze</span>
     <h2 style="text-align:center;font-size:32px">Which voters respond strongest to Matt's bio and message?</h2>
-    <div class="two" style="margin-top:16px">
+    <div class="ai-cols" style="grid-template-columns:repeat(3,1fr);align-items:start;margin-top:22px">
       <div>
-        <div class="kicker" style="margin-bottom:12px">Helpful data format</div>
-        <div class="card" style="padding:20px 22px;margin-bottom:18px">
-          <div class="flow">
-            <span class="p">ID</span><span class="ar">→</span><span class="p now">Treatment</span><span class="ar">→</span><span class="p">ID</span>
-          </div>
-          <div class="muted" style="font-size:13.5px;margin-top:12px;line-height:1.5">Ask the same support question before and after showing a message — the shift between the two IDs tells you which ad copy actually persuades.</div>
+        <div class="kicker" style="margin-bottom:12px">Options</div>
+        <div class="card" style="padding:16px 18px;margin-bottom:12px">
+          <div style="font-size:16.5px;font-weight:800;color:var(--ink)">Cross-tabs + judgement</div>
+          <p style="margin:6px 0 0;font-size:15px;color:#475569;line-height:1.5">Read the poll crosstabs directly and decide who to target.</p>
         </div>
-        <div class="kicker" style="margin-bottom:12px">Impact</div>
-        <div class="card" style="padding:24px 26px">
-          <p style="margin:0;font-size:21px;line-height:1.55;color:#1f2937">Modeling did suggest <b>more precision in who to show ads to</b> — though the true real-world impact is hard to know.</p>
+        <div class="card" style="padding:16px 18px">
+          <div style="font-size:16.5px;font-weight:800;color:var(--ink)">Fit a model</div>
+          <p style="margin:6px 0 0;font-size:15px;color:#475569;line-height:1.5">Predict at the voter level which voters to show which ad.</p>
         </div>
       </div>
       <div>
-        <div class="kicker" style="margin-bottom:8px">Options</div>
-        <p style="margin:0 0 18px;font-size:17px;line-height:1.5;color:#334155">Use cross-tabs and judgement, or fit a model to inform which voters to show which ad.</p>
-        <div class="kicker" style="margin-bottom:12px">Learnings in setting this up</div>
-        <ul class="pts" style="margin:0;font-size:19px">
+        <div class="kicker" style="margin-bottom:12px">Impact</div>
+        <div class="card" style="padding:22px 24px">
+          <p style="margin:0;font-size:19px;line-height:1.55;color:#1f2937">Modeling did suggest <b>more precision in who to show ads to</b> — though the true real-world impact is hard to know.</p>
+        </div>
+      </div>
+      <div>
+        <div class="kicker" style="margin-bottom:12px">Learnings</div>
+        <ul class="pts" style="margin:0;font-size:16px">
           <li><b>AI was enormously helpful</b> in expediting the work — setting up data, fitting models, and interpreting &amp; sharing results.</li>
           <li><b>You need good poll data</b> to begin with.</li>
           <li>It helps to have <b>someone versed in modeling</b> — or willing to learn quickly — to ask the right questions and vet the output.</li>
