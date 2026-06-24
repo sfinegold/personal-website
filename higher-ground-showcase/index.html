@@ -206,14 +206,28 @@
   .lb-h .t{font-size:16px;font-weight:800}
   .lb-h .s{font-size:10.5px;opacity:.85;margin-top:1px}
   .lb-list{flex:1;overflow:hidden;padding:6px 10px}
-  .lb-row{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px solid #f1f5f9}
+  .lb-row{display:flex;align-items:center;gap:7px;padding:9px 4px;border-bottom:1px solid #f1f5f9}
   .lb-row.you{background:var(--brand-lime);border-radius:10px;border-bottom:none;color:#fff}
-  .lb-rank{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font:800 12px system-ui;background:#eef2f7;color:#64748b}
+  .lb-rank{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font:800 10.5px system-ui;background:#eef2f7;color:#64748b}
   .lb-rank.g{background:#f4c430;color:#5c4708}.lb-rank.s{background:#cbd5e1;color:#334155}.lb-rank.b{background:#cd7f32;color:#fff}
-  .lb-name{flex:1;font-size:12.5px;font-weight:700;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lb-name{flex:1;min-width:0;font-size:12px;font-weight:700;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lb-row.you .lb-name,.lb-row.you .lb-rank{color:#fff}.lb-row.you .lb-rank{background:rgba(255,255,255,.3)}
-  .lb-pts{background:var(--brand-lime);color:#fff;font:800 11px system-ui;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .lb-pts{background:var(--brand-lime);color:#fff;font:800 10px system-ui;border-radius:999px;padding:2px 7px;white-space:nowrap}
   .lb-row.you .lb-pts{background:#fff;color:var(--lime-ink)}
+  .lb-av{width:21px;height:21px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font:800 9px system-ui}
+  .lb-foot{background:#f0fdf4;color:var(--lime-ink);text-align:center;font-size:11px;font-weight:800;padding:10px}
+  /* phone 1: campaign website */
+  .cw{height:100%;display:flex;flex-direction:column;background:#fff}
+  .cw-nav{padding:24px 12px 9px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eef1f5}
+  .cw-logo{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--blue)}
+  .cw-dot{width:22px;height:22px;border-radius:6px;background:var(--blue);color:#fff;font-size:9.5px;display:flex;align-items:center;justify-content:center}
+  .cw-hero{flex:1;background:linear-gradient(155deg,#2a4fc4,#15309c);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 16px}
+  .cw-eye{font-size:10px;font-weight:800;letter-spacing:.09em;color:#bcd0ff}
+  .cw-h{font-size:22px;font-weight:800;line-height:1.12;margin:7px 0 15px}
+  .cw-cta{display:flex;gap:8px}
+  .cw-b1{background:#fff;color:var(--blue);font-weight:800;font-size:11px;border-radius:7px;padding:8px 13px}
+  .cw-b2{background:var(--lime);color:#1a2e05;font-weight:800;font-size:11px;border-radius:7px;padding:8px 13px}
+  .cw-strip{background:#0f172a;color:#cbd5e1;font-size:10px;font-weight:600;text-align:center;padding:8px}
 </style>
 </head>
 <body>
@@ -330,7 +344,7 @@
       <div>
         <div class="phone"><div class="scr"><div class="notch"></div>
           <div class="brz">
-            <div class="brz-bar"><span class="brz-url" id="p1url">ericchungformichigan.com</span></div>
+            <div class="brz-bar"><span class="brz-url" id="p1url">samscampaign.org</span></div>
             <div class="brz-body" id="p1body"></div>
           </div>
         </div></div>
@@ -369,15 +383,17 @@
       <div>
         <div class="phone"><div class="scr"><div class="notch"></div>
           <div class="lb">
-            <div class="lb-h"><div class="t">Leaderboard</div><div class="s">Houses completed per volunteer</div></div>
+            <div class="lb-h"><div class="t">Leaderboard</div><div class="s">Houses completed = points</div></div>
             <div class="lb-list">
-              <div class="lb-row"><span class="lb-rank g">1</span><span class="lb-name">Maria A.</span><span class="lb-pts">412 mp</span></div>
-              <div class="lb-row"><span class="lb-rank s">2</span><span class="lb-name">James O.</span><span class="lb-pts">388 mp</span></div>
-              <div class="lb-row"><span class="lb-rank b">3</span><span class="lb-name">Susan B.</span><span class="lb-pts">351 mp</span></div>
-              <div class="lb-row you"><span class="lb-rank">4</span><span class="lb-name">You</span><span class="lb-pts">336 mp</span></div>
-              <div class="lb-row"><span class="lb-rank">5</span><span class="lb-name">Darnell P.</span><span class="lb-pts">290 mp</span></div>
-              <div class="lb-row"><span class="lb-rank">6</span><span class="lb-name">Linda C.</span><span class="lb-pts">274 mp</span></div>
+              <div class="lb-row"><span class="lb-rank g">1</span><span class="lb-av" style="background:#fde68a;color:#92400e">M</span><span class="lb-name">Maria</span><span class="lb-pts">412 mp</span></div>
+              <div class="lb-row"><span class="lb-rank s">2</span><span class="lb-av" style="background:#cffafe;color:#155e75">J</span><span class="lb-name">James</span><span class="lb-pts">388 mp</span></div>
+              <div class="lb-row"><span class="lb-rank b">3</span><span class="lb-av" style="background:#fce7f3;color:#9d174d">S</span><span class="lb-name">Susan</span><span class="lb-pts">351 mp</span></div>
+              <div class="lb-row you"><span class="lb-rank">4</span><span class="lb-av" style="background:rgba(255,255,255,.35);color:#fff">★</span><span class="lb-name">You</span><span class="lb-pts">336 mp</span></div>
+              <div class="lb-row"><span class="lb-rank">5</span><span class="lb-av" style="background:#dbeafe;color:#1e40af">D</span><span class="lb-name">Darnell</span><span class="lb-pts">290 mp</span></div>
+              <div class="lb-row"><span class="lb-rank">6</span><span class="lb-av" style="background:#dcfce7;color:#166534">L</span><span class="lb-name">Linda</span><span class="lb-pts">274 mp</span></div>
+              <div class="lb-row"><span class="lb-rank">7</span><span class="lb-av" style="background:#ffe4e6;color:#9f1239">T</span><span class="lb-name">Tom</span><span class="lb-pts">251 mp</span></div>
             </div>
+            <div class="lb-foot">↑ You moved up 2 spots this week</div>
           </div>
         </div></div>
         <div class="ph-cap">4 · Stay motivated<span>points &amp; leaderboard</span></div>
@@ -389,12 +405,12 @@
   <section class="slide">
     <span class="tag">Impact</span>
     <h2 style="text-align:center;font-size:33px;margin:0 0 4px">Significant impact achieved in a short time</h2>
-    <div class="metrics" style="margin-top:8px">
+    <div class="metrics" style="margin:8px auto 0;max-width:1000px">
       <div class="metric"><div class="n">200+</div><div class="l">Volunteers signed up</div></div>
       <div class="metric"><div class="n">14K+</div><div class="l">Houses reached</div></div>
       <div class="metric"><div class="n">1.3K+</div><div class="l">Digital actions taken</div></div>
     </div>
-    <ul class="pts" style="margin:24px auto 0;max-width:92ch">
+    <ul class="pts" style="margin:24px auto 0;max-width:1000px">
       <li><b>Volunteers self-served turf</b> — exponential growth in the first weeks, with no organizer bottleneck.</li>
       <li><b>Added digital actions</b>, not just doors.
         <div style="font-size:16px;color:#64748b;line-height:1.5;margin-top:4px">Prompts for supporters to act beyond the field — on social media — including encouraging them to post on the candidate's behalf about why they support him.</div>
@@ -491,19 +507,19 @@
   function initPhone1(){
     var url=document.getElementById('p1url'),body=document.getElementById('p1body');
     if(!url||!body||initPhone1.run)return;initPhone1.run=1;
-    var home='<div class="hm"><div class="hm-logo">EC</div><div class="hm-h">Eric Chung<br>for Congress</div><div class="hm-btn">Volunteer →</div></div>';
-    var signup='<div class="su"><div class="logo">EC</div><h3>Join the field team</h3><p>No app to install.</p><input value="you@email.com" readonly /><div class="btn">Send my magic link →</div><div class="ok"><span class="c">✓</span>You\'re in — here\'s your turf.</div></div>';
+    var home='<div class="cw"><div class="cw-nav"><span class="cw-logo"><span class="cw-dot">SC</span>Sam\'s Campaign</span><span style="color:#94a3b8;font-size:14px">☰</span></div><div class="cw-hero"><div class="cw-eye">SAM FOR CONGRESS</div><div class="cw-h">A new voice for our district</div><div class="cw-cta"><span class="cw-b1">Donate</span><span class="cw-b2">Volunteer →</span></div></div><div class="cw-strip">★ Endorsed by local leaders</div></div>';
+    var signup='<div class="su"><div class="logo">SC</div><h3>Join the field team</h3><p>No app to install.</p><input value="you@email.com" readonly /><div class="btn">Send my magic link →</div><div class="ok"><span class="c">✓</span>You\'re in — here\'s your turf.</div></div>';
     function loop(){
-      url.innerHTML='ericchungformichigan.com';body.innerHTML=home;
-      setTimeout(function(){var suf='/volunteer',i=0,t=setInterval(function(){i++;url.innerHTML='ericchungformichigan.com<b>'+suf.slice(0,i)+'</b>';
+      url.innerHTML='samscampaign.org';body.innerHTML=home;
+      setTimeout(function(){var suf='/volunteer',i=0,t=setInterval(function(){i++;url.innerHTML='samscampaign.org<b>'+suf.slice(0,i)+'</b>';
         if(i>=suf.length){clearInterval(t);setTimeout(function(){body.innerHTML=signup;setTimeout(loop,2900);},450);}},85);},1500);
     }
     loop();
   }
   /* ---------- phone 3: walk on your own time — tap & mark doors ---------- */
   var p3map,p3m=[],p3houses=[],p3anim=null,P3C=[37.7762,-122.4242];
-  (function(){var k=0;for(var r=0;r<6;r++)for(var c=0;c<6;c++){if(Math.random()>0.82)continue;
-    p3houses.push({lat:P3C[0]-0.0016+r*0.00064+(Math.random()-0.5)*0.00018,lon:P3C[1]-0.0021+c*0.00084+(Math.random()-0.5)*0.00022,label:String(10+k*2),status:'not_attempted'});k++;}})();
+  (function(){var k=0;for(var r=0;r<12;r++)for(var c=0;c<4;c++){if(Math.random()>0.55)continue;
+    p3houses.push({lat:P3C[0]-0.0050+r*0.00085+(Math.random()-0.5)*0.0005,lon:P3C[1]-0.0026+c*0.0016+(Math.random()-0.5)*0.0007,label:String(10+k*2),status:'not_attempted'});k++;}})();
   function p3icon(status,label){var b=layout(label);return L.divIcon({className:'',html:markerHtml(status,label,null),iconSize:[b.tapW,b.tapH],iconAnchor:[Math.round(b.tapW/2),b.tapH]});}
   function p3render(i){p3m[i].setIcon(p3icon(p3houses[i].status,p3houses[i].label));}
   function initPhone3(){
