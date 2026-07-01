@@ -459,10 +459,79 @@
       from { transform: translateY(15px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
+    /* Tab bar */
+    .tabbar { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    .tab {
+      flex: 1; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 1.5px; color: #3C638E;
+      background: #f4f6fa; border: 1px solid #c8cfe0; border-radius: 8px;
+      padding: 11px 8px; cursor: pointer; transition: all 0.15s;
+    }
+    .tab:hover { border-color: #3C638E; }
+    .tab.active { background: #00288B; color: #FDD201; border-color: #00288B; }
+
+    /* Shoulder rehab tab */
+    .rehab-note {
+      background: #f4f6fa; border: 1px solid #c8cfe0; border-left: 4px solid #00288B;
+      border-radius: 8px; padding: 12px 14px; font-size: 0.85rem; line-height: 1.45;
+      margin-bottom: 1.25rem; color: #1c2c44;
+    }
+    .rehab-group { margin-bottom: 1.4rem; }
+    .rehab-group-title {
+      font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 1.5px; color: #00288B;
+      border-bottom: 2px solid #FDD201; padding-bottom: 5px; margin-bottom: 9px;
+    }
+    .rehab-progress { margin-bottom: 1.1rem; }
+    .rehab-progress-top {
+      display: flex; justify-content: space-between; font-family: 'Oswald', sans-serif;
+      font-weight: 600; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase;
+      color: #00288B; margin-bottom: 6px;
+    }
+    .rehab-bar { height: 8px; background: #eef1f6; border-radius: 4px; overflow: hidden; }
+    .rehab-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #00288B, #FDD201); transition: width 0.25s; }
+    .rehab-ex {
+      display: flex; align-items: flex-start; gap: 12px; padding: 11px 8px; margin: 0 -8px;
+      border-bottom: 1px solid #eef1f6; cursor: pointer; border-radius: 8px;
+      transition: background 0.12s; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .rehab-ex:hover { background: #f7f9fc; }
+    .rehab-ex:last-child { border-bottom: 0; }
+    .rehab-body { flex: 1; }
+    .rehab-ex b { font-size: 0.95rem; color: #061224; }
+    .rehab-body span { display: block; font-size: 0.8rem; color: #5a6b85; margin-top: 2px; line-height: 1.35; }
+    .rehab-check {
+      flex: none; width: 22px; height: 22px; border: 2px solid #c8cfe0; border-radius: 6px;
+      margin-top: 1px; position: relative; transition: all 0.15s;
+    }
+    .rehab-ex.done .rehab-check { background: #00288B; border-color: #00288B; }
+    .rehab-ex.done .rehab-check::after {
+      content: "\2713"; position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; color: #FDD201; font-size: 14px; font-weight: 700;
+    }
+    .rehab-ex.done { opacity: 0.6; }
+    .rehab-ex.done .rehab-body b { text-decoration: line-through; color: #8a95a8; }
+    .rehab-ex .dose {
+      white-space: nowrap; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 0.82rem;
+      color: #00288B; background: rgba(253,210,1,0.16); border: 1px solid #FDD201;
+      border-radius: 6px; padding: 3px 8px; margin-top: 2px;
+    }
+    .rehab-avoid {
+      background: #fff4f2; border: 1px solid #f3c9c1; border-left: 4px solid #E8734A;
+      border-radius: 8px; padding: 11px 14px; font-size: 0.84rem; color: #7a2e18; margin-bottom: 1rem;
+    }
+    .rehab-foot { font-size: 0.75rem; color: #8a95a8; text-align: center; padding-top: 0.5rem; line-height: 1.4; }
   </style>
 </head>
 <body>
   <div class="app">
+    <div class="tabbar">
+      <button class="tab active" id="tab-btn-workout" onclick="switchTab('workout')">Workout</button>
+      <button class="tab" id="tab-btn-rehab" onclick="switchTab('rehab')">Shoulder Rehab</button>
+    </div>
+
+    <div id="tab-workout">
     <!-- Setup -->
     <div class="setup-view" id="setup">
       <div class="header">
@@ -519,6 +588,58 @@
       <button class="btn btn-restart-round" id="restart-round-btn" onclick="restartExercise()" style="display:none;">Restart Exercise</button>
       <div class="upcoming" id="upcoming"></div>
     </div>
+    </div><!-- /#tab-workout -->
+
+    <!-- Shoulder Rehab tab -->
+    <div id="tab-rehab" style="display:none;">
+      <div class="header">
+        <div class="header-left">
+          <h1>Shoulder Rehab</h1>
+          <span class="header-badge">Right</span>
+        </div>
+        <button class="log-link" onclick="resetRehab()">Reset</button>
+      </div>
+      <div class="header-stripe"></div>
+
+      <div class="rehab-progress">
+        <div class="rehab-progress-top"><span id="rehab-count">0 / 10 done</span><span id="rehab-pct">0%</span></div>
+        <div class="rehab-bar"><div class="rehab-bar-fill" id="rehab-bar-fill"></div></div>
+      </div>
+
+      <div class="rehab-note">
+        <b>Rotator-cuff / impingement — right shoulder.</b> Pain lives in the overhead arc, worst at ball impact.
+        Play by the traffic light: 🟢 dull &amp; settles = OK &middot; 🟡 achy but gone next day = cap volume &middot; 🔴 sharp catch / sore next morning = stop.
+        Groundstrokes are usually fine &mdash; modulate the <b>serve</b> (50&ndash;60%, slice over kick, no smashes).
+      </div>
+
+      <div class="rehab-group">
+        <div class="rehab-group-title">Calm it down &middot; daily</div>
+        <div class="rehab-ex" data-id="iso-er" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Isometric external rotation</b><span>Elbow at your side, press the back of your hand into a doorframe &mdash; pain-free intensity.</span></div><span class="dose">5 &times; 30&ndash;45s</span></div>
+        <div class="rehab-ex" data-id="pendulums" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Pendulums</b><span>Lean over, let the arm hang, swing small circles to decompress the joint.</span></div><span class="dose">30s each way</span></div>
+      </div>
+
+      <div class="rehab-group">
+        <div class="rehab-group-title">Build load tolerance &middot; 3&times; / week</div>
+        <div class="rehab-ex" data-id="ecc-er" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Eccentric external rotation</b><span>Band or light DB &mdash; slow 4-second lowering. The key drill for pain at impact.</span></div><span class="dose">3 &times; 12</span></div>
+        <div class="rehab-ex" data-id="pull-aparts" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Band pull-aparts</b><span>Arms straight at chest height, pull apart and squeeze the shoulder blades.</span></div><span class="dose">3 &times; 15</span></div>
+        <div class="rehab-ex" data-id="prone-y" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Prone Y raise</b><span>Face down, thumbs up, lift the arms into a Y.</span></div><span class="dose">3 &times; 12</span></div>
+        <div class="rehab-ex" data-id="prone-t" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Prone T raise</b><span>Face down, lift the arms straight out to a T.</span></div><span class="dose">3 &times; 12</span></div>
+        <div class="rehab-ex" data-id="low-trap" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Low-trap raise</b><span>Arm hanging off a bench at ~135&deg;, thumb up, lift.</span></div><span class="dose">3 &times; 12</span></div>
+        <div class="rehab-ex" data-id="full-can" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Full-can raise</b><span>Thumb <b>up</b>, raise to shoulder height ~30&deg; forward. Never empty-can (thumb down).</span></div><span class="dose">3 &times; 12</span></div>
+      </div>
+
+      <div class="rehab-group">
+        <div class="rehab-group-title">Mobility &middot; daily</div>
+        <div class="rehab-ex" data-id="cross-body" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Cross-body stretch</b><span>Pull the arm gently across your chest.</span></div><span class="dose">2 &times; 30s</span></div>
+        <div class="rehab-ex" data-id="sleeper" onclick="toggleRehab(this)"><span class="rehab-check"></span><div class="rehab-body"><b>Sleeper stretch</b><span>Side-lying on the sore shoulder, gently press the forearm toward the floor.</span></div><span class="dose">2 &times; 30s</span></div>
+      </div>
+
+      <div class="rehab-avoid">
+        <b>Avoid while irritated:</b> empty-can raises (thumb down), heavy overhead press, and pushing through <b>sharp</b> pain on the serve.
+      </div>
+
+      <div class="rehab-foot">Tap an exercise to check it off &mdash; progress resets daily. Not medical advice; see a PT / sports-med if it&rsquo;s not improving in ~2 weeks, wakes you at night, or you notice weakness.</div>
+    </div>
   </div>
 
   <div class="toast" id="toast">Workout logged ✓</div>
@@ -561,6 +682,56 @@
         "'": '&#39;'
       }[char]));
     }
+
+    // ========== TABS ==========
+    function switchTab(name) {
+      const isWorkout = name === 'workout';
+      document.getElementById('tab-workout').style.display = isWorkout ? '' : 'none';
+      document.getElementById('tab-rehab').style.display = isWorkout ? 'none' : '';
+      document.getElementById('tab-btn-workout').classList.toggle('active', isWorkout);
+      document.getElementById('tab-btn-rehab').classList.toggle('active', !isWorkout);
+    }
+
+    // ========== SHOULDER REHAB CHECK-OFF (resets daily) ==========
+    const REHAB_TOTAL = 10;
+    function rehabKey() {
+      const d = new Date();
+      return 'sam_rehab_' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    }
+    function getRehabDone() {
+      try { return new Set(JSON.parse(localStorage.getItem(rehabKey())) || []); } catch { return new Set(); }
+    }
+    function saveRehabDone(set) { localStorage.setItem(rehabKey(), JSON.stringify([...set])); }
+    function toggleRehab(el) {
+      const id = el.dataset.id;
+      const done = getRehabDone();
+      if (done.has(id)) done.delete(id); else done.add(id);
+      saveRehabDone(done);
+      el.classList.toggle('done');
+      updateRehabProgress();
+    }
+    function updateRehabProgress() {
+      const n = document.querySelectorAll('#tab-rehab .rehab-ex.done').length;
+      const pct = Math.round((n / REHAB_TOTAL) * 100);
+      const c = document.getElementById('rehab-count');
+      if (!c) return;
+      c.textContent = n + ' / ' + REHAB_TOTAL + ' done';
+      document.getElementById('rehab-pct').textContent = pct + '%';
+      document.getElementById('rehab-bar-fill').style.width = pct + '%';
+    }
+    function resetRehab() {
+      localStorage.removeItem(rehabKey());
+      document.querySelectorAll('#tab-rehab .rehab-ex.done').forEach(e => e.classList.remove('done'));
+      updateRehabProgress();
+    }
+    function initRehab() {
+      const done = getRehabDone();
+      document.querySelectorAll('#tab-rehab .rehab-ex').forEach(el => {
+        if (done.has(el.dataset.id)) el.classList.add('done');
+      });
+      updateRehabProgress();
+    }
+    initRehab();
 
     // ========== TIMER STATE ==========
     let exercises = [];
