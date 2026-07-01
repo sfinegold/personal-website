@@ -555,7 +555,7 @@
         <div class="header-left">
           <h1>Workout</h1>
         </div>
-        <a href="log/" class="log-link">Log</a>
+        <a href="/workout-timer/log/" class="log-link" id="log-link">Log</a>
       </div>
       <div class="header-stripe"></div>
       <div class="label-row">
@@ -803,6 +803,13 @@
       const hint = document.getElementById('rest-hint');
       if (hint) hint.textContent = REST_HINTS[mode] || '';
       updateTotalTime();
+    }
+
+    // Resolve the /log path correctly on both the deployed site (absolute) and file:// (relative to this file's folder)
+    function logHref() {
+      return location.protocol === 'file:'
+        ? location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'log/'
+        : '/workout-timer/log/';
     }
 
     function initRestMode() {
@@ -1466,9 +1473,9 @@
       launchConfetti();
       const overlay = showCompletionOverlay();
 
-      // Redirect to log after celebration (relative path works on file:// and deployed)
+      // Redirect to log after celebration
       setTimeout(() => {
-        window.location.href = 'log/';
+        window.location.href = logHref();
       }, 3000);
     }
 
@@ -1485,6 +1492,7 @@
 
     if (!loadDefaultWorkout()) loadBuiltInWorkout();
     initRestMode();
+    document.getElementById('log-link').href = logHref();
   </script>
 </body>
 </html>
