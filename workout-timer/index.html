@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
-  <title>Sam's ATP Workout</title>
+  <title>Workout</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
@@ -522,6 +522,23 @@
       border-radius: 8px; padding: 11px 14px; font-size: 0.84rem; color: #7a2e18; margin-bottom: 1rem;
     }
     .rehab-foot { font-size: 0.75rem; color: #8a95a8; text-align: center; padding-top: 0.5rem; line-height: 1.4; }
+
+    /* Rest mode selector */
+    .rest-mode { margin: 16px 0 4px; }
+    .rest-mode-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #3C638E; margin-bottom: 6px; }
+    .rest-seg { display: flex; gap: 6px; }
+    .seg-btn {
+      flex: 1; padding: 9px 6px; font-size: 0.8rem; font-weight: 600;
+      border: 1px solid #c8cfe0; border-radius: 8px; background: #f4f6fa; color: #3C638E;
+      cursor: pointer; transition: background 0.12s; -webkit-tap-highlight-color: transparent;
+    }
+    .seg-btn.active { background: #00288B; color: #FDD201; border-color: #00288B; }
+    .rest-hint { font-size: 0.76rem; color: #8a95a8; margin-top: 7px; line-height: 1.35; }
+    .round-rest-row { margin-top: 9px; font-size: 0.85rem; color: #061224; display: flex; align-items: center; gap: 8px; }
+    .round-rest-row input {
+      width: 62px; padding: 6px 8px; border: 1px solid #c8cfe0; border-radius: 6px;
+      font-size: 0.9rem; text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -536,10 +553,9 @@
     <div class="setup-view" id="setup">
       <div class="header">
         <div class="header-left">
-          <h1>Sam's ATP Workout</h1>
-          <span class="header-badge">ATP</span>
+          <h1>Workout</h1>
         </div>
-        <a href="/workout-timer/log" class="log-link">Log</a>
+        <a href="log/" class="log-link">Log</a>
       </div>
       <div class="header-stripe"></div>
       <div class="label-row">
@@ -567,6 +583,19 @@
           <span id="saved-arrow">&#9654;</span> Saved Exercises
         </button>
         <div class="saved-list" id="saved-list"></div>
+      </div>
+      <div class="rest-mode">
+        <div class="rest-mode-label">Rest</div>
+        <div class="rest-seg">
+          <button class="seg-btn active" data-mode="exercise" onclick="setRestMode('exercise')">Between exercises</button>
+          <button class="seg-btn" data-mode="round" onclick="setRestMode('round')">Between rounds</button>
+          <button class="seg-btn" data-mode="none" onclick="setRestMode('none')">None</button>
+        </div>
+        <div class="round-rest-row" id="round-rest-row" style="display:none;">
+          <span>Rest between rounds</span>
+          <input type="number" id="round-rest" value="30" min="0" step="5" onchange="saveRoundRest()"> s
+        </div>
+        <div class="rest-hint" id="rest-hint"></div>
       </div>
       <div class="total-time" id="total-time"></div>
       <button class="btn btn-start" onclick="startWorkout()">Start Workout</button>
@@ -744,6 +773,44 @@
     let queueIndex = 0;
     let workoutStartTime = null;
     let wakeLock = null;
+
+    // ========== REST MODE ==========
+    let restMode = 'exercise';                 // 'exercise' | 'round' | 'none'
+    const REST_MODE_KEY = 'sam_rest_mode';
+    const ROUND_REST_KEY = 'sam_round_rest';
+    const REST_HINTS = {
+      exercise: "Rests after each exercise, using its Rest value.",
+      round: "Exercises run back-to-back — one rest between rounds. Faster.",
+      none: "No rests — fully continuous.",
+    };
+
+    function getRoundRest() {
+      const el = document.getElementById('round-rest');
+      return el ? Math.max(0, +el.value || 0) : 30;
+    }
+
+    function saveRoundRest() {
+      const el = document.getElementById('round-rest');
+      if (el) localStorage.setItem(ROUND_REST_KEY, el.value);
+      updateTotalTime();
+    }
+
+    function setRestMode(mode) {
+      restMode = mode;
+      localStorage.setItem(REST_MODE_KEY, mode);
+      document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+      document.getElementById('round-rest-row').style.display = mode === 'round' ? 'flex' : 'none';
+      const hint = document.getElementById('rest-hint');
+      if (hint) hint.textContent = REST_HINTS[mode] || '';
+      updateTotalTime();
+    }
+
+    function initRestMode() {
+      const savedRR = localStorage.getItem(ROUND_REST_KEY);
+      const rrEl = document.getElementById('round-rest');
+      if (savedRR && rrEl) rrEl.value = savedRR;
+      setRestMode(localStorage.getItem(REST_MODE_KEY) || 'exercise');
+    }
     let workoutActive = false;
 
     async function requestWakeLock() {
@@ -931,13 +998,17 @@
       });
       let totalSec = 0;
       const maxSets = exercises.length ? Math.max(...exercises.map(e => e.sets)) : 0;
+      const roundRest = getRoundRest();
       for (let round = 1; round <= maxSets; round++) {
-        exercises.forEach((ex, idx) => {
-          if (round > ex.sets) return;
+        const active = exercises.filter(ex => round <= ex.sets);
+        active.forEach((ex, i) => {
           totalSec += ex.work;
-          const isLastExInLastRound = round === maxSets && idx === exercises.length - 1;
-          if (ex.rest > 0 && !isLastExInLastRound) totalSec += ex.rest;
+          if (restMode === 'exercise') {
+            const isLastExInLastRound = round === maxSets && i === active.length - 1;
+            if (ex.rest > 0 && !isLastExInLastRound) totalSec += ex.rest;
+          }
         });
+        if (restMode === 'round' && round < maxSets && roundRest > 0) totalSec += roundRest;
       }
       const mins = Math.floor(totalSec / 60);
       const secs = totalSec % 60;
@@ -1144,16 +1215,22 @@
     function buildQueue() {
       queue = [];
       const maxSets = Math.max(...exercises.map(e => e.sets));
+      const roundRest = getRoundRest();
       for (let round = 1; round <= maxSets; round++) {
-        exercises.forEach((ex, idx) => {
-          if (round > ex.sets) return;
+        const active = exercises.filter(ex => round <= ex.sets);
+        active.forEach((ex, i) => {
           const name = ex.name || 'Exercise';
-          queue.push({ name, type: 'work', duration: ex.work, set: round, totalSets: ex.sets });
-          const isLastExInLastRound = round === maxSets && idx === exercises.length - 1;
-          if (ex.rest > 0 && !isLastExInLastRound) {
-            queue.push({ name, type: 'rest', duration: ex.rest, set: round, totalSets: ex.sets });
+          queue.push({ name, type: 'work', duration: ex.work, set: round, totalSets: maxSets });
+          if (restMode === 'exercise') {
+            const isLastExInLastRound = round === maxSets && i === active.length - 1;
+            if (ex.rest > 0 && !isLastExInLastRound) {
+              queue.push({ name, type: 'rest', duration: ex.rest, set: round, totalSets: maxSets });
+            }
           }
         });
+        if (restMode === 'round' && round < maxSets && roundRest > 0) {
+          queue.push({ name: 'Rest', type: 'rest', duration: roundRest, set: round, totalSets: maxSets });
+        }
       }
     }
 
@@ -1277,11 +1354,9 @@
       clearInterval(timerInterval);
       paused = false;
       document.getElementById('pause-btn').textContent = 'Pause';
+      // From a rest, step back to the work it followed; from a work, just restart it.
       if (queue[queueIndex]?.type === 'rest') {
-        queueIndex--;
         while (queueIndex > 0 && queue[queueIndex].type !== 'work') queueIndex--;
-      } else {
-        while (queueIndex > 0 && queue[queueIndex - 1].type === 'work') queueIndex--;
       }
       loadPhase();
     }
@@ -1391,9 +1466,9 @@
       launchConfetti();
       const overlay = showCompletionOverlay();
 
-      // Redirect to log after celebration
+      // Redirect to log after celebration (relative path works on file:// and deployed)
       setTimeout(() => {
-        window.location.href = '/workout-timer/log';
+        window.location.href = 'log/';
       }, 3000);
     }
 
@@ -1409,6 +1484,7 @@
     }
 
     if (!loadDefaultWorkout()) loadBuiltInWorkout();
+    initRestMode();
   </script>
 </body>
 </html>
