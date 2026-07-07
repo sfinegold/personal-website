@@ -1,0 +1,8 @@
+{
+  "name": "samfinegold-me",
+  "private": true,
+  "description": "Static site + Vercel serverless functions. Lineup uses nodemailer for Gmail SMTP email.",
+  "dependencies": {
+    "nodemailer": "^6.9.14"
+  }
+}

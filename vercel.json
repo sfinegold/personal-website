@@ -3,6 +3,18 @@
     {
       "source": "/milton-finance-review",
       "destination": "/api/milton-finance-review"
+    },
+    {
+      "source": "/lineup/milton",
+      "destination": "/api/lineup-milton"
+    },
+    {
+      "source": "/lineup/me",
+      "destination": "/api/lineup-me"
     }
-  ]
+  ],
+  "functions": {
+    "api/lineup-milton.js": { "maxDuration": 60 },
+    "api/lineup-me.js": { "maxDuration": 60 }
+  }
 }
