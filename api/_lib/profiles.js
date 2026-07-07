@@ -19,6 +19,8 @@
 //
 // setting: 'indoor' | 'outdoor'  — the cool<80 rule only applies to 'outdoor'.
 
+const bayAreaVenues = require('./venues/bayarea.json');
+
 const MILTON = {
   id: 'milton',
   name: 'Milton',
@@ -83,7 +85,7 @@ const SAM = {
   recipientEnv: 'SAM_EMAIL', // comma-separated env var, if set, overrides `recipients`
   passwordEnv: 'LINEUP_ME_PASSWORD',
   schedule: { days: ['Mon'], hour: 8 }, // weekly, 8am Monday in `timezone`
-  interests: ['comedy', 'live-music', 'electronic', 'sports', 'theater'],
+  interests: ['comedy', 'live-music', 'electronic', 'jazz', 'sports', 'theater'],
   favorites: ['electronic', 'live-music'],
   filters: {
     lookaheadDays: 30,
@@ -97,32 +99,9 @@ const SAM = {
     weekendPreferred: true, // small boost to Fri/Sat/Sun events
     freeBoost: false,
   },
-  sources: [
-    // Comedy
-    { id: 'cobbs', name: 'Cobb\'s Comedy Club', url: 'https://www.cobbscomedy.com/', category: 'comedy', setting: 'indoor', enabled: true },
-    { id: 'punchline', name: 'Punch Line SF', url: 'https://www.punchlinecomedyclub.com/', category: 'comedy', setting: 'indoor', enabled: true },
-    // Live music & shows
-    { id: 'independent', name: 'The Independent', url: 'https://www.theindependentsf.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'chapel', name: 'The Chapel', url: 'https://thechapelsf.com/music/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'gamh', name: 'Great American Music Hall', url: 'https://gamh.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'fillmore', name: 'The Fillmore', url: 'https://thefillmore.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'billgraham', name: 'Bill Graham Civic', url: 'https://billgrahamcivic.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'fox', name: 'Fox Theater Oakland', url: 'https://thefoxoakland.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'sfjazz', name: 'SFJAZZ', url: 'https://www.sfjazz.org/', category: 'live-music', setting: 'indoor', enabled: true },
-    // Electronic / nightlife
-    { id: 'publicworks', name: 'Public Works', url: 'https://publicsf.com/', category: 'electronic', setting: 'indoor', enabled: true },
-    { id: '1015', name: '1015 Folsom', url: 'https://1015.com/', category: 'electronic', setting: 'indoor', enabled: true },
-    { id: 'midway', name: 'The Midway SF', url: 'https://themidwaysf.com/', category: 'electronic', setting: 'indoor', enabled: true },
-    { id: 'greatnorthern', name: 'The Great Northern', url: 'https://thegreatnorthernsf.com/', category: 'electronic', setting: 'indoor', enabled: true },
-    // Sports
-    { id: 'giants', name: 'SF Giants (Oracle Park)', url: 'https://www.mlb.com/giants/schedule', category: 'sports', setting: 'outdoor', enabled: true },
-    { id: 'warriors', name: 'Golden State Warriors', url: 'https://www.nba.com/warriors/schedule', category: 'sports', setting: 'indoor', enabled: true },
-    { id: 'chasecenter', name: 'Chase Center Events', url: 'https://www.chasecenter.com/events', category: 'live-music', setting: 'indoor', enabled: true },
-    // Aggregators
-    { id: 'dice', name: 'DICE — San Francisco', url: 'https://dice.fm/browse/san-francisco', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'do415', name: 'Do415', url: 'https://do415.com/', category: 'live-music', setting: 'indoor', enabled: true },
-    { id: 'funcheap', name: 'Funcheap SF', url: 'https://sf.funcheap.com/', category: 'comedy', setting: 'indoor', enabled: true },
-  ],
+  // Exhaustive Bay Area music-venue list (SF, East Bay, Peninsula, South Bay,
+  // Marin) + free newsletters/aggregators. Editable data file — see venues/bayarea.json.
+  sources: bayAreaVenues,
 };
 
 const PROFILES = { milton: MILTON, me: SAM };

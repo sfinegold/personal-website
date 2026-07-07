@@ -10,6 +10,7 @@
 //   LINEUP_USE_LLM=0    force-disable the LLM fallback even if a key is set
 
 const { extractDeterministic } = require('./parse');
+const { getAdapter } = require('./adapters');
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = process.env.LINEUP_MODEL || 'claude-sonnet-5';
@@ -66,8 +67,20 @@ const llmEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY) && process.env.L
 // Orchestrator: deterministic first, LLM only as a gated fallback.
 // Returns { events, method } where method ∈ {json-ld, ical, rss, llm, null}.
 async function extractEvents({ source, crawled, interests, todayYMD, windowEndYMD }) {
+  // 0. custom adapter (tailored, fast) — tried first; may not need the crawl at all
+  const adapter = getAdapter(source.adapter);
+  if (adapter) {
+    try {
+      const events = await adapter(source, { todayYMD, windowEndYMD });
+      if (events && events.length) return { events, method: `adapter:${source.adapter}` };
+    } catch (err) {
+      // fall through to generic extraction
+    }
+  }
+  // 1. generic deterministic (JSON-LD / iCal / RSS)
   const det = extractDeterministic(crawled, source);
   if (det.events.length) return { events: det.events, method: det.method };
+  // 2. optional LLM fallback
   if (!llmEnabled()) return { events: [], method: null };
   const events = await extractWithLLM({ source, text: crawled.text, interests, todayYMD, windowEndYMD });
   return { events, method: 'llm' };

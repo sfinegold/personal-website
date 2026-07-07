@@ -50,9 +50,10 @@ async function runProfile(profileId, options = {}) {
   const sources = await effectiveSources(profile);
 
   // 1. crawl + 2. extract, per source, with diagnostics
-  const perSource = await mapLimit(sources, 4, async (source) => {
+  const perSource = await mapLimit(sources, 8, async (source) => {
     const crawled = await crawlSource(source);
-    if (!crawled.ok) return { source, events: [], method: null, error: crawled.note };
+    // Always call extractEvents: an adapter can succeed even if the homepage
+    // crawl 404/403s (it hits an API), so a failed crawl isn't fatal by itself.
     try {
       const { events, method } = await extractEvents({
         source,
@@ -61,7 +62,8 @@ async function runProfile(profileId, options = {}) {
         todayYMD: start,
         windowEndYMD,
       });
-      return { source, events, method, error: null };
+      const error = !events.length && !crawled.ok ? crawled.note : null;
+      return { source, events, method, error };
     } catch (err) {
       return { source, events: [], method: null, error: String(err.message || err) };
     }

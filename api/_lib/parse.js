@@ -197,4 +197,4 @@ function extractDeterministic(crawled, source) {
   return { events: [], method: null };
 }
 
-module.exports = { extractDeterministic, parseJsonLd, parseICal, parseRss, splitDateTime };
+module.exports = { extractDeterministic, parseJsonLd, parseICal, parseRss, splitDateTime, normalizeEvent: normalize, defaultEffort };
