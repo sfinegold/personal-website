@@ -123,6 +123,17 @@ function renderText(profile, kept, meta) {
   return lines.join('\n');
 }
 
+// Deterministic "judge" fallback — used when no curation-written recommendation
+// exists, so the top-pick block is ALWAYS present. Highlights the #1 ranked event.
+function topPick(kept) {
+  if (!kept.length) return null;
+  const e = kept[0];
+  const when = fmtDayHeading(e.date) + (e.time ? `, ${fmtTime(e)}` : '');
+  const bits = [`${e.title} at ${e.venue} (${when}) — the top-ranked match on your list this week.`];
+  if (e.note) bits.push(e.note);
+  return bits.join(' ');
+}
+
 function subjectLine(profile, kept, meta) {
   const n = kept.length;
   if (!n) return `Your ${profile.city} Lineup — nothing coming up`;
@@ -131,4 +142,4 @@ function subjectLine(profile, kept, meta) {
   return `Your ${profile.city} Lineup — ${n} pick${n === 1 ? '' : 's'}${newBit}`;
 }
 
-module.exports = { renderHTML, renderText, subjectLine, groupByDay };
+module.exports = { renderHTML, renderText, subjectLine, groupByDay, topPick };

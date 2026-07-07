@@ -8,7 +8,7 @@ const { crawlSource } = require('./crawl');
 const { extractEvents } = require('./extract');
 const { getForecastHighs } = require('./weather');
 const { filterAndRank, eventKey, diversify } = require('./filter');
-const { renderHTML, renderText, subjectLine } = require('./digest');
+const { renderHTML, renderText, subjectLine, topPick } = require('./digest');
 const { sendEmail } = require('./email');
 const { todayYMD, addDaysYMD } = require('./util');
 
@@ -90,14 +90,17 @@ async function runProfile(profileId, options = {}) {
   const hadPrev = Array.isArray(prevSent) && prevSent.length > 0;
   for (const e of kept) e.isNew = hadPrev ? !prevSet.has(eventKey(e)) : false;
 
-  // 5. render (with the "judge" write-up, if the curation session left one)
+  // 5. JUDGE LAYER — a curation-written "top pick" paragraph if present, else a
+  // deterministic fallback highlighting the #1 ranked event (always included).
   const rec = await store.getRecommendation(profile.id);
+  const recommendation = rec && rec.paragraph ? rec.paragraph : topPick(kept);
   const base = process.env.LINEUP_BASE_URL || 'https://samfinegold.me/lineup';
   const meta = {
     rangeLabel: rangeLabel(start, windowEndYMD),
     short: 'window',
     tennisNote: (profile.filters.blackout || []).length > 0,
-    recommendation: rec && rec.paragraph ? rec.paragraph : null,
+    recommendation,
+    recommendationSource: rec && rec.paragraph ? 'curated' : 'auto',
     adminUrl: `${base}/${profile.id}`,
   };
   const html = renderHTML(profile, kept, meta);
