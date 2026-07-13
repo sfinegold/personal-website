@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paraform — Nominations (Prototype)</title>
+<style>
+  /* Paraform tokens: BureauSerif→Georgia, Circular→system sans */
+  :root {
+    --ink:#0a0a0a; --ink2:#3a3a3a; --muted:#6f6f6f; --faint:#9b9b9b;
+    --bg:#fff; --panel:#fafafa; --border:#e4e4e4; --bsoft:#efefef;
+    --blue:#2f7cf6; --blueink:#1d5fd0; --bluesoft:#eef4fe; --bluebd:#cfe0fc;
+    --green:#16a34a; --greensoft:#ecfdf3; --amber:#b45309; --ambersoft:#fef7e0; --amberbd:#f5e6b8;
+    --violet:#7c3aed; --violetsoft:#f3eefe; --r:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+  .serif{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-0.01em}
+
+  /* proto strip */
+  .strip{background:var(--violetsoft);border-bottom:1px solid #e4d9fb;padding:8px 22px;display:flex;align-items:center;gap:12px;font-size:12.5px;color:#4c2d91;flex-wrap:wrap}
+  .strip b{font-weight:600}
+  .strip .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .pillbtn{border:1px solid #d9c9f7;background:#fff;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:500;color:#5b3fa8;cursor:pointer}
+  .pillbtn.on{background:var(--violet);color:#fff;border-color:var(--violet)}
+
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 10px 14px}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .who{font-size:13px;font-weight:500}
+  .role{font-size:11px;color:var(--muted)}
+  .nav a{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;font-weight:450;font-size:14px;margin-bottom:1px;position:relative}
+  .nav a.active{background:#e9e9e9;color:var(--ink)}
+  .nav a.locked{color:#b5b5b5}
+  .nav .icon{width:16px;text-align:center;font-size:13px;color:var(--faint)}
+  .nav .lock{margin-left:auto;font-size:11px;color:#c9c9c9}
+
+  .main{flex:1;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid var(--bsoft);font-size:13px;color:var(--muted)}
+  .content{padding:26px 32px;max-width:1080px}
+
+  h1{font-size:27px}
+  .lede{color:var(--ink2);font-size:14px;margin-top:4px;max-width:70ch}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;margin-top:22px}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;position:relative}
+  .card h3{font-size:15px;font-weight:600;margin-bottom:10px}
+  .chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:500}
+  .chip.green{background:var(--greensoft);color:var(--green)}
+  .chip.amber{background:var(--ambersoft);color:var(--amber);border:1px solid var(--amberbd)}
+  .chip.blue{background:var(--bluesoft);color:var(--blueink)}
+  .chip.gray{background:#f2f2f2;color:var(--ink2)}
+
+  /* ladder */
+  .ladder-hero{background:var(--bluesoft);border:1px solid var(--bluebd);border-radius:var(--r);padding:18px;margin-bottom:16px;position:relative}
+  .ladder-hero h3{font-size:15px;font-weight:600}
+  .miles{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .mile{flex:1;min-width:150px;background:#fff;border:1px solid var(--bluebd);border-radius:10px;padding:12px}
+  .mile .n{font-size:22px;font-weight:600;font-family:Georgia,serif}
+  .mile .k{font-size:12px;color:var(--muted)}
+  .mile.done{border-color:var(--green);background:var(--greensoft)}
+  .unlock{margin-top:12px;font-size:12.5px;color:var(--blueink)}
+  .unlock b{font-weight:600}
+
+  /* role cards */
+  .rolecard{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;position:relative}
+  .rolecard .logo{width:40px;height:40px;border-radius:9px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .rolecard .t{font-weight:600;font-size:14px}
+  .rolecard .m{font-size:12.5px;color:var(--muted);margin-top:1px}
+  .rolecard .why{font-size:12px;color:var(--blueink);margin-top:4px}
+  .rolecard button{margin-left:auto;align-self:center}
+
+  .btn{border:0;border-radius:10px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.primary:hover{background:#2569d8}
+  .btn.ghost{background:#fff;border:1px solid var(--border);color:var(--ink)}
+  .btn.ghost:hover{background:var(--panel)}
+
+  /* feed */
+  .feed .item{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--bsoft);font-size:13px;align-items:flex-start}
+  .feed .item:first-child{border-top:0}
+  .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+  .dot.g{background:var(--green)} .dot.b{background:var(--blue)} .dot.a{background:var(--amber)}
+  .feed .when{margin-left:auto;color:var(--faint);font-size:11.5px;white-space:nowrap}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:800px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--panel);border:1px solid var(--bsoft);border-radius:10px;padding:12px}
+  .step .sn{font-size:11px;font-weight:700;color:var(--faint)}
+  .step .st{font-weight:600;font-size:13.5px;margin:2px 0 3px}
+  .step .sd{font-size:12.5px;color:var(--muted)}
+
+  /* connectors cross-link */
+  .connectors{border:1px dashed #d8d8d8;border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--muted)}
+  .connectors b{color:var(--ink2)}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(10,10,10,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;width:560px;max-width:94vw;max-height:92vh;overflow:auto;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative}
+  .modal h2{font-size:19px;font-family:Georgia,serif;font-weight:500;margin-bottom:3px}
+  .modal .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .bar-list{background:var(--panel);border:1px solid var(--bsoft);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+  .bar-list .bl-t{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .bar-list li{font-size:13px;color:var(--ink2);margin-left:16px;margin-bottom:3px}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 5px}
+  .field input,.field textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-family:inherit;font-size:13px}
+  .field textarea{min-height:70px;resize:vertical}
+  .hint{font-size:11.5px;color:var(--faint);margin-top:4px}
+  .parsed{display:none;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--bsoft);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .parsed.show{display:flex}
+  .avatar{width:34px;height:34px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12.5px;color:#555;flex-shrink:0}
+  .verdict{display:none;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;border:1px solid}
+  .verdict.show{display:block}
+  .verdict.good{background:var(--greensoft);border-color:#c9ecd4}
+  .verdict.warn{background:var(--ambersoft);border-color:var(--amberbd)}
+  .verdict .vt{font-weight:600;margin-bottom:4px}
+  .modal .btnrow{display:flex;gap:10px;margin-top:16px}
+  .fineprint{font-size:11.5px;color:var(--faint);margin-top:10px}
+  .close-x{position:absolute;top:14px;right:16px;border:0;background:none;font-size:16px;color:var(--faint);cursor:pointer}
+
+  /* design notes */
+  .ndot{display:none;position:absolute;width:20px;height:20px;border-radius:50%;background:var(--violet);color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+  body.notes .ndot{display:flex}
+  .notepanel{display:none;position:fixed;right:18px;bottom:18px;width:360px;max-height:60vh;overflow:auto;background:#fff;border:1px solid #d9c9f7;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.2);padding:16px;z-index:60}
+  .notepanel.open{display:block}
+  .notepanel h4{font-size:13px;font-weight:700;color:#4c2d91;margin-bottom:8px}
+  .notepanel .nn{font-size:12.5px;color:var(--ink2);padding:8px 0;border-top:1px solid var(--bsoft)}
+  .notepanel .nn b{color:var(--violet)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:999px;padding:10px 20px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:70}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="strip">
+  <b>Prototype · Nominations</b>
+  <span>the pre-submission ramp for new recruiters — waitlist state shown</span>
+  <div class="right">
+    <button class="pillbtn" onclick="simulateConversion()">▶ Simulate: pro picks up your nominee</button>
+    <button class="pillbtn" id="notesBtn" onclick="toggleNotes()">Design notes</button>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">=</div>
+      <div><div class="who">Sam Park</div><div class="role">Waitlist · Nominator</div></div>
+    </div>
+    <nav class="nav">
+      <a href="#"><span class="icon">⌂</span> Home</a>
+      <a href="#" class="active"><span class="icon">◈</span> Nominations</a>
+      <a href="#"><span class="icon">◎</span> Browse roles</a>
+      <a href="#" class="locked"><span class="icon">🏆</span> Primary Roles <span class="lock">🔒 at Trial</span></a>
+      <a href="#" class="locked"><span class="icon">➤</span> Single Submissions <span class="lock">🔒 at Trial</span></a>
+      <a href="#" class="locked"><span class="icon">☰</span> Candidates <span class="lock">unlocks with 1st approval</span></a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar"><span>Nominations</span><span>Help · 🔔</span></div>
+    <div class="content">
+      <h1 class="serif">Earn your way in</h1>
+      <p class="lede">Your application is in review — but the fastest path off the waitlist is showing judgment, not waiting. Nominate candidates against real roles. Strong nominations unlock recruiting rights.</p>
+
+      <div class="grid">
+        <!-- LEFT -->
+        <div>
+          <div class="ladder-hero">
+            <span class="ndot" style="top:-9px;left:-9px" onclick="openNotes()">1</span>
+            <h3>Your ladder to a trial slot</h3>
+            <div class="miles">
+              <div class="mile" id="mApproved"><div class="n"><span id="nApproved">0</span>/5</div><div class="k">nominations approved — you read the bar right</div></div>
+              <div class="mile" id="mConverted"><div class="n"><span id="nConverted">0</span>/2</div><div class="k">picked up by a recruiter — real, reachable people</div></div>
+              <div class="mile"><div class="n">→</div><div class="k">Trial slot on a role matched to your niche</div></div>
+            </div>
+            <div class="unlock">Next unlock: <b id="unlockText">1 approval opens your Candidates CRM</b> · Nominations this week: <b><span id="allowance">3</span> left</b></div>
+          </div>
+
+          <div class="card">
+            <span class="ndot" style="top:-9px;left:-9px" onclick="openNotes()">2</span>
+            <h3>Roles matched to your background <span class="chip gray">from your signup: Backend · SF · Series A · Marketplace</span></h3>
+
+            <div class="rolecard">
+              <span class="ndot" style="top:-9px;right:-9px" onclick="openNotes()">3</span>
+              <div class="logo">M</div>
+              <div>
+                <div class="t">Backend Engineer — Meridian (Series B)</div>
+                <div class="m">$170K–$210K · SF, On-site · 22.5% + bonus · Low nomination coverage</div>
+                <div class="why">Why you: matches 4/4 of your stated niches</div>
+              </div>
+              <button class="btn primary" onclick="openModal('good')">Nominate</button>
+            </div>
+
+            <div class="rolecard">
+              <div class="logo" style="background:#444">H</div>
+              <div>
+                <div class="t">Staff Product Engineer — Harbor (Series A)</div>
+                <div class="m">$190K–$240K · SF, Hybrid · 20% + bonus · Senior · Specialized</div>
+                <div class="why">Stretch role: senior bar — good calibration practice</div>
+              </div>
+              <button class="btn ghost" onclick="openModal('warn')">Nominate</button>
+            </div>
+
+            <div class="connectors" style="margin-top:12px;position:relative">
+              <span class="ndot" style="top:-9px;left:-9px" onclick="openNotes()">4</span>
+              <b>Know great people, but recruiting isn't your goal?</b> Refer them through Connectors instead — $10K per hire, no role-matching required. Nominations that don't fit any role you're working flow there automatically, so no lead is wasted.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>How nominations work</h3>
+            <div class="steps">
+              <div class="step"><div class="sn">STEP 1</div><div class="st">Pick a role, study the bar</div><div class="sd">Intake notes, must-haves, and past rejection reasons are open to you — the bar is public.</div></div>
+              <div class="step"><div class="sn">STEP 2</div><div class="st">Nominate + make the case</div><div class="sd">Paste a profile and write why they clear the bar. No outreach — nominating never contacts anyone.</div></div>
+              <div class="step"><div class="sn">STEP 3</div><div class="st">Graded, then converted</div><div class="sd">ParaAI grades the fit in minutes. Approved nominees go to proven recruiters — pickups tick your ladder and pay you on placement.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div>
+          <div class="card">
+            <span class="ndot" style="top:-9px;left:-9px" onclick="openNotes()">5</span>
+            <h3>Activity</h3>
+            <div class="feed" id="feed">
+              <div class="item"><span class="dot b"></span><div>Welcome! Nominate your first candidate to start your ladder.</div><span class="when">now</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>What good looks like</h3>
+            <div style="font-size:12.5px;color:var(--ink2)">Approval isn't pedigree-matching — it's <b>fit against this role's actual bar</b>. The #1 miss on backend roles this month: nominees who haven't owned a product surface end-to-end. Address it in your case, or pick someone who has.</div>
+          </div>
+          <div class="card" style="position:relative">
+            <span class="ndot" style="top:-9px;left:-9px" onclick="openNotes()">6</span>
+            <h3>Where your nominees go</h3>
+            <div style="font-size:12.5px;color:var(--ink2)">Approved nominees join the talent network with <b>your name on the find</b>. If any recruiter places them within 90 days, you earn a finder's reward — even before you have submission rights.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- nominate modal -->
+<div class="overlay" id="nomModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2 id="modalRole">Nominate — Backend Engineer at Meridian</h2>
+    <div class="sub">Nominating adds this person as your graded lead. It does not contact them.</div>
+    <div class="bar-list">
+      <div class="bl-t">The bar (from the intake call)</div>
+      <li>4–7 yrs full-stack; owned a product surface end-to-end</li>
+      <li>Startup pace — Seed→Series B strongly preferred</li>
+      <li id="barThird">LLM/agent product exposure is the differentiator</li>
+    </div>
+    <div class="field">
+      <label>Candidate LinkedIn URL</label>
+      <input id="liUrl" placeholder="https://linkedin.com/in/…" oninput="parseProfile(this.value)">
+      <div class="parsed" id="parsedCard"><div class="avatar">MC</div><div><b>Maya Chen</b> · Senior SWE @ Loop (Seed→A) · prev. Instacart<br><span style="color:var(--muted);font-size:12px">Auto-parsed · S/A-tier company history</span></div></div>
+    </div>
+    <div class="field">
+      <label>Your case — why does this person clear the bar? <span style="color:var(--faint);font-weight:400">(this is the judgment being graded)</span></label>
+      <textarea id="caseText" placeholder="e.g. Owned Loop's checkout surface 0→1 as eng #4; shipped an LLM support agent in '25 — maps to all three must-haves…"></textarea>
+    </div>
+    <div class="verdict good" id="vGood"><div class="vt">✓ Approved — strong fit (ParaAI + rubric)</div>End-to-end ownership: confirmed (Loop checkout, eng #4). Stage fit: Seed→A. LLM exposure: shipped agent product. Your case addressed all three must-haves. <b>+1 approval.</b> A proven recruiter can now pick Maya up.</div>
+    <div class="verdict warn" id="vWarn"><div class="vt">▲ Gap flagged — not approved yet</div>This role's bar is <b>staff-level scope</b>: your nominee shows strong senior work but no org-level ownership — the #1 rejection reason on this role (3 of last 5). Revise your case with evidence of scope, or nominate them to a mid-level role instead — <b>your allowance isn't spent on flagged nominations.</b></div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Save draft</button>
+      <button class="btn primary" id="submitNom" onclick="gradeNom()">Submit nomination</button>
+    </div>
+    <div class="fineprint">Nominations are graded against the role's rubric and intake transcript. Approvals and pickups build your record; flagged nominations coach, they don't punish. Duplicate checks run automatically — candidates already owned at this company can't be nominated.</div>
+  </div>
+</div>
+
+<div class="notepanel" id="notePanel">
+  <h4>Design notes — why it's built this way</h4>
+  <div class="nn"><b>1 · The ladder is the landing page.</b> Free work needs a legible prize: both milestones, the unlock, and the weekly allowance are always on screen. Approval proves you read the bar; pickup proves the person is real and reachable — count-gaming doesn't ladder.</div>
+  <div class="nn"><b>2 · Roles come pre-matched from signup taxonomy.</b> The recruiter's stated niches route them to roles where their judgment is most testable — and nomination coverage gaps steer effort to under-served roles.</div>
+  <div class="nn"><b>3 · Nomination ≠ outreach.</b> No candidate is contacted by nominating. Protects candidates and Paraform's brand from unvetted outreach; the relationship starts only when a proven recruiter picks the nominee up.</div>
+  <div class="nn"><b>4 · Connectors is the pressure valve.</b> Network-rich people who don't want to audition flow to referrals; nominations that fit no role also route there. The two programs share payout rails — no lead is wasted, no one is dead-ended.</div>
+  <div class="nn"><b>5 · The activity feed is the retention loop.</b> Verdicts land in minutes (come back today); pickups land in days (come back this week). The feed is why a waitlisted recruiter returns without email nagging.</div>
+  <div class="nn"><b>6 · Provenance pays.</b> Nominators earn a finder's reward on placement, Connectors-style — the work is compensated on outcomes even if the nominator never becomes a recruiter. Ownership stays with the engaging recruiter; credit stays with the finder.</div>
+  <div class="nn"><b>7 · Flagged ≠ punished.</b> A gap verdict coaches (citing the role's real rejection reasons) and refunds the allowance. The AI is a teacher pre-submission precisely so it can be a gate later without being hated.</div>
+  <div class="nn"><b>8 · HMs feel nothing.</b> No nomination ever appears in an HM queue. Quality is proven on Paraform's attention, not the customer's.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let approved = 0, converted = 0, allowance = 3, mode = 'good';
+
+  function openModal(m){
+    mode = m;
+    document.getElementById('modalRole').textContent = m === 'good' ? 'Nominate — Backend Engineer at Meridian' : 'Nominate — Staff Product Engineer at Harbor';
+    document.getElementById('barThird').textContent = m === 'good' ? 'LLM/agent product exposure is the differentiator' : 'Staff scope: has owned an org-level surface, not just features';
+    document.getElementById('vGood').classList.remove('show');
+    document.getElementById('vWarn').classList.remove('show');
+    document.getElementById('liUrl').value = '';
+    document.getElementById('caseText').value = '';
+    document.getElementById('parsedCard').classList.remove('show');
+    document.getElementById('submitNom').textContent = 'Submit nomination';
+    document.getElementById('nomModal').classList.add('open');
+  }
+  function closeModal(){ document.getElementById('nomModal').classList.remove('open'); }
+  function parseProfile(v){ document.getElementById('parsedCard').classList.toggle('show', v.length > 12); }
+
+  function gradeNom(){
+    const hasUrl = document.getElementById('liUrl').value.length > 12;
+    const hasCase = document.getElementById('caseText').value.trim().length > 0;
+    if(!hasUrl){ document.getElementById('liUrl').focus(); return; }
+    if(!hasCase){ document.getElementById('caseText').focus(); return; }
+    if(mode === 'good'){
+      document.getElementById('vGood').classList.add('show');
+      if(document.getElementById('submitNom').textContent === 'Submit nomination'){
+        approved++; allowance--;
+        updateLadder();
+        addFeed('g', '<b>Maya Chen approved</b> for Backend Eng at Meridian — +1 toward your ladder.', 'just now');
+        toast('Approved · 1/5 — Candidates CRM unlocked');
+      }
+      document.getElementById('submitNom').textContent = 'Done';
+    } else {
+      document.getElementById('vWarn').classList.add('show');
+      addFeed('a', 'Gap flagged on your Harbor nomination — allowance refunded, revise when ready.', 'just now');
+      document.getElementById('submitNom').textContent = 'Revise case';
+    }
+  }
+
+  function simulateConversion(){
+    if(approved === 0){ toast('Nominate + get approved first — then pros can pick your nominee up'); return; }
+    if(converted >= 2) { toast('Ladder complete — trial slot unlocked'); return; }
+    converted++;
+    updateLadder();
+    addFeed('b', '<b>Dana R. (Preferred) picked up Maya Chen</b> for Meridian — you earn a finder\'s reward if she\'s placed within 90 days.', '3 days later');
+    toast(converted >= 2 ? '2/2 pickups — Trial slot unlocked on a Backend role 🎉' : 'Pickup! 1/2 — one more and you trial');
+  }
+
+  function updateLadder(){
+    document.getElementById('nApproved').textContent = approved;
+    document.getElementById('nConverted').textContent = converted;
+    document.getElementById('allowance').textContent = allowance;
+    document.getElementById('mApproved').classList.toggle('done', approved >= 5);
+    document.getElementById('mConverted').classList.toggle('done', converted >= 2);
+    document.getElementById('unlockText').textContent =
+      converted >= 2 ? 'Trial slot unlocked — pick your first role' :
+      approved >= 1 ? `${5-approved} more approval${5-approved===1?'':'s'} + ${2-converted} pickup${2-converted===1?'':'s'} to a trial slot` :
+      '1 approval opens your Candidates CRM';
+  }
+
+  function addFeed(color, html, when){
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = `<span class="dot ${color}"></span><div>${html}</div><span class="when">${when}</span>`;
+    document.getElementById('feed').prepend(el);
+  }
+
+  function toggleNotes(){
+    document.body.classList.toggle('notes');
+    document.getElementById('notesBtn').classList.toggle('on');
+    document.getElementById('notePanel').classList.toggle('open', document.body.classList.contains('notes'));
+  }
+  function openNotes(){ document.body.classList.add('notes'); document.getElementById('notesBtn').classList.add('on'); document.getElementById('notePanel').classList.add('open'); }
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
