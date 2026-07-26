@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Practice — 15 minutes a day</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0b1622; --bg-2:#0f1c2b; --card:rgba(255,255,255,.035); --card-2:rgba(255,255,255,.055);
+    --text:#e8ecf1; --dim:rgba(232,236,241,.55); --faint:rgba(232,236,241,.32);
+    --accent:#6b8aad; --accent-hi:#8fafc8; --line:rgba(255,255,255,.08);
+    --ok:#68A98C; --warn:#D9974A; --hard:#C77D8A;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;letter-spacing:.01em;padding:0 0 5rem}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.5;
+    background:linear-gradient(var(--line) 1px,transparent 1px),
+               linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:120px 120px}
+  .wrap{max-width:920px;margin:0 auto;padding:0 1.25rem;position:relative}
+  a{color:var(--accent-hi)}
+  :focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px;border-radius:4px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  header{padding:3rem 0 1.5rem}
+  .kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.6rem}
+  h1{font-size:clamp(1.6rem,4vw,2.1rem);font-weight:600;letter-spacing:-.01em}
+  .sub{color:var(--dim);font-size:.95rem;margin-top:.5rem;max-width:60ch}
+
+  /* ---- status strip ---- */
+  .status{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem}
+  .chip{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.3rem .6rem;border:1px solid var(--line);border-radius:999px;color:var(--dim);
+    background:var(--card)}
+  .chip b{color:var(--text);font-weight:600}
+  .chip button{all:unset;cursor:pointer;color:var(--accent-hi);padding:0 .25rem}
+
+  /* ---- today ---- */
+  .today{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:1.25rem;
+    overflow:hidden}
+  .today-top{padding:1.1rem 1.3rem;border-bottom:1px solid var(--line);display:flex;
+    align-items:center;gap:.7rem;flex-wrap:wrap}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .disc{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+  .today-when{margin-left:auto;font-family:var(--mono);font-size:.7rem;color:var(--faint)}
+  .today-body{padding:1.3rem}
+  .today h2{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin-bottom:.35rem}
+  .goal{color:var(--dim);font-size:.95rem;margin-bottom:1.1rem}
+  ol.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.2rem}
+  ol.steps li{counter-increment:s;padding-left:2rem;position:relative;font-size:.95rem}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.35rem;height:1.35rem;
+    border-radius:50%;border:1px solid var(--line);font-family:var(--mono);font-size:.68rem;
+    display:grid;place-items:center;color:var(--accent)}
+  .note-row{display:grid;gap:.7rem;margin-bottom:1.1rem}
+  @media(min-width:640px){.note-row{grid-template-columns:1fr 1fr}}
+  .nb{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:.8rem .95rem}
+  .nb h4{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:.35rem}
+  .nb p{font-size:.9rem;color:var(--dim)}
+  .nb.listen{border-left:2px solid var(--accent)}
+  .nb.capture{border-left:2px solid var(--ok)}
+  .nb.melody{border-left:2px solid #68A98C;grid-column:1/-1}
+  .why{font-size:.86rem;color:var(--faint);border-top:1px solid var(--line);padding-top:.9rem}
+
+  /* ---- feedback ---- */
+  .fb{border-top:1px solid var(--line);padding:1.2rem 1.3rem;background:rgba(107,138,173,.05)}
+  .fb h3{font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.8rem}
+  .fb-row{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem}
+  .fb-lab{font-size:.82rem;color:var(--dim);min-width:5.5rem}
+  .tog{font-family:var(--mono);font-size:.7rem;padding:.35rem .7rem;border-radius:6px;cursor:pointer;
+    border:1px solid var(--line);background:var(--card);color:var(--dim);transition:.15s}
+  .tog:hover{border-color:var(--accent);color:var(--text)}
+  .tog[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#0b1622;font-weight:600}
+  .tog.easy[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+  .tog.hard[aria-pressed="true"]{background:var(--hard);border-color:var(--hard)}
+  textarea{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;
+    color:var(--text);font-family:var(--sans);font-size:.9rem;padding:.7rem .85rem;resize:vertical;
+    min-height:4.5rem}
+  textarea::placeholder{color:var(--faint)}
+  .btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.6rem 1rem;border-radius:8px;border:1px solid var(--accent);background:transparent;
+    color:var(--accent-hi);cursor:pointer;transition:.15s}
+  .btn:hover{background:var(--accent);color:#0b1622}
+  .btn.solid{background:var(--accent);color:#0b1622;font-weight:600}
+  .btn.solid:hover{background:var(--accent-hi)}
+  .btn-row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem}
+  .saved{font-family:var(--mono);font-size:.68rem;color:var(--ok);opacity:0;transition:opacity .2s}
+  .saved.on{opacity:1}
+
+  /* ---- sections ---- */
+  section{margin-top:2.6rem}
+  section>h3{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+  section>h3::after{content:'';flex:1;height:1px;background:var(--line)}
+
+  .weekstrip{display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem}
+  .ws{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:.7rem .5rem;
+    text-align:center;cursor:pointer;transition:.15s}
+  .ws:hover{background:var(--card-2)}
+  .ws.is-today{border-color:var(--accent)}
+  .ws.done{background:rgba(104,169,140,.12);border-color:rgba(104,169,140,.4)}
+  .ws .d{font-family:var(--mono);font-size:.6rem;color:var(--faint);letter-spacing:.1em}
+  .ws .n{font-size:.78rem;margin-top:.25rem;color:var(--dim)}
+  .ws.done .n{color:var(--ok)}
+
+  .weeks{display:flex;flex-direction:column;gap:.5rem}
+  .wk{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .wk summary{padding:.8rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.7rem;
+    font-size:.92rem;list-style:none}
+  .wk summary::-webkit-details-marker{display:none}
+  .wk summary::before{content:'▸';color:var(--accent);font-size:.8rem;transition:transform .15s}
+  .wk[open] summary::before{transform:rotate(90deg)}
+  .wk .mo{font-family:var(--mono);font-size:.64rem;color:var(--faint);margin-left:auto;
+    letter-spacing:.1em;text-transform:uppercase}
+  .wk-body{padding:0 1rem 1rem;display:flex;flex-direction:column;gap:.45rem}
+  .dr{display:flex;gap:.7rem;align-items:baseline;padding:.5rem .7rem;border-radius:7px;
+    background:var(--bg-2);font-size:.88rem;cursor:pointer;border:1px solid transparent}
+  .dr:hover{border-color:var(--line)}
+  .dr .t{color:var(--dim)}
+  .dr.done .t{color:var(--ok)}
+  .dr .tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    min-width:4.6rem}
+
+  .changes{display:flex;flex-direction:column;gap:.6rem}
+  .ch{background:var(--card);border:1px solid var(--line);border-left:2px solid var(--accent);
+    border-radius:8px;padding:.8rem 1rem}
+  .ch .date{font-family:var(--mono);font-size:.62rem;color:var(--faint);letter-spacing:.1em}
+  .ch p{font-size:.9rem;margin-top:.2rem}
+  .ch .why{border:0;padding:0;margin-top:.35rem;font-size:.84rem}
+
+  .months{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .mn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
+  .mn.now{border-color:var(--accent)}
+  .mn h4{font-size:1rem;font-weight:600}
+  .mn .num{font-family:var(--mono);font-size:.62rem;color:var(--accent);letter-spacing:.14em}
+  .mn p{font-size:.84rem;color:var(--dim);margin-top:.4rem}
+  .mn .cp{font-size:.8rem;color:var(--faint);margin-top:.5rem;border-top:1px solid var(--line);
+    padding-top:.5rem}
+  .mn .st{font-family:var(--mono);font-size:.6rem;color:var(--warn);margin-top:.4rem;
+    letter-spacing:.08em;text-transform:uppercase}
+
+  dialog{background:var(--bg-2);color:var(--text);border:1px solid var(--line);border-radius:12px;
+    max-width:640px;width:92%;padding:1.4rem}
+  dialog::backdrop{background:rgba(5,10,16,.75)}
+  dialog h3{font-size:1rem;margin-bottom:.7rem}
+  dialog pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.9rem;
+    font-family:var(--mono);font-size:.74rem;white-space:pre-wrap;max-height:46vh;overflow:auto;
+    color:var(--dim)}
+  footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);
+    font-size:.8rem;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Daily practice · MicroFreak</div>
+    <h1>Fifteen minutes, one thing at a time.</h1>
+    <p class="sub">One discipline per weekday so nothing goes stale. Every session ends with a
+      recording — that is the whole point, and the only way to know this is working.</p>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div class="today" id="today"></div>
+
+  <section>
+    <h3>This week</h3>
+    <div class="weekstrip" id="weekstrip"></div>
+  </section>
+
+  <section>
+    <h3>The arc</h3>
+    <div class="months" id="months"></div>
+  </section>
+
+  <section>
+    <h3>All drills</h3>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <section>
+    <h3>What Claude changed from your feedback</h3>
+    <div class="changes" id="changes"></div>
+  </section>
+
+  <footer>
+    Ratings are stored only in this browser. Nothing is sent anywhere — use
+    <b>Copy for Claude</b> to share them.
+  </footer>
+</div>
+
+<dialog id="exportDlg">
+  <h3>Paste this into a Claude conversation</h3>
+  <pre id="exportTxt"></pre>
+  <div class="btn-row">
+    <button class="btn solid" id="copyBtn">Copy to clipboard</button>
+    <button class="btn" id="closeDlg">Close</button>
+    <span class="saved" id="copied">copied</span>
+  </div>
+</dialog>
+
+<script src="curriculum.js"></script>
+<script src="feedback.js"></script>
+<script>
+const C=window.CURRICULUM, FB=window.FEEDBACK;
+const KEY='sam_music_practice_v1';
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}};
+const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
+let S=load();
+if(!S.start){S.start=C.startDefault;S.log={};save(S);}
+if(!S.log)S.log={};
+
+const DAYNAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const todayISO=()=>new Date().toISOString().slice(0,10);
+function weekNow(){
+  if(S.weekOverride)return S.weekOverride;
+  const d0=new Date(S.start+'T00:00:00'), d1=new Date(todayISO()+'T00:00:00');
+  return Math.max(1,Math.floor((d1-d0)/864e5/7)+1);
+}
+const monthFor=w=>C.months.find(m=>m.weeks.includes(w))||C.months[C.months.length-1];
+const drillFor=(w,disc)=>C.drills.find(d=>d.week===w&&d.d===disc);
+
+/* ---------------- status ---------------- */
+function renderStatus(){
+  const w=weekNow(), m=monthFor(w);
+  const done=Object.values(S.log).filter(x=>x.done).length;
+  const caps=Object.values(S.log).filter(x=>x.kept).length;
+  document.getElementById('status').innerHTML=
+    `<span class="chip">Week <b>${w}</b> <button id="wkMinus">−</button><button id="wkPlus">+</button></span>`+
+    `<span class="chip">Month <b>${m.n} · ${m.name}</b></span>`+
+    `<span class="chip">Sessions <b>${done}</b></span>`+
+    `<span class="chip">Captures worth keeping <b>${caps}</b></span>`;
+  document.getElementById('wkMinus').onclick=()=>{S.weekOverride=Math.max(1,weekNow()-1);save(S);renderAll()};
+  document.getElementById('wkPlus').onclick=()=>{S.weekOverride=weekNow()+1;save(S);renderAll()};
+}
+
+/* ---------------- today ---------------- */
+let viewing=null;   // {week, disc} — defaults to actual today
+function renderToday(){
+  const w=viewing?viewing.week:weekNow();
+  const dow=viewing?viewing.dow:new Date().getDay();
+  const disc=C.rotation[dow];
+  const el=document.getElementById('today');
+
+  if(!disc){
+    el.innerHTML=`<div class="today-body"><h2>Rest day</h2>
+      <p class="goal">Sunday is deliberately empty. Listening back to the week counts as practice.</p></div>`;
+    return;
+  }
+  const d=drillFor(w,disc), meta=C.disciplines[disc];
+  if(!d){
+    el.innerHTML=`<div class="today-body"><h2>${meta.label} — not written yet</h2>
+      <p class="goal">Week ${w} is in a month that gets built from your feedback on the previous one.
+      Send feedback and I'll write it.</p></div>`;
+    return;
+  }
+  const st=S.log[d.id]||{};
+  el.innerHTML=`
+    <div class="today-top">
+      <span class="dot" style="background:${meta.hue}"></span>
+      <span class="disc" style="color:${meta.hue}">${meta.label}</span>
+      <span class="today-when">${viewing?'Week '+w+' · '+DAYNAMES[dow]:'Today · '+DAYNAMES[dow]} · 15 min</span>
+    </div>
+    <div class="today-body">
+      <h2>${d.title}</h2>
+      <p class="goal">${d.goal}</p>
+      <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+      <div class="note-row">
+        <div class="nb listen"><h4>Listen for</h4><p>${d.listen}</p></div>
+        <div class="nb capture"><h4>Capture</h4><p>${d.capture}</p></div>
+        ${d.melody?`<div class="nb melody"><h4>On melody</h4><p>${d.melody}</p></div>`:''}
+      </div>
+      <p class="why">${d.why}</p>
+    </div>
+    <div class="fb">
+      <h3>How did it go?</h3>
+      <div class="fb-row"><span class="fb-lab">Difficulty</span>
+        ${['too easy','right','too hard'].map((v,i)=>
+          `<button class="tog ${i===0?'easy':i===2?'hard':''}" data-k="difficulty" data-v="${v}"
+             aria-pressed="${st.difficulty===v}">${v}</button>`).join('')}
+      </div>
+      <div class="fb-row"><span class="fb-lab">Kept it?</span>
+        <button class="tog" data-k="kept" data-v="1" aria-pressed="${st.kept===true}">worth keeping</button>
+        <button class="tog" data-k="kept" data-v="0" aria-pressed="${st.kept===false}">not this time</button>
+      </div>
+      <textarea id="noteBox" placeholder="What worked, what confused you, what you want more or less of…">${st.note||''}</textarea>
+      <div class="btn-row">
+        <button class="btn solid" id="doneBtn">${st.done?'Logged ✓':'Mark done'}</button>
+        <button class="btn" id="expBtn">Copy for Claude</button>
+        <span class="saved" id="savedTag">saved</span>
+      </div>
+    </div>`;
+
+  el.querySelectorAll('.tog').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.k, v=b.dataset.v;
+    const cur=S.log[d.id]||{};
+    cur[k]= k==='kept' ? (v==='1') : v;
+    S.log[d.id]=cur; save(S); flash(); renderToday(); renderStatus(); renderWeek();
+  });
+  document.getElementById('noteBox').addEventListener('input',e=>{
+    const cur=S.log[d.id]||{}; cur.note=e.target.value; S.log[d.id]=cur; save(S); flash();
+  });
+  document.getElementById('doneBtn').onclick=()=>{
+    const cur=S.log[d.id]||{}; cur.done=!cur.done; cur.date=todayISO();
+    S.log[d.id]=cur; save(S); renderAll();
+  };
+  document.getElementById('expBtn').onclick=openExport;
+}
+let flashT;
+function flash(){const t=document.getElementById('savedTag');if(!t)return;
+  t.classList.add('on');clearTimeout(flashT);flashT=setTimeout(()=>t.classList.remove('on'),900);}
+
+/* ---------------- week strip ---------------- */
+function renderWeek(){
+  const w=weekNow(), dow=new Date().getDay();
+  document.getElementById('weekstrip').innerHTML=[1,2,3,4,5,6].map(i=>{
+    const disc=C.rotation[i], meta=C.disciplines[disc], d=drillFor(w,disc);
+    const done=d&&S.log[d.id]&&S.log[d.id].done;
+    return `<div class="ws ${done?'done':''} ${i===dow?'is-today':''}" data-dow="${i}">
+      <div class="d">${DAYNAMES[i]}</div>
+      <div class="n" style="${done?'':'color:'+meta.hue}">${meta.label}</div></div>`;
+  }).join('');
+  document.querySelectorAll('.ws').forEach(el=>el.onclick=()=>{
+    viewing={week:weekNow(),dow:+el.dataset.dow}; renderToday();
+    document.getElementById('today').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+
+/* ---------------- months + all drills ---------------- */
+function renderMonths(){
+  const w=weekNow();
+  document.getElementById('months').innerHTML=C.months.map(m=>`
+    <div class="mn ${m.weeks.includes(w)?'now':''}">
+      <div class="num">Month ${m.n}</div><h4>${m.name}</h4>
+      <p>${m.constraint}</p>
+      <div class="cp"><b>Checkpoint:</b> ${m.checkpoint}</div>
+      ${m.status?`<div class="st">${m.status}</div>`:''}
+    </div>`).join('');
+}
+function renderWeeks(){
+  const cur=weekNow();
+  const weeks=[...new Set(C.drills.map(d=>d.week))].sort((a,b)=>a-b);
+  document.getElementById('weeks').innerHTML=weeks.map(w=>{
+    const m=monthFor(w);
+    const rows=[1,2,3,4,5,6].map(i=>{
+      const d=drillFor(w,C.rotation[i]); if(!d)return '';
+      const meta=C.disciplines[d.d], done=S.log[d.id]&&S.log[d.id].done;
+      return `<div class="dr ${done?'done':''}" data-w="${w}" data-dow="${i}">
+        <span class="tag" style="color:${meta.hue}">${meta.label}</span>
+        <span class="t">${d.title}</span></div>`;
+    }).join('');
+    return `<details class="wk" ${w===cur?'open':''}><summary>Week ${w}
+      <span class="mo">Month ${m.n} · ${m.name}</span></summary>
+      <div class="wk-body">${rows}</div></details>`;
+  }).join('');
+  document.querySelectorAll('.dr').forEach(el=>el.onclick=()=>{
+    viewing={week:+el.dataset.w,dow:+el.dataset.dow}; renderToday();
+    document.getElementById('today').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+function renderChanges(){
+  document.getElementById('changes').innerHTML=FB.changes.slice().reverse().map(c=>`
+    <div class="ch"><div class="date">${c.date}</div><p>${c.what}</p>
+    <p class="why">${c.why}</p></div>`).join('');
+}
+
+/* ---------------- export ---------------- */
+function openExport(){
+  const lines=['MUSIC PRACTICE FEEDBACK','date: '+todayISO(),
+    'week: '+weekNow()+'  (month '+monthFor(weekNow()).n+' — '+monthFor(weekNow()).name+')',''];
+  const ids=Object.keys(S.log).filter(id=>{const x=S.log[id];
+    return x.done||x.difficulty||x.note||x.kept!==undefined;});
+  if(!ids.length) lines.push('(nothing logged yet)');
+  ids.forEach(id=>{
+    const x=S.log[id], d=C.drills.find(k=>k.id===id); if(!d)return;
+    const bits=[];
+    if(x.done)bits.push('done');
+    if(x.difficulty)bits.push(x.difficulty);
+    if(x.kept!==undefined)bits.push(x.kept?'kept':'not kept');
+    lines.push(`- ${id} (${C.disciplines[d.d].label}: ${d.title})`);
+    lines.push(`    ${bits.join(' · ')||'—'}`);
+    if(x.note)lines.push(`    note: ${x.note.replace(/\n/g,' ')}`);
+  });
+  lines.push('','Adapt the drills and write the next month based on this.');
+  document.getElementById('exportTxt').textContent=lines.join('\n');
+  document.getElementById('exportDlg').showModal();
+}
+document.getElementById('closeDlg').onclick=()=>document.getElementById('exportDlg').close();
+document.getElementById('copyBtn').onclick=async()=>{
+  try{await navigator.clipboard.writeText(document.getElementById('exportTxt').textContent);
+    const c=document.getElementById('copied');c.classList.add('on');
+    setTimeout(()=>c.classList.remove('on'),1400);
+  }catch(e){
+    const r=document.createRange();r.selectNode(document.getElementById('exportTxt'));
+    getSelection().removeAllRanges();getSelection().addRange(r);
+  }
+};
+
+function renderAll(){renderStatus();renderToday();renderWeek();renderMonths();renderWeeks();renderChanges();}
+renderAll();
+</script>
+</body>
+</html>
