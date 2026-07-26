@@ -16,5 +16,14 @@
   "functions": {
     "api/lineup-milton.js": { "maxDuration": 60 },
     "api/lineup-me.js": { "maxDuration": 60 }
-  }
+  },
+  "headers": [
+    {
+      "comment": "Practice data changes whenever Claude adapts the curriculum from feedback — never serve it stale.",
+      "source": "/music-learning/(curriculum|feedback).js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ]
+    }
+  ]
 }

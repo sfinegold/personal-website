@@ -22,5 +22,7 @@ window.FEEDBACK = {
   changes: [
     {date:'2026-07-28', what:'Curriculum created. Month 1 written in full; Months 2–4 are themes only.',
      why:'Months 2–4 are deliberately unbuilt so they can be shaped by how Month 1 actually goes, rather than guessed at now.'},
+    {date:'2026-07-28', what:'All four months shipped — 96 drills across 16 weeks. Months 2–4 written out in full.',
+     why:'Sam asked for the whole arc up front rather than waiting on feedback. The drills can still be rewritten from feedback at any point; having them written just means you are never blocked on me.'},
   ],
 };
