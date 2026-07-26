@@ -203,8 +203,10 @@
   </div>
 </dialog>
 
-<script src="curriculum.js"></script>
-<script src="feedback.js"></script>
+<!-- Absolute paths: with a URL of /music-learning (no trailing slash) a relative
+     src would resolve to /curriculum.js at the site root and 404. -->
+<script src="/music-learning/curriculum.js"></script>
+<script src="/music-learning/feedback.js"></script>
 <script>
 const C=window.CURRICULUM, FB=window.FEEDBACK;
 const KEY='sam_music_practice_v1';
