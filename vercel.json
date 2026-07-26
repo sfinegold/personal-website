@@ -19,11 +19,12 @@
   },
   "headers": [
     {
-      "comment": "Practice data changes whenever Claude adapts the curriculum from feedback — never serve it stale.",
-      "source": "/music-learning/(curriculum|feedback).js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
-      ]
+      "source": "/music-learning/curriculum.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+    },
+    {
+      "source": "/music-learning/feedback.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
     }
   ]
 }
