@@ -90,17 +90,21 @@ async function runProfile(profileId, options = {}) {
   const hadPrev = Array.isArray(prevSent) && prevSent.length > 0;
   for (const e of kept) e.isNew = hadPrev ? !prevSet.has(eventKey(e)) : false;
 
-  // 5. JUDGE LAYER — a curation-written "top pick" paragraph if present, else a
-  // deterministic fallback highlighting the #1 ranked event (always included).
+  // 5. JUDGE LAYER — a curation-written "top pick" paragraph if it's still FRESH
+  // (curation runs ~weekly; a stale paragraph would name past events), else a
+  // deterministic fallback highlighting the current #1 ranked event.
+  const REC_MAX_AGE_DAYS = 9;
   const rec = await store.getRecommendation(profile.id);
-  const recommendation = rec && rec.paragraph ? rec.paragraph : topPick(kept);
+  const recAgeDays = rec && rec.at ? (now - new Date(rec.at)) / 86400000 : Infinity;
+  const recFresh = Boolean(rec && rec.paragraph && recAgeDays <= REC_MAX_AGE_DAYS);
+  const recommendation = recFresh ? rec.paragraph : topPick(kept);
   const base = process.env.LINEUP_BASE_URL || 'https://samfinegold.me/lineup';
   const meta = {
     rangeLabel: rangeLabel(start, windowEndYMD),
     short: 'window',
     tennisNote: (profile.filters.blackout || []).length > 0,
     recommendation,
-    recommendationSource: rec && rec.paragraph ? 'curated' : 'auto',
+    recommendationSource: recFresh ? 'curated' : 'auto',
     adminUrl: `${base}/${profile.id}`,
   };
   const html = renderHTML(profile, kept, meta);

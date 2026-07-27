@@ -23,7 +23,9 @@ function splitDateTime(iso) {
   const dm = iso.match(/^(\d{4}-\d{2}-\d{2})/);
   if (!dm) return { date: null, time: null };
   const tm = iso.match(/T(\d{2}:\d{2})/);
-  return { date: dm[1], time: tm ? tm[1] : null };
+  let time = tm ? tm[1] : null;
+  if (time === '00:00') time = null; // midnight in a feed almost always = date-only placeholder, not a real showtime
+  return { date: dm[1], time };
 }
 
 function normalize(ev, source) {
