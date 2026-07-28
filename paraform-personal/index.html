@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paraform — personal prep</title>
+<style>
+  :root{
+    --ink:#111; --ink2:#3a3a3a; --muted:#6b7280; --faint:#9ca3af;
+    --bg:#fbfbfa; --card:#fff; --border:#e5e7eb; --line:#eef0f2;
+    --blue:#2f7cf6; --blueink:#1d5fd0; --bluesoft:#eef4fe;
+    --green:#16a34a; --greenbg:#f0fdf4; --greenbd:#bbf7d0;
+    --amber:#b45309; --amberbg:#fffbeb; --amberbd:#fde68a;
+    --red:#b91c1c; --redbg:#fef2f2; --redbd:#fecaca;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.55}
+  .serif{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-0.01em}
+  .wrap{max-width:920px;margin:0 auto;padding:30px 24px 80px}
+  h1{font-size:26px;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:26px}
+  h2{font-size:18px;margin:34px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+  h2 .n{color:var(--blueink);font-size:13px;font-weight:800;letter-spacing:.05em;margin-right:8px}
+  p{margin:8px 0}
+  b{color:#000}
+  ul{margin:8px 0 8px 4px;list-style:none}
+  li{margin:5px 0;padding-left:15px;text-indent:-15px}
+  li::before{content:"▪";color:var(--faint);margin-right:8px}
+  .q{color:var(--blueink);font-weight:700}
+  .callout{background:var(--bluesoft);border:1px solid #cfe0fc;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px}
+  .callout b{color:var(--blueink)}
+
+  /* ---- 2x2 ---- */
+  .matrix-frame{display:grid;grid-template-columns:26px 1fr;gap:8px;margin:14px 0 6px}
+  .yaxis{writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;justify-content:center}
+  .matrix-right{display:flex;flex-direction:column;gap:6px}
+  .xaxis{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;text-align:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cell{border-radius:10px;padding:13px 14px;border:1px solid var(--border)}
+  .cell .qname{font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+  .cell .role{font-weight:700;font-size:14.5px;margin:2px 0 6px}
+  .cell .fx{font-size:12.5px;color:var(--ink2);line-height:1.5}
+  .cell .set{display:inline-block;margin-top:9px;font-size:11.5px;font-weight:800;border-radius:999px;padding:3px 10px}
+  .cell.good{background:var(--greenbg);border-color:var(--greenbd)} .cell.good .set{background:#dcfce7;color:var(--green)}
+  .cell.warn{background:var(--amberbg);border-color:var(--amberbd)} .cell.warn .set{background:#fef3c7;color:var(--amber)}
+  .cell.bad{background:var(--redbg);border-color:var(--redbd)} .cell.bad .set{background:#fee2e2;color:var(--red)}
+  .quadlabel{display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;color:var(--faint);padding:0 4px}
+
+  .facts{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .foot{margin-top:30px;font-size:12px;color:var(--faint);border-top:1px solid var(--line);padding-top:12px}
+
+  /* gate */
+  #pw-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#0a0a0a}
+  #pw-form{width:min(92vw,360px);background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.35);padding:26px 24px}
+  #pw-form .k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+  #pw-form h3{font-size:20px;margin:6px 0 12px;font-family:Georgia,serif;font-weight:500}
+  #pw-input{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}
+  #pw-btn{width:100%;margin-top:11px;padding:11px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+  #pw-err{display:none;color:#dc2626;font-size:13px;font-weight:600;margin:8px 0 0}
+</style>
+</head>
+<body>
+
+<div id="pw-gate">
+  <form id="pw-form">
+    <div class="k">Personal · prep only</div>
+    <h3 class="serif">Paraform call prep</h3>
+    <input id="pw-input" type="password" placeholder="Password" autocomplete="current-password" autofocus>
+    <button id="pw-btn" type="submit">Enter</button>
+    <p id="pw-err">Nope — try again.</p>
+  </form>
+</div>
+
+<div class="wrap">
+  <h1 class="serif">Paraform — call prep</h1>
+  <div class="sub">Private notes for the Zach conversation. Not for sending.</div>
+
+  <!-- ===== 2x2 ===== -->
+  <h2><span class="n">01</span>Where the stake fits — the 2×2</h2>
+  <p>Two axes that decide the stake's effect on a role: <b>supply</b> (how crowded the pipeline is) and <b>payout/skill</b> (how big the bounty, how senior the role). The stake isn't a blanket tax — it's a precision tool that belongs in one quadrant and should be waived in others.</p>
+
+  <div class="matrix-frame">
+    <div class="yaxis">Payout / skill</div>
+    <div class="matrix-right">
+      <div class="quadlabel"><span>◀ Low supply</span><span>High supply ▶</span></div>
+      <div class="grid2">
+        <!-- top-left: low supply, high payout -->
+        <div class="cell warn">
+          <div class="qname">Low supply · high payout</div>
+          <div class="role">Hard-to-fill senior / niche</div>
+          <div class="fx">You need every submission — don't deter the few who can work it. But the big bounty makes a stake trivial to a confident specialist, so it barely bites the right people.</div>
+          <span class="set">Waive or minimal · (or "stake for early access")</span>
+        </div>
+        <!-- top-right: high supply, high payout -->
+        <div class="cell good">
+          <div class="qname">High supply · high payout</div>
+          <div class="role">Crowded + lucrative senior <span style="font-weight:400;color:var(--muted)">(the PE role)</span></div>
+          <div class="fx">Best case. Thins the spray the HM was drowning in, and $50 is nothing against a $30K+ bounty — so good submissions aren't deterred, only the low-confidence flyers. This is also where the quality pain concentrates.</div>
+          <span class="set">Full stake ✓ — the sweet spot</span>
+        </div>
+        <!-- bottom-left: low supply, low payout -->
+        <div class="cell bad">
+          <div class="qname">Low supply · low payout</div>
+          <div class="role">Undersubscribed junior, small bounty</div>
+          <div class="fx">Worst case. Too few submissions already, and the stake is heavy relative to a small reward — you'd be taxing a trickle you want to grow.</div>
+          <span class="set">Waive (maybe raise payout instead)</span>
+        </div>
+        <!-- bottom-right: high supply, low payout -->
+        <div class="cell warn">
+          <div class="qname">High supply · low payout</div>
+          <div class="role">Crowded easy / junior <span style="font-weight:400;color:var(--muted)">("firehose is fine")</span></div>
+          <div class="fx">Questionable. The HM may actually want the firehose here, and low payout means the stake bites relative to reward — you'd slow a process nobody was complaining about.</div>
+          <span class="set">Waive or small · HM's call</span>
+        </div>
+      </div>
+      <div class="xaxis" style="margin-top:2px">Supply →</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>What it tells you:</b> price by <b>congestion</b>, waive by <b>scarcity</b>, keep it small where <b>payouts are low</b>. The stake earns its keep in the top-right (crowded + lucrative senior roles) — which is exactly where the "crazed dogs" complaint lives — and should be dialed down or off everywhere supply is thin. This <i>is</i> the role-level tuning iteration, and it maps to the prototype's "stake waived · low supply" chip.<br><br>
+    <b>Use it to disarm two objections:</b> "you're supply-constrained" → the whole left column waives. "Some HMs want the firehose" → bottom-right waives. You're not proposing a marketplace tax; you're proposing a scalpel.
+  </div>
+
+  <!-- ===== spine ===== -->
+  <h2><span class="n">02</span>The spine + how you got here</h2>
+  <p><b>One line:</b> A bad submission costs a recruiter nothing, and with few submissions each you can't tell good from bad fast enough to filter — so HMs do the filtering. A refundable stake prices each submission at n=1: the one early signal nothing else gives you.</p>
+  <p><b>How I got here (7 beats — narrate in 90 sec):</b></p>
+  <ul>
+    <li>The three HM quotes are one story — quality is the symptom.</li>
+    <li>Quality is a <b>portfolio</b> problem; pick one high-leverage bet I can ship fast.</li>
+    <li>Root cause is <b>economic</b>: bad submissions are free; the platform's filter needs 15–20 subs + weeks to converge, so HM attention absorbs the risk.</li>
+    <li>Mapped the option space (intake / checks / flow / incentives / demand); built two prototypes.</li>
+    <li>Chose the stake: prices the free externality, elicits the recruiter's private read, ships without ML, revenue-neutral.</li>
+    <li>Designed hard for fairness — because "cost to submit" is a backlash risk.</li>
+    <li>Got honest about the hard part: knowing if it worked is a real measurement problem.</li>
+  </ul>
+
+  <!-- ===== why over other levers ===== -->
+  <h2><span class="n">03</span>Why the stake over the dozen other levers</h2>
+  <ul>
+    <li><b>Everything Paraform already does is lagging & reputational</b> — interview-rate floors, ratings, Preferred, streaks — all need 15–20 submissions to mean anything. The stake is the <b>only lever that prices a single submission on day one</b>, the exact new-recruiter window the existing tools can't cover. Complementary, not redundant.</li>
+    <li><b>Simple & messageable</b> — complexity itself suppresses supply, so the fancier fixes (Signal-score tiers, AI-review pipeline) cost supply you can't spare.</li>
+    <li><b>Uses private info + keeps agency</b> — the recruiter talked to the candidate; the stake lets them bet on their own read (override the algorithm with money).</li>
+    <li><b>Tunable</b> — a dial (per tier, per role) to hit a target rejection rate, not a rebuild.</li>
+    <li><b>I'd retire the volume floors in the same move</b> — you can't price an obligation, and the floor manufactures the forced junk. Net complexity-neutral, and removing it <i>is</i> part of the fix.</li>
+  </ul>
+
+  <!-- ===== tough Q ===== -->
+  <h2><span class="n">04</span>Tough questions → your trigger</h2>
+  <ul>
+    <li><span class="q">"Why the stake, not X?"</span> → lagging-vs-forward-priced; it's the only per-submission, day-one signal.</li>
+    <li><span class="q">"Won't it shrink supply?"</span> (the one) → yes, deliberately, for junk. 3 losses: junk (good) / underconfident-good (keep it small) / cash-tight-skilled (fairness). Small stake (zero-price effect: signal comes from crossing zero, not the size). Iterations point loss back at growth.</li>
+    <li><span class="q">"How would you know it worked?"</span> → rate <u>and</u> count together; interference means the lift is a <b>lower bound</b>.</li>
+    <li><span class="q">"Why new recruiters first?"</span> → clean experiment + rules-not-takebacks + risk concentrates there.</li>
+    <li><span class="q">"Don't we already do a lot for quality?"</span> → yes, but all of it is reputation that needs a sample. The stake covers day one.</li>
+    <li><span class="q">"Why might it fail?"</span> → sentiment ("pay to work" screenshot) + slow/fuzzy measurement → start small, contained, reversible. (Have the two failure stories ready — adverse selection of the best; and mixed-results → dial it down / role-waive.)</li>
+  </ul>
+
+  <!-- ===== measurement ===== -->
+  <h2><span class="n">05</span>Measurement — the crux (go deep)</h2>
+  <ul>
+    <li><b>Power:</b> +10pp off ~40% ≈ 385 subs/arm ≈ ~110 recruiters/arm (~220 total). Detectable effect = volume × duration. Pre-register the min effect; else before/after cohorts + interviews.</li>
+    <li><b>Interference:</b> treated holds back → control's field thins → control flattered → bias is <b>down</b> → a clean win is a strong win. Magnitude ≈ treated-share × volume-cut (small for new recruiters). Query: treated share of subs per role; if a tail is big, partition the marketplace.</li>
+    <li><b>Rate vs. count:</b> rate↑ can be denominator math (that's the mechanism) <u>or</u> a starving pipeline. Watch both. Fulfillment guardrail = final-rounders/recruiter, low-frequency & fuzzy → <b>HM willingness-to-pay sets the tolerable dip, not the experiment.</b></li>
+  </ul>
+
+  <!-- ===== facts ===== -->
+  <h2><span class="n">06</span>Hard numbers — don't blank</h2>
+  <div class="facts">
+    <ul style="margin:0">
+      <li><b>Preferred:</b> score ≥2.75/4 · first-round ≥60% · mid-round ≥30% · monthly. Perks: priority review, early access, unlimited approvals, badge.</li>
+      <li><b>Interview rewards:</b> $250 final-round · $500 offer-round · 1/candidate · <b>paid by Paraform</b>. Hire reward ~22.5% first-yr.</li>
+      <li><b>Enforcement:</b> interview rate <30% flag → 25–30% approvals revoked (single-sub-only, 2-mo review) → ≤25% deactivation. Avg rating ≥2.5; a single 1/4 disables submissions.</li>
+      <li><b>Your stake:</b> $50 Standard · $25 Preferred. Refund at screen pass. Forfeit → role pool, returned if role dies / 6mo.</li>
+      <li><b>Signal gap:</b> new default rating 5.0; platform avg ~4.7. Live evidence: "please ease off" HM banner; pending-submission-limit card already exists.</li>
+    </ul>
+  </div>
+
+  <!-- ===== ask him ===== -->
+  <h2><span class="n">07</span>Ask him (make it a conversation — pick 3–4)</h2>
+  <ul>
+    <li>Is <b>supply or demand</b> the binding constraint right now? Roles per active recruiter?</li>
+    <li>Conversion <b>by recruiter tenure</b> — composition story, or individuals getting worse?</li>
+    <li>Can you <b>run experiments</b>? New-recruiter <b>approvals/week</b>? (decides what I could detect)</li>
+    <li>Ever tested <b>HM willingness-to-pay</b> for fewer, better subs?</li>
+    <li>Last quality initiative — <b>why didn't it stick?</b> How do your <b>best</b> recruiters behave?</li>
+  </ul>
+
+  <!-- ===== are you impressive ===== -->
+  <h2><span class="n">08</span>"Are you impressive / prepared?" — your angle</h2>
+  <ul>
+    <li><b>Turf</b> — solo-founded a two-sided field tool (volunteers ↔ voters). You've <i>lived</i> marketplace dynamics, incentives, adoption — not from a case study.</li>
+    <li><b>Mahan tech/AI lead</b> — shipped under brutal time pressure, wore every hat. That's early-startup PM.</li>
+    <li><b>Analyst / SQL background</b> — it's why your measurement section has a power calc and an interference argument instead of "I'd A/B test it." Let that section be the proof.</li>
+    <li><b>Let the case study be the evidence, not the claim.</b> Don't say "I'm rigorous / I get marketplaces" — the interference analysis and the option-space breadth say it for you.</li>
+  </ul>
+
+  <!-- ===== don'ts ===== -->
+  <h2><span class="n">09</span>Don't</h2>
+  <ul>
+    <li>Call it "the fix" (it's one bet). · Claim it'll work (honest "it's hard to measure" is stronger). · Hand-wave the supply concern — he lives it. · Get a product fact wrong — one miss kills the "did the work" signal. · Be precious when he proposes a change — build on it out loud. · Overrun — answer, then stop.</li>
+  </ul>
+
+  <div class="foot">Private prep. Password-gated so it isn't stumbled on. Change or remove the gate anytime.</div>
+</div>
+
+<script>
+(function(){var K='pf_personal_pw';function unlock(){var g=document.getElementById('pw-gate');if(g)g.remove();}
+  if(sessionStorage.getItem(K)==='ok')unlock();
+  var f=document.getElementById('pw-form');if(f)f.addEventListener('submit',function(e){e.preventDefault();if(document.getElementById('pw-input').value==='backstage'){sessionStorage.setItem(K,'ok');unlock();}else document.getElementById('pw-err').style.display='block';});
+  var inp=document.getElementById('pw-input');if(inp)inp.addEventListener('keydown',function(e){e.stopPropagation();});})();
+</script>
+</body>
+</html>
