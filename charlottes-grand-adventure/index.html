@@ -39,7 +39,7 @@
     background:
       radial-gradient(ellipse at 50% -10%, #f8efdb 0%, var(--parch) 45%, var(--parch-deep) 100%) fixed;
     color:var(--ink);
-    font-size:clamp(17px,1.05vw + 13px,19px);
+    font-size:clamp(16px,0.95vw + 12.5px,18px);
     line-height:1.55;
   }
 
@@ -131,7 +131,7 @@
   nav.toc .dot{color:var(--edge)}
 
   /* ————— layout ————— */
-  main{max-width:880px;margin:0 auto;padding:0 1.25rem 4rem}
+  main{max-width:970px;margin:0 auto;padding:0 1.25rem 4rem}
   section{margin-top:4.2rem}
 
   .chapter-kicker{
@@ -260,25 +260,46 @@
     color:var(--gold);
     white-space:nowrap;
   }
-  .line{
-    display:grid;
-    grid-template-columns:1fr 7.2rem;
-    gap:.4rem 1rem;
-    align-items:start;
-    padding:.7rem 0;
+  table.ledger{width:100%;border-collapse:collapse}
+  table.ledger td{padding:.5rem 0;border-bottom:1px dotted #b7a06b99;vertical-align:middle}
+  table.ledger tr:last-child td{border-bottom:none}
+  td.amt-td{width:7.2rem;padding-left:1rem}
+  .custom-cell{display:flex;align-items:center;gap:.3rem}
+  .custom-label{
+    flex:1;
+    background:transparent;
+    border:none;
     border-bottom:1px dotted #b7a06b99;
+    font-family:'EB Garamond',serif;
+    font-size:1em;
+    color:var(--ink);
+    padding:.1rem;
   }
-  .line:last-child{border-bottom:none}
-  .line .lbl{font-weight:600}
-  .line .whisper{
-    display:block;
-    font-family:'IM Fell English',serif;
-    font-style:italic;
-    font-weight:400;
-    font-size:.9em;
-    color:var(--ink2);
-    max-width:46ch;
+  .custom-label:focus{outline:none;border-bottom-color:var(--gold)}
+  .row-x{
+    background:none;
+    border:none;
+    color:#b08d5e;
+    cursor:pointer;
+    font-size:1.1rem;
+    line-height:1;
+    padding:.1rem .35rem;
   }
+  .row-x:hover{color:var(--wax)}
+  .add-row{
+    margin-top:.65rem;
+    font-family:'Cinzel',serif;
+    font-size:.68rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--gold);
+    border:1.5px dashed var(--gold);
+    border-radius:999px;
+    padding:.45em 1.1em .38em;
+    cursor:pointer;
+  }
+  .add-row:hover{color:var(--wax);border-color:var(--wax)}
   .amt{
     font-family:'EB Garamond',serif;
     font-size:1.12rem;
@@ -410,16 +431,18 @@
     font-size:.92em;
     margin-bottom:.8rem;
   }
-  .house ul{list-style:none}
-  .house li{
-    padding:.42rem 0 .42rem 1.3rem;
-    position:relative;
-    border-bottom:1px dotted #b7a06b66;
+  .pc-label{
+    display:block;
+    font-family:'Cinzel',serif;
+    font-size:.72rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    margin:1rem 0 .35rem;
   }
-  .house li:last-child{border-bottom:none}
-  .house li::before{content:"✦";position:absolute;left:0;font-size:.75rem;top:.62rem}
-  .house.bk li::before{color:var(--bk2)}
-  .house.sf li::before{color:var(--sf1)}
+  .house.bk .pc-label{color:var(--bk1)}
+  .house.sf .pc-label{color:var(--sf1)}
+  .house textarea{min-height:112px}
+  .house textarea::placeholder{color:#a89673;font-style:italic}
 
   .hat-box{
     margin-top:1.6rem;
@@ -595,7 +618,7 @@
   @media (max-width:720px){
     .houses{grid-template-columns:1fr}
     .card{padding:1.15rem}
-    .line{grid-template-columns:1fr 6rem}
+    td.amt-td{width:6rem}
     header{padding:4rem 1.1rem 5.2rem}
     .seal{width:54px;height:54px;font-size:1.3rem;top:-22px;right:14px}
   }
@@ -684,122 +707,67 @@
   <section id="ledger">
     <p class="chapter-kicker">Chapter II</p>
     <h2>The Ledger</h2>
-    <p class="chapter-note">Gringotts-grade accounting, goblin-free. Every figure is a guess in gold ink — tap it and write your own. The page remembers.</p>
+    <p class="chapter-note">Every number is an editable guess — tap to overwrite, add lines for what I missed. The page remembers.</p>
 
     <div class="card">
 
       <div class="ledger-part">
         <h3>Coming in <span class="sub-amt" id="sub-in">$0</span></h3>
-        <div class="line">
-          <div><span class="lbl">Sam's boost</span><span class="whisper">locked in — no interest, no repayment, occasional smugness</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-sam" data-default="1000" data-group="in" aria-label="Sam's boost, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Grandpa's boost</span><span class="whisper">his to offer, yours to accept — one phone call away</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-grandpa" data-default="1500" data-group="in" aria-label="Grandpa's boost, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Stage stipend, if any</span><span class="whisper">some bakeries pay a little; many pay in bread</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-stage" data-default="800" data-group="in" aria-label="Stage stipend, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Savings you'll spend</span><span class="whisper">whatever the clerkship left in the vault — your number, not mine</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-savings" data-default="0" data-group="in" aria-label="Savings you'll spend, dollars"></div>
-        </div>
+        <table class="ledger"><tbody id="rows-in">
+          <tr><td>Sam's boost — confirmed</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-sam" data-default="1000" data-group="in" aria-label="Sam's boost, dollars"></div></td></tr>
+          <tr><td>Grandpa's boost — just ask</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-grandpa" data-default="1500" data-group="in" aria-label="Grandpa's boost, dollars"></div></td></tr>
+          <tr><td>Stage stipend, if any</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-stage" data-default="800" data-group="in" aria-label="Stage stipend, dollars"></div></td></tr>
+          <tr><td>Savings you'll spend</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="in-savings" data-default="0" data-group="in" aria-label="Savings you'll spend, dollars"></div></td></tr>
+        </tbody></table>
+        <button class="add-row" type="button" data-group="in">＋ Add a line</button>
       </div>
 
       <div class="ledger-part">
         <h3>Flights &amp; rails <span class="sub-amt" id="sub-flights">$0</span></h3>
-        <div class="line">
-          <div><span class="lbl">Philadelphia → San Francisco</span><span class="whisper">one way, Aug 28 — book by early August</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-phl" data-default="220" data-group="flights" aria-label="Philadelphia to San Francisco flight, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">San Francisco → London</span><span class="whisper">one way, mid-September</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-lhr" data-default="480" data-group="flights" aria-label="San Francisco to London flight, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Hops inside Europe</span><span class="whisper">two or three budget legs — trains where you can</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-hops" data-default="180" data-group="flights" aria-label="Flights within Europe, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Europe → East Coast</span><span class="whisper">one way, ~Oct 15 — book once the route firms up</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-home" data-default="430" data-group="flights" aria-label="Europe to East Coast flight, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Guatemala, round trip</span><span class="whisper">set to 0 if the grant covers airfare — worth asking</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-guat" data-default="450" data-group="flights" aria-label="Guatemala round trip flight, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">New York trains</span><span class="whisper">the northeast corridor, as ever</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-nyc" data-default="60" data-group="flights" aria-label="New York trains, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">The flight you can't see yet</span><span class="whisper">there's always one</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-wild" data-default="150" data-group="flights" aria-label="Contingency flight, dollars"></div>
-        </div>
+        <table class="ledger"><tbody id="rows-flights">
+          <tr><td>Philadelphia → San Francisco, Aug 28</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-phl" data-default="220" data-group="flights" aria-label="Philadelphia to San Francisco flight, dollars"></div></td></tr>
+          <tr><td>San Francisco → London, ~Sep 15</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-lhr" data-default="480" data-group="flights" aria-label="San Francisco to London flight, dollars"></div></td></tr>
+          <tr><td>Hops inside Europe</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-hops" data-default="180" data-group="flights" aria-label="Flights within Europe, dollars"></div></td></tr>
+          <tr><td>Europe → East Coast, ~Oct 15</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-home" data-default="430" data-group="flights" aria-label="Europe to East Coast flight, dollars"></div></td></tr>
+          <tr><td>Guatemala round trip — $0 if the grant covers it</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-guat" data-default="450" data-group="flights" aria-label="Guatemala round trip flight, dollars"></div></td></tr>
+          <tr><td>New York trains</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-nyc" data-default="60" data-group="flights" aria-label="New York trains, dollars"></div></td></tr>
+          <tr><td>The flight you can't see yet</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="fl-wild" data-default="150" data-group="flights" aria-label="Contingency flight, dollars"></div></td></tr>
+        </tbody></table>
+        <button class="add-row" type="button" data-group="flights">＋ Add a line</button>
       </div>
 
       <div class="ledger-part">
         <h3>On the road <span class="sub-amt" id="sub-road">$0</span></h3>
-        <div class="line">
-          <div><span class="lbl">The Bay, two weeks</span><span class="whisper">the other Charlotte's couch is free; burritos are not</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-bay" data-default="250" data-group="road" aria-label="Bay Area spending, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Europe, four weeks</span><span class="whisper">~$55 a day on couches — food, transit, museums, the rounds you owe</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-eur" data-default="1550" data-group="road" aria-label="Europe spending, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Host gifts</span><span class="whisper">arrive with something — flowers beat fridge magnets</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-gifts" data-default="120" data-group="road" aria-label="Host gifts, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Home, two-ish weeks</span><span class="whisper">the dog splits the check</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-home" data-default="60" data-group="road" aria-label="Home spending, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">New York days</span><span class="whisper">couches are free; everything else is New York</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-nyc" data-default="250" data-group="road" aria-label="New York spending, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Guatemala pocket money</span><span class="whisper">the grant feeds you; this is for everything else</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-guat" data-default="150" data-group="road" aria-label="Guatemala pocket money, dollars"></div>
-        </div>
+        <table class="ledger"><tbody id="rows-road">
+          <tr><td>The Bay, two weeks</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-bay" data-default="250" data-group="road" aria-label="Bay Area spending, dollars"></div></td></tr>
+          <tr><td>Europe, four weeks — ~$55 a day</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-eur" data-default="1550" data-group="road" aria-label="Europe spending, dollars"></div></td></tr>
+          <tr><td>Host gifts</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-gifts" data-default="120" data-group="road" aria-label="Host gifts, dollars"></div></td></tr>
+          <tr><td>Home, two weeks</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-home" data-default="60" data-group="road" aria-label="Home spending, dollars"></div></td></tr>
+          <tr><td>New York days</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-nyc" data-default="250" data-group="road" aria-label="New York spending, dollars"></div></td></tr>
+          <tr><td>Guatemala pocket money</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="rd-guat" data-default="150" data-group="road" aria-label="Guatemala pocket money, dollars"></div></td></tr>
+        </tbody></table>
+        <button class="add-row" type="button" data-group="road">＋ Add a line</button>
       </div>
 
       <div class="ledger-part">
         <h3>The quiet monthlies · Sep–Dec <span class="sub-amt" id="sub-monthly">$0</span></h3>
-        <div class="line">
-          <div><span class="lbl">Storage unit, four months</span><span class="whisper">~$160/mo for a 5×10 in Philly — measure before you rent</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-storage" data-default="640" data-group="monthly" aria-label="Storage unit, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Health insurance, four months</span><span class="whisper">~$450/mo on the marketplace. The sneakiest line on this page — you get ~60 days after the clerkship to enroll. Do it in August.</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-health" data-default="1800" data-group="monthly" aria-label="Health insurance, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Phone + travel eSIMs</span><span class="whisper">one eSIM per continent beats roaming</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-phone" data-default="260" data-group="monthly" aria-label="Phone and eSIMs, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Subscriptions you forgot</span><span class="whisper">audit in August; cancel half without mercy</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-subs" data-default="120" data-group="monthly" aria-label="Subscriptions, dollars"></div>
-        </div>
+        <table class="ledger"><tbody id="rows-monthly">
+          <tr><td>Storage unit, $160 × 4 months</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-storage" data-default="640" data-group="monthly" aria-label="Storage unit, dollars"></div></td></tr>
+          <tr><td>Health insurance, $450 × 4 — enroll in August</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-health" data-default="1800" data-group="monthly" aria-label="Health insurance, dollars"></div></td></tr>
+          <tr><td>Phone + travel eSIMs</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-phone" data-default="260" data-group="monthly" aria-label="Phone and eSIMs, dollars"></div></td></tr>
+          <tr><td>Subscriptions</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="10" id="mo-subs" data-default="120" data-group="monthly" aria-label="Subscriptions, dollars"></div></td></tr>
+        </tbody></table>
+        <button class="add-row" type="button" data-group="monthly">＋ Add a line</button>
       </div>
 
       <div class="ledger-part">
         <h3>The landing fund · December <span class="sub-amt" id="sub-landing">$0</span></h3>
-        <div class="line">
-          <div><span class="lbl">First month + deposit</span><span class="whisper">Brooklyn or San Francisco — either way it stings</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="ld-rent" data-default="4000" data-group="landing" aria-label="First month and deposit, dollars"></div>
-        </div>
-        <div class="line">
-          <div><span class="lbl">Movers + shipping the boxes</span><span class="whisper">the storage unit's revenge</span></div>
-          <div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="ld-move" data-default="800" data-group="landing" aria-label="Movers and shipping, dollars"></div>
-        </div>
+        <table class="ledger"><tbody id="rows-landing">
+          <tr><td>First month + deposit</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="ld-rent" data-default="4000" data-group="landing" aria-label="First month and deposit, dollars"></div></td></tr>
+          <tr><td>Movers + shipping</td><td class="amt-td"><div class="amt-wrap"><input class="amt" type="number" min="0" step="50" id="ld-move" data-default="800" data-group="landing" aria-label="Movers and shipping, dollars"></div></td></tr>
+        </tbody></table>
+        <button class="add-row" type="button" data-group="landing">＋ Add a line</button>
         <label class="landing-toggle"><input type="checkbox" id="landing-include"> Count the landing in the total</label>
-        <p class="whisper" style="font-family:'IM Fell English',serif;font-style:italic;color:var(--ink2);margin-top:.5rem">Not part of the adventure — it's the boss fight at the end. Start a separate pot if you can.</p>
       </div>
 
       <div class="totals" id="totals">
@@ -826,27 +794,21 @@
     <div class="houses">
       <div class="house bk">
         <div class="crest">🗽</div>
-        <h3>House Brooklyn</h3>
+        <h3>Brooklyn</h3>
         <p class="motto">loud, warm, elbow-to-elbow</p>
-        <ul>
-          <li>The New York folks, a subway ride from the old ones</li>
-          <li>A bakery on every third corner — and stages to match</li>
-          <li>Philadelphia stays a cheap train away</li>
-          <li>Winter is real; so is the city that ignores it</li>
-          <li>You will never once eat alone</li>
-        </ul>
+        <label class="pc-label" for="bk-pros">Pros</label>
+        <textarea id="bk-pros" data-save rows="4" aria-label="Brooklyn pros" placeholder="The New York folks… bakeries to stage in…"></textarea>
+        <label class="pc-label" for="bk-cons">Cons</label>
+        <textarea id="bk-cons" data-save rows="4" aria-label="Brooklyn cons" placeholder="Real winter…"></textarea>
       </div>
       <div class="house sf">
         <div class="crest">🌉</div>
-        <h3>House by the Bay</h3>
+        <h3>The Bay</h3>
         <p class="motto">fog, hills, and long horizons</p>
-        <ul>
-          <li>Sam, ten minutes away, insufferably pleased about it</li>
-          <li>Sourdough's home turf — the pilgrimage stage</li>
-          <li>Ocean on one side, mountains on the other</li>
-          <li>Winter is a rumor with light rain</li>
-          <li>Quieter streets, earlier nights, bigger skies</li>
-        </ul>
+        <label class="pc-label" for="sf-pros">Pros</label>
+        <textarea id="sf-pros" data-save rows="4" aria-label="The Bay pros" placeholder="Sam ten minutes away… sourdough country…"></textarea>
+        <label class="pc-label" for="sf-cons">Cons</label>
+        <textarea id="sf-cons" data-save rows="4" aria-label="The Bay cons" placeholder="A red-eye from the East Coast…"></textarea>
       </div>
     </div>
 
@@ -855,7 +817,7 @@
       <div class="lean-row">
         <span class="end">Brooklyn</span>
         <input type="range" id="sort-lean" min="-5" max="5" step="1" value="0" data-default="0">
-        <span class="end">San Francisco</span>
+        <span class="end">The Bay</span>
       </div>
       <p id="lean-read" aria-live="polite">Truly torn — good. That means both are real.</p>
     </div>
@@ -918,8 +880,8 @@
 
     <div class="q card">
       <span class="num">VII</span>
-      <p class="ask">What stays in Philadelphia?</p>
-      <p class="hint">A habit, a worry, a version of you whose clerkship is complete.</p>
+      <p class="ask">What will you leave behind on purpose?</p>
+      <p class="hint">A habit, a worry, a routine that ended with the clerkship.</p>
       <textarea id="q7" data-save rows="2" aria-label="Answer to question seven"></textarea>
     </div>
 
@@ -1022,12 +984,13 @@
   function val(el){ var n = parseFloat(el.value); return isNaN(n) ? 0 : n; }
 
   /* ————— ledger ————— */
-  var amts = Array.prototype.slice.call(document.querySelectorAll('.amt'));
+  var staticAmts = Array.prototype.slice.call(document.querySelectorAll('.amt'));
   var landing = document.getElementById('landing-include');
+  var GROUPS = ['in','flights','road','monthly','landing'];
 
   function sum(group){
-    return amts.filter(function(a){ return a.dataset.group === group; })
-               .reduce(function(t,a){ return t + val(a); }, 0);
+    return Array.prototype.slice.call(document.querySelectorAll('.amt[data-group="'+group+'"]'))
+      .reduce(function(t,a){ return t + val(a); }, 0);
   }
 
   function recalc(){
@@ -1059,7 +1022,7 @@
     }
   }
 
-  amts.forEach(function(a){
+  staticAmts.forEach(function(a){
     var saved = read(a.id);
     a.value = (saved !== null && saved !== '') ? saved : a.dataset.default;
     a.addEventListener('input', function(){ store(a.id, a.value); recalc(); });
@@ -1071,9 +1034,82 @@
     landing.addEventListener('change', function(){ store('landing-include', landing.checked ? '1' : '0'); recalc(); });
   })();
 
+  /* custom rows — stored as JSON per section */
+  function loadCustom(g){ try{ return JSON.parse(read('custom:'+g) || '[]'); }catch(e){ return []; } }
+  function saveCustomRows(g, rows){ store('custom:'+g, JSON.stringify(rows)); }
+
+  function renderCustom(g){
+    var tb = document.getElementById('rows-'+g);
+    if (!tb) return;
+    Array.prototype.slice.call(tb.querySelectorAll('tr.custom-row')).forEach(function(tr){ tr.parentNode.removeChild(tr); });
+    loadCustom(g).forEach(function(row, i){
+      var tr = document.createElement('tr');
+      tr.className = 'custom-row';
+
+      var td1 = document.createElement('td');
+      var cell = document.createElement('div');
+      cell.className = 'custom-cell';
+      var lab = document.createElement('input');
+      lab.type = 'text';
+      lab.className = 'custom-label';
+      lab.placeholder = 'New line';
+      lab.value = row.label || '';
+      lab.setAttribute('aria-label', 'Line label');
+      lab.addEventListener('input', function(){
+        var rows = loadCustom(g); rows[i].label = lab.value; saveCustomRows(g, rows);
+      });
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'row-x';
+      x.textContent = '×';
+      x.title = 'Remove this line';
+      x.setAttribute('aria-label', 'Remove this line');
+      x.addEventListener('click', function(){
+        var rows = loadCustom(g); rows.splice(i, 1); saveCustomRows(g, rows);
+        renderCustom(g); recalc();
+      });
+      cell.appendChild(lab); cell.appendChild(x); td1.appendChild(cell);
+
+      var td2 = document.createElement('td');
+      td2.className = 'amt-td';
+      var wrap = document.createElement('div');
+      wrap.className = 'amt-wrap';
+      var amt = document.createElement('input');
+      amt.type = 'number'; amt.min = '0'; amt.step = '10';
+      amt.className = 'amt';
+      amt.setAttribute('data-group', g);
+      amt.setAttribute('aria-label', 'Amount, dollars');
+      amt.value = row.value || 0;
+      amt.addEventListener('input', function(){
+        var rows = loadCustom(g); rows[i].value = val(amt); saveCustomRows(g, rows); recalc();
+      });
+      wrap.appendChild(amt); td2.appendChild(wrap);
+
+      tr.appendChild(td1); tr.appendChild(td2);
+      tb.appendChild(tr);
+    });
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll('.add-row')).forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var g = btn.dataset.group;
+      var rows = loadCustom(g);
+      rows.push({label: '', value: 0});
+      saveCustomRows(g, rows);
+      renderCustom(g);
+      recalc();
+      var labs = document.getElementById('rows-'+g).querySelectorAll('.custom-label');
+      if (labs.length) labs[labs.length - 1].focus();
+    });
+  });
+
+  GROUPS.forEach(renderCustom);
+
   document.getElementById('reset-ledger').addEventListener('click', function(){
-    amts.forEach(function(a){ a.value = a.dataset.default; drop(a.id); });
+    if (!confirm('Reset every number to the starting guesses and remove added lines?')) return;
+    staticAmts.forEach(function(a){ a.value = a.dataset.default; drop(a.id); });
     landing.checked = false; drop('landing-include');
+    GROUPS.forEach(function(g){ drop('custom:'+g); renderCustom(g); });
     recalc();
   });
 
@@ -1086,8 +1122,8 @@
     if (v <= -4) t = 'The Hat says Brooklyn.';
     else if (v <= -1) t = 'Leaning Brooklyn…';
     else if (v === 0) t = 'Truly torn — good. That means both are real.';
-    else if (v <= 3) t = 'Leaning San Francisco…';
-    else t = 'The Hat says San Francisco.';
+    else if (v <= 3) t = 'Leaning toward the Bay…';
+    else t = 'The Hat says the Bay.';
     leanRead.textContent = t;
   }
   (function(){
