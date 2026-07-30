@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/charlottes-grand-adventure",
+      "destination": "/api/charlotte"
+    },
+    {
+      "source": "/charlottes-grand-adventure/",
+      "destination": "/api/charlotte"
+    },
+    {
+      "source": "/charlottes-grand-adventure/:path*",
+      "destination": "/api/charlotte"
+    },
+    {
       "source": "/milton-finance-review",
       "destination": "/api/milton-finance-review"
     },
