@@ -583,6 +583,7 @@
   }
   .owl span{transition:color .2s}
   .owl input:checked + span{color:var(--ink2);text-decoration:line-through;text-decoration-color:#a5791d88}
+  .owl-custom input[type=checkbox]:checked + .custom-label{color:var(--ink2);text-decoration:line-through;text-decoration-color:#a5791d88}
 
   /* ————— footer ————— */
   footer{
@@ -918,12 +919,12 @@
   <section id="owlpost">
     <p class="chapter-kicker">Chapter V</p>
     <h2>The Owl Post</h2>
-    <p class="chapter-note">The whole plan, as errands. Tick them off — the page remembers.</p>
+    <p class="chapter-note">Everything before wheels-up, as errands. Tick them off, add what I forgot — the page remembers.</p>
 
     <div class="card">
 
       <div class="owl-group">
-        <h3>Before wheels-up · August, Philadelphia <span class="prog" data-prog></span></h3>
+        <h3>Pre-leaving Philly <span class="prog" data-prog></span></h3>
         <label class="owl"><input type="checkbox" id="s1" data-save><span>Give notice and set the move-out date</span></label>
         <label class="owl"><input type="checkbox" id="s2" data-save><span>Book the storage unit — measure first; a 5×10 fits a one-bedroom that has edited itself</span></label>
         <label class="owl"><input type="checkbox" id="s3" data-save><span>Pick health insurance for Sep–Dec — marketplace usually beats COBRA; enroll inside the 60-day window</span></label>
@@ -932,35 +933,8 @@
         <label class="owl"><input type="checkbox" id="s6" data-save><span>Confirm Guatemala dates with the grant folks — and ask if airfare's covered</span></label>
         <label class="owl"><input type="checkbox" id="s7" data-save><span>Email three bakeries about a December stage — three sentences: who you are, when you're free, that you'll work for bread</span></label>
         <label class="owl"><input type="checkbox" id="s8" data-save><span>Forward the mail; photograph the storage unit before the door rolls down</span></label>
-      </div>
-
-      <div class="owl-group">
-        <h3>From the Bay · September <span class="prog" data-prog></span></h3>
-        <label class="owl"><input type="checkbox" id="s9" data-save><span>Book San Francisco → London once the couch replies land</span></label>
-        <label class="owl"><input type="checkbox" id="s10" data-save><span>Sketch the Europe route — two bases beat six cities</span></label>
-        <label class="owl"><input type="checkbox" id="s11" data-save><span>Buy the eSIM before takeoff</span></label>
-      </div>
-
-      <div class="owl-group">
-        <h3>From the road · October <span class="prog" data-prog></span></h3>
-        <label class="owl"><input type="checkbox" id="s12" data-save><span>Book the flight home, Europe → East Coast, ~Oct 15</span></label>
-        <label class="owl"><input type="checkbox" id="s13" data-save><span>Line up the New York couches</span></label>
-        <label class="owl"><input type="checkbox" id="s14" data-save><span>Call the bakeries back and pick the stage city — quietly, this is the Sorting</span></label>
-      </div>
-
-      <div class="owl-group">
-        <h3>Home · November <span class="prog" data-prog></span></h3>
-        <label class="owl"><input type="checkbox" id="s15" data-save><span>Guatemala, weeks one and two — ink the exact dates</span></label>
-        <label class="owl"><input type="checkbox" id="s16" data-save><span>November 30: the Hat speaks — Brooklyn or San Francisco</span></label>
-        <label class="owl"><input type="checkbox" id="s17" data-save><span>Tell everyone; recruit the apartment scouts</span></label>
-      </div>
-
-      <div class="owl-group">
-        <h3>The landing · December <span class="prog" data-prog></span></h3>
-        <label class="owl"><input type="checkbox" id="s18" data-save><span>Stage, weeks one and two — arrive early, leave floury</span></label>
-        <label class="owl"><input type="checkbox" id="s19" data-save><span>Hunt the apartment; sign the lease</span></label>
-        <label class="owl"><input type="checkbox" id="s20" data-save><span>Book the movers; empty the storage unit</span></label>
-        <label class="owl"><input type="checkbox" id="s21" data-save><span>Land. Begin the next book.</span></label>
+        <div id="todo-custom"></div>
+        <button class="add-row" type="button" id="add-todo">＋ Add a line</button>
       </div>
 
     </div>
@@ -1090,7 +1064,7 @@
     });
   }
 
-  Array.prototype.slice.call(document.querySelectorAll('.add-row')).forEach(function(btn){
+  Array.prototype.slice.call(document.querySelectorAll('.add-row[data-group]')).forEach(function(btn){
     btn.addEventListener('click', function(){
       var g = btn.dataset.group;
       var rows = loadCustom(g);
@@ -1161,6 +1135,59 @@
       if (el) el.textContent = done + ' of ' + boxes.length + ' owled';
     });
   }
+
+  /* ————— custom errands ————— */
+  function loadTodos(){ try{ return JSON.parse(read('custom:todo') || '[]'); }catch(e){ return []; } }
+  function saveTodos(t){ store('custom:todo', JSON.stringify(t)); }
+
+  function renderTodos(){
+    var host = document.getElementById('todo-custom');
+    if (!host) return;
+    host.innerHTML = '';
+    loadTodos().forEach(function(item, i){
+      var row = document.createElement('div');
+      row.className = 'owl owl-custom';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!item.done;
+      cb.setAttribute('aria-label', 'Done');
+      cb.addEventListener('change', function(){
+        var t = loadTodos(); t[i].done = cb.checked; saveTodos(t); updateProgress();
+      });
+      var lab = document.createElement('input');
+      lab.type = 'text';
+      lab.className = 'custom-label';
+      lab.placeholder = 'New errand';
+      lab.value = item.label || '';
+      lab.setAttribute('aria-label', 'Errand');
+      lab.addEventListener('input', function(){
+        var t = loadTodos(); t[i].label = lab.value; saveTodos(t);
+      });
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'row-x';
+      x.textContent = '×';
+      x.title = 'Remove this errand';
+      x.setAttribute('aria-label', 'Remove this errand');
+      x.addEventListener('click', function(){
+        var t = loadTodos(); t.splice(i, 1); saveTodos(t); renderTodos(); updateProgress();
+      });
+      row.appendChild(cb); row.appendChild(lab); row.appendChild(x);
+      host.appendChild(row);
+    });
+  }
+
+  document.getElementById('add-todo').addEventListener('click', function(){
+    var t = loadTodos();
+    t.push({label: '', done: false});
+    saveTodos(t);
+    renderTodos();
+    updateProgress();
+    var labs = document.querySelectorAll('#todo-custom .custom-label');
+    if (labs.length) labs[labs.length - 1].focus();
+  });
+
+  renderTodos();
 
   /* ————— copy answers ————— */
   document.getElementById('copy-answers').addEventListener('click', function(){
