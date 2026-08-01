@@ -80,6 +80,9 @@
     text-transform:uppercase;color:var(--gold)}
   .dayrow h2{font-size:.92rem;font-weight:600}
   .dayrow .cnt{font-family:var(--mono);font-size:.6rem;color:var(--faint)}
+  /* MUST stay: without display:flex the columns stack as blocks and the
+     stage columns fall off-screen. position:relative anchors .dayrow. */
+  .grid{display:flex;min-width:max-content;position:relative}
   .col{flex:none;width:var(--colw);border-right:1px solid var(--line);position:relative}
   .col.gut{width:var(--gutter);position:sticky;left:0;background:var(--bg);z-index:22}
   .col.person{width:var(--personw);background:rgba(59,122,92,.06)}
