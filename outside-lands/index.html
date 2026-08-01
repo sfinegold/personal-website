@@ -21,7 +21,7 @@
     --on-accent:#F7F5F0;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --ppm:1.7;                       /* pixels per minute of festival time */
-    --colw:116px; --personw:100px; --gutter:44px;
+    --colw:116px; --personw:100px; --gutter:44px; --miniw:26px;
   }
   body{background:var(--bg);color:var(--text);
     font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
@@ -86,6 +86,16 @@
   .col{flex:none;width:var(--colw);border-right:1px solid var(--line);position:relative}
   .col.gut{width:var(--gutter);position:sticky;left:0;background:var(--bg);z-index:22}
   .col.person{width:var(--personw);background:rgba(59,122,92,.06)}
+  /* the boundary between the festival's lineup and our own columns */
+  .col.person.sep,.headrow .col.person.sep{border-left:2px solid rgba(59,122,92,.45)}
+  /* collapsed side stages */
+  .col.mini,.headrow .col.mini{width:var(--miniw)}
+  .col.mini .head{padding:0}
+  .col.mini .head .nm{writing-mode:vertical-rl;transform:rotate(180deg);
+    font-size:.53rem;letter-spacing:.06em;max-height:38px;overflow:hidden}
+  .head.tog{cursor:pointer}
+  .head.tog:hover{background:var(--card)}
+  .minibar{position:absolute;left:4px;right:4px;border-radius:2px;opacity:.5}
   .col.person.active{background:rgba(59,122,92,.13)}
   .head{height:44px;display:flex;align-items:center;justify-content:center;gap:.3rem;
     border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);
@@ -161,7 +171,7 @@
     </div>
   </div>
   <p class="hint">Click an artist to hear a <b>30-second preview</b>. Hit <b>+</b> to add them to
-    your column on the left. Everyone's picks are shared — add a column for each friend.
+    your column on the right. Click a stage header to fold or unfold it. Everyone's picks are shared — add a column for each friend.
     A <b>red</b> block in someone's column means they double-booked themselves.</p>
 </header>
 
@@ -182,6 +192,12 @@
 const API='/api/outside-lands';
 const HUES=['#A8761E','#3F6485','#3B7A5C','#A34E60','#6E4E9E','#22758A','#B3561A','#525C6B'];
 let DAY=0, STATE={people:[]}, ME=localStorage.getItem('ol_me')||null, PLAYING=null;
+// Dolores', Duboce Triangle and Cocktail Magic start collapsed — they are the
+// side stages, and folding them lets the whole core lineup fit on one screen.
+let MINI=new Set(JSON.parse(localStorage.getItem('ol_mini')||'[5,6,7]'));
+const isMini=i=>MINI.has(i);
+function toggleMini(i){ MINI.has(i)?MINI.delete(i):MINI.add(i);
+  localStorage.setItem('ol_mini',JSON.stringify([...MINI])); render(); }
 
 const T0=688, T1=1342;   // padded either side so sets never crowd the day divider
 const ppm=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ppm'));
@@ -268,8 +284,9 @@ function timeCol(){
   });
   c.appendChild(b); return c;
 }
-function personCol(p){
-  const c=document.createElement('div'); c.className='col person'+(p.id===ME?' active':'');
+function personCol(p,first){
+  const c=document.createElement('div');
+  c.className='col person'+(p.id===ME?' active':'')+(first?' sep':'');
   const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
   OL.days.forEach((d,di)=>{
     const mine=allSets(di).filter(x=>(p.picks||[]).includes(x.k));
@@ -286,7 +303,7 @@ function personCol(p){
   c.appendChild(b); return c;
 }
 function stageCol(si){
-  const c=document.createElement('div'); c.className='col';
+  const c=document.createElement('div'); c.className='col'+(isMini(si)?' mini':'');
   const hue=HUES[si%HUES.length];
   const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
   OL.days.forEach((d,di)=>{
@@ -294,12 +311,18 @@ function stageCol(si){
       l.style.top=(dayTop(di)+(m-T0)*ppm())+'px';b.appendChild(l);}
     const st=d.stages[si]; if(!st) return;
     st.sets.forEach(x=>{
+      const top=dayTop(di)+(x.s-T0)*ppm(), h=Math.max(20,(x.e-x.s)*ppm()-3);
+      if(isMini(si)){                       // collapsed: just show that something is on
+        const bar=document.createElement('div'); bar.className='minibar';
+        bar.style.cssText=`top:${top}px;height:${h}px;background:${hue}`;
+        bar.title=x.a+' · '+x.st+'–'+x.et+'  (expand '+st.name+')';
+        b.appendChild(bar); return;
+      }
       const k=key(di,st.name,x.a,x.s), me=meObj();
       const picked=me&&(me.picks||[]).includes(k);
-      const h=Math.max(20,(x.e-x.s)*ppm()-3);
       const el=document.createElement('div');
       el.className='blk'+(picked?' picked':'')+(h<34?' tiny':'');
-      el.style.cssText=`top:${dayTop(di)+(x.s-T0)*ppm()}px;height:${h}px;--h:${hue}`;
+      el.style.cssText=`top:${top}px;height:${h}px;--h:${hue}`;
       el.innerHTML=`<div class="a">${esc(x.a)}</div><div class="t">${x.st}–${x.et}</div>`;
       el.title=x.a+' · '+x.st+'–'+x.et+' · '+st.name+'  (click to preview)';
       el.onclick=()=>playFor(x.a,el);
@@ -337,8 +360,21 @@ function render(){
   const hr=document.getElementById('headrow'); hr.innerHTML='';
   const gutH=document.createElement('div'); gutH.className='col gut';
   gutH.innerHTML='<div class="head"></div>'; hr.appendChild(gutH);
-  STATE.people.forEach(p=>{
-    const c=document.createElement('div'); c.className='col person'+(p.id===ME?' active':'');
+
+  // festival stages first; clicking a header folds or unfolds that stage
+  OL.days[0].stages.forEach((_,i)=>{
+    const c=document.createElement('div'); c.className='col'+(isMini(i)?' mini':'');
+    const hd=document.createElement('div'); hd.className='head tog';
+    hd.innerHTML=`<div class="nm" style="color:${HUES[i%HUES.length]}">${esc(STAGE_LABEL(i))}</div>`;
+    hd.title=(isMini(i)?'Expand ':'Collapse ')+STAGE_LABEL(i);
+    hd.onclick=()=>toggleMini(i);
+    c.appendChild(hd); hr.appendChild(c);
+  });
+
+  // our own columns, to the right of the lineup
+  STATE.people.forEach((p,idx)=>{
+    const c=document.createElement('div');
+    c.className='col person'+(p.id===ME?' active':'')+(idx===0?' sep':'');
     const hd=document.createElement('div'); hd.className='head';
     const nm=document.createElement('div'); nm.className='nm'; nm.textContent=p.name;
     nm.title='Double-click to rename';
@@ -347,17 +383,12 @@ function render(){
     x.onclick=()=>{if(confirm('Remove '+p.name+"'s column?"))act({action:'remove',id:p.id});};
     hd.append(nm,x); c.appendChild(hd); hr.appendChild(c);
   });
-  OL.days[0].stages.forEach((_,i)=>{
-    const c=document.createElement('div'); c.className='col';
-    c.innerHTML=`<div class="head"><div class="nm" style="color:${HUES[i%HUES.length]}">${esc(STAGE_LABEL(i))}</div></div>`;
-    hr.appendChild(c);
-  });
 
   // ---- the grid: all three days, one continuous scroll ----
   const g=document.getElementById('grid'); g.innerHTML='';
   g.appendChild(timeCol());
-  STATE.people.forEach(p=>g.appendChild(personCol(p)));
   OL.days[0].stages.forEach((_,i)=>g.appendChild(stageCol(i)));
+  STATE.people.forEach((p,idx)=>g.appendChild(personCol(p,idx===0)));
   g.style.height=totalH()+'px';
 
   // ---- day divider rows across the full width ----
