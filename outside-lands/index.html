@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Outside Lands 2026 — Planner</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/outside-lands/favicon.svg">
+<meta name="description" content="Set times for Outside Lands 2026 with 30-second previews and shared picks.">
+<meta property="og:title" content="Outside Lands 2026 — Planner">
+<meta property="og:description" content="All three days, every stage. Preview any artist, and plan alongside your friends.">
+<meta property="og:image" content="https://samfinegold.me/outside-lands/share.png">
+<meta property="og:url" content="https://samfinegold.me/outside-lands">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{
@@ -29,6 +35,8 @@
   .kick{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
     color:var(--gold);margin-bottom:.35rem}
   h1{font-size:1.3rem;font-weight:600;letter-spacing:-.01em}
+  .brand{display:flex;align-items:center;gap:.7rem}
+  .mark{border-radius:8px;flex:none;display:block}
   .bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.9rem}
   .tabs{display:flex;gap:.3rem;background:var(--card);border:1px solid var(--line);
     border-radius:8px;padding:.2rem}
@@ -51,7 +59,12 @@
   .hint b{color:var(--dim)}
 
   /* ---------- grid ---------- */
-  .wrap{overflow-x:auto;overflow-y:visible;position:relative}
+  /* Each day is its own scroll pane. This is what lets BOTH the stage header
+     row (sticky top) and the time gutter (sticky left) actually stick — a
+     page-level sticky can't work inside a horizontally scrolling container. */
+  .wrap{overflow:auto;position:relative;
+    height:min(780px,calc(100vh - 210px));min-height:400px;
+    border-top:1px solid var(--line)}
   .day{border-top:1px solid var(--line)}
   .day:first-child{border-top:0}
   .dayhead{position:sticky;left:0;display:flex;align-items:baseline;gap:.6rem;
@@ -62,13 +75,13 @@
   .dayhead .cnt{font-family:var(--mono);font-size:.62rem;color:var(--faint)}
   .grid{display:flex;min-width:max-content;position:relative}
   .col{flex:none;width:var(--colw);border-right:1px solid var(--line);position:relative}
-  .col.gut{width:var(--gutter);position:sticky;left:0;background:var(--bg);z-index:20}
+  .col.gut{width:var(--gutter);position:sticky;left:0;background:var(--bg);z-index:22}
   .col.person{width:var(--personw);background:rgba(59,122,92,.06)}
   .col.person.active{background:rgba(59,122,92,.13)}
   .head{height:44px;display:flex;align-items:center;justify-content:center;gap:.3rem;
     border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);
-    z-index:15;padding:0 .4rem;text-align:center}
-  .col.gut .head{background:var(--bg);z-index:25}
+    z-index:18;padding:0 .4rem;text-align:center;box-shadow:0 1px 0 var(--line)}
+  .col.gut .head{background:var(--bg);z-index:30}
   .head .nm{font-family:var(--mono);font-size:.57rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);line-height:1.15;overflow:hidden}
   .col.person .head .nm{color:var(--pick)}
@@ -81,27 +94,28 @@
     transform:translateY(-50%)}
 
   .blk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.28rem .35rem;
-    background:var(--card);border:1px solid var(--line);border-left:3px solid var(--h,#6b8aad);
+    background:#fff;border:1px solid rgba(28,32,38,.16);border-left:3px solid var(--h,#4A6E8F);
+    box-shadow:0 1px 2px rgba(28,32,38,.06);
     overflow:hidden;cursor:pointer;transition:background .12s}
-  .blk:hover{background:rgba(28,32,38,.07);border-color:rgba(28,32,38,.22)}
+  .blk:hover{background:#F1EDE5;border-color:rgba(28,32,38,.3)}
   .blk .a{font-size:.67rem;font-weight:600;line-height:1.15;
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .blk .t{font-family:var(--mono);font-size:.55rem;color:var(--faint);margin-top:1px}
   .blk .add{position:absolute;top:2px;right:2px;width:17px;height:17px;border-radius:4px;
-    border:1px solid var(--line);background:var(--bg2);color:var(--dim);font-size:.72rem;
+    border:1px solid rgba(28,32,38,.2);background:#F4F1EA;color:var(--dim);font-size:.72rem;
     line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
   .blk .add:hover{background:var(--pick);border-color:var(--pick);color:#fff}
-  .blk.picked{border-color:var(--pick);background:rgba(59,122,92,.14)}
+  .blk.picked{border-color:var(--pick);background:#E3F0E8}
   .blk.picked .add{background:var(--pick);border-color:var(--pick);color:#fff}
   .blk.playing{box-shadow:0 0 0 2px var(--gold) inset}
   .blk.tiny .t{display:none}
   .blk.tiny .a{-webkit-line-clamp:1;font-size:.62rem}
   .pblk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.25rem .35rem;
-    background:rgba(59,122,92,.16);border:1px solid rgba(59,122,92,.45);overflow:hidden}
+    background:#DCEDE3;border:1px solid rgba(59,122,92,.5);overflow:hidden}
   .pblk .a{font-size:.64rem;font-weight:600;line-height:1.15;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .pblk .t{font-family:var(--mono);font-size:.55rem;color:var(--faint)}
-  .pblk.clash{border-color:#C0392B;background:rgba(192,57,43,.14)}
+  .pblk.clash{border-color:#C0392B;background:#F8E2DE}
 
   /* ---------- now playing ---------- */
   .np{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
@@ -120,8 +134,13 @@
 </head>
 <body>
 <header>
-  <div class="kick">Golden Gate Park · Aug 7–9</div>
-  <h1>Outside Lands 2026 — planner</h1>
+  <div class="brand">
+    <img class="mark" src="/outside-lands/favicon.svg" alt="" width="34" height="34">
+    <div>
+      <div class="kick">Golden Gate Park · Aug 7–9</div>
+      <h1>Outside Lands 2026 — planner</h1>
+    </div>
+  </div>
   <div class="bar">
     <div class="tabs" id="tabs" role="tablist"></div>
     <div class="who">

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img"
+     aria-label="Sun behind fog over Golden Gate Park">
+  <!-- Original mark: low sun cut by fog banks — August in the park.
+       Deliberately not the festival's own logo. -->
+  <rect width="32" height="32" rx="7" fill="#2F6B50"/>
+  <circle cx="16" cy="19" r="8.5" fill="#E8B84B"/>
+  <!-- fog rolling across the sun -->
+  <rect x="1"  y="16.4" width="30" height="2.6" rx="1.3" fill="#F7F5F0" opacity=".93"/>
+  <rect x="4"  y="21.2" width="24" height="2.4" rx="1.2" fill="#F7F5F0" opacity=".8"/>
+  <rect x="8"  y="25.6" width="16" height="2.2" rx="1.1" fill="#F7F5F0" opacity=".6"/>
+  <!-- treeline -->
+  <path d="M2 30h28v2H2z" fill="#1F4A37"/>
+</svg>
