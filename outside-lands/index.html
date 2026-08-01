@@ -74,8 +74,8 @@
   .dayrow{position:absolute;left:0;height:var(--divh);display:flex;align-items:center;
     background:var(--bg2);border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);z-index:12}
-  .dayrow .lab{position:sticky;left:0;display:flex;align-items:baseline;gap:.55rem;
-    padding:0 .7rem;white-space:nowrap;background:var(--bg2)}
+  .dayrow .lab{position:sticky;left:0;display:flex;align-items:baseline;gap:.6rem;
+    padding:0 1rem;white-space:nowrap;background:var(--bg2)}
   .dayrow .n{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;
     text-transform:uppercase;color:var(--gold)}
   .dayrow h2{font-size:.92rem;font-weight:600}
@@ -99,8 +99,8 @@
   .body{position:relative}
   .hr{position:absolute;left:0;right:0;height:1px;background:var(--line);opacity:.5}
   .hr.half{opacity:.2}
-  .tick{position:absolute;right:5px;font-family:var(--mono);font-size:.58rem;color:var(--faint);
-    transform:translateY(-50%)}
+  .tick{position:absolute;left:5px;font-family:var(--mono);font-size:.58rem;color:var(--faint);
+    transform:translateY(-100%);padding-bottom:2px;line-height:1}
 
   .blk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.28rem .35rem;
     background:#fff;border:1px solid rgba(28,32,38,.16);border-left:3px solid var(--h,#4A6E8F);
@@ -183,7 +183,7 @@ const API='/api/outside-lands';
 const HUES=['#A8761E','#3F6485','#3B7A5C','#A34E60','#6E4E9E','#22758A','#B3561A','#525C6B'];
 let DAY=0, STATE={people:[]}, ME=localStorage.getItem('ol_me')||null, PLAYING=null;
 
-const T0=705, T1=1320;                       // minutes: 11:45am -> 10pm
+const T0=688, T1=1342;   // padded either side so sets never crowd the day divider
 const ppm=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ppm'));
 const y=m=>(m-T0)*ppm();
 const key=(d,st,a,s)=>`${d}|${st}|${a}|${s}`;
@@ -248,7 +248,7 @@ let tt; function toast(m){const t=document.getElementById('toast');t.textContent
   t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
 
 /* ---------------- render ---------------- */
-const DIVH=46;
+const DIVH=56;
 const dayH=()=>(T1-T0)*ppm();
 const dayTop=i=>i*(dayH()+DIVH)+DIVH;
 const totalH=()=>OL.days.length*(dayH()+DIVH);
@@ -365,8 +365,8 @@ function render(){
     const n=d.stages.reduce((a,st)=>a+st.sets.length,0);
     const row=document.createElement('div'); row.className='dayrow'; row.id='div-'+di;
     row.style.top=(di*(dayH()+DIVH))+'px'; row.style.width=g.scrollWidth+'px';
-    row.innerHTML=`<div class="lab"><span class="n">${esc(d.day.split(' ')[0])}</span>`+
-      `<h2>${esc(d.day)}</h2><span class="cnt">${n} sets · ${esc(d.stages[5].name)}</span></div>`;
+    row.innerHTML=`<div class="lab"><h2>${esc(d.day)}</h2>`+
+      `<span class="cnt">${n} sets · ${esc(d.stages[5].name)}</span></div>`;
     g.appendChild(row);
   });
   syncHead();
