@@ -59,21 +59,27 @@
   .hint b{color:var(--dim)}
 
   /* ---------- grid ---------- */
-  /* Each day is its own scroll pane. This is what lets BOTH the stage header
-     row (sticky top) and the time gutter (sticky left) actually stick — a
-     page-level sticky can't work inside a horizontally scrolling container. */
-  .wrap{overflow:auto;position:relative;
-    height:min(780px,calc(100vh - 210px));min-height:400px;
-    border-top:1px solid var(--line)}
-  .day{border-top:1px solid var(--line)}
-  .day:first-child{border-top:0}
-  .dayhead{position:sticky;left:0;display:flex;align-items:baseline;gap:.6rem;
-    padding:.85rem 1.25rem .55rem;width:max-content}
-  .dayhead h2{font-size:1rem;font-weight:600;letter-spacing:-.01em}
-  .dayhead .n{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;
+  /* Page scrolls vertically so a day runs to its last artist before the next
+     begins. The header row therefore CANNOT live inside the horizontally
+     scrolling grid — a sticky-top there would have nothing to stick to. It sits
+     outside as its own strip and mirrors the grid's scrollLeft. */
+  .wrap{overflow-x:auto;overflow-y:visible;position:relative}
+  .headbar{position:sticky;top:var(--hh,132px);z-index:35;overflow:hidden;
+    background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .headrow{display:flex;min-width:max-content;will-change:transform}
+  .headrow .col{border-right:1px solid var(--line);flex:none;width:var(--colw)}
+  .headrow .col.gut{width:var(--gutter)}
+  .headrow .col.person{width:var(--personw);background:rgba(59,122,92,.09)}
+  .headrow .col.person.active{background:rgba(59,122,92,.18)}
+  .dayrow{position:absolute;left:0;height:var(--divh);display:flex;align-items:center;
+    background:var(--bg2);border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);z-index:12}
+  .dayrow .lab{position:sticky;left:0;display:flex;align-items:baseline;gap:.55rem;
+    padding:0 .7rem;white-space:nowrap;background:var(--bg2)}
+  .dayrow .n{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;
     text-transform:uppercase;color:var(--gold)}
-  .dayhead .cnt{font-family:var(--mono);font-size:.62rem;color:var(--faint)}
-  .grid{display:flex;min-width:max-content;position:relative}
+  .dayrow h2{font-size:.92rem;font-weight:600}
+  .dayrow .cnt{font-family:var(--mono);font-size:.6rem;color:var(--faint)}
   .col{flex:none;width:var(--colw);border-right:1px solid var(--line);position:relative}
   .col.gut{width:var(--gutter);position:sticky;left:0;background:var(--bg);z-index:22}
   .col.person{width:var(--personw);background:rgba(59,122,92,.06)}
@@ -156,7 +162,8 @@
     A <b>red</b> block in someone's column means they double-booked themselves.</p>
 </header>
 
-<div id="days"></div>
+<div class="headbar" id="headbar"><div class="headrow" id="headrow"></div></div>
+<div class="wrap" id="wrap"><div class="grid" id="grid"></div></div>
 
 <div class="np" id="np">
   <img id="npArt" alt="">
@@ -238,126 +245,139 @@ let tt; function toast(m){const t=document.getElementById('toast');t.textContent
   t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
 
 /* ---------------- render ---------------- */
+const DIVH=46;
+const dayH=()=>(T1-T0)*ppm();
+const dayTop=i=>i*(dayH()+DIVH)+DIVH;
+const totalH=()=>OL.days.length*(dayH()+DIVH);
+const STAGE_LABEL=i=>i===5?"Dolores'":OL.days[0].stages[i].name;
+
+/* ---- columns (each spans all three days) ---- */
 function timeCol(){
   const c=document.createElement('div'); c.className='col gut';
-  c.innerHTML='<div class="head"></div>';
-  const b=document.createElement('div'); b.className='body';
-  b.style.height=y(T1)+'px';
-  for(let m=720;m<=1320;m+=30){
-    const line=document.createElement('div');
-    line.className='hr'+(m%60?' half':''); line.style.top=y(m)+'px'; b.appendChild(line);
-    if(m%60===0){ const t=document.createElement('div'); t.className='tick';
-      t.style.top=y(m)+'px'; t.textContent=label(m); b.appendChild(t); }
-  }
-  c.appendChild(b); return c;
-}
-function personCol(p,di){
-  const c=document.createElement('div');
-  c.className='col person'+(p.id===ME?' active':'');
-  const hd=document.createElement('div'); hd.className='head';
-  const nm=document.createElement('div'); nm.className='nm'; nm.textContent=p.name;
-  nm.title='Double-click to rename';
-  nm.ondblclick=()=>{const n=prompt('Rename column',p.name); if(n) act({action:'rename',id:p.id,name:n});};
-  const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Remove column';
-  x.onclick=()=>{ if(confirm('Remove '+p.name+"'s column?")) act({action:'remove',id:p.id}); };
-  hd.append(nm,x); c.appendChild(hd);
-
-  const b=document.createElement('div'); b.className='body'; b.style.height=y(T1)+'px';
-  for(let m=720;m<=1320;m+=60){const l=document.createElement('div');l.className='hr';
-    l.style.top=y(m)+'px';b.appendChild(l);}
-  const mine=allSets(di).filter(s=>(p.picks||[]).includes(s.k));
-  mine.forEach(s=>{
-    const clash=mine.some(o=>o!==s && o.s<s.e && s.s<o.e);
-    const d=document.createElement('div'); d.className='pblk'+(clash?' clash':'');
-    d.style.top=y(s.s)+'px'; d.style.height=Math.max(20,(s.e-s.s)*ppm()-3)+'px';
-    d.innerHTML=`<div class="a">${esc(s.a)}</div><div class="t">${s.st}</div>`;
-    d.title=s.a+' · '+s.stage+' · '+s.st+'–'+s.et+(clash?'  ⚠ overlaps another pick':'');
-    b.appendChild(d);
+  const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
+  OL.days.forEach((d,di)=>{
+    for(let m=720;m<=1320;m+=30){
+      const l=document.createElement('div'); l.className='hr'+(m%60?' half':'');
+      l.style.top=(dayTop(di)+(m-T0)*ppm())+'px'; b.appendChild(l);
+      if(m%60===0){const t=document.createElement('div'); t.className='tick';
+        t.style.top=(dayTop(di)+(m-T0)*ppm())+'px'; t.textContent=label(m); b.appendChild(t);}
+    }
   });
   c.appendChild(b); return c;
 }
-function stageCol(st,i,di){
+function personCol(p){
+  const c=document.createElement('div'); c.className='col person'+(p.id===ME?' active':'');
+  const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
+  OL.days.forEach((d,di)=>{
+    const mine=allSets(di).filter(x=>(p.picks||[]).includes(x.k));
+    mine.forEach(x=>{
+      const clash=mine.some(o=>o!==x && o.s<x.e && x.s<o.e);
+      const el=document.createElement('div'); el.className='pblk'+(clash?' clash':'');
+      el.style.top=(dayTop(di)+(x.s-T0)*ppm())+'px';
+      el.style.height=Math.max(20,(x.e-x.s)*ppm()-3)+'px';
+      el.innerHTML=`<div class="a">${esc(x.a)}</div><div class="t">${x.st}</div>`;
+      el.title=x.a+' · '+x.stage+' · '+x.st+'–'+x.et+(clash?'  ⚠ overlaps another pick':'');
+      b.appendChild(el);
+    });
+  });
+  c.appendChild(b); return c;
+}
+function stageCol(si){
   const c=document.createElement('div'); c.className='col';
-  const hue=HUES[i%HUES.length];
-  c.innerHTML=`<div class="head"><div class="nm" style="color:${hue}">${esc(st.name)}</div></div>`;
-  const b=document.createElement('div'); b.className='body'; b.style.height=y(T1)+'px';
-  for(let m=720;m<=1320;m+=60){const l=document.createElement('div');l.className='hr';
-    l.style.top=y(m)+'px';b.appendChild(l);}
-  st.sets.forEach(s=>{
-    const k=key(di,st.name,s.a,s.s), me=meObj();
-    const picked=me&&(me.picks||[]).includes(k);
-    const h=Math.max(20,(s.e-s.s)*ppm()-3);
-    const d=document.createElement('div');
-    d.className='blk'+(picked?' picked':'')+(h<34?' tiny':'');
-    d.style.cssText=`top:${y(s.s)}px;height:${h}px;--h:${hue}`;
-    d.innerHTML=`<div class="a">${esc(s.a)}</div><div class="t">${s.st}–${s.et}</div>`;
-    d.title=s.a+' · '+s.st+'–'+s.et+' · '+st.name+'  (click to preview)';
-    d.onclick=()=>playFor(s.a,d);
-    const add=document.createElement('button');
-    add.className='add'; add.textContent=picked?'✓':'+';
-    add.title=me?(picked?'Remove from '+me.name:'Add to '+me.name):'Add a column first';
-    add.onclick=ev=>{ ev.stopPropagation();
-      if(!me){ toast('Add a column with your name first'); return; }
-      act({action:'toggle',id:me.id,setKey:k}); };
-    d.appendChild(add); b.appendChild(d);
+  const hue=HUES[si%HUES.length];
+  const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
+  OL.days.forEach((d,di)=>{
+    for(let m=720;m<=1320;m+=60){const l=document.createElement('div');l.className='hr';
+      l.style.top=(dayTop(di)+(m-T0)*ppm())+'px';b.appendChild(l);}
+    const st=d.stages[si]; if(!st) return;
+    st.sets.forEach(x=>{
+      const k=key(di,st.name,x.a,x.s), me=meObj();
+      const picked=me&&(me.picks||[]).includes(k);
+      const h=Math.max(20,(x.e-x.s)*ppm()-3);
+      const el=document.createElement('div');
+      el.className='blk'+(picked?' picked':'')+(h<34?' tiny':'');
+      el.style.cssText=`top:${dayTop(di)+(x.s-T0)*ppm()}px;height:${h}px;--h:${hue}`;
+      el.innerHTML=`<div class="a">${esc(x.a)}</div><div class="t">${x.st}–${x.et}</div>`;
+      el.title=x.a+' · '+x.st+'–'+x.et+' · '+st.name+'  (click to preview)';
+      el.onclick=()=>playFor(x.a,el);
+      const add=document.createElement('button');
+      add.className='add'; add.textContent=picked?'✓':'+';
+      add.title=me?(picked?'Remove from '+me.name:'Add to '+me.name):'Add a column first';
+      add.onclick=ev=>{ev.stopPropagation();
+        if(!me){toast('Add a column with your name first');return;}
+        act({action:'toggle',id:me.id,setKey:k});};
+      el.appendChild(add); b.appendChild(el);
+    });
   });
   c.appendChild(b); return c;
 }
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
 function render(){
-  // nav — jumps to the day rather than swapping the grid
+  // nav jumps to a day
   const tabs=document.getElementById('tabs'); tabs.innerHTML='';
   OL.days.forEach((d,i)=>{
     const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab');
     b.setAttribute('aria-selected',i===DAY); b.textContent=d.day.split(' ')[0];
-    b.onclick=()=>{
-      DAY=i;
-      const el=document.getElementById('day-'+i);
-      const top=el.getBoundingClientRect().top+window.scrollY
-                -document.querySelector('header').offsetHeight-6;
-      window.scrollTo({top,behavior:'smooth'});
-      document.querySelectorAll('.tab').forEach((t,j)=>t.setAttribute('aria-selected',j===i));
-    };
+    b.onclick=()=>{DAY=i; const el=document.getElementById('div-'+i);
+      const y0=el.getBoundingClientRect().top+window.scrollY-headH()-DIVH;
+      window.scrollTo({top:y0,behavior:'smooth'});};
     tabs.appendChild(b);
   });
-
-  // person picker
   const sel=document.getElementById('me'); sel.innerHTML='';
   if(!STATE.people.length) sel.innerHTML='<option>— add a column —</option>';
   STATE.people.forEach(p=>{const o=document.createElement('option');
     o.value=p.id;o.textContent=p.name;o.selected=p.id===ME;sel.appendChild(o);});
   sel.onchange=()=>{ME=sel.value;localStorage.setItem('ol_me',ME);render();};
 
-  // one section per day, all on the page
-  const host=document.getElementById('days'); host.innerHTML='';
-  OL.days.forEach((d,di)=>{
-    const sec=document.createElement('section'); sec.className='day'; sec.id='day-'+di;
-    const n=d.stages.reduce((a,st)=>a+st.sets.length,0);
-    const hd=document.createElement('div'); hd.className='dayhead';
-    hd.innerHTML=`<span class="n">${esc(d.day.split(' ')[0])}</span>`+
-                 `<h2>${esc(d.day)}</h2><span class="cnt">${n} sets</span>`;
-    sec.appendChild(hd);
-    const wrap=document.createElement('div'); wrap.className='wrap';
-    const g=document.createElement('div'); g.className='grid';
-    g.appendChild(timeCol());
-    STATE.people.forEach(p=>g.appendChild(personCol(p,di)));
-    d.stages.forEach((st,i)=>g.appendChild(stageCol(st,i,di)));
-    wrap.appendChild(g); sec.appendChild(wrap); host.appendChild(sec);
+  // ---- the one header row, outside the scroller ----
+  const hr=document.getElementById('headrow'); hr.innerHTML='';
+  const gutH=document.createElement('div'); gutH.className='col gut';
+  gutH.innerHTML='<div class="head"></div>'; hr.appendChild(gutH);
+  STATE.people.forEach(p=>{
+    const c=document.createElement('div'); c.className='col person'+(p.id===ME?' active':'');
+    const hd=document.createElement('div'); hd.className='head';
+    const nm=document.createElement('div'); nm.className='nm'; nm.textContent=p.name;
+    nm.title='Double-click to rename';
+    nm.ondblclick=()=>{const n=prompt('Rename column',p.name);if(n)act({action:'rename',id:p.id,name:n});};
+    const x=document.createElement('button'); x.className='x'; x.textContent='×';
+    x.onclick=()=>{if(confirm('Remove '+p.name+"'s column?"))act({action:'remove',id:p.id});};
+    hd.append(nm,x); c.appendChild(hd); hr.appendChild(c);
+  });
+  OL.days[0].stages.forEach((_,i)=>{
+    const c=document.createElement('div'); c.className='col';
+    c.innerHTML=`<div class="head"><div class="nm" style="color:${HUES[i%HUES.length]}">${esc(STAGE_LABEL(i))}</div></div>`;
+    hr.appendChild(c);
   });
 
-  // highlight whichever day you have scrolled to
-  if(!render._obs){
-    render._obs=new IntersectionObserver(es=>{
-      es.forEach(e=>{ if(e.isIntersecting){
-        const i=+e.target.id.split('-')[1];
-        document.querySelectorAll('.tab').forEach((t,j)=>t.setAttribute('aria-selected',j===i));
-      }});
-    },{rootMargin:'-25% 0px -65% 0px'});
-  }
-  render._obs.disconnect();
-  document.querySelectorAll('.day').forEach(el=>render._obs.observe(el));
+  // ---- the grid: all three days, one continuous scroll ----
+  const g=document.getElementById('grid'); g.innerHTML='';
+  g.appendChild(timeCol());
+  STATE.people.forEach(p=>g.appendChild(personCol(p)));
+  OL.days[0].stages.forEach((_,i)=>g.appendChild(stageCol(i)));
+  g.style.height=totalH()+'px';
+
+  // ---- day divider rows across the full width ----
+  OL.days.forEach((d,di)=>{
+    const n=d.stages.reduce((a,st)=>a+st.sets.length,0);
+    const row=document.createElement('div'); row.className='dayrow'; row.id='div-'+di;
+    row.style.top=(di*(dayH()+DIVH))+'px'; row.style.width=g.scrollWidth+'px';
+    row.innerHTML=`<div class="lab"><span class="n">${esc(d.day.split(' ')[0])}</span>`+
+      `<h2>${esc(d.day)}</h2><span class="cnt">${n} sets · ${esc(d.stages[5].name)}</span></div>`;
+    g.appendChild(row);
+  });
+  syncHead();
 }
+
+function headH(){return document.querySelector('header').offsetHeight;}
+function syncHead(){
+  const w=document.getElementById('wrap');
+  document.getElementById('headrow').style.transform='translateX('+(-w.scrollLeft)+'px)';
+  document.documentElement.style.setProperty('--hh',headH()+'px');
+  document.documentElement.style.setProperty('--divh',DIVH+'px');
+}
+document.getElementById('wrap').addEventListener('scroll',syncHead,{passive:true});
+addEventListener('resize',syncHead);
 
 document.getElementById('addBtn').onclick=()=>{
   const i=document.getElementById('newname'); const n=i.value.trim();
