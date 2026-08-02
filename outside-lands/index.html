@@ -98,8 +98,10 @@
   .col.mini .head{padding:0}
   .col.mini .head .nm{writing-mode:vertical-rl;transform:rotate(180deg);
     font-size:.53rem;letter-spacing:.06em;max-height:38px;overflow:hidden}
+  /* stage heads are painted with the stage's own colour inline, so a background
+     hover would be overridden — brighten the fill instead */
   .head.tog{cursor:pointer}
-  .head.tog:hover{background:var(--card)}
+  .head.tog:hover{filter:brightness(1.12)}
   .minibar{position:absolute;left:4px;right:4px;border-radius:2px;opacity:.5}
   .col.person.active{background:rgba(59,122,92,.13)}
   .head{height:44px;display:flex;align-items:center;justify-content:center;gap:.3rem;
@@ -108,7 +110,9 @@
   .col.gut .head{background:var(--bg);z-index:30}
   .head .nm{font-family:var(--mono);font-size:.57rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);line-height:1.15;overflow:hidden}
-  .col.person .head .nm{color:var(--pick)}
+  /* stage names sit on their stage colour, so they carry their own weight */
+  .head.tog .nm{font-weight:700;letter-spacing:.06em}
+  .col.person .head .nm{color:var(--pick);font-weight:700;font-size:.72rem;letter-spacing:.02em}
   .head .x{background:none;border:0;color:var(--faint);cursor:pointer;font-size:.85rem;padding:0 2px}
   .head .x:hover{color:#C0392B}
   .body{position:relative}
@@ -391,6 +395,16 @@ function stageCol(si){
 }
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
+/* Stage headers are filled with the stage's colour, so the label has to be
+   whichever of white or near-black reads better on it. Picked by WCAG contrast
+   rather than by eye — the gold stage needs dark text where the rest need white. */
+function bestText(hex){
+  const c=[1,3,5].map(i=>parseInt(hex.substr(i,2),16)/255)
+    .map(v=>v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4));
+  const L=.2126*c[0]+.7152*c[1]+.0722*c[2];
+  return (1.05/(L+.05)) >= ((L+.05)/.0575) ? '#FFFFFF' : '#12161C';
+}
+
 function render(){
   // nav jumps to a day
   const tabs=document.getElementById('tabs'); tabs.innerHTML='';
@@ -417,7 +431,9 @@ function render(){
   OL.days[0].stages.forEach((_,i)=>{
     const c=document.createElement('div'); c.className='col'+(isMini(i)?' mini':'');
     const hd=document.createElement('div'); hd.className='head tog';
-    hd.innerHTML=`<div class="nm" style="color:${HUES[i%HUES.length]}">${esc(STAGE_LABEL(i))}</div>`;
+    const hue=HUES[i%HUES.length];
+    hd.style.background=hue;
+    hd.innerHTML=`<div class="nm" style="color:${bestText(hue)}">${esc(STAGE_LABEL(i))}</div>`;
     hd.title=(isMini(i)?'Expand ':'Collapse ')+STAGE_LABEL(i);
     hd.onclick=()=>toggleMini(i);
     c.appendChild(hd); hr.appendChild(c);
