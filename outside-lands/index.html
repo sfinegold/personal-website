@@ -156,11 +156,16 @@
   .blk.tiny .add{height:11px;width:22px;bottom:1px;font-size:.6rem}
   .pblk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.15rem .3rem;
     background:rgba(215,235,224,.62);border:1px solid rgba(59,122,92,.65);overflow:hidden}
-  .pblk .a,.pblk .t{position:relative}   /* text stays crisp over the wash */
+  .pblk .a,.pblk .t{position:relative;z-index:1}   /* text stays crisp over the wash */
+  /* Only the minutes that actually collide are marked, not the whole set — a
+     45-minute act clipping the last 10 minutes of another is a different
+     problem from two acts sitting straight on top of each other. */
+  .pblk .lap{position:absolute;left:0;right:0;z-index:0;pointer-events:none;
+    background:rgba(192,57,43,.26);
+    border-top:1px solid rgba(192,57,43,.55);border-bottom:1px solid rgba(192,57,43,.55)}
   .pblk .a{font-size:.63rem;font-weight:600;line-height:1.1;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .pblk .t{font-family:var(--mono);font-size:.55rem;color:var(--faint)}
-  .pblk.clash{border-color:#C0392B;background:rgba(246,215,210,.62)}
 
   /* ---------- now playing ---------- */
   .np{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
@@ -221,7 +226,7 @@
     <summary>How it works</summary>
     <p>Click an artist to hear a <b>30-second preview</b>. Hit <b>+</b> to add them to
       your column on the right. Click a stage header to fold or unfold it. Everyone's picks are shared — add a column for each friend.
-      A <b>red</b> block in someone's column means they double-booked themselves.</p>
+      A <b>red</b> band in someone's column marks the exact minutes two of their picks collide.</p>
   </details>
 </header>
 
@@ -264,6 +269,22 @@ function allSets(di){
     out.push({...s, stage:st.name, k:key(di,st.name,s.a,s.s)}))); return out;
 }
 const meObj=()=>STATE.people.find(p=>p.id===ME)||null;
+
+/* The stretches of `x` that collide with any other pick that day, merged so
+   three-way pileups produce one band rather than three stacked ones. */
+function overlaps(x,mine){
+  const raw=[];
+  mine.forEach(o=>{ if(o===x) return;
+    const s=Math.max(o.s,x.s), e=Math.min(o.e,x.e);
+    if(s<e) raw.push([s,e]);
+  });
+  raw.sort((a,b)=>a[0]-b[0]);
+  return raw.reduce((out,l)=>{
+    const last=out[out.length-1];
+    if(last && l[0]<=last[1]) last[1]=Math.max(last[1],l[1]); else out.push(l.slice());
+    return out;
+  },[]);
+}
 
 /* ---------------- API ---------------- */
 async function pull(){
@@ -345,13 +366,23 @@ function personCol(p,first){
     const mine=allSets(di).filter(x=>(p.picks||[]).includes(x.k))
                           .sort((a,b)=>a.s-b.s||a.e-b.e);
     mine.forEach((x,idx)=>{
-      const clash=mine.some(o=>o!==x && o.s<x.e && x.s<o.e);
-      const el=document.createElement('div'); el.className='pblk'+(clash?' clash':'');
+      const laps=overlaps(x,mine);
+      const h=Math.max(20,(x.e-x.s)*ppm()-3);
+      const el=document.createElement('div'); el.className='pblk';
       el.style.top=(dayTop(di)+(x.s-T0)*ppm())+'px';
-      el.style.height=Math.max(20,(x.e-x.s)*ppm()-3)+'px';
+      el.style.height=h+'px';
       el.style.zIndex=10+idx;          // sorted by start, so later overlaps earlier
       el.innerHTML=`<div class="a">${esc(x.a)}</div><div class="t">${x.st}</div>`;
-      el.title=x.a+' · '+x.stage+' · '+x.st+'–'+x.et+(clash?'  ⚠ overlaps another pick':'');
+      // one red band per collision, positioned by clock time within the card
+      laps.forEach(([s,e])=>{
+        const t=Math.min((s-x.s)*ppm(),h);
+        const lap=document.createElement('div'); lap.className='lap';
+        lap.style.top=t+'px';
+        lap.style.height=Math.max(2,Math.min((e-s)*ppm(),h-t))+'px';
+        el.appendChild(lap);
+      });
+      el.title=x.a+' · '+x.stage+' · '+x.st+'–'+x.et+
+        (laps.length?'  ⚠ overlaps '+laps.map(([s,e])=>hm(s)+'–'+hm(e)).join(', '):'');
       b.appendChild(el);
     });
   });
