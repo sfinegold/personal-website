@@ -20,7 +20,7 @@
     --accent:#4A6E8F; --accent-hi:#33556F; --gold:#A8761E; --pick:#3B7A5C;
     --on-accent:#F7F5F0;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    --ppm:1.7;                       /* pixels per minute of festival time */
+    --ppm:1.45;                      /* pixels per minute of festival time */
     --colw:116px; --personw:100px; --gutter:44px; --miniw:26px;
   }
   body{background:var(--bg);color:var(--text);
@@ -30,21 +30,18 @@
   :focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px;border-radius:4px}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-  header{padding:1.5rem 1.25rem .9rem;border-bottom:1px solid var(--line);
+  header{padding:.6rem .75rem .5rem;border-bottom:1px solid var(--line);
     position:sticky;top:0;background:var(--bg);z-index:40}
-  .kick{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--gold);margin-bottom:.35rem}
-  h1{font-size:1.3rem;font-weight:600;letter-spacing:-.01em}
-  .brand{display:flex;align-items:center;gap:.7rem}
-  .mark{border-radius:8px;flex:none;display:block}
-  .bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.9rem}
+  h1{font-size:.95rem;font-weight:600;letter-spacing:.02em;text-align:center}
+  .bar{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;justify-content:center;
+    margin-top:.5rem}
   .tabs{display:flex;gap:.3rem;background:var(--card);border:1px solid var(--line);
     border-radius:8px;padding:.2rem}
   .tab{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;
     padding:.4rem .8rem;border:0;border-radius:6px;background:transparent;color:var(--dim);
     cursor:pointer}
   .tab[aria-selected="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
-  .who{display:flex;gap:.4rem;align-items:center;margin-left:auto;flex-wrap:wrap}
+  .who{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:center}
   .who label{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
     text-transform:uppercase;color:var(--faint)}
   select,input[type=text]{background:var(--bg2);color:var(--text);border:1px solid var(--line);
@@ -55,15 +52,24 @@
   .btn:hover{background:var(--accent);color:var(--on-accent)}
   .btn.ghost{border-color:var(--line);color:var(--dim)}
   .btn.ghost:hover{background:var(--card);color:var(--text)}
-  .hint{font-size:.78rem;color:var(--faint);margin-top:.6rem}
-  .hint b{color:var(--dim)}
+  /* the instructions still exist, but folded away so the header stays one strip */
+  .howto{margin-top:.45rem;text-align:center}
+  .howto summary{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);cursor:pointer;list-style:none}
+  .howto summary::-webkit-details-marker{display:none}
+  .howto summary:hover{color:var(--dim)}
+  .howto p{font-size:.78rem;color:var(--faint);margin-top:.5rem;text-align:left;
+    max-width:46rem;margin-inline:auto}
+  .howto b{color:var(--dim)}
 
   /* ---------- grid ---------- */
   /* Page scrolls vertically so a day runs to its last artist before the next
      begins. The header row therefore CANNOT live inside the horizontally
      scrolling grid — a sticky-top there would have nothing to stick to. It sits
      outside as its own strip and mirrors the grid's scrollLeft. */
-  .wrap{overflow-x:auto;overflow-y:visible;position:relative}
+  .wrap{overflow-x:auto;overflow-y:visible;position:relative;
+    -webkit-overflow-scrolling:touch;   /* momentum panning on iOS */
+    overscroll-behavior-x:contain}      /* a sideways swipe never triggers back-nav */
   .headbar{position:sticky;top:var(--hh,132px);z-index:35;overflow:hidden;
     background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .headrow{display:flex;min-width:max-content;will-change:transform}
@@ -71,15 +77,14 @@
   .headrow .col.gut{width:var(--gutter)}
   .headrow .col.person{width:var(--personw);background:rgba(59,122,92,.09)}
   .headrow .col.person.active{background:rgba(59,122,92,.18)}
-  .dayrow{position:absolute;left:0;height:var(--divh);display:flex;align-items:center;
+  /* left/right rather than a JS width, so the band still spans the whole grid
+     after a rotate or resize changes the column widths */
+  .dayrow{position:absolute;left:0;right:0;height:var(--divh);display:flex;align-items:center;
     background:var(--bg2);border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);z-index:12}
   .dayrow .lab{position:sticky;left:var(--gutter);display:flex;align-items:baseline;gap:.6rem;
     padding:0 1rem;white-space:nowrap;background:var(--bg2)}
-  .dayrow .n{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--gold)}
-  .dayrow h2{font-size:.92rem;font-weight:600}
-  .dayrow .cnt{font-family:var(--mono);font-size:.6rem;color:var(--faint)}
+  .dayrow h2{font-size:.85rem;font-weight:600}
   /* MUST stay: without display:flex the columns stack as blocks and the
      stage columns fall off-screen. position:relative anchors .dayrow. */
   .grid{display:flex;min-width:max-content;position:relative}
@@ -115,30 +120,40 @@
   /* padding-bottom reserves the strip the centred + button sits in; .txt is
      what actually clips, since overflow on .blk would still spill into padding */
   .blk .txt{height:100%;overflow:hidden}
-  .blk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.28rem .35rem 18px;
+  .blk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.18rem .3rem 15px;
     background:#fff;border:1px solid rgba(28,32,38,.16);border-left:3px solid var(--h,#4A6E8F);
     box-shadow:0 1px 2px rgba(28,32,38,.06);
     overflow:hidden;cursor:pointer;transition:background .12s}
   .blk:hover{background:#F1EDE5;border-color:rgba(28,32,38,.3)}
-  .blk .a{font-size:.67rem;font-weight:600;line-height:1.15;
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .blk .t{font-family:var(--mono);font-size:.55rem;color:var(--faint);margin-top:1px}
+  .blk .a{font-size:.67rem;font-weight:600;line-height:1.1;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  /* nowrap: "12:10 PM–12:55 PM" is wider than a column, and letting it wrap to a
+     second line was pushing the time out of the card's visible area */
+  .blk .t{font-family:var(--mono);font-size:.53rem;line-height:1.2;color:var(--faint);
+    margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .blk .add{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
-    width:30px;height:15px;border-radius:8px;
-    border:1px solid rgba(28,32,38,.2);background:#F4F1EA;color:var(--dim);font-size:.7rem;
+    width:28px;height:13px;border-radius:7px;
+    border:1px solid rgba(28,32,38,.2);background:#F4F1EA;color:var(--dim);font-size:.68rem;
     line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
   .blk .add:hover{background:var(--pick);border-color:var(--pick);color:#fff}
   .blk.picked{border-color:var(--pick);background:#E3F0E8}
   .blk.picked .add{background:var(--pick);border-color:var(--pick);color:#fff}
   .blk.playing{box-shadow:0 0 0 2px var(--gold) inset}
-  .blk.tiny{padding-bottom:15px}
+  /* Cards are sized by set length, so the short ones have to give something up.
+     .short (a 30-minute set) drops the time row; .tiny (20 minutes) drops the
+     second line of the name too. Both shrink the + strip to match. */
+  .blk.short{padding:.15rem .3rem 14px}
+  .blk.short .t{display:none}
+  .blk.short .a{font-size:.63rem}
+  .blk.short .add{height:12px;width:26px;bottom:1px}
+  .blk.tiny{padding:.1rem .28rem 12px}
   .blk.tiny .t{display:none}
-  .blk.tiny .a{-webkit-line-clamp:1;font-size:.62rem}
-  .blk.tiny .add{height:13px;width:26px;bottom:1px}
-  .pblk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.25rem .35rem;
+  .blk.tiny .a{-webkit-line-clamp:1;font-size:.6rem;line-height:1.05}
+  .blk.tiny .add{height:11px;width:22px;bottom:1px;font-size:.6rem}
+  .pblk{position:absolute;left:3px;right:3px;border-radius:6px;padding:.15rem .3rem;
     background:rgba(215,235,224,.62);border:1px solid rgba(59,122,92,.65);overflow:hidden}
   .pblk .a,.pblk .t{position:relative}   /* text stays crisp over the wash */
-  .pblk .a{font-size:.64rem;font-weight:600;line-height:1.15;
+  .pblk .a{font-size:.63rem;font-weight:600;line-height:1.1;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .pblk .t{font-family:var(--mono);font-size:.55rem;color:var(--faint)}
   .pblk.clash{border-color:#C0392B;background:rgba(246,215,210,.62)}
@@ -156,17 +171,38 @@
     border:1px solid var(--line);border-radius:8px;padding:.5rem .9rem;font-size:.82rem;
     z-index:70;display:none}
   .toast.on{display:block}
+
+  /* ---------- phones ----------
+     The grid is far wider than any phone, so it pans sideways rather than
+     reflowing: the time gutter stays pinned left, the stage header strip
+     mirrors the pan, and everything else just gets narrower. */
+  @media (max-width:700px){
+    :root{--colw:98px; --personw:86px; --gutter:36px; --miniw:21px}
+    header{padding:.5rem .5rem .4rem}
+    h1{font-size:.85rem}
+    .bar{gap:.3rem;margin-top:.4rem}
+    .tab{padding:.35rem .6rem;font-size:.66rem}
+    .who{gap:.3rem;width:100%}
+    .who label{display:none}          /* "You are" — the select speaks for itself */
+    select,input[type=text]{padding:.35rem .45rem;font-size:.8rem;max-width:8.5rem}
+    .btn{padding:.38rem .55rem;font-size:.64rem}
+    #refresh{display:none}            /* picks already re-sync every 25s */
+    .howto p{font-size:.74rem}
+    .head{height:38px}
+    .head .nm{font-size:.53rem}
+    .np{padding:.5rem .6rem;gap:.5rem}
+    .np img{width:32px;height:32px}
+    .np .m b{font-size:.78rem}
+    .np .st{display:none}
+  }
+  @media (max-width:400px){
+    :root{--colw:88px; --personw:80px; --gutter:32px}
+  }
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">
-    <img class="mark" src="/outside-lands/favicon.svg" alt="" width="34" height="34">
-    <div>
-      <div class="kick">Golden Gate Park · Aug 7–9</div>
-      <h1>Outside Lands 2026 — planner</h1>
-    </div>
-  </div>
+  <h1>Outside Lands Planner</h1>
   <div class="bar">
     <div class="tabs" id="tabs" role="tablist"></div>
     <div class="who">
@@ -177,9 +213,12 @@
       <button class="btn ghost" id="refresh">Refresh</button>
     </div>
   </div>
-  <p class="hint">Click an artist to hear a <b>30-second preview</b>. Hit <b>+</b> to add them to
-    your column on the right. Click a stage header to fold or unfold it. Everyone's picks are shared — add a column for each friend.
-    A <b>red</b> block in someone's column means they double-booked themselves.</p>
+  <details class="howto">
+    <summary>How it works</summary>
+    <p>Click an artist to hear a <b>30-second preview</b>. Hit <b>+</b> to add them to
+      your column on the right. Click a stage header to fold or unfold it. Everyone's picks are shared — add a column for each friend.
+      A <b>red</b> block in someone's column means they double-booked themselves.</p>
+  </details>
 </header>
 
 <div class="headbar" id="headbar"><div class="headrow" id="headrow"></div></div>
@@ -211,6 +250,9 @@ const ppm=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyV
 const y=m=>(m-T0)*ppm();
 const key=(d,st,a,s)=>`${d}|${st}|${a}|${s}`;
 const label=m=>{const h=Math.floor(m/60),x=h%12||12;return x+(m%60?':'+String(m%60).padStart(2,'0'):'')+(h<12?'am':'pm');};
+// Card times drop the am/pm — every set runs noon to 10pm, and the hour axis on
+// the left carries the rest. "12:05–12:50" fits a column; "12:05 PM–12:50 PM" did not.
+const hm=m=>(Math.floor(m/60)%12||12)+':'+String(m%60).padStart(2,'0');
 
 /* ---------------- data helpers ---------------- */
 function allSets(di){
@@ -271,7 +313,7 @@ let tt; function toast(m){const t=document.getElementById('toast');t.textContent
   t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
 
 /* ---------------- render ---------------- */
-const DIVH=56;
+const DIVH=38;
 const dayH=()=>(T1-T0)*ppm();
 const dayTop=i=>i*(dayH()+DIVH)+DIVH;
 const totalH=()=>OL.days.length*(dayH()+DIVH);
@@ -330,10 +372,10 @@ function stageCol(si){
       const k=key(di,st.name,x.a,x.s), me=meObj();
       const picked=me&&(me.picks||[]).includes(k);
       const el=document.createElement('div');
-      el.className='blk'+(picked?' picked':'')+(h<34?' tiny':'');
+      el.className='blk'+(picked?' picked':'')+(h<34?' tiny':h<48?' short':'');
       el.style.cssText=`top:${top}px;height:${h}px;--h:${hue}`;
       el.innerHTML=`<div class="txt"><div class="a">${esc(x.a)}</div>`+
-                   `<div class="t">${x.st}–${x.et}</div></div>`;
+                   `<div class="t">${hm(x.s)}–${hm(x.e)}</div></div>`;
       el.title=x.a+' · '+x.st+'–'+x.et+' · '+st.name+'  (click to preview)';
       el.onclick=()=>playFor(x.a,el);
       const add=document.createElement('button');
@@ -403,11 +445,9 @@ function render(){
 
   // ---- day divider rows across the full width ----
   OL.days.forEach((d,di)=>{
-    const n=d.stages.reduce((a,st)=>a+st.sets.length,0);
     const row=document.createElement('div'); row.className='dayrow'; row.id='div-'+di;
-    row.style.top=(di*(dayH()+DIVH))+'px'; row.style.width=g.scrollWidth+'px';
-    row.innerHTML=`<div class="lab"><h2>${esc(d.day)}</h2>`+
-      `<span class="cnt">${n} sets · ${esc(d.stages[5].name)}</span></div>`;
+    row.style.top=(di*(dayH()+DIVH))+'px';
+    row.innerHTML=`<div class="lab"><h2>${esc(d.day)}</h2></div>`;
     g.appendChild(row);
   });
   syncHead();
@@ -422,6 +462,8 @@ function syncHead(){
 }
 document.getElementById('wrap').addEventListener('scroll',syncHead,{passive:true});
 addEventListener('resize',syncHead);
+// opening "How it works" makes the header taller, so the stage strip has to move
+document.querySelector('.howto').addEventListener('toggle',syncHead);
 
 document.getElementById('addBtn').onclick=()=>{
   const i=document.getElementById('newname'); const n=i.value.trim();
