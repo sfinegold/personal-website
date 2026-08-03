@@ -83,8 +83,9 @@ function page(snap) {
       for (const v of venues) {
         const evs = bucket[day + '|' + v] || [];
         const tiles = evs.map((e) => `
-          <div class="ev">
+          <div class="ev" data-key="${esc(e.sourceId + '|' + e.title + '|' + e.date)}">
             <div class="thumb" data-term="${esc(e.term)}" data-uid="${e.uid}">
+              <button class="heart" aria-label="Save show">&#9825;</button>
               <button class="play" id="p${e.uid}" disabled aria-label="Preview ${esc(e.term)}">&#9654;</button>
             </div>
             <div class="ea">${esc(e.title)}</div>
@@ -155,6 +156,14 @@ function page(snap) {
   .thumb.ready .play{opacity:1}
   .play.playing{background:var(--pick);color:#fff}
   .thumb.now{box-shadow:0 0 0 3px var(--pick)}
+  .heart{position:absolute;top:4px;left:4px;width:22px;height:22px;border:0;border-radius:50%;
+    background:rgba(255,255,255,.85);color:#c0324b;font-size:.72rem;cursor:pointer;display:grid;place-items:center;
+    line-height:1;opacity:0;transition:opacity .12s;z-index:2}
+  .thumb:hover .heart{opacity:1}
+  .ev.hearted .heart{opacity:1;background:#c0324b;color:#fff}
+  body.hearts-only .ev:not(.hearted){display:none}
+  .rbtn.heartbtn{border-color:#c0324b;background:transparent;color:#c0324b}
+  .rbtn.heartbtn.on{background:#c0324b;color:#fff}
   .ea{font-size:.62rem;font-weight:600;line-height:1.12;margin-top:2px;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .et{font-family:var(--mono);font-size:.54rem;color:var(--faint);margin-top:1px}
@@ -181,7 +190,10 @@ function page(snap) {
 <body>
   <div class="top">
     <div><h1>Your Lineup</h1> <span class="sfx">San Francisco · next 5 weeks</span></div>
-    <button class="rbtn" id="rbtn" onclick="toggleRadio()">&#9654; Play</button>
+    <div style="display:flex;gap:.5rem;flex:none">
+      <button class="rbtn heartbtn" id="heartsBtn" onclick="toggleHeartsOnly()">&#9829; <span id="hc">0</span></button>
+      <button class="rbtn" id="rbtn" onclick="toggleRadio()">&#9654; Play</button>
+    </div>
   </div>
   ${rec ? `<div class="rec"><b>This week's top pick</b>${esc(rec)}</div>` : ''}
   <div class="scroll"><div class="grid">${cells}</div></div>
@@ -263,6 +275,23 @@ document.addEventListener('keydown', (e)=>{
   else if (e.key === 'Escape'){ stopAll(); }
 });
 audio.addEventListener('ended', skip); // auto-advance through the lineup
+
+// ---- hearts: save shows to this browser (localStorage) ----
+const HK = 'lineup_sf_hearts';
+let hearts; try { hearts = new Set(JSON.parse(localStorage.getItem(HK) || '[]')); } catch(e){ hearts = new Set(); }
+function updateHc(){ const el = $('hc'); if(el) el.textContent = hearts.size; }
+function saveHearts(){ try { localStorage.setItem(HK, JSON.stringify([...hearts])); } catch(e){} updateHc(); }
+function markHeart(ev, on){ ev.classList.toggle('hearted', on); const h = ev.querySelector('.heart'); if(h) h.innerHTML = on ? '&#9829;' : '&#9825;'; }
+document.querySelectorAll('.ev').forEach(ev => { if (hearts.has(ev.dataset.key)) markHeart(ev, true); });
+updateHc();
+document.addEventListener('click', (e) => {
+  const h = e.target.closest('.heart'); if(!h) return;
+  e.preventDefault(); e.stopPropagation();
+  const ev = h.closest('.ev'), k = ev.dataset.key;
+  if (hearts.has(k)) { hearts.delete(k); markHeart(ev, false); } else { hearts.add(k); markHeart(ev, true); }
+  saveHearts();
+});
+function toggleHeartsOnly(){ const on = document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on', on); }
 </script>
 </body></html>`;
 }
