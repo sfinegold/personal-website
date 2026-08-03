@@ -108,15 +108,17 @@ function page(snap) {
     --gold:#A8761E;--pick:#3B7A5C;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --dw:78px;--cw:108px;--gh:22px;--vh:46px}
   html{-webkit-text-size-adjust:100%}
+  /* whole page is a fixed-height flex column; the grid wrapper is the only
+     scroller (both axes) so position:sticky headers anchor to its viewport */
   body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;padding-bottom:80px}
-  .top{padding:1rem 1.1rem .55rem;border-bottom:2px solid var(--text)}
+    -webkit-font-smoothing:antialiased;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+  .top{flex:none;padding:1rem 1.1rem .55rem;border-bottom:2px solid var(--text)}
   h1{font-size:1.35rem;font-weight:700;display:inline}
   .sfx{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-left:.5rem}
-  .rec{margin:.65rem 1.1rem 0;background:rgba(74,110,143,.09);border-left:3px solid var(--accent);
+  .rec{flex:none;margin:.65rem 1.1rem .55rem;background:rgba(74,110,143,.09);border-left:3px solid var(--accent);
     border-radius:0 8px 8px 0;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;max-width:60rem}
   .rec b{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-hi);display:block;margin-bottom:.2rem}
-  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;margin-top:.65rem}
+  .scroll{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
   .grid{display:grid;grid-template-columns:${cols};min-width:max-content;align-items:stretch}
   .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:3px}
   /* sticky stack: group bands (top:0) -> venue headers (top:gh) -> week band (top:gh+vh) */
@@ -159,7 +161,7 @@ function page(snap) {
   .now .s{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
   .now button{margin-left:auto;border:1px solid var(--line);background:var(--bg);border-radius:18px;
     padding:.35rem .8rem;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);cursor:pointer}
-  .foot{padding:.9rem 1.1rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .foot{flex:none;padding:.6rem 1.1rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent-hi)}
   @media (max-width:640px){
     :root{--dw:52px;--cw:82px;--gh:19px;--vh:36px}
