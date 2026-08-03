@@ -12,9 +12,9 @@
 // To add one: drop a module in this folder and register it below.
 
 const registry = {
-  tribe: require('./tribe'), // The Events Calendar (WordPress plugin) JSON API — covers many venues
+  tribe: require('./tribe'), // The Events Calendar (WordPress plugin) JSON API
+  eventdiscovery: require('./eventdiscovery'), // TicketWeb "event-discovery" plugin (The Independent, The New Parish)
   // 'ticketmaster': require('./ticketmaster'),  // (needs a free Discovery API key)
-  // 'seetickets': require('./seetickets'),
 };
 
 function getAdapter(name) {

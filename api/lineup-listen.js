@@ -58,7 +58,7 @@ function page(snap) {
     (bucket[k] = bucket[k] || []).push({ ...e, uid: uid++, term: artistTerm(e.title) });
   });
 
-  const colTemplate = `92px repeat(${venues.length}, 150px)`;
+  const colTemplate = `78px repeat(${venues.length}, 108px)`;
 
   // header row
   let cells = `<div class="cell corner">Day</div>` +
@@ -109,7 +109,7 @@ function page(snap) {
   .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;margin-top:.7rem}
   .grid{display:grid;grid-template-columns:${colTemplate};min-width:max-content;
     align-items:stretch}
-  .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px}
+  .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:3px}
   .corner{position:sticky;left:0;top:0;z-index:30;background:var(--bg2);
     font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
     display:flex;align-items:center;justify-content:center}
@@ -120,21 +120,25 @@ function page(snap) {
     font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
     padding:5px 10px}
   .daylab{position:sticky;left:0;z-index:10;background:var(--bg);
-    font-family:var(--mono);font-size:.62rem;letter-spacing:.02em;color:var(--dim);
-    display:flex;align-items:center;line-height:1.15}
-  .slot{background:var(--bg);min-height:44px;display:flex;flex-direction:column;gap:6px}
+    font-family:var(--mono);font-size:.58rem;letter-spacing:.01em;color:var(--dim);
+    display:flex;align-items:center;line-height:1.1;padding:3px 5px}
+  .slot{background:var(--bg);min-height:26px;display:flex;flex-direction:column;gap:4px}
   .ev{display:flex;flex-direction:column}
-  .thumb{position:relative;width:100%;aspect-ratio:1;border-radius:7px;overflow:hidden;
-    background:linear-gradient(135deg,#dfe6e6,#cbd3d8);background-size:cover;background-position:center;
+  .thumb{position:relative;width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;
+    background:linear-gradient(135deg,#e4e0d6,#d3ccbe);background-size:cover;background-position:center;
     border:1px solid var(--line)}
-  .play{position:absolute;right:5px;bottom:5px;width:26px;height:26px;border-radius:50%;border:0;
-    background:rgba(255,255,255,.92);color:var(--text);font-size:.6rem;cursor:pointer;display:grid;place-items:center;
+  /* generic album look when there's no artwork match */
+  .thumb::after{content:"\\266A";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:1.6rem;color:rgba(25,29,35,.22)}
+  .thumb.hasart::after{display:none}
+  .play{position:absolute;right:4px;bottom:4px;width:23px;height:23px;border-radius:50%;border:0;
+    background:rgba(255,255,255,.94);color:var(--text);font-size:.55rem;cursor:pointer;display:grid;place-items:center;
     box-shadow:0 1px 4px rgba(0,0,0,.3);opacity:0;transition:opacity .15s}
   .thumb.ready .play{opacity:1}
   .play.playing{background:var(--pick);color:#fff}
-  .ea{font-size:.68rem;font-weight:600;line-height:1.15;margin-top:3px;
+  .ea{font-size:.62rem;font-weight:600;line-height:1.12;margin-top:2px;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .et{font-family:var(--mono);font-size:.58rem;color:var(--faint);margin-top:1px}
+  .et{font-family:var(--mono);font-size:.54rem;color:var(--faint);margin-top:1px}
   .now{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
     padding:.6rem 1rem;display:none;align-items:center;gap:.7rem;z-index:60}
   .now.on{display:flex}
@@ -167,7 +171,7 @@ const io = new IntersectionObserver((ents) => {
     fetch('/api/outside-lands?preview=' + encodeURIComponent(term)).then(r=>r.json()).then(p=>{
       if (!p) return;
       store[uid] = { previewUrl: p.previewUrl || null, art: big(p.artwork) };
-      if (p.artwork) el.style.backgroundImage = 'url("' + big(p.artwork) + '")';
+      if (p.artwork) { el.style.backgroundImage = 'url("' + big(p.artwork) + '")'; el.classList.add('hasart'); }
       if (p.previewUrl) { el.classList.add('ready'); const b=document.getElementById('p'+uid); if(b) b.disabled=false; }
     }).catch(()=>{});
   });

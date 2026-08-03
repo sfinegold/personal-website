@@ -1,99 +1,780 @@
 [
-  { "id": "fillmore", "name": "The Fillmore", "url": "https://thefillmore.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "warfield", "name": "The Warfield", "url": "https://www.thewarfieldtheatre.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "gamh", "name": "Great American Music Hall", "url": "https://gamh.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "independent", "name": "The Independent", "url": "https://www.theindependentsf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "chapel", "name": "The Chapel", "url": "https://thechapelsf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "bimbos", "name": "Bimbo's 365 Club", "url": "https://bimbos365club.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "rickshaw", "name": "Rickshaw Stop", "url": "https://rickshawstop.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "cafedunord", "name": "Cafe du Nord", "url": "https://cafedunord.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "bottomofthehill", "name": "Bottom of the Hill", "url": "https://www.bottomofthehill.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "brickmortar", "name": "Brick & Mortar Music Hall", "url": "https://brickandmortarmusic.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "theeparkside", "name": "Thee Parkside", "url": "https://theeparkside.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "elrio", "name": "El Rio", "url": "https://www.elriosf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "knockout", "name": "The Knockout", "url": "https://theknockoutsf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "neckofthewoods", "name": "Neck of the Woods", "url": "https://www.neckofthewoodssf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "amados", "name": "Amado's", "url": "https://www.amadossf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "regency", "name": "The Regency Ballroom", "url": "https://www.theregencyballroom.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "augusthall", "name": "August Hall", "url": "https://augusthallsf.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "masonic", "name": "The Masonic", "url": "https://www.sfmasonic.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "palacefinearts", "name": "Palace of Fine Arts Theatre", "url": "https://palaceoffinearts.org", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "herbst", "name": "Herbst Theatre", "url": "https://sfwarmemorial.org/herbst-theatre", "category": "classical", "setting": "indoor", "region": "SF" },
-  { "id": "midway", "name": "The Midway", "url": "https://themidwaysf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "billgraham", "name": "Bill Graham Civic Auditorium", "url": "https://billgrahamcivic.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "chasecenter", "name": "Chase Center", "url": "https://www.chasecenter.com", "category": "sports", "setting": "indoor", "region": "SF" },
-  { "id": "oraclepark", "name": "Oracle Park", "url": "https://www.mlb.com/giants/ballpark", "category": "sports", "setting": "outdoor", "region": "SF" },
-  { "id": "1015", "name": "1015 Folsom", "url": "https://1015.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "publicworks", "name": "Public Works", "url": "https://publicsf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "greatnorthern", "name": "The Great Northern", "url": "https://thegreatnorthernsf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "audiosf", "name": "Audio SF", "url": "https://www.audiosf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "halcyon", "name": "Halcyon", "url": "https://www.halcyon-sf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "monarch", "name": "Monarch", "url": "https://www.monarchsf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "f8", "name": "F8 (1192 Folsom)", "url": "https://www.f8sf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "temple", "name": "Temple SF", "url": "https://www.templesf.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "endup", "name": "The EndUp", "url": "https://theendup.com", "category": "electronic", "setting": "indoor", "region": "SF" },
-  { "id": "dnalounge", "name": "DNA Lounge", "url": "https://www.dnalounge.com", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "sfjazz", "name": "SFJAZZ Center", "url": "https://www.sfjazz.org", "category": "jazz", "setting": "indoor", "region": "SF" },
-  { "id": "blackcat", "name": "Black Cat SF", "url": "https://blackcatsf.com", "category": "jazz", "setting": "indoor", "region": "SF" },
-  { "id": "keysjazz", "name": "Keys Jazz Bistro", "url": "https://www.keysjazzbistro.com", "category": "jazz", "setting": "indoor", "region": "SF" },
-  { "id": "mrtipples", "name": "Mr. Tipple's", "url": "https://www.mrtipplessf.com", "category": "jazz", "setting": "indoor", "region": "SF" },
-  { "id": "davies", "name": "Davies Symphony Hall", "url": "https://www.sfsymphony.org", "category": "classical", "setting": "indoor", "region": "SF" },
-  { "id": "sfopera", "name": "War Memorial Opera House", "url": "https://www.sfopera.com", "category": "classical", "setting": "indoor", "region": "SF" },
-  { "id": "gracecathedral", "name": "Grace Cathedral", "url": "https://www.gracecathedral.org", "category": "classical", "setting": "indoor", "region": "SF" },
-  { "id": "ybca", "name": "Yerba Buena Center for the Arts", "url": "https://ybca.org", "category": "live-music", "setting": "indoor", "region": "SF" },
-  { "id": "sterngrove", "name": "Stern Grove Festival", "url": "https://sterngrove.org", "category": "live-music", "setting": "outdoor", "region": "SF" },
-  { "id": "foxoakland", "name": "The Fox Theater (Oakland)", "url": "https://thefoxoakland.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "paramount", "name": "Paramount Theatre", "url": "https://www.paramountoakland.org", "category": "classical", "setting": "indoor", "region": "East Bay" },
-  { "id": "newparish", "name": "The New Parish", "url": "https://www.thenewparish.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "starline", "name": "Starline Social Club", "url": "https://www.starlinesocialclub.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "yoshis", "name": "Yoshi's", "url": "https://yoshis.com", "category": "jazz", "setting": "indoor", "region": "East Bay" },
-  { "id": "uptown", "name": "The Uptown Nightclub", "url": "https://www.uptownnightclub.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "elismilehigh", "name": "Eli's Mile High Club", "url": "https://elismilehighclub.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "goldenbull", "name": "The Golden Bull", "url": "https://www.goldenbulloakland.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "storkclub", "name": "Thee Stork Club", "url": "https://www.storkcluboakland.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "oaklandarena", "name": "Oakland Arena", "url": "https://www.theoaklandarena.com", "category": "sports", "setting": "indoor", "region": "East Bay" },
-  { "id": "uctheatre", "name": "The UC Theatre", "url": "https://www.theuctheatre.org", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "greekberkeley", "name": "The Greek Theatre (Berkeley)", "url": "https://thegreekberkeley.com", "category": "live-music", "setting": "outdoor", "region": "East Bay" },
-  { "id": "cornerstone", "name": "Cornerstone Berkeley", "url": "https://cornerstoneberkeley.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "ashkenaz", "name": "Ashkenaz Music & Dance", "url": "https://ashkenaz.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "freight", "name": "Freight & Salvage", "url": "https://thefreight.org", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "zellerbach", "name": "Zellerbach Hall", "url": "https://calperformances.org", "category": "classical", "setting": "indoor", "region": "East Bay" },
-  { "id": "gilman", "name": "924 Gilman", "url": "https://924gilman.org", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "starryplough", "name": "The Starry Plough", "url": "https://www.starryploughpub.com", "category": "live-music", "setting": "indoor", "region": "East Bay" },
-  { "id": "frost", "name": "Frost Amphitheater", "url": "https://live.stanford.edu", "category": "live-music", "setting": "outdoor", "region": "Peninsula" },
-  { "id": "shoreline", "name": "Shoreline Amphitheatre", "url": "https://www.shorelineamp.com", "category": "live-music", "setting": "outdoor", "region": "Peninsula" },
-  { "id": "mvcpa", "name": "Mountain View Center for the Performing Arts", "url": "https://mvcpa.com", "category": "live-music", "setting": "indoor", "region": "Peninsula" },
-  { "id": "guild", "name": "The Guild Theatre", "url": "https://guildtheatre.org", "category": "live-music", "setting": "indoor", "region": "Peninsula" },
-  { "id": "clubfox", "name": "Club Fox", "url": "https://clubfoxrwc.com", "category": "live-music", "setting": "indoor", "region": "Peninsula" },
-  { "id": "foxrwc", "name": "Fox Theatre Redwood City", "url": "https://foxrwc.com", "category": "live-music", "setting": "indoor", "region": "Peninsula" },
-  { "id": "bing", "name": "Bing Concert Hall", "url": "https://live.stanford.edu", "category": "classical", "setting": "indoor", "region": "Peninsula" },
-  { "id": "ritzsj", "name": "The Ritz San Jose", "url": "https://www.theritzsanjose.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "sapcenter", "name": "SAP Center", "url": "https://www.sapcenter.com", "category": "sports", "setting": "indoor", "region": "South Bay" },
-  { "id": "sjcivic", "name": "San Jose Civic", "url": "https://sanjosetheaters.org/theaters/san-jose-civic", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "continental", "name": "The Continental", "url": "https://thecontinentalbar.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "improvsj", "name": "The Improv San Jose", "url": "https://improv.com/sanjose", "category": "comedy", "setting": "indoor", "region": "South Bay" },
-  { "id": "mountainwinery", "name": "Mountain Winery", "url": "https://www.mountainwinery.com", "category": "live-music", "setting": "outdoor", "region": "South Bay" },
-  { "id": "californiatheatre", "name": "California Theatre San Jose", "url": "https://sanjosetheaters.org/theaters/california-theatre", "category": "classical", "setting": "indoor", "region": "South Bay" },
-  { "id": "levis", "name": "Levi's Stadium", "url": "https://www.levisstadium.com", "category": "sports", "setting": "outdoor", "region": "South Bay" },
-  { "id": "paypalpark", "name": "PayPal Park", "url": "https://www.sjearthquakes.com/paypalpark", "category": "sports", "setting": "outdoor", "region": "South Bay" },
-  { "id": "catalyst", "name": "The Catalyst", "url": "https://catalystclub.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "moesalley", "name": "Moe's Alley", "url": "https://moesalley.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "riotheatre", "name": "Rio Theatre", "url": "https://riotheatre.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "kuumbwa", "name": "Kuumbwa Jazz Center", "url": "https://www.kuumbwajazz.org", "category": "jazz", "setting": "indoor", "region": "South Bay" },
-  { "id": "felton", "name": "Felton Music Hall", "url": "https://feltonmusichall.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "crepeplace", "name": "The Crepe Place", "url": "https://thecrepeplace.com", "category": "live-music", "setting": "indoor", "region": "South Bay" },
-  { "id": "sweetwater", "name": "Sweetwater Music Hall", "url": "https://sweetwatermusichall.com", "category": "live-music", "setting": "indoor", "region": "Marin" },
-  { "id": "hopmonk", "name": "HopMonk Novato", "url": "https://www.hopmonk.com/novato", "category": "live-music", "setting": "indoor", "region": "Marin" },
-  { "id": "marincenter", "name": "Marin Veterans' Memorial Auditorium", "url": "https://www.marincenter.org", "category": "live-music", "setting": "indoor", "region": "Marin" },
-  { "id": "ranchonicasio", "name": "Rancho Nicasio", "url": "https://www.ranchonicasio.com", "category": "live-music", "setting": "indoor", "region": "Marin" },
-  { "id": "smileys", "name": "Smiley's Saloon", "url": "https://www.smileyssaloon.com", "category": "live-music", "setting": "indoor", "region": "Marin" },
-  { "id": "cobbs", "name": "Cobb's Comedy Club", "url": "https://www.cobbscomedy.com", "category": "comedy", "setting": "indoor", "region": "SF" },
-  { "id": "punchline", "name": "Punch Line SF", "url": "https://www.punchlinecomedyclub.com", "category": "comedy", "setting": "indoor", "region": "SF" },
-  { "id": "funcheap", "name": "FunCheap SF", "url": "https://sf.funcheap.com", "category": "live-music", "setting": "indoor", "region": "aggregator" },
-  { "id": "do415", "name": "Do415 / DoTheBay", "url": "https://dothebay.com", "category": "live-music", "setting": "indoor", "region": "aggregator" },
-  { "id": "48hills", "name": "48 Hills", "url": "https://48hills.org", "category": "live-music", "setting": "indoor", "region": "aggregator" },
-  { "id": "sfstation", "name": "SF Station", "url": "https://www.sfstation.com", "category": "live-music", "setting": "indoor", "region": "aggregator" },
-  { "id": "ra", "name": "Resident Advisor (Bay Area)", "url": "https://ra.co", "category": "electronic", "setting": "indoor", "region": "aggregator" },
-  { "id": "dice", "name": "DICE", "url": "https://dice.fm", "category": "live-music", "setting": "indoor", "region": "aggregator" },
-  { "id": "datebook", "name": "SF Chronicle Datebook", "url": "https://datebook.sfchronicle.com", "category": "live-music", "setting": "indoor", "region": "aggregator" }
+  {
+    "id": "fillmore",
+    "name": "The Fillmore",
+    "url": "https://thefillmore.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "warfield",
+    "name": "The Warfield",
+    "url": "https://www.thewarfieldtheatre.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "gamh",
+    "name": "Great American Music Hall",
+    "url": "https://gamh.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "independent",
+    "name": "The Independent",
+    "url": "https://www.theindependentsf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF",
+    "adapter": "eventdiscovery"
+  },
+  {
+    "id": "chapel",
+    "name": "The Chapel",
+    "url": "https://thechapelsf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "bimbos",
+    "name": "Bimbo's 365 Club",
+    "url": "https://bimbos365club.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "rickshaw",
+    "name": "Rickshaw Stop",
+    "url": "https://rickshawstop.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "cafedunord",
+    "name": "Cafe du Nord",
+    "url": "https://cafedunord.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "bottomofthehill",
+    "name": "Bottom of the Hill",
+    "url": "https://www.bottomofthehill.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "brickmortar",
+    "name": "Brick & Mortar Music Hall",
+    "url": "https://brickandmortarmusic.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "theeparkside",
+    "name": "Thee Parkside",
+    "url": "https://theeparkside.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "elrio",
+    "name": "El Rio",
+    "url": "https://www.elriosf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "knockout",
+    "name": "The Knockout",
+    "url": "https://theknockoutsf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "neckofthewoods",
+    "name": "Neck of the Woods",
+    "url": "https://www.neckofthewoodssf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "amados",
+    "name": "Amado's",
+    "url": "https://www.amadossf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "regency",
+    "name": "The Regency Ballroom",
+    "url": "https://www.theregencyballroom.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "augusthall",
+    "name": "August Hall",
+    "url": "https://augusthallsf.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "masonic",
+    "name": "The Masonic",
+    "url": "https://www.sfmasonic.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "palacefinearts",
+    "name": "Palace of Fine Arts Theatre",
+    "url": "https://palaceoffinearts.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "herbst",
+    "name": "Herbst Theatre",
+    "url": "https://sfwarmemorial.org/herbst-theatre",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "midway",
+    "name": "The Midway",
+    "url": "https://themidwaysf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "billgraham",
+    "name": "Bill Graham Civic Auditorium",
+    "url": "https://billgrahamcivic.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "chasecenter",
+    "name": "Chase Center",
+    "url": "https://www.chasecenter.com",
+    "category": "sports",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "oraclepark",
+    "name": "Oracle Park",
+    "url": "https://www.mlb.com/giants/ballpark",
+    "category": "sports",
+    "setting": "outdoor",
+    "region": "SF"
+  },
+  {
+    "id": "1015",
+    "name": "1015 Folsom",
+    "url": "https://1015.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "publicworks",
+    "name": "Public Works",
+    "url": "https://publicsf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "greatnorthern",
+    "name": "The Great Northern",
+    "url": "https://thegreatnorthernsf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "audiosf",
+    "name": "Audio SF",
+    "url": "https://www.audiosf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "halcyon",
+    "name": "Halcyon",
+    "url": "https://www.halcyon-sf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "monarch",
+    "name": "Monarch",
+    "url": "https://www.monarchsf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "f8",
+    "name": "F8 (1192 Folsom)",
+    "url": "https://www.f8sf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "temple",
+    "name": "Temple SF",
+    "url": "https://www.templesf.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "endup",
+    "name": "The EndUp",
+    "url": "https://theendup.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "dnalounge",
+    "name": "DNA Lounge",
+    "url": "https://www.dnalounge.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "sfjazz",
+    "name": "SFJAZZ Center",
+    "url": "https://www.sfjazz.org",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "blackcat",
+    "name": "Black Cat SF",
+    "url": "https://blackcatsf.com",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "keysjazz",
+    "name": "Keys Jazz Bistro",
+    "url": "https://www.keysjazzbistro.com",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "mrtipples",
+    "name": "Mr. Tipple's",
+    "url": "https://www.mrtipplessf.com",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "davies",
+    "name": "Davies Symphony Hall",
+    "url": "https://www.sfsymphony.org",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "sfopera",
+    "name": "War Memorial Opera House",
+    "url": "https://www.sfopera.com",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "gracecathedral",
+    "name": "Grace Cathedral",
+    "url": "https://www.gracecathedral.org",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "ybca",
+    "name": "Yerba Buena Center for the Arts",
+    "url": "https://ybca.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "sterngrove",
+    "name": "Stern Grove Festival",
+    "url": "https://sterngrove.org",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "SF"
+  },
+  {
+    "id": "foxoakland",
+    "name": "The Fox Theater (Oakland)",
+    "url": "https://thefoxoakland.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "paramount",
+    "name": "Paramount Theatre",
+    "url": "https://www.paramountoakland.org",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "newparish",
+    "name": "The New Parish",
+    "url": "https://www.thenewparish.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay",
+    "adapter": "eventdiscovery"
+  },
+  {
+    "id": "starline",
+    "name": "Starline Social Club",
+    "url": "https://www.starlinesocialclub.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "yoshis",
+    "name": "Yoshi's",
+    "url": "https://yoshis.com",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "uptown",
+    "name": "The Uptown Nightclub",
+    "url": "https://www.uptownnightclub.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "elismilehigh",
+    "name": "Eli's Mile High Club",
+    "url": "https://elismilehighclub.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "goldenbull",
+    "name": "The Golden Bull",
+    "url": "https://www.goldenbulloakland.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "storkclub",
+    "name": "Thee Stork Club",
+    "url": "https://www.storkcluboakland.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "oaklandarena",
+    "name": "Oakland Arena",
+    "url": "https://www.theoaklandarena.com",
+    "category": "sports",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "uctheatre",
+    "name": "The UC Theatre",
+    "url": "https://www.theuctheatre.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "greekberkeley",
+    "name": "The Greek Theatre (Berkeley)",
+    "url": "https://thegreekberkeley.com",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "cornerstone",
+    "name": "Cornerstone Berkeley",
+    "url": "https://cornerstoneberkeley.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "ashkenaz",
+    "name": "Ashkenaz Music & Dance",
+    "url": "https://ashkenaz.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "freight",
+    "name": "Freight & Salvage",
+    "url": "https://thefreight.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "zellerbach",
+    "name": "Zellerbach Hall",
+    "url": "https://calperformances.org",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "gilman",
+    "name": "924 Gilman",
+    "url": "https://924gilman.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "starryplough",
+    "name": "The Starry Plough",
+    "url": "https://www.starryploughpub.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "East Bay"
+  },
+  {
+    "id": "frost",
+    "name": "Frost Amphitheater",
+    "url": "https://live.stanford.edu",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "shoreline",
+    "name": "Shoreline Amphitheatre",
+    "url": "https://www.shorelineamp.com",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "mvcpa",
+    "name": "Mountain View Center for the Performing Arts",
+    "url": "https://mvcpa.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "guild",
+    "name": "The Guild Theatre",
+    "url": "https://guildtheatre.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "clubfox",
+    "name": "Club Fox",
+    "url": "https://clubfoxrwc.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "foxrwc",
+    "name": "Fox Theatre Redwood City",
+    "url": "https://foxrwc.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "bing",
+    "name": "Bing Concert Hall",
+    "url": "https://live.stanford.edu",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "Peninsula"
+  },
+  {
+    "id": "ritzsj",
+    "name": "The Ritz San Jose",
+    "url": "https://www.theritzsanjose.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "sapcenter",
+    "name": "SAP Center",
+    "url": "https://www.sapcenter.com",
+    "category": "sports",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "sjcivic",
+    "name": "San Jose Civic",
+    "url": "https://sanjosetheaters.org/theaters/san-jose-civic",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "continental",
+    "name": "The Continental",
+    "url": "https://thecontinentalbar.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "improvsj",
+    "name": "The Improv San Jose",
+    "url": "https://improv.com/sanjose",
+    "category": "comedy",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "mountainwinery",
+    "name": "Mountain Winery",
+    "url": "https://www.mountainwinery.com",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "californiatheatre",
+    "name": "California Theatre San Jose",
+    "url": "https://sanjosetheaters.org/theaters/california-theatre",
+    "category": "classical",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "levis",
+    "name": "Levi's Stadium",
+    "url": "https://www.levisstadium.com",
+    "category": "sports",
+    "setting": "outdoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "paypalpark",
+    "name": "PayPal Park",
+    "url": "https://www.sjearthquakes.com/paypalpark",
+    "category": "sports",
+    "setting": "outdoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "catalyst",
+    "name": "The Catalyst",
+    "url": "https://catalystclub.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "moesalley",
+    "name": "Moe's Alley",
+    "url": "https://moesalley.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "riotheatre",
+    "name": "Rio Theatre",
+    "url": "https://riotheatre.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "kuumbwa",
+    "name": "Kuumbwa Jazz Center",
+    "url": "https://www.kuumbwajazz.org",
+    "category": "jazz",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "felton",
+    "name": "Felton Music Hall",
+    "url": "https://feltonmusichall.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "crepeplace",
+    "name": "The Crepe Place",
+    "url": "https://thecrepeplace.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "South Bay"
+  },
+  {
+    "id": "sweetwater",
+    "name": "Sweetwater Music Hall",
+    "url": "https://sweetwatermusichall.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Marin"
+  },
+  {
+    "id": "hopmonk",
+    "name": "HopMonk Novato",
+    "url": "https://www.hopmonk.com/novato",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Marin"
+  },
+  {
+    "id": "marincenter",
+    "name": "Marin Veterans' Memorial Auditorium",
+    "url": "https://www.marincenter.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Marin"
+  },
+  {
+    "id": "ranchonicasio",
+    "name": "Rancho Nicasio",
+    "url": "https://www.ranchonicasio.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Marin"
+  },
+  {
+    "id": "smileys",
+    "name": "Smiley's Saloon",
+    "url": "https://www.smileyssaloon.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "Marin"
+  },
+  {
+    "id": "cobbs",
+    "name": "Cobb's Comedy Club",
+    "url": "https://www.cobbscomedy.com",
+    "category": "comedy",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "punchline",
+    "name": "Punch Line SF",
+    "url": "https://www.punchlinecomedyclub.com",
+    "category": "comedy",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
+    "id": "funcheap",
+    "name": "FunCheap SF",
+    "url": "https://sf.funcheap.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "do415",
+    "name": "Do415 / DoTheBay",
+    "url": "https://dothebay.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "48hills",
+    "name": "48 Hills",
+    "url": "https://48hills.org",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "sfstation",
+    "name": "SF Station",
+    "url": "https://www.sfstation.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "ra",
+    "name": "Resident Advisor (Bay Area)",
+    "url": "https://ra.co",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "dice",
+    "name": "DICE",
+    "url": "https://dice.fm",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  },
+  {
+    "id": "datebook",
+    "name": "SF Chronicle Datebook",
+    "url": "https://datebook.sfchronicle.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "aggregator"
+  }
 ]
