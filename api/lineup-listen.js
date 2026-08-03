@@ -92,7 +92,7 @@ function page(snap) {
     border-radius:0 8px 8px 0;padding:.6rem .85rem;font-size:.86rem;line-height:1.45;max-width:64rem}
   .rec b{font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-hi);display:block;margin-bottom:.15rem}
   .scroll{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-  .grid{display:grid;grid-template-columns:${cols};min-width:max-content;align-items:stretch}
+  .grid{display:grid;grid-template-columns:${cols};align-items:stretch}
   .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
   .corner{position:sticky;top:0;left:0;z-index:40;background:var(--bg2);display:flex;align-items:center;justify-content:center;
     font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);height:26px}
