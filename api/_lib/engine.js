@@ -112,12 +112,17 @@ async function runProfile(profileId, options = {}) {
   const text = renderText(profile, kept, meta);
   const subject = subjectLine(profile, kept, meta);
 
-  // Snapshot for the web "listen" view (so it never re-crawls).
+  // Snapshot for the web views (so they never re-crawl). `kept` = the emailed
+  // top picks; `grid` = every filtered event in the window for the venue×week grid.
   await store.setSnapshot(profile.id, {
     city: profile.city,
     window: { start, end: windowEndYMD },
     recommendation,
     kept,
+    grid: ranked.kept.map((e) => ({
+      title: e.title, venue: e.venue, sourceId: e.sourceId,
+      date: e.date, time: e.time, category: e.category, url: e.url,
+    })),
     at: now.toISOString(),
   });
 
