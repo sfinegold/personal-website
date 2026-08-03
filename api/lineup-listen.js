@@ -38,7 +38,7 @@ function groupOf(cat) {
 const GORDER = { Music: 0, Comedy: 1, Sports: 2 };
 
 const WEEKS = 5;
-const MAX_COLS = 12;
+const MAX_COLS = 16;
 
 function page(snap) {
   const events = (snap && snap.grid) || [];
@@ -112,7 +112,11 @@ function page(snap) {
      scroller (both axes) so position:sticky headers anchor to its viewport */
   body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-  .top{flex:none;padding:1rem 1.1rem .55rem;border-bottom:2px solid var(--text)}
+  .top{flex:none;padding:1rem 1.1rem .55rem;border-bottom:2px solid var(--text);
+    display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+  .rbtn{flex:none;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;
+    padding:.5rem .9rem;border-radius:20px;border:1px solid var(--pick);background:var(--pick);color:#fff;cursor:pointer}
+  .rbtn.on{background:transparent;color:var(--pick)}
   h1{font-size:1.35rem;font-weight:700;display:inline}
   .sfx{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-left:.5rem}
   .rec{flex:none;margin:.65rem 1.1rem .55rem;background:rgba(74,110,143,.09);border-left:3px solid var(--accent);
@@ -150,6 +154,7 @@ function page(snap) {
     box-shadow:0 1px 4px rgba(0,0,0,.3);opacity:0;transition:opacity .15s}
   .thumb.ready .play{opacity:1}
   .play.playing{background:var(--pick);color:#fff}
+  .thumb.now{box-shadow:0 0 0 3px var(--pick)}
   .ea{font-size:.62rem;font-weight:600;line-height:1.12;margin-top:2px;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .et{font-family:var(--mono);font-size:.54rem;color:var(--faint);margin-top:1px}
@@ -174,49 +179,90 @@ function page(snap) {
   }
 </style></head>
 <body>
-  <div class="top"><h1>Your Lineup</h1><span class="sfx">San Francisco · next 5 weeks</span></div>
+  <div class="top">
+    <div><h1>Your Lineup</h1> <span class="sfx">San Francisco · next 5 weeks</span></div>
+    <button class="rbtn" id="rbtn" onclick="toggleRadio()">&#9654; Play</button>
+  </div>
   ${rec ? `<div class="rec"><b>This week's top pick</b>${esc(rec)}</div>` : ''}
   <div class="scroll"><div class="grid">${cells}</div></div>
-  <div class="foot">Tap &#9654; for a 30-second Apple Music preview · <a href="/lineup/me">edit venues</a></div>
-  <div class="now" id="now"><div class="a" id="nA"></div><div><div class="n" id="nN">—</div><div class="s" id="nS">now playing</div></div><button onclick="stopAll()">Stop</button></div>
+  <div class="foot">Play = auto-preview every act · space = play/pause · &rarr; or S = skip · <a href="/lineup/me">edit venues</a></div>
+  <div class="now" id="now"><div class="a" id="nA"></div><div><div class="n" id="nN">—</div><div class="s" id="nS">now playing</div></div><button onclick="skip()">Skip &#9197;</button><button onclick="stopAll()">Stop</button></div>
 <script>
 const audio = new Audio();
-const store = {};
-let current = null;
+const store = {};                 // uid -> {previewUrl, art, p:Promise}
+let current = null, qi = null;     // current uid, radio queue index
+const $ = (id) => document.getElementById(id);
 function big(u){ return u ? u.replace(/\\/[0-9]+x[0-9]+bb?\\./,'/300x300bb.') : u; }
-const io = new IntersectionObserver((ents) => {
-  ents.forEach((en) => {
-    if (!en.isIntersecting) return;
-    const el = en.target; io.unobserve(el);
-    const term = el.dataset.term, uid = el.dataset.uid;
-    if (!term) return;
-    fetch('/api/outside-lands?preview=' + encodeURIComponent(term)).then(r=>r.json()).then(p=>{
-      if (!p) return;
-      store[uid] = { previewUrl: p.previewUrl || null, art: big(p.artwork) };
-      if (p.artwork) { el.style.backgroundImage = 'url("' + big(p.artwork) + '")'; el.classList.add('hasart'); }
-      if (p.previewUrl) { el.classList.add('ready'); const b=document.getElementById('p'+uid); if(b) b.disabled=false; }
-    }).catch(()=>{});
+
+const thumbs = [...document.querySelectorAll('.thumb')];
+const queue = thumbs.map(t => ({ uid: t.dataset.uid, term: t.dataset.term }));
+const uidIndex = {}; queue.forEach((q,i) => uidIndex[q.uid] = i);
+
+// cached, de-duped preview fetch — also paints art + enables the tile button
+function loadPreview(uid, term){
+  if (store[uid] && store[uid].p) return store[uid].p;
+  store[uid] = store[uid] || {};
+  store[uid].p = fetch('/api/outside-lands?preview=' + encodeURIComponent(term)).then(r=>r.json()).then(p=>{
+    const el = document.querySelector('.thumb[data-uid="'+uid+'"]');
+    const rec = { previewUrl:(p&&p.previewUrl)||null, art:(p&&p.artwork)?big(p.artwork):null };
+    store[uid].previewUrl = rec.previewUrl; store[uid].art = rec.art;
+    if (el){ if(rec.art){ el.style.backgroundImage='url("'+rec.art+'")'; el.classList.add('hasart'); }
+      if(rec.previewUrl){ el.classList.add('ready'); const b=$('p'+uid); if(b) b.disabled=false; } }
+    return rec;
+  }).catch(()=>({previewUrl:null, art:null}));
+  return store[uid].p;
+}
+
+// lazy-load art/preview for tiles as they scroll into view
+const io = new IntersectionObserver((ents)=>{ ents.forEach(en=>{ if(!en.isIntersecting) return;
+  io.unobserve(en.target); if(en.target.dataset.term) loadPreview(en.target.dataset.uid, en.target.dataset.term); }); }, { rootMargin:'400px' });
+thumbs.forEach(t => io.observe(t));
+
+function setRbtn(on){ const b=$('rbtn'); b.innerHTML = on ? '&#10073;&#10073; Pause' : '&#9654; Play'; b.classList.toggle('on', on); }
+function markNow(uid){ document.querySelectorAll('.thumb.now').forEach(e=>e.classList.remove('now'));
+  const el=document.querySelector('.thumb[data-uid="'+uid+'"]'); if(el){ el.classList.add('now'); el.scrollIntoView({block:'center',inline:'center',behavior:'smooth'}); } }
+
+function playIndex(i){
+  if (i < 0 || i >= queue.length){ stopAll(); return; }
+  const it = queue[i];
+  loadPreview(it.uid, it.term).then(rec=>{
+    if (qi !== null && queue[qi] !== it && !audio.paused) {} // no-op guard
+    if (rec.previewUrl){
+      qi = i; current = it.uid;
+      audio.src = rec.previewUrl; audio.play().catch(()=>{});
+      markNow(it.uid); setRbtn(true);
+      const el = document.querySelector('.thumb[data-uid="'+it.uid+'"]');
+      $('nN').textContent = el ? el.closest('.ev').querySelector('.ea').textContent : it.term;
+      $('nS').textContent = 'now playing · 30s preview';
+      $('nA').style.backgroundImage = rec.art ? 'url("'+rec.art+'")' : '';
+      $('now').classList.add('on');
+    } else {
+      playIndex(i + 1); // no preview for this act — skip to the next
+    }
   });
-}, { rootMargin: '400px' });
-document.querySelectorAll('.thumb').forEach(t => io.observe(t));
-function ico(uid, on){ const b=document.getElementById('p'+uid); if(b){ b.classList.toggle('playing',on); b.innerHTML = on ? '&#10073;&#10073;' : '&#9654;'; } }
-function stopAll(){ audio.pause(); if(current!=null) ico(current,false); current=null; document.getElementById('now').classList.remove('on'); }
-document.addEventListener('click', (ev) => {
-  const b = ev.target.closest('.play'); if(!b) return;
-  ev.preventDefault();
-  const thumb = b.closest('.thumb'); const uid = thumb.dataset.uid; const s = store[uid];
-  if (!s || !s.previewUrl) return;
-  if (current === uid) { stopAll(); return; }
-  if (current != null) ico(current, false);
-  audio.src = s.previewUrl; audio.play().catch(()=>{});
-  current = uid; ico(uid, true);
-  const ev2 = thumb.closest('.ev');
-  document.getElementById('nN').textContent = ev2 ? ev2.querySelector('.ea').textContent : '';
-  document.getElementById('nS').textContent = 'now playing · 30s preview';
-  document.getElementById('nA').style.backgroundImage = s.art ? 'url("'+s.art+'")' : '';
-  document.getElementById('now').classList.add('on');
+}
+function toggleRadio(){
+  if (current !== null && !audio.paused){ audio.pause(); setRbtn(false); return; }
+  if (current !== null && audio.paused && audio.src){ audio.play(); setRbtn(true); return; }
+  playIndex(0);
+}
+function skip(){ playIndex((qi === null ? -1 : qi) + 1); }
+function stopAll(){ audio.pause(); document.querySelectorAll('.thumb.now').forEach(e=>e.classList.remove('now'));
+  $('now').classList.remove('on'); qi = null; current = null; setRbtn(false); }
+
+// clicking a tile's play button starts the radio from that act
+document.addEventListener('click', (ev)=>{ const b = ev.target.closest('.play'); if(!b) return;
+  ev.preventDefault(); const uid = b.closest('.thumb').dataset.uid; const i = uidIndex[uid]; if(i != null) playIndex(i); });
+
+// keyboard: space = play/pause, arrow-right / s / n = skip, esc = stop
+document.addEventListener('keydown', (e)=>{
+  if (e.target.matches('input,textarea,select')) return;
+  const k = e.key.toLowerCase();
+  if (e.code === 'Space'){ e.preventDefault(); toggleRadio(); }
+  else if (e.key === 'ArrowRight' || k === 's' || k === 'n'){ e.preventDefault(); skip(); }
+  else if (e.key === 'Escape'){ stopAll(); }
 });
-audio.addEventListener('ended', ()=>{ if(current!=null) ico(current,false); document.getElementById('nS').textContent='ended'; });
+audio.addEventListener('ended', skip); // auto-advance through the lineup
 </script>
 </body></html>`;
 }

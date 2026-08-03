@@ -177,6 +177,14 @@
     "region": "SF"
   },
   {
+    "id": "cowpalace",
+    "name": "Cow Palace",
+    "url": "https://www.cowpalace.com",
+    "category": "live-music",
+    "setting": "indoor",
+    "region": "SF"
+  },
+  {
     "id": "chasecenter",
     "name": "Chase Center",
     "url": "https://www.chasecenter.com",
