@@ -23,6 +23,10 @@
     {
       "source": "/lineup/me",
       "destination": "/api/lineup-me"
+    },
+    {
+      "source": "/lineup/sf",
+      "destination": "/api/lineup-listen"
     }
   ],
   "functions": {

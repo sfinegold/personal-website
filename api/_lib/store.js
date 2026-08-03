@@ -60,6 +60,7 @@ const curatedKey = (id) => `lineup:curated:${id}`;
 const lastSentKey = (id) => `lineup:lastsent:${id}`;
 const sentKeysKey = (id) => `lineup:sentkeys:${id}`;
 const recommendationKey = (id) => `lineup:recommendation:${id}`;
+const snapshotKey = (id) => `lineup:snapshot:${id}`;
 
 // Live source list = seed defaults overlaid with stored edits.
 async function loadSourceEdits(id) {
@@ -122,6 +123,15 @@ async function setRecommendation(id, paragraph) {
   await setJSON(recommendationKey(id), paragraph ? { paragraph, at: new Date().toISOString() } : null);
 }
 
+// Snapshot of the last computed digest — read by the web "listen" view so it
+// never has to re-crawl. Written by the engine on every run.
+async function getSnapshot(id) {
+  return getJSON(snapshotKey(id), null);
+}
+async function setSnapshot(id, snap) {
+  await setJSON(snapshotKey(id), snap);
+}
+
 module.exports = {
   dbEnabled,
   getJSON,
@@ -139,4 +149,6 @@ module.exports = {
   setSentKeys,
   getRecommendation,
   setRecommendation,
+  getSnapshot,
+  setSnapshot,
 };

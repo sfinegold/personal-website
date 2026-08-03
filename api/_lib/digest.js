@@ -97,6 +97,7 @@ function renderHTML(profile, kept, meta) {
         </td></tr>` : ''}
         ${kept.length ? dayBlocks : empty}
         <tr><td style="padding-top:16px;border-top:1px solid #eee;">
+          ${meta.listenUrl ? `<div style="font-size:14px;margin-bottom:6px;"><a href="${esc(meta.listenUrl)}" style="color:#3B7A5C;text-decoration:none;font-weight:700;">&#9654; Listen to this week's lineup (30-sec previews) &rarr;</a></div>` : ''}
           ${meta.adminUrl ? `<div style="font-size:13px;margin-bottom:6px;"><a href="${esc(meta.adminUrl)}" style="color:#7c3aed;text-decoration:none;font-weight:600;">See or edit the venues Lineup checks &rarr;</a></div>` : ''}
           <div style="font-size:12px;color:#aaa;">${kept.length} pick${kept.length === 1 ? '' : 's'} for ${esc(profile.name)}${meta.tennisNote ? ' &middot; Tue &amp; Thu evenings kept clear for tennis' : ''}</div>
         </td></tr>

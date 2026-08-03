@@ -85,6 +85,7 @@ const SAM = {
   recipientEnv: 'SAM_EMAIL', // comma-separated env var, if set, overrides `recipients`
   passwordEnv: 'LINEUP_ME_PASSWORD',
   schedule: { days: ['Mon'], hour: 8 }, // weekly, 8am Monday in `timezone`
+  listen: true, // music-forward: link the Apple-Music-preview view (/lineup/sf) in the email
   interests: ['comedy', 'live-music', 'electronic', 'jazz', 'sports', 'theater'],
   favorites: ['electronic', 'live-music'],
   filters: {

@@ -106,10 +106,20 @@ async function runProfile(profileId, options = {}) {
     recommendation,
     recommendationSource: recFresh ? 'curated' : 'auto',
     adminUrl: `${base}/${profile.id}`,
+    listenUrl: profile.listen ? `${base}/sf` : null,
   };
   const html = renderHTML(profile, kept, meta);
   const text = renderText(profile, kept, meta);
   const subject = subjectLine(profile, kept, meta);
+
+  // Snapshot for the web "listen" view (so it never re-crawls).
+  await store.setSnapshot(profile.id, {
+    city: profile.city,
+    window: { start, end: windowEndYMD },
+    recommendation,
+    kept,
+    at: now.toISOString(),
+  });
 
   const diagnostics = {
     window: { start, end: windowEndYMD },
