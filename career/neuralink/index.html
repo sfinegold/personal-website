@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How do you move a cursor with a thought?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1014;
+  --paper:#E6E5DF;
+  --paper-hi:#F3F2EC;
+  --panel:#13161C;
+  --panel-2:#1B1F27;
+  --rule:#B3B2A8;
+  --rule-soft:#CFCEC5;
+  --muted:#6C6B62;
+  --neural:#F0A03C;   /* measured — what the brain emits */
+  --decode:#4F7BE8;   /* estimated — what the math returns */
+  --err:#C0517A;      /* residual */
+  --ok:#3E9C7A;
+
+  --disp:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --body:'Newsreader',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --gut:clamp(16px,3.2vw,44px);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.62;
+  font-optical-sizing:auto;
+  background-image:radial-gradient(circle at 1px 1px, rgba(14,16,20,.055) 1px, transparent 0);
+  background-size:22px 22px;
+}
+::selection{background:var(--neural);color:var(--ink)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--gut) 6rem}
+
+/* ---------- masthead ---------- */
+.mast{padding:3.4rem 0 1.2rem;border-bottom:1.5px solid var(--ink)}
+.tagline{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);display:flex;flex-wrap:wrap;gap:.35rem 1.1rem;margin-bottom:2.2rem
+}
+.tagline b{color:var(--ink);font-weight:600}
+h1{
+  font-family:var(--disp);font-variation-settings:'wdth' 112;
+  font-weight:800;letter-spacing:-.028em;line-height:.94;
+  font-size:clamp(2.5rem,7.4vw,5.6rem);margin:0 0 1.1rem;text-wrap:balance;
+}
+h1 em{font-style:normal;color:var(--neural);font-variation-settings:'wdth' 88;font-weight:500}
+.dek{font-size:clamp(1.05rem,1.9vw,1.35rem);max-width:60ch;color:#2B2E34;margin:0}
+.dek i{color:var(--ink);font-weight:500}
+
+/* ---------- figure plate grid ---------- */
+.plate{
+  display:grid;grid-template-columns:9.5rem 1fr;gap:0 2.6rem;
+  border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:3.4rem;
+}
+.plate:first-of-type{margin-top:2.6rem}
+.legend{position:sticky;top:1.4rem;align-self:start}
+.letter{
+  font-family:var(--disp);font-variation-settings:'wdth' 125;font-weight:900;
+  font-size:2.9rem;line-height:.8;letter-spacing:-.03em;display:block;margin-bottom:.7rem;
+  color:var(--ink);
+}
+.legend p{font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--muted);margin:0}
+.legend p + p{margin-top:.7rem}
+.legend .tag{
+  display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;border:1px solid var(--rule);padding:.15rem .45rem;color:var(--muted);
+  margin-bottom:.7rem;
+}
+.body h2{
+  font-family:var(--disp);font-variation-settings:'wdth' 100;font-weight:700;
+  font-size:clamp(1.5rem,3vw,2.15rem);letter-spacing:-.02em;line-height:1.08;margin:0 0 .85rem;
+  text-wrap:balance;
+}
+.body p{margin:0 0 1rem;max-width:66ch}
+.body p:last-child{margin-bottom:0}
+.body strong{font-weight:600}
+
+/* ---------- instrument panels (dark insets) ---------- */
+.scope{
+  background:var(--panel);color:#D6D8DE;border:1px solid var(--ink);
+  padding:1rem;margin:1.4rem 0;position:relative;
+}
+.scope-head{
+  display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:baseline;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:#7E8593;border-bottom:1px solid #2A2F39;padding-bottom:.6rem;margin-bottom:.85rem;
+}
+.scope-head b{color:#E9EBF0;font-weight:600;letter-spacing:.08em}
+canvas{display:block;width:100%;touch-action:none}
+
+/* ---------- live rig ---------- */
+.rig{display:grid;grid-template-columns:1.15fr .85fr;gap:1rem}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.rig-col{display:flex;flex-direction:column;gap:1rem;min-width:0}
+.arena-wrap{position:relative}
+.hint{
+  position:absolute;inset:auto 0 10px 0;text-align:center;pointer-events:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6D7480;
+  transition:opacity .4s;
+}
+.controls{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem 1.1rem;
+  margin-top:.9rem;padding-top:.9rem;border-top:1px solid #2A2F39;
+}
+.ctl label{
+  display:block;font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:#7E8593;margin-bottom:.4rem;
+}
+.ctl label span{color:var(--neural);float:right;letter-spacing:.04em}
+.seg{display:flex;gap:3px;flex-wrap:wrap}
+#segSrc button{flex:1 1 46%;min-width:120px}
+.seg button, select.seg-sel{
+  flex:1;font-family:var(--mono);font-size:11px;padding:.42rem .2rem;cursor:pointer;
+  background:#242932;border:1px solid #333A46;color:#AEB4C0;transition:.14s;
+}
+.seg button:hover{background:#2E3540;color:#fff}
+.seg button[aria-pressed="true"]{background:var(--decode);border-color:var(--decode);color:#fff;font-weight:600}
+select.seg-sel{width:100%;appearance:none;padding:.42rem .5rem}
+input[type=range]{width:100%;accent-color:var(--neural);margin:0;height:20px}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{
+  outline:2px solid var(--neural);outline-offset:2px
+}
+
+.readout{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#2A2F39;border:1px solid #2A2F39}
+.rd{background:var(--panel);padding:.6rem .55rem}
+.rd i{
+  font-style:normal;display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:#6D7480;margin-bottom:.25rem
+}
+.rd b{font-family:var(--disp);font-variation-settings:'wdth' 88;font-weight:600;font-size:1.35rem;color:#E9EBF0;letter-spacing:-.01em}
+.rd b.hl{color:var(--decode)}
+.rd b.am{color:var(--neural)}
+
+/* ---------- equations ---------- */
+.plain{background:var(--paper-hi);border-left:2.5px solid var(--neural);padding:1rem 1.15rem;margin:1.3rem 0}
+.plain .n{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:.65rem}
+.plain .we{font-family:var(--disp);font-variation-settings:'wdth' 92;font-weight:600;letter-spacing:-.012em;
+  font-size:clamp(1.02rem,1.9vw,1.3rem);line-height:1.48}
+.plain .we b{color:var(--decode);font-weight:800}
+.plain .we em{font-style:normal;color:#8A5A12}
+.sym-only{display:none}
+body.symbols .sym-only{display:block}
+.symswitch{display:flex;flex-wrap:wrap;align-items:center;gap:.55rem 1rem;margin-top:1.7rem}
+.symswitch button{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:.5rem .9rem;background:transparent;border:1.5px solid var(--ink);color:var(--ink);cursor:pointer}
+.symswitch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.symswitch span{font-family:var(--mono);font-size:11px;color:var(--muted);max-width:44ch;line-height:1.5}
+.eq{
+  font-family:var(--body);font-size:1.12rem;line-height:1.9;
+  padding:1rem 1.15rem;background:var(--paper-hi);border-left:2.5px solid var(--ink);
+  margin:1.2rem 0;overflow-x:auto;
+}
+.eq + .eq{margin-top:-.4rem}
+.eq .n{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);
+  text-transform:uppercase;display:block;margin-bottom:.5rem}
+.s{font-style:italic;font-family:var(--body)}
+.vv{font-weight:700;font-style:normal;font-family:var(--disp);font-variation-settings:'wdth' 100}
+.mm{font-weight:600;font-style:normal;font-family:var(--disp);font-variation-settings:'wdth' 100}
+.eq sub{font-size:.66em;font-family:var(--mono)}
+.eq sup{font-size:.66em}
+.frac{display:inline-block;vertical-align:middle;text-align:center;margin:0 .28em;line-height:1.25}
+.frac span{display:block;padding:0 .3em}
+.frac span:first-child{border-bottom:1.2px solid currentColor}
+.note{font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--muted);margin-top:.5rem}
+.note b{color:var(--ink);font-weight:600}
+
+/* ---------- tables / stack ---------- */
+.tbl{width:100%;border-collapse:collapse;margin:1.3rem 0;font-size:15px}
+.tbl th{
+  text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;border-bottom:1.5px solid var(--ink);padding:0 .8rem .5rem 0;vertical-align:bottom
+}
+.tbl td{padding:.72rem .8rem .72rem 0;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+.tbl td:first-child{font-family:var(--mono);font-size:12.5px;line-height:1.5;width:8.5rem;color:var(--ink)}
+.tbl td code{font-family:var(--mono);font-size:12px;background:rgba(14,16,20,.06);padding:.08em .34em}
+.tbl tr:last-child td{border-bottom:none}
+
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:1.4rem 0}
+.kv div{background:var(--paper-hi);padding:.85rem .9rem}
+.kv i{font-style:normal;display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.kv b{font-family:var(--disp);font-variation-settings:'wdth' 88;font-weight:700;font-size:1.5rem;
+  letter-spacing:-.015em;display:block;line-height:1.1}
+.kv em{font-style:normal;font-size:13px;color:var(--muted);font-family:var(--mono)}
+
+ul.tight{margin:.4rem 0 1rem;padding-left:1.1rem;max-width:66ch}
+ul.tight li{margin-bottom:.42rem}
+ul.tight li::marker{color:var(--neural)}
+
+.pull{
+  font-family:var(--disp);font-variation-settings:'wdth' 92;font-weight:600;
+  font-size:clamp(1.2rem,2.4vw,1.6rem);line-height:1.24;letter-spacing:-.015em;
+  border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
+  padding:1.1rem 0;margin:1.8rem 0;max-width:54ch;text-wrap:balance;
+}
+.pull span{color:var(--neural)}
+
+/* ---------- latency bar ---------- */
+.budget{display:flex;height:52px;border:1px solid var(--ink);margin:1.3rem 0 .3rem;overflow:hidden}
+.budget div{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink);border-right:1px solid var(--ink);text-align:center;padding:0 .2rem;overflow:hidden;
+}
+.budget div:last-child{border-right:none}
+.blegend{display:flex;flex-wrap:wrap;gap:.3rem 1.3rem;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.blegend b{color:var(--ink);font-weight:600}
+
+/* ---------- footer ---------- */
+.foot{border-top:1.5px solid var(--ink);margin-top:4rem;padding-top:1.4rem;
+  font-family:var(--mono);font-size:11.5px;line-height:1.7;color:var(--muted);
+  display:grid;grid-template-columns:9.5rem 1fr;gap:0 2.6rem}
+.foot a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--neural)}
+.foot a:hover{background:var(--neural)}
+.foot p{max-width:72ch;margin:0 0 .6rem}
+
+@media (max-width:900px){
+  .plate,.foot{grid-template-columns:1fr;gap:0}
+  .legend{position:static;margin-bottom:1.1rem;display:flex;gap:1rem;align-items:flex-start}
+  .letter{font-size:2rem;margin-bottom:0}
+  .legend > div{flex:1}
+  .rig,.duo{grid-template-columns:1fr}
+  .controls{grid-template-columns:1fr}
+  .readout{grid-template-columns:repeat(2,1fr)}
+  .foot{margin-top:3rem}
+  .foot .letter{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="tagline">
+    <span><b>Neuralink</b> — BCI Team</span>
+    <span>Machine Learning Engineer</span>
+    <span>Austin, TX · S. San Francisco, CA</span>
+    <span>$199,000–$331,000 + RSUs</span>
+    <span>req 5663271003</span>
+  </div>
+  <h1>How do you move a cursor <em>with a thought?</em></h1>
+  <p class="dek">Neuralink puts about a thousand hair-thin wires into the part of the brain that plans movement. Those wires don't hear the word <i>left</i>. They hear crackling. This page is how the crackling becomes a cursor — <i>and four parts of it you can play with yourself.</i> No background needed.</p>
+  <div class="symswitch">
+    <button id="symBtn" aria-pressed="false">Show the symbols</button>
+    <span>Off by default. Every idea here is written out in ordinary words. The notation is an optional second copy for anyone who wants it.</span>
+  </div>
+</header>
+
+<!-- ============ A ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">A</span>
+    <div>
+      <span class="tag">Try it</span>
+      <p>Orange is what you meant. Blue is what the computer guessed you meant.</p>
+      <p>Closing the gap between those two is the entire job.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>Steer a dot you're not allowed to touch</h2>
+
+    <p>Move your pointer around inside the black box below. You are not moving the blue dot. You never touch the blue dot.</p>
+
+    <p>What your pointer does is set an <strong>intention</strong> — a direction you'd like to go. That intention is handed to 128 pretend brain cells, and the only thing they do in response is crackle. A program listens to the crackling, tries to work out which way you meant, and nudges the blue dot that way. Your job is to get it into the orange rings.</p>
+
+    <p>This is the real situation for someone who is paralyzed. The intention is completely intact. What's broken is the wiring between the intention and the hand. Everything on this page is about rebuilding that wiring out of software.</p>
+
+    <div class="scope">
+      <div class="scope-head"><b>Interactive</b><span>move your pointer inside · drag on touch</span></div>
+      <div class="rig">
+        <div class="rig-col">
+          <div class="arena-wrap">
+            <canvas id="arena" height="330" aria-label="Interactive cursor arena"></canvas>
+            <div class="hint" id="hint">Move your pointer inside · drag on touch</div>
+          </div>
+          <div class="readout">
+            <div class="rd"><i>Accuracy (0–1)</i><b id="mCorr" class="hl">—</b></div>
+            <div class="rd"><i>Speed (bits/sec)</i><b id="mBps" class="hl">0.00</b></div>
+            <div class="rd"><i>Rings hit</i><b id="mHits">0</b></div>
+            <div class="rd"><i>Working wires</i><b id="mCh" class="am">128</b></div>
+          </div>
+        </div>
+        <div class="rig-col">
+          <div>
+            <div class="scope-head" style="margin-bottom:.5rem;padding-bottom:.4rem"><b>The crackling</b><span>each mark is one cell firing once</span></div>
+            <canvas id="raster" height="192" aria-label="Spike raster plot"></canvas>
+          </div>
+          <div>
+            <div class="scope-head" style="margin-bottom:.5rem;padding-bottom:.4rem"><b>Who's shouting</b><span>loudness by direction</span></div>
+            <canvas id="wheel" height="150" aria-label="Directional tuning wheel"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctl">
+          <label for="dec">How the computer guesses</label>
+          <select id="dec" class="seg-sel">
+            <option value="pv">1 — Everyone votes</option>
+            <option value="ols" selected>2 — Best fit</option>
+            <option value="kf">3 — Best fit, with memory</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <label>Brain cells listened to <span id="lN">128</span></label>
+          <div class="seg" id="segN">
+            <button data-v="16">16</button><button data-v="48">48</button>
+            <button data-v="128" aria-pressed="true">128</button><button data-v="512">512</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <label for="bin">Listening window <span id="lBin">20 ms</span></label>
+          <input type="range" id="bin" min="10" max="100" step="10" value="20">
+        </div>
+        <div class="ctl">
+          <label for="dead">Broken wires <span id="lDead">0%</span></label>
+          <input type="range" id="dead" min="0" max="95" step="5" value="0">
+        </div>
+      </div>
+    </div>
+
+    <p class="note"><b>Two things worth trying.</b> Drop the cell count to 16 and watch the accuracy number fall — with only a few cells to average over, the guesses go wild. Then push broken wires up to 85%. That's roughly what Neuralink's first patient lost within weeks of surgery, when some of the threads pulled loose from the tissue. Now switch between the three guessing methods and notice that the third one — the one with memory — holds up far better than the other two. Panel E is about why.</p>
+  </div>
+</section>
+
+<!-- ============ B ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">B</span>
+    <div>
+      <span class="tag">The signal</span>
+      <p>Imagine a stadium crowd where everyone is facing a slightly different way.</p>
+      <p>No one person tells you the answer. The average of the crowd does.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>One brain cell is a vote, not an answer</h2>
+
+    <p>Picture a crowd where each person faces a slightly different direction. Ask the crowd to move <em>right</em>. The people already facing right cheer loudest. The ones facing up-and-right cheer a bit. The ones facing left go quiet. Nobody announces "right" — but if you look at where the loud people are facing and average it, you get right.</p>
+
+    <p>That is close to literally how this part of the brain works. Each cell has a favourite direction. It fires fastest for that direction and tapers off smoothly as you move away from it. Nothing is a readout. Everything is a vote.</p>
+
+    <div class="plain">
+      <span class="n">The rule, in one sentence</span>
+      <div class="we"><b>How fast a cell fires</b> = its resting rate, <em>plus</em> how much it likes the direction you chose.</div>
+    </div>
+    <div class="eq sym-only">
+      <span class="n">Cosine tuning · Georgopoulos et al., 1982</span>
+      <span class="s">λ</span><sub>i</sub>(<span class="vv">v</span>) = <span class="s">b</span><sub>0i</sub> + <span class="s">m</span><sub>i</sub> (<span class="vv">u</span><sub>i</sub> · <span class="vv">v</span>) = <span class="s">b</span><sub>0i</sub> + <span class="s">m</span><sub>i</sub> ‖<span class="vv">v</span>‖ cos(<span class="s">θ</span> − <span class="s">θ</span><sub>i</sub>)
+    </div>
+
+    <p>That relationship is simple enough to run <strong>backwards</strong>, which is the whole trick. If you know each cell's favourite direction, and you can hear how hard each one is firing, you can work back to the direction that would have produced this pattern of shouting.</p>
+
+    <p>Two things make it harder than a crowd:</p>
+
+    <ul class="tight">
+      <li><strong>Cells are unreliable witnesses.</strong> Ask the same cell the same question twice and it answers differently, because the timing of its firing is partly random. It's right on average and untrustworthy on any single occasion.</li>
+      <li><strong>You're only hearing a few of them.</strong> A thousand wires in a region containing millions of cells. You aren't reading the crowd — you're polling a small, arbitrary sample of it.</li>
+    </ul>
+
+    <p>Both problems have the same answer: listen to more cells, and weight each one by how much you trust it. That's why the cell-count slider in panel A moves the accuracy number so much.</p>
+
+    <p class="note">There's a small bonus hidden in the unreliability. The randomness in these cells has a known shape — the busier a cell is, the more its count wobbles, and the two rise together in a fixed way. So the noise itself tells you how much to trust each cell on each occasion. It's a calibration you get for free, and a decoder that ignores it is throwing away something it was handed for nothing.</p>
+  </div>
+</section>
+
+<!-- ============ C ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">C</span>
+    <div>
+      <span class="tag">The trick</span>
+      <p>A recording of an orchestra is one wiggly line. Yet you can still pick out the violin.</p>
+      <p>This is how a machine does the same thing.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>How do you hear one instrument in a recording?</h2>
+
+    <p>Before anything can guess intentions, it has to find the crackles at all. And the raw recording from a single wire is a mess — like one microphone in a room with an orchestra playing, a fridge humming, and someone tapping a pencil. All of it arrives as a single wiggly line.</p>
+
+    <p>There's a trick for pulling that apart, and it is far simpler than its reputation.</p>
+
+    <p>Take your recording. Take a pure test wave — one clean note at one speed. Multiply the two together point by point, and average the result.</p>
+
+    <ul class="tight">
+      <li><strong>If your recording contains that note</strong>, the two rise and fall together. The multiplication keeps landing on positive, and the average comes out large.</li>
+      <li><strong>If it doesn't</strong>, the two drift in and out of step. The multiplication is negative as often as positive, and the average cancels itself down to nothing.</li>
+    </ul>
+
+    <p>That's the whole idea. Do it for every possible note, and you end up with a list of what's in the recording. That list is called a <strong>spectrum</strong>, and the procedure has a name: the <strong>Fourier transform</strong>.</p>
+
+    <div class="scope">
+      <div class="scope-head"><b>Interactive</b><span>the recording is two notes mixed together · drag the dial</span></div>
+      <canvas id="fProbe" height="316" aria-label="Signal multiplied by a probe sinusoid"></canvas>
+      <div class="scope-head" style="margin:.9rem 0 .5rem;padding-bottom:.4rem"><b>Every answer, plotted</b><span>the score at each speed — this curve is the spectrum</span></div>
+      <canvas id="fSpec" height="152" aria-label="Magnitude spectrum built by sweeping the probe"></canvas>
+      <div class="controls" style="grid-template-columns:1fr">
+        <div class="ctl">
+          <label for="fProbeF">Test wave speed <span id="lProbe">5.0 Hz</span></label>
+          <input type="range" id="fProbeF" min="5" max="200" step="1" value="50">
+        </div>
+      </div>
+      <div class="readout" style="grid-template-columns:repeat(3,1fr)">
+        <div class="rd"><i>score, test wave A</i><b id="fA">—</b></div>
+        <div class="rd"><i>score, test wave B</i><b id="fB">—</b></div>
+        <div class="rd"><i>how much is there</i><b id="fM" class="am">—</b></div>
+      </div>
+    </div>
+
+    <p class="note"><b>Why two test waves and not one?</b> Set the dial to 5&nbsp;Hz and watch. Wave A scores <b>0.000</b> — as though there were no 5&nbsp;Hz note in the recording at all. There obviously is; it's just a quarter-step out of sync, so peaks land on troughs and everything cancels. Wave B is the same wave shifted over, and it catches it perfectly at <b>1.000</b>. One test wave can be fooled by timing. Two never are. <br><br>Now try 8 or 17&nbsp;Hz, speeds that genuinely aren't in the recording. Both scores read zero. Not nearly zero — <b>zero</b>. Waves at different speeds cancel each other out exactly, which is why this method never smears one note into its neighbours.</p>
+
+    <div class="eq sym-only">
+      <span class="n">Continuous, then discrete</span>
+      <span class="s">X</span>(<span class="s">f</span>) = ∫ <span class="s">x</span>(<span class="s">t</span>) <span class="s">e</span><sup>−<span class="s">i</span>2π<span class="s">ft</span></sup> <span class="s">dt</span>,&nbsp;&nbsp; <span class="s">e</span><sup>−<span class="s">i</span>2π<span class="s">ft</span></sup> = cos(2π<span class="s">ft</span>) − <span class="s">i</span> sin(2π<span class="s">ft</span>)<br>
+      <span class="s">X</span><sub>k</sub> = Σ<sub>n=0</sub><sup>N−1</sup> <span class="s">x</span><sub>n</sub> <span class="s">e</span><sup>−<span class="s">i</span>2π<span class="s">kn</span>/N</sup>
+      <div class="note" style="margin-top:.7rem">The two test waves are the cosine and sine terms. The integral is the averaging you just watched, nothing more exotic.</div>
+    </div>
+
+    <p>One last thing, because it's the reason anyone can afford to do this. Done the obvious way, checking every note in a short recording takes about <strong>17 million multiplications</strong>. A shortcut published in the 1960s — the Fast Fourier Transform — gets the identical answer in about <strong>49,000</strong>. That saving of roughly 340× is the only reason your phone can do this while you're still talking into it.</p>
+  </div>
+</section>
+
+<!-- ============ D ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">D</span>
+    <div>
+      <span class="tag">The bottleneck</span>
+      <p>Spikes, brain waves and the building's mains hum all sit at different speeds.</p>
+      <p>That separation is what lets you keep one and bin the rest.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>Three things are on the wire, and only one is useful</h2>
+
+    <p>Point that trick at a real electrode and the mess sorts itself out. There are three sources, and they occupy different speeds:</p>
+
+    <ul class="tight">
+      <li><strong>Spikes.</strong> A brain cell firing makes a blip about a thousandth of a second long. Short blip means fast wiggle — these land around 1,000 wiggles per second.</li>
+      <li><strong>Brain waves.</strong> The murmur of thousands of nearby cells, rising and falling over tens of milliseconds. Much slower, and much louder — several times the size of the spikes.</li>
+      <li><strong>Mains hum.</strong> The building's electrical wiring leaks in at exactly 60 wiggles per second, everywhere in North America.</li>
+    </ul>
+
+    <div class="scope">
+      <div class="scope-head"><b>Interactive</b><span>toggle the sources · watch the spectrum respond</span></div>
+      <div class="duo">
+        <div>
+          <div class="scope-head" style="margin-bottom:.5rem;padding-bottom:.4rem"><b>The recording</b><span>raw, then filtered</span></div>
+          <canvas id="nTime" height="228" aria-label="Raw and bandpass filtered electrode trace"></canvas>
+        </div>
+        <div>
+          <div class="scope-head" style="margin-bottom:.5rem;padding-bottom:.4rem"><b>What's in it</b><span>slow ← speed → fast</span></div>
+          <canvas id="nSpec" height="228" aria-label="Power spectrum of the electrode signal"></canvas>
+        </div>
+      </div>
+      <div class="controls" style="grid-template-columns:1fr">
+        <div class="ctl">
+          <label>What's on the wire</label>
+          <div class="seg" id="segSrc">
+            <button data-k="lfp" aria-pressed="true">Brain waves</button>
+            <button data-k="hum" aria-pressed="true">60 Hz mains hum</button>
+            <button data-k="spk" aria-pressed="true">Spikes</button>
+            <button data-k="noi" aria-pressed="true">Electronic hiss</button>
+          </div>
+        </div>
+      </div>
+      <div class="readout" style="grid-template-columns:repeat(3,1fr)">
+        <div class="rd"><i>spike loudness · timed</i><b id="pTime" class="am">—</b></div>
+        <div class="rd"><i>spike loudness · from spectrum</i><b id="pFreq" class="am">—</b></div>
+        <div class="rd"><i>brain wave loudness</i><b id="pLfp">—</b></div>
+      </div>
+    </div>
+
+    <p class="note"><b>Turn off brain waves</b> and watch spike loudness barely budge — 7.68 to 7.91. <b>Turn off spikes</b> and it falls off a cliff, to 1.27, which is just the electronics' own hiss. That gap is what makes the whole thing possible.</p>
+
+    <p>Because the three sit at different speeds, you can keep one and discard the others. That's what "filter to 300–6,000&nbsp;Hz" means, and those numbers aren't arbitrary — they are the width of a spike, converted into a speed. Short things are fast. That's the only physics involved.</p>
+
+    <div class="scope">
+      <div class="scope-head"><b>What survives</b><span>filtered signal · a mark for each spike detected</span></div>
+      <canvas id="trace" height="150" aria-label="Filtered voltage trace with spike detection threshold"></canvas>
+    </div>
+
+    <h2 style="margin-top:2.4rem">Now the awkward part: none of this fits down the wire</h2>
+
+    <p>The implant listens to 1,024 wires, about 19,300 times a second each. Written out, that's roughly <strong>200 million bits every second</strong>.</p>
+
+    <p>The implant is sealed inside a skull and talks to the outside world over Bluetooth, which carries maybe <strong>1 million bits a second</strong> — and can't carry more without drawing power the implant doesn't have and making heat the surrounding tissue can't tolerate.</p>
+
+    <div class="kv">
+      <div><i>What the wires hear</i><b>197 Mb/s</b><em>the firehose</em></div>
+      <div><i>What Bluetooth carries</i><b>~1 Mb/s</b><em>the drinking straw</em></div>
+      <div><i>Gap to close</i><b>~200×</b><em>not optional</em></div>
+      <div><i>Heat allowed</i><b>&lt;2 °C</b><em>tissue safety limit</em></div>
+    </div>
+
+    <p>There is no clever compression that squeezes 200× out of something that's mostly noise. So the implant does something blunter. It <strong>doesn't send the recording at all</strong>. It listens on the spot, notices each spike as it happens, and sends only a tally: how many spikes on each wire in the last twentieth of a second. A thousand small numbers, fifty times a second. That fits comfortably.</p>
+
+    <p class="pull">The recording is destroyed inside your head, on purpose, and never leaves. <span>What the software is allowed to see is decided by the hardware.</span></p>
+
+    <p>Which is why the job posting says the work will "inform our hardware roadmap." How many wires, how fast they sample, and what the chip measures before transmitting are not settled facts the software has to live with. They're open questions, and the person building the models is the person best placed to answer them.</p>
+
+    <div class="plain">
+      <span class="n">A shortcut worth knowing</span>
+      <div class="we">Measuring <b>how much spike-sized activity is on a wire</b> sounds like it needs the full note-by-note breakdown. <em>It doesn't.</em> A 200-year-old result says you get the identical answer by filtering the signal and measuring how loud it is — which is a few lines of arithmetic.</div>
+    </div>
+    <div class="eq sym-only">
+      <span class="n">Parseval's theorem</span>
+      Σ<sub>n</sub> |<span class="s">x</span><sub>n</sub>|<sup>2</sup> = <span class="frac"><span>1</span><span>N</span></span> Σ<sub>k</sub> |<span class="s">X</span><sub>k</sub>|<sup>2</sup>
+    </div>
+
+    <p>That's why the two "spike loudness" numbers in the widget agree to three decimal places — they aren't two estimates of the same thing, they <em>are</em> the same number, arrived at from opposite directions. So the chip inside the head never does the note-by-note breakdown at all. The frequency view tells you what to measure; you then measure it the cheap way.</p>
+  </div>
+</section>
+
+<!-- ============ E ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">E</span>
+    <div>
+      <span class="tag">The guess</span>
+      <p>Three methods, forty years apart. All three are switchable in panel A.</p>
+      <p>Watch the shape of the movement change, not just the score.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>Turning a thousand tallies back into a direction</h2>
+
+    <p>So now you have a thousand numbers, fifty times a second, and you need exactly two out of them: how fast left-or-right, and how fast up-or-down.</p>
+
+    <p><strong>1 — Everyone votes.</strong> Give each cell an arrow pointing its favourite way, make the arrow as long as the cell fired hard, and add them all up. It's a handful of lines of code and it genuinely works. Its flaw is that it assumes the cells you happen to be listening to are spread evenly around the compass. They never are — you got whichever cells the wires landed near — so the answer leans toward wherever your cells happen to be crowded.</p>
+
+    <p><strong>2 — Best fit.</strong> Instead of assuming the spread is even, measure it during setup and correct for it. It's the same idea as drawing a best-fit line through a scatter plot, just done in two directions at once. Still fast enough to run in millionths of a second, and it removes the lean.</p>
+
+    <p><strong>3 — Best fit, with memory.</strong> The first two treat every twentieth of a second as a fresh, isolated guess, which is exactly why their output twitches. But a real hand doesn't teleport. Where it was a moment ago tells you a great deal about where it is now.</p>
+
+    <div class="plain">
+      <span class="n">What "with memory" actually does, each round</span>
+      <div class="we">Predict where you probably are, <em>from a moment ago.</em> Look at what the cells just said. Then <b>blend the two</b> — leaning on whichever one you currently have more reason to trust.</div>
+    </div>
+    <div class="eq sym-only">
+      <span class="n">Kalman filter · predict, then update in information form</span>
+      <span class="vv">x̂</span><sup>−</sup> = <span class="mm">A</span><span class="vv">x̂</span>,&nbsp;&nbsp; <span class="mm">P</span><sup>−</sup> = <span class="mm">A</span><span class="mm">P</span><span class="mm">A</span><sup>⊤</sup> + <span class="mm">W</span><br>
+      <span class="mm">P</span> = ((<span class="mm">P</span><sup>−</sup>)<sup>−1</sup> + <span class="mm">C</span><sup>⊤</sup><span class="mm">Q</span><sup>−1</sup><span class="mm">C</span>)<sup>−1</sup><br>
+      <span class="vv">x̂</span> = <span class="mm">P</span> ((<span class="mm">P</span><sup>−</sup>)<sup>−1</sup><span class="vv">x̂</span><sup>−</sup> + <span class="mm">C</span><sup>⊤</sup><span class="mm">Q</span><sup>−1</sup>(<span class="vv">y</span> − <span class="vv">o</span>))
+    </div>
+
+    <p>That balance is the important part. When the cells are reporting clearly it leans on them. When they go quiet, or half the wires stop working, it leans on the prediction and coasts through. This is precisely why option 3 survives the broken-wires slider in panel A while the other two fall apart — it has something to fall back on.</p>
+
+    <p class="note"><b>A practical wrinkle.</b> Written the textbook way, the memory method needs you to invert a 1,024-by-1,024 grid of numbers every twentieth of a second — hopelessly slow. Rearranged, the identical answer needs only a 2-by-2. Same result, roughly ten thousand times less work. A great deal of real-time engineering turns out to be finding the rearrangement.</p>
+
+    <p>Past these three, the field moves on to neural networks that <em>learn</em> the pattern instead of assuming it. The method with memory stays as the honest yardstick: if a large model can't beat it on a day it has never seen, it hasn't learned anything about brains. It has memorised one day's electrodes.</p>
+  </div>
+</section>
+
+<!-- ============ F ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">F</span>
+    <div>
+      <span class="tag">The person</span>
+      <p>Normally the thing you're learning from sits still. Here it's a person, watching, adjusting.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>The person is learning too, which breaks the usual rules</h2>
+
+    <p>Setting up a decoder starts out ordinary. The cursor moves on its own, the user imagines following it, and you collect matched pairs — <em>brain did this, cursor did that</em>. Standard stuff.</p>
+
+    <p>Then you hand over control, and the answers quietly go wrong.</p>
+
+    <p>Say the cursor is drifting to the left of the target. What is the user thinking at that moment? Not "left." They're thinking "<strong>right</strong>, hard" — they're correcting. So if you keep training on where the cursor actually went, you are patiently teaching the decoder to reproduce its own mistakes.</p>
+
+    <p>The fix is almost embarrassingly simple. Assume that whatever the cursor did, the user was trying to go <strong>toward the target</strong>. Repoint every training example at the target, keep how fast it was moving, and retrain. One assumption, and control improves in a way that no amount of offline testing would have predicted.</p>
+
+    <div class="plain">
+      <span class="n">The whole fix</span>
+      <div class="we">Don't learn from <em>where the cursor went.</em> Learn from <b>where the person obviously meant it to go.</b></div>
+    </div>
+
+    <p>There's a second problem, and it never goes away. The brain is not a fixed instrument. Electrodes shift by fractions of a millimetre, tissue reacts to them, threads pull loose, and attention and tiredness change the answers within a single afternoon. A decoder tuned on Monday is measurably worse by Friday.</p>
+
+    <p>So retuning can't mean a trip to the clinic. It has to happen constantly, in the background, working out what the person meant from context they're already producing — without them ever being asked to stop and recalibrate.</p>
+
+    <p class="pull">Every number you can measure in a lab is a stand-in. <span>The real test is a person at home at 11pm trying to answer a text message.</span></p>
+  </div>
+</section>
+
+<!-- ============ G ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">G</span>
+    <div>
+      <span class="tag">The clock</span>
+      <p>Past about a tenth of a second, a cursor stops feeling like part of you.</p>
+      <p>Uneven delay is worse than long delay.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>All of it has to happen in less than a blink</h2>
+
+    <div class="budget" id="budget"></div>
+    <div class="blegend">
+      <span><b>Window</b> 20 ms — waiting to collect enough spikes</span>
+      <span><b>Detect</b> ~1 ms</span>
+      <span><b>Bluetooth</b> 8–15 ms</span>
+      <span><b>Guess</b> &lt;1 ms</span>
+      <span><b>Screen</b> 8–16 ms</span>
+    </div>
+
+    <p>Notice where the time actually goes. The guessing — the part that sounds hardest — is nearly free. The two real costs are waiting to collect enough crackling to be confident, and the Bluetooth hop out of the head.</p>
+
+    <p>That waiting is a genuine dilemma, and you can feel it yourself. In panel A, drag the listening window down to 10&nbsp;ms: the dot responds faster and gets twitchier, because it's deciding on half as much evidence. Drag it up to 100&nbsp;ms: much smoother and steadier, but now it visibly trails your hand. <strong>There is no setting that wins both.</strong> Picking where to sit on that trade-off is one of the most consequential decisions in the entire system.</p>
+
+    <p>One subtlety: unevenness is worse than delay. A steady lag is something a person learns to lead by, the way you throw a ball slightly ahead of someone running. A lag that jumps around can't be learned at all. Which is why this software is written with unusual care about <em>when</em> things happen and not just what they compute — and why the posting asks for C, C++ or Rust, languages that let you control timing exactly.</p>
+
+    <h2 style="margin-top:2.4rem">How fast is fast enough?</h2>
+
+    <p>There's a standard way to score pointing that lets you compare a brain implant to a trackpad on the same scale: how far away the target was, how small it was, and how long it took. It comes out in <strong>bits per second</strong>, and it's the number running live in panel A.</p>
+
+    <div class="kv">
+      <div><i>Previous implant record</i><b>~4.6</b><em>bits/sec</em></div>
+      <div><i>Neuralink's first patient</i><b>~8–9</b><em>bits/sec, reported</em></div>
+      <div><i>You, with a mouse</i><b>~10</b><em>bits/sec, typical</em></div>
+      <div><i>What the job targets</i><b>35</b><em>words/min typing</em></div>
+    </div>
+
+    <p>The posting asks for typing at 35 words a minute. If you treat every letter as a fresh surprise, that works out to about <strong>13.7 bits per second</strong> — well beyond what any cursor delivers today.</p>
+
+    <p>But English isn't a string of surprises. After "the cat sat on the ma—" you can guess what's coming. Measured properly, English carries only about <strong>1 bit per letter</strong>, so the amount that genuinely has to come out of the brain is closer to 3 bits per second. That's reachable.</p>
+
+    <p class="pull">The gap between 13.7 and 3 is a language model. <span>Half of a typing implant is neuroscience. The other half is software that knows what a sentence looks like.</span></p>
+  </div>
+</section>
+
+<!-- ============ H ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">H</span>
+    <div>
+      <span class="tag">The build</span>
+      <p>Eight layers between a brain cell and a cursor, and what each one gets wrong.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>Who builds what</h2>
+
+    <table class="tbl">
+      <thead><tr><th>Layer</th><th>What it does</th><th>What goes wrong</th></tr></thead>
+      <tbody>
+        <tr><td>The chip in the implant</td><td>Boosts a signal far smaller than a AA battery's, turns it into numbers, spots spikes on the spot</td><td>If its sense of "normal background noise" drifts, every number downstream is quietly wrong</td></tr>
+        <tr><td>The implant's software</td><td>Keeps time, counts spikes, packs them into radio messages, watches power and heat, accepts updates that can be undone</td><td>Overheating — or an implant you can no longer update</td></tr>
+        <tr><td>The radio link</td><td>Carries the tallies out over Bluetooth. Messages do get lost, and it has to admit that rather than paper over it</td><td>Silence the decoder mistakes for a quiet brain</td></tr>
+        <tr><td>The live program</td><td>Receives tallies, makes the guess fifty times a second, moves the cursor. Must never pause, not even briefly</td><td>One hiccup and the cursor stutters, which the user feels instantly</td></tr>
+        <tr><td>The models</td><td>Initial setup, ongoing retuning, and learning that carries across sessions and across different people</td><td>Works beautifully on the day it was built, and nowhere else</td></tr>
+        <tr><td>The test rig</td><td>Replays recorded sessions against a new decoder; simulates a user so changes can be tested without one</td><td>The only way to know if something is better is to ask a person to try it</td></tr>
+        <tr><td>Setup experience</td><td>First calibration, then continuous invisible retuning</td><td>Retuning becomes a chore and the device stops being used</td></tr>
+        <tr><td>Release process</td><td>A version per person, new decoders scored quietly against the live one, instant undo</td><td>A problem reaches a person before it reaches a dashboard</td></tr>
+      </tbody>
+    </table>
+
+    <p>Two things make this unlike most machine learning work. The data keeps changing shape, because the sensor physically moves inside living tissue. And there is almost none of it — a handful of participants, each session costing real hours of a real person's day.</p>
+
+    <p>The field's usual answer to a hard problem is to throw more data at it. Here that option isn't available, which pushes everything toward strong assumptions, borrowing what you learned from one person to help the next, and simulations you can actually trust.</p>
+  </div>
+</section>
+
+<!-- ============ I ============ -->
+<section class="plate">
+  <div class="legend">
+    <span class="letter">I</span>
+    <div>
+      <span class="tag">The job</span>
+      <p>Taken from the posting, mapped back to the panels above.</p>
+    </div>
+  </div>
+  <div class="body">
+    <h2>What the posting is really asking for</h2>
+    <ul class="tight">
+      <li><strong>Production C, C++ or Rust, plus Python.</strong> Panel G — the part that has to hit a deadline fifty times a second and the part that trains models are different jobs, so they're written in different languages.</li>
+      <li><strong>Has shipped real-time machine learning.</strong> Panel F — systems where the person adapts back at you, and lab measurements stop being trustworthy.</li>
+      <li><strong>Signal processing.</strong> Panels C and D — finding the spikes, choosing what to measure, under a hard limit on power and bandwidth.</li>
+      <li><strong>Telepathy: 35 words a minute, robotic arms.</strong> Panel G — bits per second, and the language model that closes the gap.</li>
+      <li><strong>Blindsight: the same problem backwards.</strong> Everything above turns brain activity into intent. Blindsight takes a camera image and writes a pattern of stimulation the visual cortex can read as a picture.</li>
+      <li><strong>"Inform our hardware roadmap."</strong> Panel D — the number of wires, how fast they sample and what the chip measures are open questions, and the person building the models is best placed to answer them.</li>
+    </ul>
+    <p>The line worth sitting with is this one: <em>no prior knowledge of neuroscience is required.</em> That's a claim about the shape of the problem. It's a guessing problem, with a tight budget, and a person in the loop — and the person is the part that never shows up in any of the numbers.</p>
+  </div>
+</section>
+
+<footer class="foot">
+  <span class="letter">·</span>
+  <div>
+    <p><b>Where this comes from.</b> Job details: Neuralink req 5663271003, <a href="https://job-boards.greenhouse.io/neuralink/jobs/5663271003">Machine Learning Engineer</a>. Implant specifications (1,024 wires across 64 threads, 19,300 samples a second) from Neuralink's published white paper. The "favourite direction" finding is Georgopoulos and colleagues, 1982. The retraining trick in panel F is from Gilja, Nuyujukian and colleagues, 2012. Speed figures are as reported by Neuralink and by the BrainGate group; treat them as approximate.</p>
+    <p><b>About the simulations.</b> All four interactive pieces compute their results honestly rather than playing back an animation — panel A really does generate random crackling and decode it, and panels C and D really do run the note-by-note breakdown. They are faithful toys, not models of any actual recording. Real brain tissue is messier, less consistent, and considerably less polite.</p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const TAU = Math.PI*2;
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- utils ---------- */
+function dpiFit(cv){
+  const r = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+  const w = cv.clientWidth || 400;
+  const h = parseInt(cv.getAttribute('height'),10);
+  cv.width = Math.round(w*r); cv.height = Math.round(h*r);
+  cv.style.height = h+'px';
+  const c = cv.getContext('2d'); c.setTransform(r,0,0,r,0,0);
+  return {c, w, h};
+}
+function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v); }
+function poisson(l){
+  if(l<=0) return 0;
+  if(l>25){ const k=Math.round(l+Math.sqrt(l)*randn()); return k>0?k:0; }
+  const L=Math.exp(-l); let k=0,p=1;
+  do{ k++; p*=Math.random(); }while(p>L);
+  return k-1;
+}
+/* direction -> cyclic colormap anchored on amber(35) and cobalt(224) */
+function dirColor(th, a){
+  const h = (35 + 360*(((th%TAU)+TAU)%TAU)/TAU) % 360;
+  return 'hsla('+h.toFixed(0)+',62%,60%,'+(a===undefined?1:a)+')';
+}
+function inv2(m){ const d=m[0]*m[3]-m[1]*m[2]; if(Math.abs(d)<1e-12) return [0,0,0,0];
+  return [m[3]/d,-m[1]/d,-m[2]/d,m[0]/d]; }
+
+/* ================= POPULATION ================= */
+const P = { N:128, theta:null, cs:null, sn:null, b0:null, md:null, alive:null, nAlive:0,
+  Hinv:null, KtQC:null, binMs:20, deadPct:0 };
+
+function buildPop(N){
+  P.N=N;
+  P.theta=new Float32Array(N); P.cs=new Float32Array(N); P.sn=new Float32Array(N);
+  P.b0=new Float32Array(N); P.md=new Float32Array(N); P.alive=new Uint8Array(N);
+  for(let i=0;i<N;i++){
+    // clustered, not uniform - real arrays are biased, which is why PV skews
+    const th = (i/N)*TAU + randn()*0.55;
+    P.theta[i]=th; P.cs[i]=Math.cos(th); P.sn[i]=Math.sin(th);
+    P.b0[i]= 4 + Math.random()*12;
+    P.md[i]= 12 + Math.random()*26;
+  }
+  applyDead();
+}
+function applyDead(){
+  const k = P.deadPct/100; let n=0;
+  for(let i=0;i<P.N;i++){ const a = (i/P.N) >= k ? 1:0; P.alive[i]=a; n+=a; }
+  if(n<2){ P.alive[0]=1; P.alive[1]=1; n=2; }
+  P.nAlive=n; precompute();
+}
+function precompute(){
+  // OLS: (H^T H)^-1 with H rows = m*[cos,sin]
+  let a=0,b=0,c=0;
+  for(let i=0;i<P.N;i++){ if(!P.alive[i])continue;
+    const m2=P.md[i]*P.md[i]; a+=m2*P.cs[i]*P.cs[i]; b+=m2*P.cs[i]*P.sn[i]; c+=m2*P.sn[i]*P.sn[i]; }
+  const ridge = 1e-3*(a+c)+1e-6;
+  P.Hinv = inv2([a+ridge,b,b,c+ridge]);
+  // Kalman: C^T Q^-1 C  (2x2), Q_i approx Poisson variance at mean drive
+  const dt=P.binMs/1000; let ka=0,kb=0,kc=0;
+  for(let i=0;i<P.N;i++){ if(!P.alive[i])continue;
+    const q=Math.max(P.b0[i]*dt,1e-3);
+    const w=(P.md[i]*dt)*(P.md[i]*dt)/q;
+    ka+=w*P.cs[i]*P.cs[i]; kb+=w*P.cs[i]*P.sn[i]; kc+=w*P.sn[i]*P.sn[i]; }
+  P.KtQC=[ka,kb,kb,kc];
+}
+
+/* ================= STATE ================= */
+const S = {
+  intent:{x:0,y:0}, vhat:{x:0,y:0},
+  pos:{x:0,y:0}, ptr:{x:0,y:0}, active:false,
+  counts:null, rates:null,
+  kx:{x:0,y:0}, kP:[1,0,0,1],
+  hist:[], hits:0, bits:0, elapsed:0,
+  target:null, dwell:0, spawnDist:0,
+  raster:[], decoder:'ols'
+};
+
+/* ================= CANVASES ================= */
+const arenaEl=document.getElementById('arena'), rastEl=document.getElementById('raster'),
+      wheelEl=document.getElementById('wheel'), traceEl=document.getElementById('trace');
+let AR, RA, WH, TR;
+function layout(){
+  AR=dpiFit(arenaEl); RA=dpiFit(rastEl); WH=dpiFit(wheelEl); TR=dpiFit(traceEl);
+  if(S.pos.x===0&&S.pos.y===0){ S.pos.x=AR.w/2; S.pos.y=AR.h/2; S.ptr.x=AR.w/2; S.ptr.y=AR.h/2; }
+  S.pos.x=Math.min(S.pos.x,AR.w-10); S.ptr.x=Math.min(S.ptr.x,AR.w-10);
+  if(!S.target) spawnTarget();
+}
+function spawnTarget(){
+  const pad=44; let x,y,d=0,tries=0;
+  do{ x=pad+Math.random()*(AR.w-2*pad); y=pad+Math.random()*(AR.h-2*pad);
+      d=Math.hypot(x-S.pos.x,y-S.pos.y); tries++; }while(d<Math.min(120,AR.w*0.3)&&tries<40);
+  S.target={x:x,y:y,r:24}; S.spawnDist=d; S.dwell=0;
+}
+
+/* ================= POINTER ================= */
+function ptrMove(e){
+  const r=arenaEl.getBoundingClientRect();
+  S.ptr.x=e.clientX-r.left; S.ptr.y=e.clientY-r.top; S.active=true;
+  document.getElementById('hint').style.opacity='0';
+}
+arenaEl.addEventListener('pointermove',ptrMove);
+arenaEl.addEventListener('pointerdown',function(e){arenaEl.setPointerCapture(e.pointerId);ptrMove(e);});
+arenaEl.addEventListener('pointerleave',function(){S.active=false;});
+
+/* ================= LOOP ================= */
+let acc=0, last=performance.now();
+const SPEED=340, REACH=150;
+
+function step(dtBin){
+  // --- intent: unit vector from decoded cursor toward pointer (the "joystick" a user generates)
+  if(S.active){
+    const dx=S.ptr.x-S.pos.x, dy=S.ptr.y-S.pos.y, d=Math.hypot(dx,dy);
+    const mag=Math.min(1,d/REACH);
+    S.intent.x = d>1 ? dx/d*mag : 0;
+    S.intent.y = d>1 ? dy/d*mag : 0;
+  } else { S.intent.x*=0.85; S.intent.y*=0.85; }
+
+  // --- ENCODE: Poisson counts from cosine tuning
+  const N=P.N, dt=dtBin;
+  if(!S.counts||S.counts.length!==N){ S.counts=new Float32Array(N); S.rates=new Float32Array(N); }
+  for(let i=0;i<N;i++){
+    if(!P.alive[i]){ S.counts[i]=0; S.rates[i]=0; continue; }
+    const drive=P.cs[i]*S.intent.x+P.sn[i]*S.intent.y;
+    const lam=Math.max(0,P.b0[i]+P.md[i]*drive);
+    const n=poisson(lam*dt);
+    S.counts[i]=n; S.rates[i]=n/dt;
+  }
+
+  // --- DECODE
+  let vx=0,vy=0;
+  if(S.decoder==='pv'){
+    let sx=0,sy=0;
+    for(let i=0;i<N;i++){ if(!P.alive[i])continue;
+      const w=(S.rates[i]-P.b0[i])/P.md[i]; sx+=w*P.cs[i]; sy+=w*P.sn[i]; }
+    vx=2*sx/P.nAlive; vy=2*sy/P.nAlive;
+  } else if(S.decoder==='ols'){
+    let gx=0,gy=0;
+    for(let i=0;i<N;i++){ if(!P.alive[i])continue;
+      const r=(S.rates[i]-P.b0[i])*P.md[i]; gx+=r*P.cs[i]; gy+=r*P.sn[i]; }
+    vx=P.Hinv[0]*gx+P.Hinv[1]*gy; vy=P.Hinv[2]*gx+P.Hinv[3]*gy;
+  } else {
+    // Kalman, information form. state = velocity
+    const A=0.93, W=0.045;
+    const px=A*S.kx.x, py=A*S.kx.y;
+    const Pm=[A*A*S.kP[0]+W, A*A*S.kP[1], A*A*S.kP[2], A*A*S.kP[3]+W];
+    const Pmi=inv2(Pm);
+    const post=inv2([Pmi[0]+P.KtQC[0], Pmi[1]+P.KtQC[1], Pmi[2]+P.KtQC[2], Pmi[3]+P.KtQC[3]]);
+    let ix=0,iy=0;
+    for(let i=0;i<N;i++){ if(!P.alive[i])continue;
+      const q=Math.max(P.b0[i]*dt,1e-3);
+      const w=(P.md[i]*dt)/q*(S.counts[i]-P.b0[i]*dt);
+      ix+=w*P.cs[i]; iy+=w*P.sn[i]; }
+    const bx=Pmi[0]*px+Pmi[1]*py+ix, by=Pmi[2]*px+Pmi[3]*py+iy;
+    vx=post[0]*bx+post[1]*by; vy=post[2]*bx+post[3]*by;
+    S.kx.x=vx; S.kx.y=vy; S.kP=post;
+  }
+  const lim=2.2;
+  vx=Math.max(-lim,Math.min(lim,vx)); vy=Math.max(-lim,Math.min(lim,vy));
+  S.vhat.x=vx; S.vhat.y=vy;
+
+  // --- integrate cursor
+  S.pos.x=Math.max(8,Math.min(AR.w-8,S.pos.x+vx*SPEED*dt));
+  S.pos.y=Math.max(8,Math.min(AR.h-8,S.pos.y+vy*SPEED*dt));
+
+  // --- metrics
+  S.hist.push([S.intent.x,vx,S.intent.y,vy]);
+  if(S.hist.length>240) S.hist.shift();
+  S.elapsed+=dt;
+  if(S.target){
+    const d=Math.hypot(S.pos.x-S.target.x,S.pos.y-S.target.y);
+    if(d<S.target.r){ S.dwell+=dt;
+      if(S.dwell>=0.25){
+        S.hits++;
+        S.bits+=Math.log2(1+S.spawnDist/(S.target.r*2));
+        spawnTarget();
+      }
+    } else S.dwell=Math.max(0,S.dwell-dt*0.5);
+  }
+
+  // --- raster column
+  const col=new Uint8Array(Math.min(64,N));
+  const stride=N/col.length;
+  for(let k=0;k<col.length;k++){ const idx=Math.floor(k*stride); col[k]=S.counts[idx]>0?Math.min(255,S.counts[idx]):0; }
+  S.raster.push(col); if(S.raster.length>160) S.raster.shift();
+}
+
+function corr(){
+  const h=S.hist; if(h.length<30) return null;
+  let n=0,sa=0,sb=0,saa=0,sbb=0,sab=0;
+  for(let k=0;k<h.length;k++){
+    for(let j=0;j<2;j++){ const a=h[k][j*2],b=h[k][j*2+1];
+      n++; sa+=a; sb+=b; saa+=a*a; sbb+=b*b; sab+=a*b; }
+  }
+  const num=n*sab-sa*sb, den=Math.sqrt((n*saa-sa*sa)*(n*sbb-sb*sb));
+  return den<1e-9?0:num/den;
+}
+
+/* ================= DRAW ================= */
+function drawArena(){
+  const c=AR.c,w=AR.w,h=AR.h;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  // grid
+  c.strokeStyle='rgba(255,255,255,.045)'; c.lineWidth=1;
+  for(let x=0;x<w;x+=30){c.beginPath();c.moveTo(x+.5,0);c.lineTo(x+.5,h);c.stroke();}
+  for(let y=0;y<h;y+=30){c.beginPath();c.moveTo(0,y+.5);c.lineTo(w,y+.5);c.stroke();}
+  // target
+  if(S.target){
+    const t=S.target, prog=Math.min(1,S.dwell/0.25);
+    c.strokeStyle='rgba(240,160,60,.5)'; c.lineWidth=1.5;
+    c.beginPath(); c.arc(t.x,t.y,t.r,0,TAU); c.stroke();
+    if(prog>0){ c.strokeStyle='#F0A03C'; c.lineWidth=3;
+      c.beginPath(); c.arc(t.x,t.y,t.r,-Math.PI/2,-Math.PI/2+TAU*prog); c.stroke(); }
+    c.fillStyle='rgba(240,160,60,.10)'; c.beginPath(); c.arc(t.x,t.y,t.r,0,TAU); c.fill();
+  }
+  // intent pointer (ghost) + intent vector
+  if(S.active){
+    c.strokeStyle='rgba(240,160,60,.55)'; c.lineWidth=1;
+    c.beginPath(); c.arc(S.ptr.x,S.ptr.y,7,0,TAU); c.stroke();
+    c.beginPath(); c.moveTo(S.ptr.x-11,S.ptr.y); c.lineTo(S.ptr.x+11,S.ptr.y);
+    c.moveTo(S.ptr.x,S.ptr.y-11); c.lineTo(S.ptr.x,S.ptr.y+11); c.stroke();
+    c.setLineDash([3,4]); c.strokeStyle='rgba(240,160,60,.30)';
+    c.beginPath(); c.moveTo(S.pos.x,S.pos.y); c.lineTo(S.ptr.x,S.ptr.y); c.stroke(); c.setLineDash([]);
+  }
+  // decoded velocity vector
+  c.strokeStyle='rgba(79,123,232,.75)'; c.lineWidth=2;
+  c.beginPath(); c.moveTo(S.pos.x,S.pos.y);
+  c.lineTo(S.pos.x+S.vhat.x*52,S.pos.y+S.vhat.y*52); c.stroke();
+  // decoded cursor
+  c.fillStyle='#4F7BE8'; c.beginPath(); c.arc(S.pos.x,S.pos.y,6.5,0,TAU); c.fill();
+  c.strokeStyle='rgba(79,123,232,.35)'; c.lineWidth=1;
+  c.beginPath(); c.arc(S.pos.x,S.pos.y,13,0,TAU); c.stroke();
+  // labels
+  c.font='10px "IBM Plex Mono",monospace'; c.fillStyle='#F0A03C';
+  c.fillText('YOU MEANT',10,16); c.fillStyle='#4F7BE8'; c.fillText('COMPUTER GUESSED',78,16);
+}
+
+function drawRaster(){
+  const c=RA.c,w=RA.w,h=RA.h;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const rows=S.raster.length?S.raster[0].length:64;
+  const rh=h/rows, cw=w/160;
+  for(let t=0;t<S.raster.length;t++){
+    const col=S.raster[t], x=t*cw;
+    for(let k=0;k<col.length;k++){
+      if(!col[k])continue;
+      const idx=Math.floor(k*(P.N/col.length));
+      c.fillStyle=dirColor(P.theta[idx], Math.min(1,.35+col[k]*.3));
+      c.fillRect(x, k*rh, Math.max(1.1,cw*0.85), Math.max(1.1,rh*0.8));
+    }
+  }
+  c.strokeStyle='rgba(255,255,255,.10)'; c.lineWidth=1;
+  c.beginPath(); c.moveTo(w-.5,0); c.lineTo(w-.5,h); c.stroke();
+  c.font='9px "IBM Plex Mono",monospace'; c.fillStyle='#5C6472';
+  c.fillText('t − '+(160*P.binMs/1000).toFixed(1)+'s',4,h-4);
+  c.fillText('now',w-24,h-4);
+}
+
+function drawWheel(){
+  const c=WH.c,w=WH.w,h=WH.h;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const cx=w/2, cy=h/2, R=Math.min(w,h)/2-16;
+  c.strokeStyle='rgba(255,255,255,.10)';
+  [0.33,0.66,1].forEach(function(f){ c.beginPath(); c.arc(cx,cy,R*f,0,TAU); c.stroke(); });
+  // average population rate as a function of direction, in bins
+  const B=48, bins=new Float64Array(B), cnt=new Float64Array(B);
+  for(let i=0;i<P.N;i++){ if(!P.alive[i])continue;
+    const b=Math.floor((((P.theta[i]%TAU)+TAU)%TAU)/TAU*B)%B;
+    bins[b]+=S.rates?S.rates[i]:0; cnt[b]++; }
+  let mx=1; for(let b=0;b<B;b++){ if(cnt[b]) bins[b]/=cnt[b]; if(bins[b]>mx)mx=bins[b]; }
+  c.beginPath();
+  for(let b=0;b<B;b++){
+    const th=b/B*TAU, r=R*Math.min(1,bins[b]/45);
+    const x=cx+Math.cos(th)*r, y=cy+Math.sin(th)*r;
+    b===0?c.moveTo(x,y):c.lineTo(x,y);
+  }
+  c.closePath(); c.fillStyle='rgba(240,160,60,.22)'; c.fill();
+  c.strokeStyle='#F0A03C'; c.lineWidth=1.5; c.stroke();
+  // decoded vector
+  c.strokeStyle='#4F7BE8'; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(cx,cy);
+  c.lineTo(cx+S.vhat.x*R*0.85, cy+S.vhat.y*R*0.85); c.stroke();
+  // true intent
+  c.strokeStyle='rgba(255,255,255,.45)'; c.lineWidth=1; c.setLineDash([3,3]);
+  c.beginPath(); c.moveTo(cx,cy);
+  c.lineTo(cx+S.intent.x*R*0.85, cy+S.intent.y*R*0.85); c.stroke(); c.setLineDash([]);
+}
+
+/* ---- panel C: voltage trace with threshold ---- */
+const TRB={buf:[],rms:1,spikes:[]};
+let traceT=0;
+function traceStep(dt){
+  const steps=Math.min(40,Math.round(dt*900));
+  for(let s=0;s<steps;s++){
+    traceT++;
+    let v=randn()*0.9;
+    // inject spike waveforms stochastically
+    if(Math.random()<0.006) TRB.spikes.push({t:traceT,ph:0});
+    for(let k=TRB.spikes.length-1;k>=0;k--){
+      const sp=TRB.spikes[k]; const p=sp.ph++;
+      if(p<26){
+        // biphasic: sharp negative then slower positive
+        v += p<7 ? -6.5*Math.sin(p/7*Math.PI) : 2.3*Math.sin((p-7)/19*Math.PI);
+      } else TRB.spikes.splice(k,1);
+    }
+    TRB.buf.push(v); if(TRB.buf.length>700) TRB.buf.shift();
+  }
+}
+function drawTrace(){
+  const c=TR.c,w=TR.w,h=TR.h;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const mid=h/2, sc=h/22, TH=-4.5;
+  // threshold band
+  c.fillStyle='rgba(240,160,60,.07)'; c.fillRect(0,mid-TH*sc,w,h-(mid-TH*sc));
+  c.strokeStyle='rgba(240,160,60,.55)'; c.setLineDash([5,4]); c.lineWidth=1;
+  c.beginPath(); c.moveTo(0,mid-TH*sc); c.lineTo(w,mid-TH*sc); c.stroke(); c.setLineDash([]);
+  c.font='9.5px "IBM Plex Mono",monospace'; c.fillStyle='#F0A03C';
+  c.fillText('spike detected below this line',6,mid-TH*sc-5);
+  c.fillStyle='#5C6472'; c.fillText('0',6,mid-4);
+  // trace
+  const n=TRB.buf.length, dx=w/700;
+  c.strokeStyle='#8E96A6'; c.lineWidth=1.1; c.beginPath();
+  for(let i=0;i<n;i++){ const x=i*dx, y=mid-TRB.buf[i]*sc; i?c.lineTo(x,y):c.moveTo(x,y); }
+  c.stroke();
+  // detected crossings
+  c.fillStyle='#F0A03C';
+  for(let i=1;i<n;i++){
+    if(TRB.buf[i]<TH && TRB.buf[i-1]>=TH){
+      const x=i*dx; c.beginPath(); c.moveTo(x,10); c.lineTo(x-4,3); c.lineTo(x+4,3); c.closePath(); c.fill();
+    }
+  }
+}
+
+/* ---- latency budget bar ---- */
+(function(){
+  const parts=[['Window',20,'#F0A03C'],['Detect',1,'#C98A46'],['Bluetooth',12,'#8A7CC4'],['Guess',1,'#6A87D8'],['Screen',12,'#4F7BE8']];
+  const tot=parts.reduce(function(a,p){return a+p[1];},0);
+  const el=document.getElementById('budget');
+  el.innerHTML=parts.map(function(p){
+    return '<div style="flex:'+p[1]+';background:'+p[2]+'">'+(p[1]>=8?p[0]+' '+p[1]+'ms':'')+'</div>';
+  }).join('')+'<div style="flex:'+(100-tot)+';background:var(--paper-hi);color:var(--muted)">headroom to 100 ms</div>';
+})();
+
+/* ================= CONTROLS ================= */
+document.getElementById('dec').addEventListener('change',function(e){
+  S.decoder=e.target.value; S.hist=[]; S.kx={x:0,y:0}; S.kP=[1,0,0,1];
+  S.bits=0; S.hits=0; S.elapsed=0;
+});
+document.getElementById('segN').addEventListener('click',function(e){
+  const b=e.target.closest('button'); if(!b)return;
+  Array.prototype.forEach.call(this.querySelectorAll('button'),function(x){x.setAttribute('aria-pressed','false');});
+  b.setAttribute('aria-pressed','true');
+  const v=+b.dataset.v; document.getElementById('lN').textContent=v;
+  buildPop(v); S.hist=[]; S.raster=[]; S.counts=null;
+});
+document.getElementById('bin').addEventListener('input',function(e){
+  P.binMs=+e.target.value; document.getElementById('lBin').textContent=P.binMs+' ms';
+  precompute(); S.hist=[]; S.raster=[];
+});
+document.getElementById('dead').addEventListener('input',function(e){
+  P.deadPct=+e.target.value; document.getElementById('lDead').textContent=P.deadPct+'%';
+  applyDead(); S.hist=[];
+});
+
+/* ================= RAF ================= */
+function frame(now){
+  let dt=(now-last)/1000; last=now;
+  if(dt>0.25) dt=0.25;
+  acc+=dt;
+  const binS=P.binMs/1000;
+  let guard=0;
+  while(acc>=binS && guard++<6){ step(binS); acc-=binS; }
+  traceStep(dt);
+  drawArena(); drawRaster(); drawWheel(); drawTrace();
+
+  const r=corr();
+  document.getElementById('mCorr').textContent = r===null?'—':r.toFixed(3);
+  document.getElementById('mBps').textContent = S.elapsed>1?(S.bits/S.elapsed).toFixed(2):'0.00';
+  document.getElementById('mHits').textContent = S.hits;
+  document.getElementById('mCh').textContent = P.nAlive;
+  requestAnimationFrame(frame);
+}
+
+/* ================= BOOT ================= */
+buildPop(128);
+layout();
+let rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(layout,140); });
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(function(){
+"use strict";
+const TAU=Math.PI*2;
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fit(cv){
+  const r=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  const w=cv.clientWidth||420, h=parseInt(cv.getAttribute('height'),10);
+  cv.width=Math.round(w*r); cv.height=Math.round(h*r); cv.style.height=h+'px';
+  const c=cv.getContext('2d'); c.setTransform(r,0,0,r,0,0);
+  return {c,w,h};
+}
+function randn(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v);}
+
+/* ---------------- radix-2 FFT, in place ---------------- */
+function fft(re,im,inverse){
+  const n=re.length;
+  for(let i=1,j=0;i<n;i++){
+    let bit=n>>1;
+    for(;j&bit;bit>>=1) j^=bit;
+    j^=bit;
+    if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}
+  }
+  for(let len=2;len<=n;len<<=1){
+    const ang=(inverse?TAU:-TAU)/len, wr=Math.cos(ang), wi=Math.sin(ang);
+    for(let i=0;i<n;i+=len){
+      let cr=1,ci=0;
+      const half=len>>1;
+      for(let k=0;k<half;k++){
+        const ur=re[i+k], ui=im[i+k];
+        const xr=re[i+k+half], xi=im[i+k+half];
+        const vr=xr*cr-xi*ci, vi=xr*ci+xi*cr;
+        re[i+k]=ur+vr; im[i+k]=ui+vi;
+        re[i+k+half]=ur-vr; im[i+k+half]=ui-vi;
+        const t=cr*wr-ci*wi; ci=cr*wi+ci*wr; cr=t;
+      }
+    }
+  }
+  if(inverse){ for(let i=0;i<n;i++){ re[i]/=n; im[i]/=n; } }
+}
+
+/* =========================================================
+   C1 — the probe: x(t) against cos and sin at frequency f
+   ========================================================= */
+const NS=512, DUR=1.0;                    // 1 second, 512 samples
+const X=new Float64Array(NS);
+for(let i=0;i<NS;i++){
+  const t=i/NS*DUR;
+  X[i]=Math.sin(TAU*5*t) + 0.6*Math.sin(TAU*12*t + 0.9);
+}
+function project(f){
+  let a=0,b=0;
+  for(let i=0;i<NS;i++){ const t=i/NS*DUR;
+    a+=X[i]*Math.cos(TAU*f*t); b+=X[i]*Math.sin(TAU*f*t); }
+  return [2*a/NS, 2*b/NS];
+}
+const FPTS=280, FMIN=0.5, FMAX=20, curve=new Float64Array(FPTS);
+for(let k=0;k<FPTS;k++){
+  const f=FMIN+(FMAX-FMIN)*k/(FPTS-1);
+  const p=project(f); curve[k]=Math.hypot(p[0],p[1]);
+}
+
+let probeF=5.0, userTouched=false, sweepT=0;
+const elP=document.getElementById('fProbeF');
+elP.addEventListener('input',function(e){
+  userTouched=true; probeF=(+e.target.value)/10;
+  document.getElementById('lProbe').textContent=probeF.toFixed(1)+' Hz';
+});
+
+let PR,SP;
+function drawProbe(){
+  const c=PR.c,w=PR.w,h=PR.h;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const pad=8, lanes=4, lh=(h-pad*2)/lanes;
+  const px=function(i){ return pad+ (w-pad*2)*i/(NS-1); };
+  const [a,b]=project(probeF);
+
+  function lane(idx,label,col){
+    const y0=pad+lh*idx, mid=y0+lh/2;
+    c.strokeStyle='rgba(255,255,255,.07)'; c.lineWidth=1;
+    c.beginPath(); c.moveTo(pad,mid+.5); c.lineTo(w-pad,mid+.5); c.stroke();
+    c.font='9.5px "IBM Plex Mono",monospace'; c.fillStyle=col;
+    c.fillText(label,pad+2,y0+11);
+    return mid;
+  }
+  // lane 0: signal
+  let mid=lane(0,'the recording — two notes mixed','#8E96A6');
+  c.strokeStyle='#C6CBD4'; c.lineWidth=1.4; c.beginPath();
+  for(let i=0;i<NS;i++){ const y=mid-X[i]*(lh*0.30);
+    i?c.lineTo(px(i),y):c.moveTo(px(i),y);} c.stroke();
+
+  // lane 1: probes
+  mid=lane(1,'test waves at '+probeF.toFixed(1)+' Hz','#4F7BE8');
+  c.strokeStyle='#4F7BE8'; c.lineWidth=1.3; c.beginPath();
+  for(let i=0;i<NS;i++){ const t=i/NS*DUR, y=mid-Math.cos(TAU*probeF*t)*(lh*0.30);
+    i?c.lineTo(px(i),y):c.moveTo(px(i),y);} c.stroke();
+  c.strokeStyle='rgba(79,123,232,.45)'; c.setLineDash([3,3]); c.beginPath();
+  for(let i=0;i<NS;i++){ const t=i/NS*DUR, y=mid-Math.sin(TAU*probeF*t)*(lh*0.30);
+    i?c.lineTo(px(i),y):c.moveTo(px(i),y);} c.stroke(); c.setLineDash([]);
+
+  // lanes 2,3: products
+  function product(idx,fn,mean,label){
+    const y0=pad+lh*idx, mid=y0+lh/2, sc=lh*0.24;
+    lane(idx,label,'#8E96A6');
+    c.beginPath(); c.moveTo(px(0),mid);
+    for(let i=0;i<NS;i++){ const t=i/NS*DUR; c.lineTo(px(i),mid-X[i]*fn(TAU*probeF*t)*sc); }
+    c.lineTo(px(NS-1),mid); c.closePath();
+    c.fillStyle='rgba(240,160,60,.28)'; c.fill();
+    c.strokeStyle='rgba(240,160,60,.85)'; c.lineWidth=1; c.stroke();
+    // mean line
+    const my=mid-mean*sc*2;
+    c.strokeStyle= Math.abs(mean)>0.06 ? '#F0A03C' : '#5C6472';
+    c.lineWidth=2; c.setLineDash([6,3]);
+    c.beginPath(); c.moveTo(pad,my); c.lineTo(w-pad,my); c.stroke(); c.setLineDash([]);
+    c.font='9.5px "IBM Plex Mono",monospace';
+    c.fillStyle= Math.abs(mean)>0.06 ? '#F0A03C' : '#5C6472';
+    c.fillText('average '+mean.toFixed(3), w-pad-92, my-4);
+  }
+  product(2,Math.cos,a,'recording × wave A');
+  product(3,Math.sin,b,'recording × wave B');
+
+  document.getElementById('fA').textContent=a.toFixed(3);
+  document.getElementById('fB').textContent=b.toFixed(3);
+  document.getElementById('fM').textContent=Math.hypot(a,b).toFixed(3);
+}
+
+function drawSpec(){
+  const c=SP.c,w=SP.w,h=SP.h, pad=8, bot=h-20;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const xf=function(f){ return pad+(w-pad*2)*(f-FMIN)/(FMAX-FMIN); };
+  const yv=function(v){ return bot-(bot-pad)*Math.min(1,v/1.15); };
+  // grid
+  c.strokeStyle='rgba(255,255,255,.07)'; c.lineWidth=1;
+  c.font='9.5px "IBM Plex Mono",monospace';
+  for(let f=0;f<=20;f+=5){ if(f<FMIN)continue;
+    const x=xf(f); c.beginPath(); c.moveTo(x+.5,pad); c.lineTo(x+.5,bot); c.stroke();
+    c.fillStyle='#5C6472'; c.fillText(f+' Hz',x+3,h-6); }
+  c.beginPath(); c.moveTo(pad,bot+.5); c.lineTo(w-pad,bot+.5);
+  c.strokeStyle='rgba(255,255,255,.18)'; c.stroke();
+  // curve
+  c.strokeStyle='rgba(240,160,60,.55)'; c.lineWidth=1.6; c.beginPath();
+  for(let k=0;k<FPTS;k++){ const f=FMIN+(FMAX-FMIN)*k/(FPTS-1);
+    const x=xf(f), y=yv(curve[k]); k?c.lineTo(x,y):c.moveTo(x,y); }
+  c.stroke();
+  // marker
+  const p=project(probeF), m=Math.hypot(p[0],p[1]);
+  const mx=xf(probeF), my=yv(m);
+  c.strokeStyle='rgba(79,123,232,.6)'; c.setLineDash([3,3]); c.lineWidth=1;
+  c.beginPath(); c.moveTo(mx,pad); c.lineTo(mx,bot); c.stroke(); c.setLineDash([]);
+  c.fillStyle='#4F7BE8'; c.beginPath(); c.arc(mx,my,4.5,0,TAU); c.fill();
+  c.fillStyle='#C6CBD4'; c.font='10px "IBM Plex Mono",monospace';
+  c.fillText(m.toFixed(2), Math.min(mx+8,w-40), Math.max(my-8,pad+10));
+  if(!userTouched){
+    c.fillStyle='#5C6472'; c.font='9.5px "IBM Plex Mono",monospace';
+    c.fillText('auto-sweeping — grab the slider',pad+2,pad+10);
+  }
+}
+
+/* =========================================================
+   C2 — the electrode: real bands, real filter
+   ========================================================= */
+const FS=19300, N2=4096;
+const src={lfp:true,hum:true,spk:true,noi:true};
+let raw=null, band=null, mag=null, spikeRmsT=0, spikeRmsF=0, lfpRms=0;
+
+function genSignal(){
+  const x=new Float64Array(N2);
+  if(src.lfp){                               // 1/f local field potential
+    for(let f=2;f<=260;f+=4){
+      const amp=95/Math.pow(f,0.85), ph=Math.random()*TAU;
+      for(let n=0;n<N2;n++) x[n]+=amp*Math.sin(TAU*f*n/FS+ph);
+    }
+  }
+  if(src.hum){                               // mains + harmonics
+    const ph=Math.random()*TAU;
+    for(let n=0;n<N2;n++){
+      x[n]+=34*Math.sin(TAU*60*n/FS+ph)+9*Math.sin(TAU*120*n/FS+ph*2)+4*Math.sin(TAU*180*n/FS);
+    }
+  }
+  if(src.spk){                               // biphasic action potentials, ~1.2 ms
+    const W=Math.round(0.0012*FS);
+    for(let s=0;s<16;s++){
+      const t0=Math.floor(Math.random()*(N2-W-4));
+      const A=55+Math.random()*30;
+      for(let k=0;k<W;k++){
+        const u=k/W;
+        const v = u<0.28 ? -Math.sin(u/0.28*Math.PI) : 0.42*Math.sin((u-0.28)/0.72*Math.PI);
+        x[t0+k]+=A*v;
+      }
+    }
+  }
+  if(src.noi){ for(let n=0;n<N2;n++) x[n]+=randn()*4.5; }
+  return x;
+}
+
+function bandLimit(x,lo,hi){
+  const re=Float64Array.from(x), im=new Float64Array(N2);
+  fft(re,im,false);
+  const df=FS/N2;
+  let energy=0;
+  for(let k=0;k<N2;k++){
+    const f=(k<=N2/2)? k*df : (N2-k)*df;
+    if(f<lo||f>hi){ re[k]=0; im[k]=0; }
+    else energy+=re[k]*re[k]+im[k]*im[k];
+  }
+  fft(re,im,true);
+  return {sig:re, parseval:Math.sqrt(energy)/N2};
+}
+function rms(a){ let s=0; for(let i=0;i<a.length;i++) s+=a[i]*a[i]; return Math.sqrt(s/a.length); }
+
+function recompute(){
+  raw=genSignal();
+  const bp=bandLimit(raw,300,6000);
+  band=bp.sig;
+  const sb=bandLimit(raw,300,1000);
+  spikeRmsT=rms(sb.sig); spikeRmsF=sb.parseval;
+  lfpRms=rms(bandLimit(raw,1,300).sig);
+  // spectrum
+  const re=Float64Array.from(raw), im=new Float64Array(N2);
+  fft(re,im,false);
+  mag=new Float64Array(N2/2);
+  for(let k=0;k<N2/2;k++) mag[k]=2*Math.hypot(re[k],im[k])/N2;
+  document.getElementById('pTime').textContent=spikeRmsT.toFixed(2)+' µV';
+  document.getElementById('pFreq').textContent=spikeRmsF.toFixed(2)+' µV';
+  document.getElementById('pLfp').textContent=lfpRms.toFixed(1)+' µV';
+}
+
+let NT,NSp;
+function drawNTime(){
+  const c=NT.c,w=NT.w,h=NT.h,pad=6;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const SHOW=Math.round(0.042*FS);           // 42 ms window
+  const lh=(h-pad*2)/2;
+  function lane(idx,data,scale,label,col,thr){
+    const y0=pad+lh*idx, mid=y0+lh/2;
+    c.strokeStyle='rgba(255,255,255,.07)'; c.lineWidth=1;
+    c.beginPath(); c.moveTo(pad,mid+.5); c.lineTo(w-pad,mid+.5); c.stroke();
+    if(thr){
+      const ty=mid+thr*scale;
+      c.strokeStyle='rgba(240,160,60,.5)'; c.setLineDash([4,4]);
+      c.beginPath(); c.moveTo(pad,ty); c.lineTo(w-pad,ty); c.stroke(); c.setLineDash([]);
+    }
+    c.strokeStyle=col; c.lineWidth=1.2; c.beginPath();
+    for(let i=0;i<SHOW;i++){
+      const x=pad+(w-pad*2)*i/(SHOW-1), y=mid-data[i]*scale;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    c.font='9.5px "IBM Plex Mono",monospace'; c.fillStyle='#7E8593';
+    c.fillText(label,pad+2,y0+11);
+  }
+  const s1=lh*0.36/Math.max(30,rms(raw)*2.6);
+  lane(0,raw,s1,'raw — everything at once','#8E96A6');
+  const s2=lh*0.36/Math.max(12,rms(band)*3.2);
+  lane(1,band,s2,'filtered — spikes only','#F0A03C', 4.5*Math.max(1,rms(band)));
+  c.font='9.5px "IBM Plex Mono",monospace'; c.fillStyle='#5C6472';
+  c.fillText('42 ms',w-42,h-4);
+}
+
+function drawNSpec(){
+  const c=NSp.c,w=NSp.w,h=NSp.h,padL=8,padR=8,top=8,bot=h-18;
+  c.fillStyle='#13161C'; c.fillRect(0,0,w,h);
+  const F0=3, F1=FS/2;
+  const xf=function(f){ return padL+(w-padL-padR)*(Math.log10(Math.max(f,F0))-Math.log10(F0))/(Math.log10(F1)-Math.log10(F0)); };
+  // bands
+  c.fillStyle='rgba(240,160,60,.07)'; c.fillRect(xf(300),top,xf(6000)-xf(300),bot-top);
+  c.fillStyle='rgba(240,160,60,.10)'; c.fillRect(xf(300),top,xf(1000)-xf(300),bot-top);
+  c.strokeStyle='rgba(240,160,60,.4)'; c.lineWidth=1;
+  [300,1000,6000].forEach(function(f){ const x=xf(f);
+    c.beginPath(); c.moveTo(x+.5,top); c.lineTo(x+.5,bot); c.stroke(); });
+  // pixel-binned magnitude in dB
+  const df=FS/N2, W=Math.round(w-padL-padR);
+  const sum=new Float64Array(W+1), cnt=new Float64Array(W+1);
+  for(let k=1;k<mag.length;k++){
+    const f=k*df; if(f<F0)continue;
+    const p=Math.min(W,Math.max(0,Math.round(xf(f)-padL)));
+    sum[p]+=mag[k]; cnt[p]++;
+  }
+  const dB=function(v){ return 20*Math.log10(Math.max(v,1e-4)); };
+  const TOP=26, BOTdb=-70;
+  const yv=function(d){ return top+(bot-top)*(TOP-d)/(TOP-BOTdb); };
+  c.strokeStyle='rgba(255,255,255,.06)';
+  for(let d=TOP;d>BOTdb;d-=20){ const y=yv(d);
+    c.beginPath(); c.moveTo(padL,y+.5); c.lineTo(w-padR,y+.5); c.stroke(); }
+  c.beginPath(); let started=false, prev=null;
+  for(let p=0;p<=W;p++){
+    if(!cnt[p]){ continue; }
+    const v=sum[p]/cnt[p], x=padL+p, y=yv(dB(v));
+    if(!started){ c.moveTo(x,y); started=true; } else c.lineTo(x,y);
+    prev=y;
+  }
+  c.strokeStyle='#C6CBD4'; c.lineWidth=1.2; c.stroke();
+  // labels
+  c.font='9.5px "IBM Plex Mono",monospace';
+  c.fillStyle='#5C6472';
+  [[10,'10'],[100,'100'],[1000,'1k'],[10000,'10k']].forEach(function(t){
+    c.fillText(t[1]+' Hz',xf(t[0])+3,h-5); });
+  c.fillStyle='#F0A03C';
+  c.fillText('spikes live here',xf(300)+4,top+11);
+  c.fillText('kept',xf(1000)+4,top+11);
+  if(src.hum){ const x=xf(60);
+    c.strokeStyle='rgba(192,81,122,.7)'; c.setLineDash([3,3]);
+    c.beginPath(); c.moveTo(x+.5,top); c.lineTo(x+.5,bot); c.stroke(); c.setLineDash([]);
+    c.fillStyle='#C0517A'; c.fillText('60',x+3,bot-4); }
+}
+
+document.getElementById('segSrc').addEventListener('click',function(e){
+  const b=e.target.closest('button'); if(!b)return;
+  const k=b.dataset.k; src[k]=!src[k];
+  b.setAttribute('aria-pressed',src[k]?'true':'false');
+  recompute(); drawNTime(); drawNSpec();
+});
+
+/* ---------------- boot + loop ---------------- */
+function layoutF(){
+  PR=fit(document.getElementById('fProbe'));
+  SP=fit(document.getElementById('fSpec'));
+  NT=fit(document.getElementById('nTime'));
+  NSp=fit(document.getElementById('nSpec'));
+  drawNTime(); drawNSpec();
+}
+recompute();
+layoutF();
+let rtf; window.addEventListener('resize',function(){clearTimeout(rtf);rtf=setTimeout(layoutF,140);});
+
+let lastF=performance.now();
+function loopF(now){
+  const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
+  if(!userTouched && !reduce){
+    sweepT+=dt*0.16;
+    const u=(Math.sin(sweepT*TAU-Math.PI/2)+1)/2;
+    probeF=FMIN+(FMAX-FMIN)*u;
+    elP.value=Math.round(probeF*10);
+    document.getElementById('lProbe').textContent=probeF.toFixed(1)+' Hz';
+  }
+  drawProbe(); drawSpec();
+  requestAnimationFrame(loopF);
+}
+requestAnimationFrame(loopF);
+})();
+</script>
+<script>
+(function(){
+  var b=document.getElementById('symBtn');
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('symbols');
+    b.setAttribute('aria-pressed',on?'true':'false');
+    b.textContent=on?'Hide the symbols':'Show the symbols';
+    window.dispatchEvent(new Event('resize'));
+  });
+})();
+</script>
+</body>
+</html>
