@@ -60,6 +60,64 @@ async function preview(term) {
   };
 }
 
+// --- Spotify export ----------------------------------------------------------
+// Picks are stored as "day|stage|artist|startMinute", so the artist and the
+// running order come straight out of the key — no need for the schedule here.
+// An artist can appear on more than one day; their tracks go in once, at the
+// first slot, so the playlist doesn't repeat itself.
+const DAYS = ['Fri', 'Sat', 'Sun'];
+
+function parsePick(k) {
+  const bits = String(k).split('|');
+  if (bits.length < 4) return null;
+  return {
+    day: Number(bits[0]),
+    stage: bits[1],
+    artist: bits.slice(2, -1).join('|'),   // tolerate a "|" inside a name
+    start: Number(bits[bits.length - 1]),
+  };
+}
+
+async function exportToSpotify(person) {
+  const { accessToken, tracksFor, syncPlaylist } = require('./_lib/spotify');
+  const token = await accessToken();
+
+  const picks = (person.picks || []).map(parsePick).filter(Boolean)
+    .sort((a, b) => a.day - b.day || a.start - b.start);
+
+  const uris = [];
+  const seen = new Set();
+  const skipped = [];
+  let matched = 0;
+  for (const pick of picks) {
+    if (seen.has(pick.artist)) continue;
+    seen.add(pick.artist);
+    const got = await tracksFor(token, pick.artist);
+    if (got.uris && got.uris.length) {
+      matched++;
+      uris.push(...got.uris);
+    } else {
+      skipped.push({ artist: pick.artist, why: got.reason || 'no match' });
+    }
+  }
+
+  if (!uris.length) {
+    const e = new Error(picks.length ? 'None of these acts resolved on Spotify.' : 'No picks to export yet.');
+    throw e;
+  }
+
+  const days = [...new Set(picks.map((p) => DAYS[p.day]).filter(Boolean))].join('/');
+  const { id, url } = await syncPlaylist(token, {
+    playlistId: person.spotify && person.spotify.id,
+    name: `Outside Lands 2026 — ${person.name}`,
+    description:
+      `${matched} acts${days ? ', ' + days : ''}, in set order. ` +
+      `Built from samfinegold.me/outside-lands`,
+    uris,
+  });
+  return { id, url, tracks: uris.length, matched, skipped };
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   try {
@@ -96,6 +154,20 @@ module.exports = async (req, res) => {
       if (action === 'remove') {
         state.people = state.people.filter((x) => x.id !== body.id);
         return res.status(200).json(await save(state));
+      }
+
+      if (action === 'spotifyExport') {
+        const p = state.people.find((x) => x.id === body.id);
+        if (!p) return res.status(404).json({ error: 'No such column.' });
+        try {
+          const out = await exportToSpotify(p);
+          p.spotify = { id: out.id, url: out.url, updated: new Date().toISOString() };
+          await save(state);
+          return res.status(200).json({ ...out, state });
+        } catch (err) {
+          return res.status(err && err.needsAuth ? 409 : 502)
+            .json({ error: String((err && err.message) || err), needsAuth: !!(err && err.needsAuth) });
+        }
       }
 
       if (action === 'toggle') {
