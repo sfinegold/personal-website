@@ -52,13 +52,6 @@
   .btn:hover{background:var(--accent);color:var(--on-accent)}
   .btn.ghost{border-color:var(--line);color:var(--dim)}
   .btn.ghost:hover{background:var(--card);color:var(--text)}
-  .btn.spot{border-color:#1DB954;color:#0F7038}
-  .btn.spot:hover{background:#1DB954;color:#fff}
-  .btn[disabled]{opacity:.5;cursor:default}
-  /* the export report — which acts made it and which didn't */
-  .spotout{margin-top:.5rem;font-size:.78rem;color:var(--faint);text-align:center}
-  .spotout a{font-weight:600}
-  .spotout .miss{display:block;margin-top:.25rem;font-size:.72rem}
   /* the instructions still exist, but folded away so the header stays one strip */
   .howto{margin-top:.45rem;text-align:center}
   .howto summary{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
@@ -235,7 +228,6 @@
       <select id="me"></select>
       <input type="text" id="newname" placeholder="add a name" maxlength="24" size="12">
       <button class="btn" id="addBtn">Add column</button>
-      <button class="btn spot" id="spotBtn" title="Build a Spotify playlist from your picks">Spotify</button>
       <button class="btn ghost" id="refresh">Refresh</button>
     </div>
   </div>
@@ -245,7 +237,6 @@
       your column on the right. Click a stage header to fold or unfold it. Everyone's picks are shared — add a column for each friend.
       A <b>red</b> band in someone's column marks the exact minutes two of their picks collide.</p>
   </details>
-  <div class="spotout" id="spotout"></div>
 </header>
 
 <div class="headbar" id="headbar"><div class="headrow" id="headrow"></div></div>
@@ -470,7 +461,7 @@ function render(){
   if(!STATE.people.length) sel.innerHTML='<option>— add a column —</option>';
   STATE.people.forEach(p=>{const o=document.createElement('option');
     o.value=p.id;o.textContent=p.name;o.selected=p.id===ME;sel.appendChild(o);});
-  sel.onchange=()=>{ME=sel.value;localStorage.setItem('ol_me',ME);spotReport=null;render();};
+  sel.onchange=()=>{ME=sel.value;localStorage.setItem('ol_me',ME);render();};
 
   // ---- the one header row, outside the scroller ----
   const hr=document.getElementById('headrow'); hr.innerHTML='';
@@ -517,7 +508,6 @@ function render(){
     g.appendChild(row);
   });
   syncHead();
-  paintSpot();
 }
 
 function headH(){return document.querySelector('header').offsetHeight;}
@@ -544,46 +534,6 @@ document.getElementById('newname').addEventListener('keydown',e=>{
   if(e.key==='Enter') document.getElementById('addBtn').click();});
 document.getElementById('refresh').onclick=pull;
 
-/* ---------------- Spotify export ----------------
-   One playlist per person, all living in the site owner's Spotify account —
-   see api/_lib/spotify.js for why it can't be per-friend. Acts that aren't
-   recording artists (club nights, "Surprise Guest") are reported back rather
-   than silently dropped. */
-const spotBtn=document.getElementById('spotBtn'), spotOut=document.getElementById('spotout');
-// Last export's report. Held separately so the 25-second sync doesn't wipe the
-// "not on Spotify" list out from under whoever just pressed the button.
-let spotReport=null;
-function paintSpot(){
-  if(!spotOut) return;
-  if(spotReport){ spotOut.innerHTML=spotReport; return; }
-  const me=meObj();
-  spotOut.innerHTML = me&&me.spotify&&me.spotify.url
-    ? `<a href="${me.spotify.url}" target="_blank" rel="noopener">Open ${esc(me.name)}'s playlist</a>`
-    : '';
-}
-spotBtn.onclick=async()=>{
-  const me=meObj();
-  if(!me){ toast('Pick who you are first'); return; }
-  spotBtn.disabled=true; const was=spotBtn.textContent; spotBtn.textContent='Building…';
-  spotReport=null; spotOut.innerHTML='Matching '+(me.picks||[]).length+' picks on Spotify…';
-  try{
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'spotifyExport',id:me.id})});
-    const j=await r.json();
-    if(!r.ok){
-      spotReport=esc(j.error||'Export failed')+
-        (j.needsAuth?' <span class="miss">The site owner needs to reconnect Spotify.</span>':'');
-      paintSpot(); return;
-    }
-    const miss=(j.skipped||[]).map(s=>esc(s.artist)).join(', ');
-    spotReport=`<a href="${j.url}" target="_blank" rel="noopener">`+
-      `Open your playlist</a> — ${j.tracks} tracks from ${j.matched} acts.`+
-      (miss?`<span class="miss">Not on Spotify: ${miss}</span>`:'');
-    if(j.state){ STATE=j.state; reconcile(); }
-    render();
-  }catch(e){ spotReport=null; spotOut.textContent='Could not reach the server.'; }
-  finally{ spotBtn.disabled=false; spotBtn.textContent=was; }
-};
 
 render(); pull();
 setInterval(pull, 25000);          // keep friends' columns in sync
