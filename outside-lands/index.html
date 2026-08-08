@@ -82,8 +82,12 @@
   .dayrow{position:absolute;left:0;right:0;height:var(--divh);display:flex;align-items:center;
     background:var(--bg2);border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);z-index:12}
-  .dayrow .lab{position:sticky;left:var(--gutter);display:flex;align-items:baseline;gap:.6rem;
+  .dayrow{cursor:pointer}
+  .dayrow:hover .lab{background:#E5E0D5}
+  .dayrow .lab{position:sticky;left:var(--gutter);display:flex;align-items:baseline;gap:.45rem;
     padding:0 1rem;white-space:nowrap;background:var(--bg2)}
+  .dayrow .fold{font-size:.7rem;color:var(--faint);line-height:1}
+  .dayrow.shut h2{color:var(--dim)}
   .dayrow h2{font-size:.85rem;font-weight:600}
   /* MUST stay: without display:flex the columns stack as blocks and the
      stage columns fall off-screen. position:relative anchors .dayrow. */
@@ -164,7 +168,7 @@
   .blk.tiny .add{height:9px;width:22px;bottom:1px;font-size:.58rem}
   .pblk{position:absolute;left:3px;right:3px;border-radius:6px;padding:2px 4px;
     background:rgba(215,235,224,.62);border:1px solid rgba(59,122,92,.65);overflow:hidden}
-  .pblk .a,.pblk .t{position:relative;z-index:1}   /* text stays crisp over the wash */
+  .pblk .a,.pblk .t,.pblk .tm{position:relative;z-index:1}  /* text stays crisp over the wash */
   /* Only the minutes that actually collide are marked, not the whole set — a
      45-minute act clipping the last 10 minutes of another is a different
      problem from two acts sitting straight on top of each other. */
@@ -173,8 +177,16 @@
     border-top:1px solid rgba(192,57,43,.3);border-bottom:1px solid rgba(192,57,43,.3)}
   .pblk .a{font-size:.58rem;font-weight:600;line-height:1.05;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .pblk .t{font-family:var(--mono);font-size:.5rem;line-height:1.2;color:var(--faint);
+  .pblk .t{font-family:var(--mono);font-size:.5rem;line-height:1.2;color:var(--pick);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pblk .tm{font-family:var(--mono);font-size:.5rem;line-height:1.2;color:var(--faint);
+    white-space:nowrap}
+  /* A 20-minute pick is 21px tall — only room for one line of name and the
+     stage, so the clock time (readable from the card's position) gives way. */
+  .pblk.tiny{padding:0 3px}
+  .pblk.tiny .a{-webkit-line-clamp:1;font-size:.52rem;line-height:1}
+  .pblk.tiny .t{font-size:.46rem;line-height:1.1}
+  .pblk.tiny .tm{display:none}
 
   /* ---------- now playing ---------- */
   .np{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
@@ -263,6 +275,38 @@ const isMini=i=>MINI.has(i);
 function toggleMini(i){ MINI.has(i)?MINI.delete(i):MINI.add(i);
   localStorage.setItem('ol_mini',JSON.stringify([...MINI])); render(); }
 
+/* ---- folded days ----
+   Three days at once is a lot of scrolling when you only care about the one
+   you're standing in. Folding a day leaves its bar and hides its grid. On a
+   first visit during the festival the other two start folded; otherwise
+   everything is open. */
+function festivalDayIndex(){
+  const MON={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const now=new Date();
+  return OL.days.findIndex(d=>{
+    const m=/([A-Z][a-z]{2})\s+(\d{1,2})$/.exec(d.day);
+    return m && MON[m[1]]===now.getMonth() && Number(m[2])===now.getDate();
+  });
+}
+let FOLD=(()=>{
+  const saved=localStorage.getItem('ol_fold');
+  if(saved) return new Set(JSON.parse(saved));
+  const today=festivalDayIndex();
+  return new Set(today<0?[]:OL.days.map((_,i)=>i).filter(i=>i!==today));
+})();
+const folded=i=>FOLD.has(i);
+function saveFold(){ localStorage.setItem('ol_fold',JSON.stringify([...FOLD])); }
+function toggleDay(i){ FOLD.has(i)?FOLD.delete(i):FOLD.add(i); saveFold(); render(); }
+// Tabs focus a single day; "All" unfolds everything.
+function focusDay(i){
+  FOLD=new Set(i===null?[]:OL.days.map((_,k)=>k).filter(k=>k!==i));
+  saveFold(); render();
+  if(i!==null) requestAnimationFrame(()=>{
+    const el=document.getElementById('div-'+i); if(!el) return;
+    window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-headH(),behavior:'smooth'});
+  });
+}
+
 const T0=688, T1=1342;   // padded either side so sets never crowd the day divider
 const ppm=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ppm'));
 const y=m=>(m-T0)*ppm();
@@ -349,15 +393,24 @@ let tt; function toast(m){const t=document.getElementById('toast');t.textContent
 /* ---------------- render ---------------- */
 const DIVH=38;
 const dayH=()=>(T1-T0)*ppm();
-const dayTop=i=>i*(dayH()+DIVH)+DIVH;
-const totalH=()=>OL.days.length*(dayH()+DIVH);
+// A folded day keeps its divider bar and loses its grid, so the days below it
+// move up. Every offset is therefore accumulated rather than multiplied.
+const dayBodyH=i=>folded(i)?0:dayH();
+function dayTop(i){ let t=0; for(let k=0;k<i;k++) t+=DIVH+dayBodyH(k); return t+DIVH; }
+function totalH(){ let t=0; for(let k=0;k<OL.days.length;k++) t+=DIVH+dayBodyH(k); return t; }
 const STAGE_LABEL=i=>i===5?"Dolores'":OL.days[0].stages[i].name;
+// Person columns are ~90px wide, so the stage has to be said briefly. The
+// Dolores' tent is billed under a different collaborator each day, and
+// "Duboce Triangle"/"Cocktail Magic" are unambiguous from their first word.
+const SHORT_STAGE=n=>/^Dolores/.test(n)?"Dolores'"
+  :n==='Duboce Triangle'?'Duboce':n==='Cocktail Magic'?'Cocktail':n;
 
 /* ---- columns (each spans all three days) ---- */
 function timeCol(){
   const c=document.createElement('div'); c.className='col gut';
   const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
   OL.days.forEach((d,di)=>{
+    if(folded(di)) return;
     for(let m=720;m<=1320;m+=30){
       const l=document.createElement('div'); l.className='hr'+(m%60?' half':'');
       l.style.top=(dayTop(di)+(m-T0)*ppm())+'px'; b.appendChild(l);
@@ -372,16 +425,22 @@ function personCol(p,first){
   c.className='col person'+(p.id===ME?' active':'')+(first?' sep':'');
   const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
   OL.days.forEach((d,di)=>{
+    if(folded(di)) return;
     const mine=allSets(di).filter(x=>(p.picks||[]).includes(x.k))
                           .sort((a,b)=>a.s-b.s||a.e-b.e);
     mine.forEach((x,idx)=>{
       const laps=overlaps(x,mine);
       const h=Math.max(20,(x.e-x.s)*ppm()-3);
-      const el=document.createElement('div'); el.className='pblk';
+      const el=document.createElement('div'); el.className='pblk'+(h<26?' tiny':'');
       el.style.top=(dayTop(di)+(x.s-T0)*ppm())+'px';
       el.style.height=h+'px';
       el.style.zIndex=10+idx;          // sorted by start, so later overlaps earlier
-      el.innerHTML=`<div class="a">${esc(x.a)}</div><div class="t">${x.st}</div>`;
+      // Stage above time: "8:40 · Lands End" on one line overflows a 90px
+      // column, and of the two the stage is the part you can't read off the
+      // card's position in the grid, so it gets the line that always survives.
+      el.innerHTML=`<div class="a">${esc(x.a)}</div>`+
+                   `<div class="t">${esc(SHORT_STAGE(x.stage))}</div>`+
+                   `<div class="tm">${hm(x.s)}</div>`;
       // one red band per collision, positioned by clock time within the card
       laps.forEach(([s,e])=>{
         const t=Math.min((s-x.s)*ppm(),h);
@@ -402,6 +461,7 @@ function stageCol(si){
   const hue=HUES[si%HUES.length];
   const b=document.createElement('div'); b.className='body'; b.style.height=totalH()+'px';
   OL.days.forEach((d,di)=>{
+    if(folded(di)) return;
     for(let m=720;m<=1320;m+=60){const l=document.createElement('div');l.className='hr';
       l.style.top=(dayTop(di)+(m-T0)*ppm())+'px';b.appendChild(l);}
     const st=d.stages[si]; if(!st) return;
@@ -447,16 +507,23 @@ function bestText(hex){
 }
 
 function render(){
-  // nav jumps to a day
+  // a tab shows one day on its own; "All" brings the other two back
   const tabs=document.getElementById('tabs'); tabs.innerHTML='';
+  const open=OL.days.map((_,i)=>i).filter(i=>!folded(i));
   OL.days.forEach((d,i)=>{
     const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab');
-    b.setAttribute('aria-selected',i===DAY); b.textContent=d.day.split(' ')[0];
-    b.onclick=()=>{DAY=i; const el=document.getElementById('div-'+i);
-      const y0=el.getBoundingClientRect().top+window.scrollY-headH()-DIVH;
-      window.scrollTo({top:y0,behavior:'smooth'});};
+    b.setAttribute('aria-selected', open.length===1 && open[0]===i);
+    b.textContent=d.day.split(' ')[0];
+    b.title='Show only '+d.day;
+    b.onclick=()=>{DAY=i; focusDay(i);};
     tabs.appendChild(b);
   });
+  const all=document.createElement('button');
+  all.className='tab'; all.setAttribute('role','tab');
+  all.setAttribute('aria-selected', open.length===OL.days.length);
+  all.textContent='All'; all.title='Show all three days';
+  all.onclick=()=>focusDay(null);
+  tabs.appendChild(all);
   const sel=document.getElementById('me'); sel.innerHTML='';
   if(!STATE.people.length) sel.innerHTML='<option>— add a column —</option>';
   STATE.people.forEach(p=>{const o=document.createElement('option');
@@ -502,9 +569,13 @@ function render(){
 
   // ---- day divider rows across the full width ----
   OL.days.forEach((d,di)=>{
-    const row=document.createElement('div'); row.className='dayrow'; row.id='div-'+di;
-    row.style.top=(di*(dayH()+DIVH))+'px';
-    row.innerHTML=`<div class="lab"><h2>${esc(d.day)}</h2></div>`;
+    const row=document.createElement('div');
+    row.className='dayrow'+(folded(di)?' shut':''); row.id='div-'+di;
+    row.style.top=(dayTop(di)-DIVH)+'px';
+    row.innerHTML=`<div class="lab"><span class="fold">${folded(di)?'▸':'▾'}</span>`+
+      `<h2>${esc(d.day)}</h2></div>`;
+    row.title=(folded(di)?'Show ':'Hide ')+d.day;
+    row.onclick=()=>toggleDay(di);
     g.appendChild(row);
   });
   syncHead();
