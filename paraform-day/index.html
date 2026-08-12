@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Work trial — Aug 12</title>
+<link rel="icon" type="image/svg+xml" href="/paraform-day/notebook-favicon.svg">
 <style>
   :root{
     --ink:#0a0a0a;--ink2:#3a3a3a;--muted:#6f6f6f;--faint:#9b9b9b;
@@ -21,9 +22,6 @@
   /* header */
   .top{position:sticky;top:0;z-index:60;background:#0f0f0f;color:#fff;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .top b{font-size:13.5px}
-  .top .now{margin-left:auto;font-size:12.5px;color:#c9c9c9;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .top .pill{background:#1f1f1f;border:1px solid #3a3a3a;border-radius:999px;padding:3px 11px;font-size:12px;font-weight:600;color:#eee}
-  .top .pill.live{background:var(--blue);border-color:var(--blue);color:#fff}
 
   .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}
   @media(max-width:920px){.wrap{grid-template-columns:1fr}}
@@ -138,10 +136,6 @@
 
 <div class="top">
   <b>Work trial · Wed Aug 12</b>
-  <span class="now">
-    <span class="pill" id="clock">--:--</span>
-    <span class="pill live" id="curblk">before start</span>
-  </span>
 </div>
 
 <div class="wrap">
@@ -562,16 +556,11 @@ function renderSum(){
 
 function tick(){
   const d = new Date(), now = d.getHours()*60 + d.getMinutes();
-  document.getElementById('clock').textContent = d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-  let cur = null;
   BLOCKS.forEach((b, i) => {
     const el = document.getElementById('blk'+i), s = +el.dataset.s, e = +el.dataset.e;
-    const live = now >= s && now < e;
-    el.classList.toggle('live', live);
+    el.classList.toggle('live', now >= s && now < e);
     el.classList.toggle('done', now >= e);
-    if (live) cur = b;
   });
-  document.getElementById('curblk').textContent = cur ? cur.name : (now < mins('08:45') ? 'before start' : 'done — go home');
 }
 paintDeck(); paintCount(); renderRoll(); renderSum(); tick(); setInterval(tick, 20000);
 
