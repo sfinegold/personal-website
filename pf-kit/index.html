@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PF Kit — prototype scaffold</title>
+<style>
+  :root{
+    --ink:#0a0a0a;--ink2:#3a3a3a;--muted:#6f6f6f;--faint:#9b9b9b;
+    --bg:#fff;--panel:#fafafa;--border:#e4e4e4;--bsoft:#efefef;
+    --blue:#2f7cf6;--blueink:#1d5fd0;--bluesoft:#eef4fe;--bluebd:#cfe0fc;
+    --green:#16a34a;--greensoft:#ecfdf3;--greenbd:#c9ecd4;
+    --amber:#b45309;--ambersoft:#fef7e0;--amberbd:#f5e6b8;
+    --red:#dc2626;--redsoft:#fdecec;--redbd:#f6cccc;
+    --violet:#7c3aed;--violetsoft:#f3eefe;--r:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.5}
+  .serif{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-.012em}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 24px 90px}
+  h1{font-size:26px}
+  .lede{color:var(--muted);margin:4px 0 18px;font-size:14px}
+  h2{font-size:15px;margin:30px 0 10px;padding-top:14px;border-top:1px solid var(--bsoft);color:var(--blueink);font-weight:700;letter-spacing:.02em}
+  .demo{border:1px solid var(--border);border-radius:var(--r);padding:18px;background:#fff;margin-bottom:8px}
+  pre{background:#0f1115;color:#e6e6e6;border-radius:10px;padding:12px 14px;font-size:11.5px;overflow-x:auto;line-height:1.5;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .bar{position:sticky;top:0;z-index:50;background:#111;color:#fff;padding:10px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .bar b{font-size:13px}
+  .bar .s{font-size:11.5px;color:#b9b9b9}
+  .cpy{margin-left:auto;background:var(--blue);color:#fff;border:0;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .cpy.alt{background:#2a2a2a;border:1px solid #444}
+  .cpy:hover{filter:brightness(1.08)}
+
+  /* ---------- COMPONENTS (copy these) ---------- */
+  .btn{border:0;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.primary:hover{background:#2569d8}
+  .btn.ghost{background:#fff;border:1px solid var(--border);color:var(--ink)}
+  .btn.dark{background:#1a1a1a;color:#fff;border-radius:999px}
+  .btn.sm{padding:7px 13px;font-size:13px}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:600}
+  .chip.green{background:var(--greensoft);color:var(--green)}
+  .chip.blue{background:var(--bluesoft);color:var(--blueink)}
+  .chip.amber{background:var(--ambersoft);color:var(--amber);border:1px solid var(--amberbd)}
+  .chip.red{background:var(--redsoft);color:var(--red)}
+  .chip.gray{background:#f2f2f2;color:var(--ink2)}
+  .newbadge{background:#e5f9d5;color:#3f7d20;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+  .card h3{font-size:14.5px;font-weight:600;margin-bottom:8px}
+
+  .app{display:flex;min-height:420px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+  .side{width:210px;background:var(--panel);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0}
+  .who{display:flex;gap:8px;align-items:center;padding:4px 8px 14px}
+  .who .av{width:26px;height:26px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#555}
+  .nav a{display:block;padding:7px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:13.5px;cursor:pointer}
+  .nav a.on{background:#e9e9e9;color:var(--ink);font-weight:600}
+  .main{flex:1;padding:20px 24px;min-width:0}
+
+  .rolecard{display:flex;gap:14px;padding:15px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;cursor:pointer}
+  .rolecard:hover{border-color:#c9c9c9}
+  .rolecard .logo{width:44px;height:44px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0}
+  .rolecard .t{font-size:15px;font-weight:600;color:var(--blueink)}
+  .rolecard .m{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .stat{border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:22px;font-weight:700;font-family:Georgia,serif}
+  .stat .k{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+  table.t{width:100%;border-collapse:collapse;font-size:13px}
+  table.t th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:700;padding:8px 6px;border-bottom:1px solid var(--border)}
+  table.t td{padding:9px 6px;border-bottom:1px solid var(--bsoft);color:var(--ink2)}
+
+  .field label{display:block;font-size:12.5px;font-weight:600;margin:12px 0 5px}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-family:inherit;font-size:13.5px}
+  .field textarea{min-height:70px;resize:vertical}
+
+  .overlay{position:fixed;inset:0;background:rgba(10,10,10,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
+  .overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;width:520px;max-width:94vw;max-height:90vh;overflow:auto;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative}
+  .modal h2{font-size:19px;font-family:Georgia,serif;font-weight:500;margin:0 0 2px;padding:0;border:0;color:var(--ink)}
+  .modal .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .close-x{position:absolute;top:13px;right:15px;border:0;background:none;font-size:16px;color:var(--faint);cursor:pointer}
+
+  .empty{text-align:center;padding:40px 20px;color:var(--muted)}
+  .empty .ico{font-size:34px;margin-bottom:8px}
+
+  .banner{border-radius:var(--r);padding:13px 15px;margin-bottom:14px;display:flex;gap:10px;border:1px solid}
+  .banner.info{background:var(--bluesoft);border-color:var(--bluebd)}
+  .banner.warn{background:var(--ambersoft);border-color:var(--amberbd)}
+
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:14px}
+  .tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:8px 12px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;margin-bottom:-1px}
+  .tabs button.on{color:var(--ink);border-bottom-color:var(--blue)}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:999px;padding:10px 20px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:70}
+  .toast.show{opacity:1}
+
+  .infowrap{position:relative;display:inline-flex;align-items:center;gap:5px}
+  .iicon{width:15px;height:15px;border-radius:50%;border:1px solid var(--faint);color:var(--muted);font-size:10px;font-weight:700;font-style:italic;font-family:Georgia,serif;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;padding:0}
+  .pop{position:absolute;bottom:calc(100% + 8px);left:0;width:240px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.16);padding:12px;font-size:11.5px;color:var(--ink2);z-index:45;display:none;text-align:left;font-weight:400}
+  .infowrap.open .pop{display:block}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <b>PF Kit</b><span class="s">Paraform-styled prototype scaffold — copy the starter, build the flow</span>
+  <button class="cpy" onclick="copyStarter()">⧉ Copy starter file</button>
+  <button class="cpy alt" onclick="copyCSS()">⧉ Copy CSS only</button>
+</div>
+
+<div class="wrap">
+  <h1 class="serif">Prototype scaffold</h1>
+  <p class="lede">Everything below is already styled to Paraform's real design language (Georgia≈BureauSerif display, system sans≈Circular, their blue <code>#2f7cf6</code>, 12px cards, pill CTAs, #fafafa sidebar). Hit <b>Copy starter file</b>, paste into a new <code>.html</code>, delete what you don't need, build the flow.</p>
+
+  <h2>App shell</h2>
+  <div class="demo">
+    <div class="app">
+      <aside class="side">
+        <div class="who"><div class="av">SP</div><div><div style="font-size:12.5px;font-weight:600">Sam Park</div><div style="font-size:10.5px;color:var(--muted)">Recruiter</div></div></div>
+        <nav class="nav"><a>Home</a><a class="on">Browse</a><a>Candidates</a><a>Earnings</a></nav>
+      </aside>
+      <div class="main">
+        <h1 class="serif" style="font-size:22px;margin-bottom:12px">Page title</h1>
+        <div class="banner info"><span>⚡</span><div><b>Banner.</b> Use for state, nudges, or an HM announcement.</div></div>
+        <div class="stats">
+          <div class="stat"><div class="v">61%</div><div class="k">submission → interview</div></div>
+          <div class="stat"><div class="v">12</div><div class="k">open roles</div></div>
+          <div class="stat"><div class="v">3.4</div><div class="k">avg HM score</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Role card · chips · buttons</h2>
+  <div class="demo">
+    <div class="rolecard">
+      <div class="logo">M</div>
+      <div style="flex:1">
+        <div class="t">Product Engineer</div>
+        <div class="m">Meridian · $140K–$290K · San Francisco · 22.5% + bonus</div>
+        <div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">
+          <span class="chip green">Qualified</span><span class="chip red">High recruiter density</span><span class="chip gray">12 openings</span>
+          <span class="infowrap"><span class="chip blue">⚡ $50 stake</span><button class="iicon" onclick="pop(this,event)">i</button><span class="pop"><b>Popover.</b> Detail on demand — keeps the surface quiet.</span></span>
+        </div>
+      </div>
+      <button class="btn primary sm" style="align-self:center">Submit</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button class="btn primary">Primary</button><button class="btn ghost">Ghost</button><button class="btn dark">Dark pill</button>
+      <span class="newbadge" style="align-self:center">NEW</span>
+    </div>
+  </div>
+
+  <h2>Table · tabs · empty state</h2>
+  <div class="demo">
+    <div class="tabs"><button class="on">Active</button><button>Archived</button><button>All</button></div>
+    <table class="t">
+      <tr><th>Candidate</th><th>Role</th><th>Stage</th><th>Status</th></tr>
+      <tr><td>Maya Chen</td><td>Product Engineer</td><td>Screen</td><td><span class="chip green">Passed</span></td></tr>
+      <tr><td>Devon Ruiz</td><td>Staff Platform</td><td>Review</td><td><span class="chip amber">Pending</span></td></tr>
+    </table>
+    <div class="empty"><div class="ico">◎</div><b>No candidates yet</b><div style="font-size:13px">Empty states sell the flow — use them.</div></div>
+  </div>
+
+  <h2>Form · modal · toast</h2>
+  <div class="demo">
+    <div class="field"><label>Candidate LinkedIn</label><input placeholder="https://linkedin.com/in/…"></div>
+    <div class="field"><label>Why this candidate clears the bar</label><textarea placeholder="Your case…"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn primary" onclick="openM()">Open modal</button>
+      <button class="btn ghost" onclick="toast('Saved — toast for confirmations')">Fire toast</button>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--violetsoft);border-color:#e4d9fb">
+    <h3>Tomorrow's shortcuts</h3>
+    <ul style="margin-left:16px;font-size:13.5px;color:var(--ink2)">
+      <li><b>One flow, three states.</b> Empty → filled → success. That's a demo.</li>
+      <li><b>Fake the data.</b> Hardcode arrays. Nobody checks the backend at 7pm.</li>
+      <li><b>Use <code>view</code> divs + a <code>go(id)</code> function</b> for screens (it's in the starter) — no router, no build step.</li>
+      <li><b>Annotate.</b> A short "why this screen exists" line under each view reads as product thinking.</li>
+      <li><b>Freeze at 4pm.</b> After that, only the presentation.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="overlay" id="m">
+  <div class="modal">
+    <button class="close-x" onclick="closeM()">✕</button>
+    <h2>Modal title</h2><div class="sub">Subtitle / context line</div>
+    <p style="font-size:13.5px;color:var(--ink2)">Body. Use for confirm-and-commit moments — the decision point in a flow.</p>
+    <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" onclick="closeM()">Cancel</button><button class="btn primary" onclick="closeM();toast('Confirmed')">Confirm</button></div>
+  </div>
+</div>
+<div class="toast" id="t"></div>
+
+<script>
+function openM(){document.getElementById('m').classList.add('open')}
+function closeM(){document.getElementById('m').classList.remove('open')}
+function toast(m){const t=document.getElementById('t');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400)}
+function pop(el,e){e.stopPropagation();const w=el.closest('.infowrap');const o=w.classList.contains('open');document.querySelectorAll('.infowrap.open').forEach(x=>x.classList.remove('open'));if(!o)w.classList.add('open')}
+document.addEventListener('click',()=>document.querySelectorAll('.infowrap.open').forEach(x=>x.classList.remove('open')));
+
+function copyCSS(){
+  const css=[...document.styleSheets[0].cssRules].map(r=>r.cssText).join('\n');
+  navigator.clipboard.writeText(css).then(()=>toast('CSS copied'));
+}
+function copyStarter(){
+  const css=[...document.styleSheets[0].cssRules].map(r=>r.cssText).join('\n');
+  const html=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype</title>
+<style>
+${css}
+/* --- screens --- */
+.view{display:none} .view.on{display:block}
+.stepnav{position:sticky;top:0;z-index:50;background:#111;color:#fff;padding:8px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.stepnav b{font-size:12.5px} .stepnav .s{font-size:11px;color:#b9b9b9}
+.stepnav .nav-btns{margin-left:auto;display:flex;gap:6px}
+.stepnav button{background:#1c1c1c;color:#eee;border:1px solid #3a3a3a;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.stepnav button.on{background:#2f7cf6;border-color:#2f7cf6;color:#fff}
+.note{background:#fef7e0;border-bottom:1px solid #f5e6b8;padding:10px 20px;font-size:12.5px;color:#7c4a10}
+.note div{max-width:680px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<div class="stepnav">
+  <b>Prototype</b><span class="s">walkthrough</span>
+  <div class="nav-btns" id="nav"></div>
+</div>
+
+<!-- ============ SCREEN 1 ============ -->
+<div class="view on" id="v-one">
+  <div class="note"><div>Why this screen exists: [one line of product reasoning]</div></div>
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">SP</div><div><div style="font-size:12.5px;font-weight:600">User</div><div style="font-size:10.5px;color:var(--muted)">Role</div></div></div>
+      <nav class="nav"><a class="on">Home</a><a>Browse</a><a>Candidates</a></nav>
+    </aside>
+    <div class="main">
+      <h1 class="serif" style="font-size:22px;margin-bottom:14px">Screen one</h1>
+      <div class="rolecard" onclick="go('two')">
+        <div class="logo">M</div>
+        <div style="flex:1"><div class="t">Example row</div><div class="m">Click me → screen two</div></div>
+        <button class="btn primary sm" style="align-self:center">Open</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SCREEN 2 ============ -->
+<div class="view" id="v-two">
+  <div class="note"><div>Why this screen exists: [one line]</div></div>
+  <div style="max-width:560px;margin:5vh auto;padding:0 20px">
+    <h1 class="serif" style="font-size:24px">Screen two</h1>
+    <div class="card" style="margin-top:14px">
+      <div class="field"><label>Input</label><input placeholder="…"></div>
+      <button class="btn primary" style="width:100%;margin-top:14px" onclick="go('three');toast('Done')">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SCREEN 3 ============ -->
+<div class="view" id="v-three">
+  <div class="note"><div>Why this screen exists: [one line]</div></div>
+  <div style="max-width:560px;margin:6vh auto;text-align:center;padding:0 20px">
+    <div style="font-size:46px">🎉</div>
+    <h1 class="serif" style="font-size:24px;margin:8px 0">Success state</h1>
+    <p style="color:var(--muted)">What happens next.</p>
+    <button class="btn primary" style="margin-top:16px" onclick="go('one')">Back to start</button>
+  </div>
+</div>
+
+<div class="toast" id="t"></div>
+
+<script>
+const STEPS=[['one','1 · Start'],['two','2 · Action'],['three','3 · Done']];
+let cur='one';
+function go(id){cur=id;STEPS.forEach(([k])=>document.getElementById('v-'+k).classList.toggle('on',k===id));
+  document.querySelectorAll('#nav button').forEach((b,i)=>b.classList.toggle('on',STEPS[i][0]===id));window.scrollTo(0,0);}
+function step(d){const i=STEPS.findIndex(s=>s[0]===cur);go(STEPS[Math.min(STEPS.length-1,Math.max(0,i+d))][0]);}
+const nav=document.getElementById('nav');
+STEPS.forEach(([id,label])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>go(id);nav.appendChild(b);});
+document.querySelector('#nav button').classList.add('on');
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1);});
+function toast(m){const t=document.getElementById('t');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400)}
+function openM(){document.getElementById('m').classList.add('open')}
+function closeM(){document.getElementById('m').classList.remove('open')}
+<\/script>
+</body>
+</html>`;
+  navigator.clipboard.writeText(html).then(()=>toast('Starter file copied — paste into a new .html'));
+}
+</script>
+</body>
+</html>
