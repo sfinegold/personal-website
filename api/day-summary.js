@@ -80,6 +80,7 @@ How to read the notes:
 - Weigh the general notes and the timed notes the same.
 
 How to write:
+- Address Sam as "you". Never write his name or refer to him in the third person.
 - Short words. Short sentences. Active voice.
 - One idea per sentence. Cut every word that does not work.
 - No praise, no hedging, no preamble.
