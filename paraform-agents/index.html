@@ -26,8 +26,12 @@
   .top a.on{color:#fff;font-weight:700}
   .top .sp{margin-left:auto}
 
-  .wrap{max-width:800px;margin:0 auto;padding:24px 16px 100px}
-  h1{font-size:31px;line-height:1.2;margin-bottom:6px}
+  .wrap{max-width:min(1160px,100%);margin:0 auto;padding:24px clamp(14px,3vw,28px) 100px}
+  /* Container grows with the window, but prose stays at a readable measure.
+     Tables, code and the diagram are allowed the full width. */
+  .part > *,h1,.lede{max-width:80ch}
+  .part > .scroll,.part > pre,.part > svg,.part > .ag{max-width:100%}
+  h1{font-size:clamp(24px,3.2vw,33px);line-height:1.2;margin-bottom:6px}
   .lede{color:var(--muted);font-size:15px;margin-bottom:22px}
 
   .part{border-top:1px solid var(--border);margin-top:38px;padding-top:26px}
@@ -77,14 +81,36 @@
   .ag .one{font-size:14.5px;color:var(--ink2);margin-bottom:12px}
   .k{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:15px 0 4px}
   .v{font-size:14px;color:var(--ink2)}
-  .gate{font-size:11px;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap;background:var(--redsoft);color:var(--red);margin-left:6px}
+  /* was white-space:nowrap — a long approval label forced the whole page wide */
+  .gate{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:2px 7px;background:var(--redsoft);color:var(--red);margin-left:6px;overflow-wrap:anywhere}
   .gate.auto{background:var(--greensoft);color:var(--green)}
+  .gate.never{background:#f0f0f0;color:var(--ink2)}
   details{margin:8px 0}
   summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--blueink);padding:4px 0}
   summary::marker{color:var(--faint)}
   .dim{color:var(--muted);font-size:13.5px}
   a{color:var(--blueink)}
   svg{max-width:100%;height:auto;display:block;margin:14px auto}
+
+  /* nothing may push the page wider than the window */
+  img,svg,table,pre,.row,.ag{max-width:100%}
+  .row .d,.row .t,.row .x,td,li{overflow-wrap:anywhere}
+
+  @media(max-width:720px){
+    body{font-size:14.5px}
+    .top{gap:9px;padding:8px 12px}
+    .top a{font-size:12px}
+    h2{font-size:21px}
+    h3{font-size:15.5px}
+    .part{margin-top:28px;padding-top:20px}
+    table{font-size:12.5px}
+    th,td{padding:8px 9px}
+    pre{font-size:11.5px;padding:12px}
+    .ag{padding:14px}
+  }
+  @media(max-width:480px){
+    .top a[href^="#"]{display:none}
+  }
 </style>
 </head>
 <body>
@@ -207,7 +233,15 @@ document.getElementById('app').innerHTML = `
     <div class="k">What it reads</div>${plain(a.senses)}
     <div class="k">What it decides</div>${plain(a.decides)}
     <div class="k">What it does — and who approves</div>
-    ${a.acts.map(x=>`<div class="row"><div class="d">${esc(x.action)}<span class="gate${/auto|none|no gate/i.test(x.gate)?' auto':''}">${esc(x.gate)}</span></div></div>`).join('')}
+    ${a.acts.map(x=>{
+      const g=String(x.gate||'');
+      const lab = /never (an )?agent action|never automated|not automated|platform policy/i.test(g) ? 'not automated'
+                : /human approval|approval always|requires approval|human-in|sign-?off/i.test(g) ? 'human approval'
+                : /automatic|auto-|\bauto\b|no gate|none/i.test(g) ? 'automatic'
+                : 'gated';
+      const cls = lab==='automatic' ? ' auto' : lab==='not automated' ? ' never' : '';
+      return `<div class="row"><div class="t">${esc(x.action)}<span class="gate${cls}">${esc(lab)}</span></div><div class="x">${esc(g)}</div></div>`;
+    }).join('')}
     <div class="k">Ground truth — how you know it was right</div><div class="v">${esc(a.ground_truth)}</div>
     <div class="k">How you'd evaluate it before shipping</div><div class="v">${esc(a.evaluation)}</div>
     <div class="k">Metrics</div>${rows(a.metrics,['m','why'])}
