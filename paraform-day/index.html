@@ -89,7 +89,10 @@
 
   /* summary */
   .sum{background:#0f1115;color:#e9e9e9;border-radius:13px;padding:14px 16px;margin-bottom:12px}
-  .sum .sh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px}
+  .sum .sh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px;cursor:pointer;user-select:none}
+  .sum .cx{background:none;border:0;color:#8b8b8b;font-size:12px;cursor:pointer;font-family:inherit;padding:0;line-height:1}
+  .sum.col .sec,.sum.col .empty,.sum.col .err{display:none}
+  .sum.col .head{margin:8px 0 0;font-size:13px;color:#b9b9b9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .sum .sh h2{font-size:14px;font-weight:700;color:#fff}
   .sum .sh .meta{font-size:11.5px;color:#8b8b8b;margin-left:auto}
   .sum .sbtn{background:#1f2228;border-color:#33373f;color:#dcdcdc}
@@ -144,9 +147,10 @@
   <div class="sub">1160 Battery St, Suite 200 (Building West) · text <b>310-765-0029</b> on arrival · everything you do funnels into the 7:00 PM deck →</div>
 
   <div class="sum" id="sum">
-    <div class="sh">
+    <div class="sh" onclick="toggleSum(event)" title="Click to collapse">
+      <button class="cx" id="sumcx" aria-label="Collapse summary">▴</button>
       <h2>Running summary</h2>
-      <button class="sbtn pri" id="sumbtn" onclick="summarize()">Update</button>
+      <button class="sbtn pri" id="sumbtn" onclick="event.stopPropagation();summarize()">Update</button>
       <span class="meta" id="summeta">not run yet</span>
     </div>
     <div id="sumbody"><div class="empty">Write notes below, then hit Update. Claude reads everything you've written and tells you where the day stands against the 7:00 deck.</div></div>
@@ -504,7 +508,19 @@ function copyAll(){
 const PASSKEY = 'wt_pass';
 (function(){ const k = new URLSearchParams(location.search).get('k'); if (k) localStorage.setItem(PASSKEY, k); })();
 
+function toggleSum(e){
+  if (e && e.target.closest('.sbtn')) return;   // Update button must not collapse the panel
+  setSum(!document.getElementById('sum').classList.contains('col'));
+}
+function setSum(collapsed){
+  document.getElementById('sum').classList.toggle('col', collapsed);
+  document.getElementById('sumcx').textContent = collapsed ? '▾' : '▴';
+  document.getElementById('sum').title = collapsed ? 'Click to expand' : 'Click to collapse';
+  S.sumc = collapsed; save();
+}
+
 async function summarize(){
+  setSum(false);   // a fresh result is worth reading, so open it
   const btn = document.getElementById('sumbtn'), body = document.getElementById('sumbody');
   const blocks = blockNotes(), general = generalText();
   if (!blocks.length && !general){
@@ -562,7 +578,7 @@ function tick(){
     el.classList.toggle('done', now >= e);
   });
 }
-paintDeck(); paintCount(); renderRoll(); renderSum(); tick(); setInterval(tick, 20000);
+paintDeck(); paintCount(); renderRoll(); renderSum(); setSum(!!S.sumc); tick(); setInterval(tick, 20000);
 
 // auto-open the live block on load
 setTimeout(()=>{ const l = document.querySelector('.blk.live'); if(l){ l.classList.add('open'); l.scrollIntoView({block:'center'}); } }, 300);
