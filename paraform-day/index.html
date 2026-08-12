@@ -84,7 +84,54 @@
   .btnrow{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
   .sbtn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink2)}
   .sbtn:hover{border-color:#c5c5c5}
+  .sbtn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+  .sbtn.pri:hover{background:var(--blueink);border-color:var(--blueink)}
+  .sbtn[disabled]{opacity:.5;cursor:default}
   a{color:var(--blueink)}
+
+  /* summary */
+  .sum{background:#0f1115;color:#e9e9e9;border-radius:13px;padding:14px 16px;margin-bottom:12px}
+  .sum .sh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px}
+  .sum .sh h2{font-size:14px;font-weight:700;color:#fff}
+  .sum .sh .meta{font-size:11.5px;color:#8b8b8b;margin-left:auto}
+  .sum .sbtn{background:#1f2228;border-color:#33373f;color:#dcdcdc}
+  .sum .sbtn:hover{border-color:#5a5f68}
+  .sum .sbtn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+  .sum .empty{font-size:12.5px;color:#8b8b8b;margin-top:6px}
+  .sum .head{font-size:14.5px;line-height:1.5;margin:9px 0 2px;color:#fff}
+  .sum .sec{margin-top:11px;border-top:1px solid #24262c;padding-top:9px}
+  .sum .sl{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#7d818a;margin-bottom:5px}
+  .sum ul{list-style:none;font-size:12.5px;line-height:1.55}
+  .sum li{margin:4px 0;padding-left:12px;position:relative;color:#cfcfcf}
+  .sum li:before{content:'';position:absolute;left:2px;top:8px;width:3px;height:3px;border-radius:50%;background:#5a5f68}
+  .sum li b{color:#fff}
+  .sum .q{border-left:2px solid var(--blue);padding:2px 0 2px 9px;margin:7px 0;font-size:12.5px;color:#e9e9e9}
+  .sum .q .attr{color:#8b8b8b;font-size:11.5px;display:block;margin-top:2px}
+  .sum .err{font-size:12.5px;color:#ffb4b4;margin-top:7px}
+
+  /* tabs */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px}
+  .tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 13px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--ink);border-bottom-color:var(--blue)}
+  .tab .ct{font-size:10.5px;font-weight:800;background:#ececec;color:var(--muted);border-radius:999px;padding:1px 6px;margin-left:5px}
+  .tab.on .ct{background:var(--bluesoft);color:var(--blueink)}
+  .pane{display:none}
+  .pane.on{display:block}
+
+  /* notes pane */
+  .ncard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px 15px;margin-bottom:12px}
+  .ncard h3{font-size:14px;font-weight:700}
+  .ncard .hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .ncard textarea{min-height:96px}
+  .ncard textarea.big{min-height:190px}
+  .roll{font-size:13px}
+  .roll .r{border-top:1px solid var(--bsoft);padding:9px 0}
+  .roll .r:first-child{border-top:0}
+  .roll .rw{font-size:11.5px;font-weight:800;color:var(--blueink);font-variant-numeric:tabular-nums}
+  .roll .rn{font-size:12.5px;font-weight:600;color:var(--ink2)}
+  .roll .rt{white-space:pre-wrap;color:var(--ink2);margin-top:3px}
+  .roll .none{color:var(--faint);font-size:12.5px}
 </style>
 </head>
 <body>
@@ -102,12 +149,67 @@
   <h1 class="serif">The day</h1>
   <div class="sub">1160 Battery St, Suite 200 (Building West) · text <b>310-765-0029</b> on arrival · everything you do funnels into the 7:00 PM deck →</div>
 
-  <div class="rule">
-    <div class="k">The one rule</div>
-    <p><b>Finished and honest beats ambitious and half-built.</b> Scope to one flow you can genuinely demo, freeze the product at 4:00, and protect 6:00–7:00 for the presentation — not the prototype.</p>
+  <div class="sum" id="sum">
+    <div class="sh">
+      <h2>Running summary</h2>
+      <button class="sbtn pri" id="sumbtn" onclick="summarize()">Update</button>
+      <span class="meta" id="summeta">not run yet</span>
+    </div>
+    <div id="sumbody"><div class="empty">Write notes below, then hit Update. Claude reads everything you've written and tells you where the day stands against the 7:00 deck.</div></div>
   </div>
 
-  <div id="blocks"></div>
+  <div class="tabs">
+    <button class="tab on" id="tab-day" onclick="showTab('day')">Schedule</button>
+    <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes<span class="ct" id="notecount">0</span></button>
+  </div>
+
+  <div class="pane on" id="pane-day">
+    <div class="rule">
+      <div class="k">The one rule</div>
+      <p><b>Finished and honest beats ambitious and half-built.</b> Scope to one flow you can genuinely demo, freeze the product at 4:00, and protect 6:00–7:00 for the presentation — not the prototype.</p>
+    </div>
+
+    <div id="blocks"></div>
+  </div>
+
+  <div class="pane" id="pane-notes">
+    <div class="ncard">
+      <h3>Scratchpad</h3>
+      <div class="hint">Anything that doesn't belong to one time block. Dump first, sort later.</div>
+      <textarea class="big" id="g-scratch" placeholder="…"></textarea>
+    </div>
+
+    <div class="ncard">
+      <h3>People</h3>
+      <div class="hint">Name · what they own · one thing they said. You need names for the 7:00 deck.</div>
+      <textarea id="g-people" placeholder="Name — role — what they told you…"></textarea>
+    </div>
+
+    <div class="ncard">
+      <h3>Product observations</h3>
+      <div class="hint">What you notice about how Paraform actually works — friction, surprises, gaps.</div>
+      <textarea id="g-product" placeholder="…"></textarea>
+    </div>
+
+    <div class="ncard">
+      <h3>Questions to ask</h3>
+      <div class="hint">Running list. Cross them off as you get answers.</div>
+      <textarea id="g-questions" placeholder="…"></textarea>
+    </div>
+
+    <div class="ncard">
+      <h3>Parking lot — what I'm cutting</h3>
+      <div class="hint">Ideas you decide not to build. This is slide 6, so write the reason too.</div>
+      <textarea id="g-cut" placeholder="Idea — why I'm not doing it today…"></textarea>
+    </div>
+
+    <div class="ncard">
+      <h3>Everything from the schedule</h3>
+      <div class="hint">Read-only roll-up of your time-block notes, so 6:00 deck-building is one screen.</div>
+      <div class="btnrow"><button class="sbtn" onclick="copyAll()" id="copybtn">Copy all notes</button></div>
+      <div class="roll" id="roll"></div>
+    </div>
+  </div>
 </div>
 
 <div class="rail">
@@ -136,7 +238,7 @@
     <div class="btnrow">
       <button class="sbtn" onclick="expandAll()">Expand all</button>
       <button class="sbtn" onclick="collapseAll()">Collapse</button>
-      <button class="sbtn" onclick="if(confirm('Clear all checkboxes and notes?')){localStorage.clear();location.reload()}">Reset</button>
+      <button class="sbtn" onclick="if(confirm('Clear all checkboxes and notes?')){localStorage.removeItem('wt');location.reload()}">Reset</button>
     </div>
   </div>
 </div>
@@ -298,6 +400,7 @@ Does the framing sound right to you?"`,
 const S = JSON.parse(localStorage.getItem('wt') || '{}');
 const save = () => localStorage.setItem('wt', JSON.stringify(S));
 const mins = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+const esc = s => String(s==null?'':s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
 const bwrap = document.getElementById('blocks');
 BLOCKS.forEach((b, bi) => {
@@ -317,7 +420,8 @@ BLOCKS.forEach((b, bi) => {
         const k = `${bi}-${ti}`, on = S[k] ? ' checked' : '';
         return `<label class="todo${on?' checked':''}" id="td${k}"><input type="checkbox"${on} onchange="chk('${k}',this)"><span>${t}</span></label>`;
       }).join('')}
-      ${b.note ? `<div class="lbl">Quotes &amp; notes</div><textarea placeholder="Verbatim quote — who said it — what it implies…" onchange="S['n-${bi}']=this.value;save()">${S['n-'+bi]||''}</textarea>` : ''}
+      <div class="lbl">${b.note ? 'Quotes &amp; notes' : 'Notes'}</div>
+      <textarea placeholder="${b.note ? 'Verbatim quote — who said it — what it implies…' : 'What happened, what you decided, what surprised you…'}" oninput="jot(${bi},this)">${esc(S['n-'+bi])}</textarea>
       ${b.warn ? `<div class="warn">${b.warn}</div>` : ''}
       <div class="exit"><b>Done when:</b> ${b.exit}</div>
       ${b.feeds ? `<div class="feeds">→ feeds deck: <b>${DECK.find(d=>d.id===b.feeds).t}</b></div>` : ''}
@@ -349,6 +453,113 @@ function tog(i){ const el = document.getElementById('blk'+i); el.classList.toggl
 function expandAll(){ BLOCKS.forEach((_,i)=>{document.getElementById('blk'+i).classList.add('open');document.getElementById('c'+i).textContent='▴';}); }
 function collapseAll(){ BLOCKS.forEach((_,i)=>{document.getElementById('blk'+i).classList.remove('open');document.getElementById('c'+i).textContent='▾';}); }
 
+/* ---------- notes ---------- */
+const GEN = ['scratch','people','product','questions','cut'];
+const GENLABEL = {scratch:'Scratchpad', people:'People', product:'Product observations', questions:'Questions to ask', cut:'Parking lot — cutting'};
+
+function jot(bi, el){ S['n-'+bi] = el.value; save(); paintCount(); }
+
+GEN.forEach(k => {
+  const el = document.getElementById('g-'+k);
+  el.value = S['g-'+k] || '';
+  el.addEventListener('input', () => { S['g-'+k] = el.value; save(); paintCount(); });
+});
+
+function blockNotes(){
+  return BLOCKS.map((b,i)=>({when:b.s, name:b.name, text:(S['n-'+i]||'').trim()})).filter(n=>n.text);
+}
+function generalText(){
+  return GEN.map(k => (S['g-'+k]||'').trim() ? `${GENLABEL[k]}:\n${(S['g-'+k]||'').trim()}` : '').filter(Boolean).join('\n\n');
+}
+function paintCount(){
+  const n = blockNotes().length + GEN.filter(k=>(S['g-'+k]||'').trim()).length;
+  document.getElementById('notecount').textContent = n;
+}
+
+function showTab(id){
+  ['day','notes'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('on', t===id);
+    document.getElementById('pane-'+t).classList.toggle('on', t===id);
+  });
+  if (id==='notes') renderRoll();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderRoll(){
+  const n = blockNotes();
+  document.getElementById('roll').innerHTML = n.length
+    ? n.map(x=>`<div class="r"><span class="rw">${x.when}</span> <span class="rn">${esc(x.name)}</span><div class="rt">${esc(x.text)}</div></div>`).join('')
+    : '<div class="none">Nothing written in the schedule blocks yet.</div>';
+}
+
+function plainAll(){
+  const parts = [];
+  blockNotes().forEach(x => parts.push(`${x.when} — ${x.name}\n${x.text}`));
+  const g = generalText();
+  if (g) parts.push('GENERAL NOTES\n\n' + g);
+  return parts.join('\n\n---\n\n');
+}
+function copyAll(){
+  const btn = document.getElementById('copybtn');
+  navigator.clipboard.writeText(plainAll() || '(no notes yet)').then(()=>{
+    btn.textContent = 'Copied'; setTimeout(()=>btn.textContent='Copy all notes', 1400);
+  });
+}
+
+/* ---------- Claude summary ---------- */
+const PASSKEY = 'wt_pass';
+(function(){ const k = new URLSearchParams(location.search).get('k'); if (k) localStorage.setItem(PASSKEY, k); })();
+
+async function summarize(){
+  const btn = document.getElementById('sumbtn'), body = document.getElementById('sumbody');
+  const blocks = blockNotes(), general = generalText();
+  if (!blocks.length && !general){
+    body.innerHTML = '<div class="err">Nothing to summarize yet — write some notes first.</div>';
+    return;
+  }
+  let pass = localStorage.getItem(PASSKEY);
+  if (!pass){
+    pass = prompt('Passphrase (one time on this device):');
+    if (!pass) return;
+    localStorage.setItem(PASSKEY, pass.trim());
+    pass = pass.trim();
+  }
+
+  btn.disabled = true; btn.textContent = 'Reading…';
+  try {
+    const r = await fetch('/api/day-summary', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ pass, blocks, general, clock: new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}) })
+    });
+    const data = await r.json();
+    if (!r.ok){
+      if (r.status === 401) localStorage.removeItem(PASSKEY);
+      body.innerHTML = `<div class="err">${esc(data.error || ('error ' + r.status))}</div>`;
+      return;
+    }
+    S.sum = data; S.sumAt = Date.now(); save();
+    renderSum();
+  } catch(e){
+    body.innerHTML = `<div class="err">${esc(String(e.message||e))}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update';
+  }
+}
+
+function renderSum(){
+  const d = S.sum, body = document.getElementById('sumbody'), meta = document.getElementById('summeta');
+  if (!d) return;
+  meta.textContent = 'updated ' + new Date(S.sumAt).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const sec = (label, inner) => inner ? `<div class="sec"><div class="sl">${label}</div>${inner}</div>` : '';
+  const list = a => (a && a.length) ? '<ul>' + a.map(x=>`<li>${esc(x)}</li>`).join('') + '</ul>' : '';
+  body.innerHTML =
+    `<div class="head">${esc(d.headline)}</div>` +
+    sec('Themes', (d.themes||[]).length ? '<ul>' + d.themes.map(t=>`<li><b>${esc(t.t)}</b> — ${esc(t.why)}</li>`).join('') + '</ul>' : '') +
+    sec('Quotes worth using', (d.quotes||[]).length ? d.quotes.map(q=>`<div class="q">"${esc(q.text)}"<span class="attr">${esc(q.who)} · ${esc(q.use)}</span></div>`).join('') : '') +
+    sec('Still missing for 7:00', list(d.gaps)) +
+    sec('Next hour', list(d.next));
+}
+
 function tick(){
   const d = new Date(), now = d.getHours()*60 + d.getMinutes();
   document.getElementById('clock').textContent = d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
@@ -362,7 +573,7 @@ function tick(){
   });
   document.getElementById('curblk').textContent = cur ? cur.name : (now < mins('08:45') ? 'before start' : 'done — go home');
 }
-paintDeck(); tick(); setInterval(tick, 20000);
+paintDeck(); paintCount(); renderRoll(); renderSum(); tick(); setInterval(tick, 20000);
 
 // auto-open the live block on load
 setTimeout(()=>{ const l = document.querySelector('.blk.live'); if(l){ l.classList.add('open'); l.scrollIntoView({block:'center'}); } }, 300);
