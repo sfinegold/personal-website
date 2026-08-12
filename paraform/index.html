@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Paraform — everything</title>
+<link rel="icon" type="image/svg+xml" href="/paraform/list-favicon.svg">
+<style>
+  :root{
+    --ink:#0a0a0a;--ink2:#3a3a3a;--muted:#6f6f6f;--faint:#9b9b9b;
+    --bg:#f7f7f6;--card:#fff;--border:#e4e4e4;--bsoft:#eef0f2;
+    --blue:#2f7cf6;--blueink:#1d5fd0;--bluesoft:#eef4fe;--bluebd:#cfe0fc;
+    --green:#16a34a;--greensoft:#ecfdf3;--greenbd:#c9ecd4;
+    --amber:#b45309;--ambersoft:#fef7e0;--amberbd:#f5e6b8;
+    --violet:#7c3aed;--violetsoft:#f3eefe;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-text-size-adjust:100%}
+  .serif{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-.012em}
+  .top{background:#0f0f0f;color:#fff;padding:9px 16px;font-size:13.5px;font-weight:700}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 90px}
+  h1{font-size:27px;margin-bottom:2px}
+  .sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+
+  .rule{background:#111;color:#fff;border-radius:13px;padding:13px 15px;margin-bottom:20px}
+  .rule .k{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9b9b9b}
+  .rule p{font-size:13.5px;margin-top:4px}
+
+  h2{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:24px 0 9px}
+  a.c{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:10px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+  a.c:hover{border-color:var(--blue);transform:translateY(-1px)}
+  .ic{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bsoft)}
+  .bd{flex:1;min-width:0}
+  .nm{font-size:16px;font-weight:700}
+  .url{font-size:12px;color:var(--blueink);font-family:ui-monospace,Menlo,Consolas,monospace;margin-top:1px}
+  .ds{font-size:13.5px;color:var(--ink2);margin-top:5px}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:5px;padding:2px 7px;margin-top:7px;margin-right:5px}
+  .tag.pw{background:var(--ambersoft);color:var(--amber);border:1px solid var(--amberbd)}
+  .tag.key{background:var(--greensoft);color:var(--green);border:1px solid var(--greenbd)}
+  .tag.new{background:var(--violetsoft);color:var(--violet)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+  .note b{color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="top">Paraform · Sam Finegold</div>
+<div class="wrap">
+  <h1 class="serif">Everything, in one place</h1>
+  <div class="sub">Wed Aug 12 · 1160 Battery St, Suite 200 (Building West) · text 310-765-0029 on arrival</div>
+
+  <div class="rule">
+    <div class="k">The one rule</div>
+    <p><b>Finished and honest beats ambitious and half-built.</b> Scope to one flow you can genuinely demo, freeze the product at 4:00, and protect 6:00–7:00 for the presentation — not the prototype.</p>
+  </div>
+
+  <h2>During the trial</h2>
+
+  <a class="c" href="/paraform-day?k=daybook">
+    <div class="ic">📓</div>
+    <div class="bd">
+      <div class="nm">The day</div>
+      <div class="url">samfinegold.me/paraform-day?k=daybook</div>
+      <div class="ds">Hour-by-hour schedule with a notes box on every block, plus a general Notes tab. Hit Update and Claude reads everything you've written and tells you where you stand against the 7:00 deck.</div>
+      <span class="tag key">bookmark this exact URL — ?k= sets the passphrase</span>
+    </div>
+  </a>
+
+  <a class="c" href="/pf-kit">
+    <div class="ic">🧰</div>
+    <div class="bd">
+      <div class="nm">PF Kit</div>
+      <div class="url">samfinegold.me/pf-kit</div>
+      <div class="ds">Paraform-styled component scaffold. One click copies a working starter <code>.html</code> — buttons, cards, tables, role cards, the app shell — so 10:15 is spent on the idea, not on CSS.</div>
+    </div>
+  </a>
+
+  <a class="c" href="/paraform-deck">
+    <div class="ic">🖥️</div>
+    <div class="bd">
+      <div class="nm">The 7:00 deck</div>
+      <div class="url">samfinegold.me/paraform-deck</div>
+      <div class="ds">Eight editable slides covering the six required parts. The Notes drawer pulls your day-page notes in beside the slide you're writing. Present hides the chrome and empty placeholders; PDF prints one page per slide.</div>
+      <span class="tag key">arrows navigate · P presents · 25-min timer</span>
+    </div>
+  </a>
+
+  <h2>Prep and reference</h2>
+
+  <a class="c" href="/paraform-briefs">
+    <div class="ic">🎯</div>
+    <div class="bd">
+      <div class="nm">20 practice briefs</div>
+      <div class="url">samfinegold.me/paraform-briefs</div>
+      <div class="ds">Briefs Paraform could plausibly hand you, across quality, liquidity, AI/agents and growth — each with the frame, a real pick, a five-hour demo, the confounds, and the trap a weak answer falls into.</div>
+      <span class="tag new">new</span>
+    </div>
+  </a>
+
+  <a class="c" href="/paraform-personal">
+    <div class="ic">🎭</div>
+    <div class="bd">
+      <div class="nm">Personal prep guide</div>
+      <div class="url">samfinegold.me/paraform-personal</div>
+      <div class="ds">Your own notes — the supply × payout 2×2, where the stake applies, and the answers you worked out for the tough questions.</div>
+      <span class="tag pw">password: backstage</span>
+    </div>
+  </a>
+
+  <a class="c" href="/paraform-takehome">
+    <div class="ic">📐</div>
+    <div class="bd">
+      <div class="nm">Submission stake — walkthrough</div>
+      <div class="url">samfinegold.me/paraform-takehome</div>
+      <div class="ds">The case study you already submitted, as an annotated clickable prototype. Useful if anyone asks you to walk through it again.</div>
+      <span class="tag pw">password: takehome</span>
+    </div>
+  </a>
+
+  <a class="c" href="/paraform-interview">
+    <div class="ic">🔗</div>
+    <div class="bd">
+      <div class="nm">Nominations prototype</div>
+      <div class="url">samfinegold.me/paraform-interview</div>
+      <div class="ds">The recruiter-nominations concept, built out as a prototype.</div>
+    </div>
+  </a>
+
+  <div class="note">
+    <b>One browser, all day.</b> Notes and slides save to that browser's local storage, so switching browsers or clearing site data loses them. <b>Everything is a URL</b> — nothing to transfer, no dongle, and you can present from any machine that has a browser.
+  </div>
+</div>
+</body>
+</html>
