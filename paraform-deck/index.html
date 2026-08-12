@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>7:00 deck — Aug 12</title>
+<title>6:00 deck — Aug 12</title>
 <link rel="icon" type="image/svg+xml" href="/paraform-deck/deck-favicon.svg">
 <style>
   :root{
@@ -107,12 +107,12 @@
 <body>
 
 <div class="bar">
-  <b>7:00 deck</b>
+  <b>6:00 deck</b>
   <button class="tb" onclick="go(-1)">←</button>
   <button class="tb" onclick="go(1)">→</button>
   <span style="font-size:12px;color:#9b9b9b" id="pos">1 / 8</span>
   <span class="sp"></span>
-  <span class="clk" id="timer" onclick="toggleTimer()" title="Click to start/pause">25:00</span>
+  <span class="clk" id="timer" onclick="toggleTimer()" title="Click to start/pause">20:00</span>
   <button class="tb" onclick="resetTimer()">reset</button>
   <button class="tb" id="notesbtn" onclick="drawer('notes')">Notes</button>
   <a class="tb" href="/paraform-briefs" style="text-decoration:none">Briefs</a>
@@ -121,7 +121,7 @@
 </div>
 
 <div class="stage" id="stage"></div>
-<div class="ptimer" id="ptimer">25:00</div>
+<div class="ptimer" id="ptimer">20:00</div>
 <div class="strip" id="strip"></div>
 
 <div class="dr" id="dr-notes">
@@ -301,7 +301,7 @@ function loadNotes(){
 
 
 /* ---------- timer ---------- */
-let tLeft=25*60, tOn=false, tInt=null;
+let tLeft=20*60, tOn=false, tInt=null;
 function paintTimer(){
   const m=Math.floor(Math.abs(tLeft)/60), s=Math.abs(tLeft)%60;
   const txt=(tLeft<0?'-':'')+m+':'+String(s).padStart(2,'0');
@@ -314,7 +314,7 @@ function toggleTimer(){
   if(tOn){ tInt=setInterval(()=>{tLeft--;paintTimer();},1000); }
   else clearInterval(tInt);
 }
-function resetTimer(){ clearInterval(tInt); tOn=false; tLeft=25*60; paintTimer(); }
+function resetTimer(){ clearInterval(tInt); tOn=false; tLeft=20*60; paintTimer(); }
 
 /* ---------- init ---------- */
 show(0); paintTimer();

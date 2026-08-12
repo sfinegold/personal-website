@@ -144,7 +144,7 @@
 <div class="wrap">
 <div>
   <h1 class="serif">The day</h1>
-  <div class="sub">1160 Battery St, Suite 200 (Building West) · text <b>310-765-0029</b> on arrival · everything you do funnels into the 7:00 PM deck →</div>
+  <div class="sub">1160 Battery St, Suite 200 (Building West) · text <b>310-765-0029</b> on arrival · everything you do funnels into the 6:00 PM deck →</div>
 
   <div class="sum" id="sum">
     <div class="sh" onclick="toggleSum(event)" title="Click to collapse">
@@ -153,7 +153,7 @@
       <button class="sbtn pri" id="sumbtn" onclick="event.stopPropagation();summarize()">Update</button>
       <span class="meta" id="summeta">not run yet</span>
     </div>
-    <div id="sumbody"><div class="empty">Write notes below, then hit Update. Claude reads everything you've written and tells you where the day stands against the 7:00 deck.</div></div>
+    <div id="sumbody"><div class="empty">Write notes below, then hit Update. Claude reads everything you've written and tells you where the day stands against the 6:00 deck.</div></div>
   </div>
 
   <div class="tabs">
@@ -164,7 +164,7 @@
   <div class="pane on" id="pane-day">
     <div class="rule">
       <div class="k">The one rule</div>
-      <p><b>Finished and honest beats ambitious and half-built.</b> Scope to one flow you can genuinely demo, freeze the product at 4:00, and protect 6:00–7:00 for the presentation — not the prototype.</p>
+      <p><b>Finished and honest beats ambitious and half-built.</b> Scope to one flow you can genuinely demo, freeze the product at 4:15, and protect 5:00–6:00 for the presentation — not the prototype.</p>
     </div>
 
     <div id="blocks"></div>
@@ -179,7 +179,7 @@
 
     <div class="ncard">
       <h3>People</h3>
-      <div class="hint">Name · what they own · one thing they said. You need names for the 7:00 deck.</div>
+      <div class="hint">Name · what they own · one thing they said. You need names for the 6:00 deck.</div>
       <textarea id="g-people" placeholder="Name — role — what they told you…"></textarea>
     </div>
 
@@ -212,7 +212,7 @@
 
 <div class="rail">
   <div class="rcard">
-    <h3>7:00 PM deck — fills as you go</h3>
+    <h3>6:00 PM deck — fills as you go</h3>
     <div class="prog"><i id="deckbar" style="width:0%"></i></div>
     <ul class="deck" id="deck"></ul>
   </div>
@@ -223,7 +223,7 @@
       <li><b>Causal depth.</b> How I'd know it worked · what would confound the read · what I'd segment on.</li>
       <li><b>Long-term quality.</b> Name what you're protecting: match quality, recruiter trust, HM confidence.</li>
       <li><b>Cuts as judgment.</b> "I deliberately left out X because Y."</li>
-      <li><b>Same story, different altitude</b> — designer 10am, recruiters 1pm, eng/product 5pm, leadership 7pm.</li>
+      <li><b>Same story, different altitude</b> — designer 11am, recruiters 1pm, eng/product 4pm, leadership 6pm.</li>
       <li><b>Answer, then stop.</b> "Want me to go deeper on that?"</li>
     </ul>
   </div>
@@ -244,22 +244,22 @@
 
 <script>
 const DECK = [
-  {id:'d1', t:'Problem + why it matters, to whom', when:'9:30'},
-  {id:'d2', t:'What I learned today (quote)', when:'3:00'},
-  {id:'d3', t:'The decision + options rejected', when:'10:00'},
-  {id:'d4', t:'Prototype demo', when:'4:00'},
-  {id:'d5', t:'How I\'d measure it', when:'5:00'},
-  {id:'d6', t:'What\'s next + what I cut', when:'6:00'},
+  {id:'d1', t:'Problem + why it matters, to whom', when:'10:30'},
+  {id:'d2', t:'What I learned today (quote)', when:'2:30'},
+  {id:'d3', t:'The decision + options rejected', when:'11:00'},
+  {id:'d4', t:'Prototype demo', when:'4:15'},
+  {id:'d5', t:'How I\'d measure it', when:'4:45'},
+  {id:'d6', t:'What\'s next + what I cut', when:'5:30'},
 ];
 
 const BLOCKS = [
   {
-    s:'08:45', e:'09:00', name:'Arrive early', badge:'', goal:'Be the person who showed up ready.',
+    s:'09:45', e:'10:00', name:'Arrive early', badge:'', goal:'Be the person who showed up ready.',
     todo:['Text 310-765-0029 · 1160 Battery St, Suite 200, Building West','Notebook + pen out, water, phone on silent','Open pf-kit + a blank .html in the editor before the brief lands'],
-    exit:'Seated, set up, calm — before 9:00.'
+    exit:'Seated, set up, calm — before 10:00.'
   },
   {
-    s:'09:00', e:'09:30', name:'Brief intake — write, don\'t solve', badge:'learn', goal:'Convert an ambiguous brief into a written problem statement.',
+    s:'10:00', e:'10:30', name:'Brief intake — write, don\'t solve', badge:'learn', goal:'Convert an ambiguous brief into a written problem statement.',
     todo:[
       'Write the brief in your own words — one paragraph',
       'WHO is the user? (recruiter / HM / internal SPL-SOL / candidate) — pick one primary',
@@ -273,7 +273,7 @@ const BLOCKS = [
     warn:'Resist building. The first 30 minutes are scored on framing — they are watching what you do in hour one.'
   },
   {
-    s:'09:30', e:'10:00', name:'Generate, then eliminate', badge:'', goal:'Arrive at 10:00 with a pick and defensible rejections.',
+    s:'10:30', e:'11:00', name:'Generate, then eliminate', badge:'', goal:'Arrive at 11:00 with a pick and defensible rejections.',
     todo:[
       'List 4–5 possible directions fast (don\'t filter yet)',
       'Kill each with a reason: too big for a day / wrong user / doesn\'t move the metric / second-order harm',
@@ -285,7 +285,7 @@ const BLOCKS = [
     feeds:'d3'
   },
   {
-    s:'10:00', e:'10:15', name:'Designer check-in', badge:'scored', goal:'Show a locked direction. Take redirects fast and visibly.',
+    s:'11:00', e:'11:15', name:'Designer check-in (time unconfirmed)', badge:'scored', goal:'Show a locked direction. Take redirects fast and visibly.',
     script:`"Here's the problem as I understand it: <i>[one sentence]</i>.<br>
 The user is <i>[who]</i>, and the metric I'd move is <i>[concrete definition]</i>.<br>
 I considered <i>[option A]</i> and <i>[option B]</i> — I set A aside because <i>[reason]</i>, B because <i>[reason]</i>.<br>
@@ -294,10 +294,10 @@ What I need from you: <i>[ask 1]</i>, <i>[ask 2]</i>.<br>
 Does the framing sound right to you?"`,
     todo:['Deliver the script in 60–90 seconds','Ask your 2–3 questions','If redirected: "That\'s helpful — so you\'d push me toward X. Let me re-scope to that." Then actually do it'],
     exit:'Direction confirmed or corrected. Never leave still exploring.',
-    warn:'Fighting a redirect is the fastest way to lose the day. Take it, restate it, move.'
+    warn:'<b>11:00 is a guess.</b> Confirm the real time in your 10:00 intake — ask "when do I show the designer?" If it lands earlier, this script still works; you just arrive with a thinner pick, which is fine. If it lands later, do not wait to lock the direction — decide at 11:00 anyway.<br><br>Fighting a redirect is the fastest way to lose the day. Take it, restate it, move.'
   },
   {
-    s:'10:15', e:'12:00', name:'Build sprint 1 — core flow', badge:'build', goal:'Get the skeleton clickable. Ugly is fine.',
+    s:'11:15', e:'12:30', name:'Build sprint 1 — core flow', badge:'build', goal:'Get the skeleton clickable. Ugly is fine.',
     todo:[
       'Copy the starter from samfinegold.me/pf-kit',
       'Build screens as .view divs + go(id) — no framework, no build step',
@@ -309,12 +309,12 @@ Does the framing sound right to you?"`,
     feeds:'d4'
   },
   {
-    s:'12:00', e:'13:00', name:'Team lunch', badge:'learn', goal:'Be a person. Also: free discovery.',
+    s:'12:30', e:'13:15', name:'Team lunch', badge:'learn', goal:'Be a person. Also: free discovery.',
     todo:['Sit with the team, not alone with the laptop','Ask what people are working on and what\'s hard about it','Say you\'re glad to be back in person / drawn to this stage — mean it','Eat properly. It\'s an 11-hour day'],
     exit:'You know 3 people\'s names and what they do.'
   },
   {
-    s:'13:00', e:'16:00', name:'SPL/SOL calls + build sprint 2', badge:'learn', goal:'Mine ground truth. Get the quote that opens your presentation.',
+    s:'13:15', e:'15:30', name:'SPL/SOL calls + build sprint 2', badge:'learn', goal:'Mine ground truth. Get the quote that opens your presentation.',
     todo:[
       'Ask permission to take notes — "mind if I write some of this down?"',
       'Where does the manual work live? What do you do in spreadsheets/Slack the product doesn\'t do?',
@@ -332,7 +332,7 @@ Does the framing sound right to you?"`,
     warn:'This is the differentiator. Almost nobody opens their presentation with "when I asked [name] how they allocate roles, they said —". Do that.'
   },
   {
-    s:'16:00', e:'17:00', name:'Build sprint 3 — then FREEZE', badge:'build', goal:'End-to-end clickable. Then stop building.',
+    s:'15:30', e:'16:15', name:'Build sprint 3 — then FREEZE', badge:'build', goal:'End-to-end clickable. Then stop building.',
     todo:[
       'Make every click in the demo path work',
       'Add the three states that sell it: empty → filled → success',
@@ -345,7 +345,7 @@ Does the framing sound right to you?"`,
     warn:'4:00 PM is the hard stop on product work. Every candidate who blows this deadline presents something half-built.'
   },
   {
-    s:'17:00', e:'18:00', name:'Product group prep', badge:'', goal:'Pressure-test tradeoffs. Find out what leadership will poke at.',
+    s:'16:15', e:'17:00', name:'Product group prep', badge:'', goal:'Pressure-test tradeoffs. Find out what leadership will poke at.',
     todo:[
       'Walk them through problem → decision → demo in 5 minutes',
       'Ask directly: "What will leadership push on?"',
@@ -353,11 +353,11 @@ Does the framing sound right to you?"`,
       'Pressure-test measurement: northstar, input metrics, guardrails, what would confound the read',
       'Sharpen — do not re-decide'
     ],
-    exit:'You know the two hardest questions coming at 7:00 and have answers.',
+    exit:'You know the two hardest questions coming at 6:00 and have answers.',
     feeds:'d5'
   },
   {
-    s:'18:00', e:'19:00', name:'Build the presentation only', badge:'deliver', goal:'Assemble and rehearse. No product changes.',
+    s:'17:00', e:'18:00', name:'Build the presentation only', badge:'deliver', goal:'Assemble and rehearse. No product changes.',
     todo:[
       'Assemble the 6 deck sections (right rail)',
       'Put extra thinking in an appendix, not the main flow',
@@ -369,7 +369,7 @@ Does the framing sound right to you?"`,
     exit:'Rehearsed once, under 12 minutes, demo staged and backed up.'
   },
   {
-    s:'19:00', e:'19:15', name:'Present', badge:'deliver', goal:'Problem → learning → decision → demo → measurement → next.',
+    s:'18:00', e:'18:20', name:'Present', badge:'deliver', goal:'Problem → learning → decision → demo → measurement → next.',
     todo:[
       'Open with the problem and who it hurts — not with the prototype',
       'Use the quote from the calls early: "When I asked [name]…"',
@@ -382,7 +382,7 @@ Does the framing sound right to you?"`,
     exit:'Delivered in 10–12 minutes with time for questions.'
   },
   {
-    s:'19:15', e:'20:00', name:'Q&A', badge:'deliver', goal:'Depth on demand. Concede honestly.',
+    s:'18:20', e:'19:00', name:'Q&A', badge:'deliver', goal:'Depth on demand. Concede honestly.',
     todo:[
       'Answer, then stop. "Want me to go deeper there?"',
       'If you don\'t know: "I don\'t know — here\'s how I\'d find out"',
@@ -566,7 +566,7 @@ function renderSum(){
     `<div class="head">${esc(d.headline)}</div>` +
     sec('Themes', (d.themes||[]).length ? '<ul>' + d.themes.map(t=>`<li><b>${esc(t.t)}</b> — ${esc(t.why)}</li>`).join('') + '</ul>' : '') +
     sec('Quotes worth using', (d.quotes||[]).length ? d.quotes.map(q=>`<div class="q">"${esc(q.text)}"<span class="attr">${esc(q.who)} · ${esc(q.use)}</span></div>`).join('') : '') +
-    sec('Still missing for 7:00', list(d.gaps)) +
+    sec('Still missing for 6:00', list(d.gaps)) +
     sec('Next hour', list(d.next));
 }
 

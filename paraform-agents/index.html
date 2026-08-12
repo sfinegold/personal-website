@@ -26,12 +26,15 @@
   .top a.on{color:#fff;font-weight:700}
   .top .sp{margin-left:auto}
 
-  .wrap{max-width:min(1160px,100%);margin:0 auto;padding:24px clamp(14px,3vw,28px) 100px}
-  /* Container grows with the window, but prose stays at a readable measure.
-     Tables, code and the diagram are allowed the full width. */
-  .part > *,h1,.lede{max-width:80ch}
-  .part > .scroll,.part > pre,.part > svg,.part > .ag{max-width:100%}
-  h1{font-size:clamp(24px,3.2vw,33px);line-height:1.2;margin-bottom:6px}
+  /* One centred reading column. Tables, code and the diagram break out wider
+     but stay on the same centre axis, so the two widths look deliberate
+     rather than ragged. */
+  .wrap{max-width:min(1000px,100%);margin:0 auto;padding:26px clamp(14px,3vw,28px) 100px}
+  h1,.lede{max-width:68ch;margin-left:auto;margin-right:auto}
+  .part{display:grid;grid-template-columns:[full-start] 1fr [content-start] min(68ch,100%) [content-end] 1fr [full-end]}
+  .part > *{grid-column:content;min-width:0}
+  .part > .scroll,.part > pre,.part > svg{grid-column:full}
+  h1{font-size:clamp(24px,3vw,32px);line-height:1.22;margin-bottom:6px}
   .lede{color:var(--muted);font-size:15px;margin-bottom:22px}
 
   .part{border-top:1px solid var(--border);margin-top:38px;padding-top:26px}

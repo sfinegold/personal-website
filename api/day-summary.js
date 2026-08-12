@@ -35,7 +35,7 @@ const SCHEMA = {
     },
     quotes: {
       type: 'array',
-      description: 'Verbatim lines from the notes worth putting in the 7pm deck. Empty array if none yet.',
+      description: 'Verbatim lines from the notes worth putting in the 6pm deck. Empty array if none yet.',
       items: {
         type: 'object',
         properties: {
@@ -49,7 +49,7 @@ const SCHEMA = {
     },
     gaps: {
       type: 'array',
-      description: 'What the 7pm deck still needs that the notes do not yet cover.',
+      description: 'What the 6pm deck still needs that the notes do not yet cover.',
       items: { type: 'string' },
     },
     next: {
@@ -64,7 +64,7 @@ const SCHEMA = {
 
 const SYSTEM = `You help Sam during a one-day product-manager work trial at Paraform, a recruiting marketplace. He takes notes through the day. You read those notes and tell him where he stands.
 
-Everything he must deliver funnels into a 25-minute presentation at 7:00 PM with six parts:
+Everything he must deliver funnels into a 25-minute presentation at 6:00 PM with six parts:
 1. The problem and why it matters, to whom
 2. What he learned today, in someone else's words
 3. The decision he made and the options he rejected

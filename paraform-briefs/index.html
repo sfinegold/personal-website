@@ -137,7 +137,7 @@ list.innerHTML = BRIEFS.map((b,i)=>`
     <div class="say">"${esc(b.prompt)}"</div>
     <div class="out">
       <div class="test"><b>Really testing:</b> ${esc(b.really_testing)}</div>
-      <div class="k">Problem — the one sentence to write at 9:00</div><div class="v">${esc(b.problem)}</div>
+      <div class="k">Problem — the one sentence to write at 10:00</div><div class="v">${esc(b.problem)}</div>
       <div class="grid">
         <div><div class="k">Primary user</div><div class="v">${esc(b.user)}</div></div>
         <div><div class="k">Metric</div><div class="v">${esc(b.metric)}</div></div>
@@ -145,7 +145,7 @@ list.innerHTML = BRIEFS.map((b,i)=>`
       <div class="k">Evidence to go get</div><div class="v">${esc(b.evidence)}</div>
       <div class="k">Options — one pick, real rejections</div>
       ${(b.options||[]).map(o=>`<div class="opt${/^\s*PICK/i.test(o.verdict)?' pick':''}">${esc(o.opt)} — ${esc(o.verdict)}</div>`).join('')}
-      <div class="k">Build &amp; demo by 4:00</div><div class="v">${esc(b.demo)}</div>
+      <div class="k">Build &amp; demo by 4:15</div><div class="v">${esc(b.demo)}</div>
       <div class="k">How you'd measure it — and what would fool you</div><div class="v">${esc(b.measure)}</div>
       <div class="k">What you cut, and why</div><div class="v">${esc(b.cut)}</div>
       <div class="trap"><b>The trap:</b> ${esc(b.trap)}</div>
