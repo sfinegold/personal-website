@@ -5,7 +5,9 @@
     "url": "https://thefillmore.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAE6eeA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "warfield",
@@ -13,7 +15,9 @@
     "url": "https://www.thewarfieldtheatre.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAJe6lA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "gamh",
@@ -21,7 +25,9 @@
     "url": "https://gamh.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAJk7aA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "independent",
@@ -30,7 +36,8 @@
     "category": "live-music",
     "setting": "indoor",
     "region": "SF",
-    "adapter": "eventdiscovery"
+    "adapter": "eventdiscovery",
+    "tmVenueId": "KovZpZAAl7AA"
   },
   {
     "id": "chapel",
@@ -38,7 +45,9 @@
     "url": "https://thechapelsf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917AOMf",
+    "adapter": "ticketmaster"
   },
   {
     "id": "bimbos",
@@ -46,7 +55,9 @@
     "url": "https://bimbos365club.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAJeFvA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "rickshaw",
@@ -54,7 +65,9 @@
     "url": "https://rickshawstop.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAa1JaA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "cafedunord",
@@ -62,7 +75,9 @@
     "url": "https://cafedunord.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917ANZn",
+    "adapter": "ticketmaster"
   },
   {
     "id": "bottomofthehill",
@@ -70,7 +85,9 @@
     "url": "https://www.bottomofthehill.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "ZFr9jZ6veA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "brickmortar",
@@ -78,7 +95,9 @@
     "url": "https://brickandmortarmusic.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAanJFA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "theeparkside",
@@ -86,7 +105,9 @@
     "url": "https://theeparkside.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "Z7r9jZaesw",
+    "adapter": "ticketmaster"
   },
   {
     "id": "elrio",
@@ -110,7 +131,9 @@
     "url": "https://www.neckofthewoodssf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917AYqw",
+    "adapter": "ticketmaster"
   },
   {
     "id": "amados",
@@ -118,7 +141,9 @@
     "url": "https://www.amadossf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "Z7r9jZa7wF",
+    "adapter": "ticketmaster"
   },
   {
     "id": "regency",
@@ -126,7 +151,9 @@
     "url": "https://www.theregencyballroom.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAEet6A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "augusthall",
@@ -134,7 +161,9 @@
     "url": "https://augusthallsf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917ALXF",
+    "adapter": "ticketmaster"
   },
   {
     "id": "masonic",
@@ -142,7 +171,9 @@
     "url": "https://www.sfmasonic.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAJ6nlA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "palacefinearts",
@@ -158,7 +189,9 @@
     "url": "https://sfwarmemorial.org/herbst-theatre",
     "category": "classical",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAatadA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "midway",
@@ -166,7 +199,9 @@
     "url": "https://themidwaysf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917AiWC",
+    "adapter": "ticketmaster"
   },
   {
     "id": "billgraham",
@@ -174,7 +209,9 @@
     "url": "https://billgrahamcivic.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpaKope",
+    "adapter": "ticketmaster"
   },
   {
     "id": "cowpalace",
@@ -182,7 +219,9 @@
     "url": "https://www.cowpalace.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAFktvA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "chasecenter",
@@ -190,7 +229,9 @@
     "url": "https://www.chasecenter.com",
     "category": "sports",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917Ah1H",
+    "adapter": "ticketmaster"
   },
   {
     "id": "oraclepark",
@@ -198,7 +239,9 @@
     "url": "https://www.mlb.com/giants/ballpark",
     "category": "sports",
     "setting": "outdoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAJF7EA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "1015",
@@ -206,7 +249,9 @@
     "url": "https://1015.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAa17tA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "publicworks",
@@ -214,7 +259,9 @@
     "url": "https://publicsf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZA1lvEA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "greatnorthern",
@@ -222,7 +269,9 @@
     "url": "https://thegreatnorthernsf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917ALXB",
+    "adapter": "ticketmaster"
   },
   {
     "id": "audiosf",
@@ -238,7 +287,9 @@
     "url": "https://www.halcyon-sf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "Z7r9jZadlk",
+    "adapter": "ticketmaster"
   },
   {
     "id": "monarch",
@@ -246,7 +297,9 @@
     "url": "https://www.monarchsf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZ917Ai8x",
+    "adapter": "ticketmaster"
   },
   {
     "id": "f8",
@@ -278,7 +331,9 @@
     "url": "https://www.dnalounge.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAalvFA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sfjazz",
@@ -286,7 +341,9 @@
     "url": "https://www.sfjazz.org",
     "category": "jazz",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "Z7r9jZadk_",
+    "adapter": "ticketmaster"
   },
   {
     "id": "blackcat",
@@ -294,7 +351,9 @@
     "url": "https://blackcatsf.com",
     "category": "jazz",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "Z7r9jZaAry",
+    "adapter": "ticketmaster"
   },
   {
     "id": "keysjazz",
@@ -318,7 +377,9 @@
     "url": "https://www.sfsymphony.org",
     "category": "classical",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAEeAaA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sfopera",
@@ -326,7 +387,9 @@
     "url": "https://www.sfopera.com",
     "category": "classical",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAFkItA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "gracecathedral",
@@ -334,7 +397,9 @@
     "url": "https://www.gracecathedral.org",
     "category": "classical",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAFFt7A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "ybca",
@@ -342,7 +407,9 @@
     "url": "https://ybca.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "ZFr9jZFav1",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sterngrove",
@@ -358,7 +425,9 @@
     "url": "https://thefoxoakland.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpaKoXe",
+    "adapter": "ticketmaster"
   },
   {
     "id": "paramount",
@@ -366,7 +435,9 @@
     "url": "https://www.paramountoakland.org",
     "category": "classical",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAFkIlA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "newparish",
@@ -375,7 +446,8 @@
     "category": "live-music",
     "setting": "indoor",
     "region": "East Bay",
-    "adapter": "eventdiscovery"
+    "adapter": "eventdiscovery",
+    "tmVenueId": "KovZpZA1dkJA"
   },
   {
     "id": "starline",
@@ -383,7 +455,9 @@
     "url": "https://www.starlinesocialclub.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAkntEA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "yoshis",
@@ -391,7 +465,9 @@
     "url": "https://yoshis.com",
     "category": "jazz",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZA1FJAA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "uptown",
@@ -399,7 +475,9 @@
     "url": "https://www.uptownnightclub.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAFJIeA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "elismilehigh",
@@ -407,7 +485,9 @@
     "url": "https://elismilehighclub.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAJaetA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "goldenbull",
@@ -415,7 +495,9 @@
     "url": "https://www.goldenbulloakland.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpa2ZUe",
+    "adapter": "ticketmaster"
   },
   {
     "id": "storkclub",
@@ -431,7 +513,9 @@
     "url": "https://www.theoaklandarena.com",
     "category": "sports",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAJe6nA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "uctheatre",
@@ -439,7 +523,9 @@
     "url": "https://www.theuctheatre.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZAIE7aA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "greekberkeley",
@@ -455,7 +541,9 @@
     "url": "https://cornerstoneberkeley.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZA6eJEA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "ashkenaz",
@@ -471,7 +559,9 @@
     "url": "https://thefreight.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "ZFr9jZFv1F",
+    "adapter": "ticketmaster"
   },
   {
     "id": "zellerbach",
@@ -479,7 +569,9 @@
     "url": "https://calperformances.org",
     "category": "classical",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpa9Spe",
+    "adapter": "ticketmaster"
   },
   {
     "id": "gilman",
@@ -487,7 +579,9 @@
     "url": "https://924gilman.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "tmVenueId": "KovZpZA6d6nA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "starryplough",
@@ -511,7 +605,9 @@
     "url": "https://www.shorelineamp.com",
     "category": "live-music",
     "setting": "outdoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "KovZpZA6ta1A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "mvcpa",
@@ -519,7 +615,9 @@
     "url": "https://mvcpa.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "ZFr9jZkFAa",
+    "adapter": "ticketmaster"
   },
   {
     "id": "guild",
@@ -527,7 +625,9 @@
     "url": "https://guildtheatre.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "Z7r9jZa7m7",
+    "adapter": "ticketmaster"
   },
   {
     "id": "clubfox",
@@ -535,7 +635,9 @@
     "url": "https://clubfoxrwc.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "Z7r9jZadSu",
+    "adapter": "ticketmaster"
   },
   {
     "id": "foxrwc",
@@ -543,7 +645,9 @@
     "url": "https://foxrwc.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "KovZpZAata6A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "bing",
@@ -551,7 +655,9 @@
     "url": "https://live.stanford.edu",
     "category": "classical",
     "setting": "indoor",
-    "region": "Peninsula"
+    "region": "Peninsula",
+    "tmVenueId": "Z7r9jZad3P",
+    "adapter": "ticketmaster"
   },
   {
     "id": "ritzsj",
@@ -559,7 +665,9 @@
     "url": "https://www.theritzsanjose.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZ917AOqb",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sapcenter",
@@ -567,7 +675,9 @@
     "url": "https://www.sapcenter.com",
     "category": "sports",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "Za5ju3rKuqZymCqU5fgF9FIezqgkI4FU",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sjcivic",
@@ -575,7 +685,9 @@
     "url": "https://sanjosetheaters.org/theaters/san-jose-civic",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAJk71A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "continental",
@@ -599,7 +711,9 @@
     "url": "https://www.mountainwinery.com",
     "category": "live-music",
     "setting": "outdoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAE6edA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "californiatheatre",
@@ -607,7 +721,9 @@
     "url": "https://sanjosetheaters.org/theaters/california-theatre",
     "category": "classical",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAa17EA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "levis",
@@ -615,7 +731,9 @@
     "url": "https://www.levisstadium.com",
     "category": "sports",
     "setting": "outdoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAJaFkA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "paypalpark",
@@ -623,7 +741,9 @@
     "url": "https://www.sjearthquakes.com/paypalpark",
     "category": "sports",
     "setting": "outdoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAEvF6A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "catalyst",
@@ -631,7 +751,9 @@
     "url": "https://catalystclub.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpapJfe",
+    "adapter": "ticketmaster"
   },
   {
     "id": "moesalley",
@@ -639,7 +761,9 @@
     "url": "https://moesalley.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZA67J6A",
+    "adapter": "ticketmaster"
   },
   {
     "id": "riotheatre",
@@ -647,7 +771,9 @@
     "url": "https://riotheatre.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZA1endA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "kuumbwa",
@@ -655,7 +781,9 @@
     "url": "https://www.kuumbwajazz.org",
     "category": "jazz",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "ZFr9jZFdv6",
+    "adapter": "ticketmaster"
   },
   {
     "id": "felton",
@@ -663,7 +791,9 @@
     "url": "https://feltonmusichall.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "Z7r9jZadDV",
+    "adapter": "ticketmaster"
   },
   {
     "id": "crepeplace",
@@ -671,7 +801,9 @@
     "url": "https://thecrepeplace.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "tmVenueId": "KovZpZAFJkEA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "sweetwater",
@@ -679,7 +811,9 @@
     "url": "https://sweetwatermusichall.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Marin"
+    "region": "Marin",
+    "tmVenueId": "KovZ917A5zV",
+    "adapter": "ticketmaster"
   },
   {
     "id": "hopmonk",
@@ -695,7 +829,9 @@
     "url": "https://www.marincenter.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Marin"
+    "region": "Marin",
+    "tmVenueId": "KovZpa3nJe",
+    "adapter": "ticketmaster"
   },
   {
     "id": "ranchonicasio",
@@ -719,7 +855,9 @@
     "url": "https://www.cobbscomedy.com",
     "category": "comedy",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "tmVenueId": "KovZpZAEkFEA",
+    "adapter": "ticketmaster"
   },
   {
     "id": "punchline",
