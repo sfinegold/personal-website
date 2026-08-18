@@ -11,6 +11,11 @@
 
 const { extractDeterministic } = require('./parse');
 const { getAdapter } = require('./adapters');
+const { crawlSource } = require('./crawl');
+
+// When a venue's landing page yields nothing, probe its likely events pages —
+// most venues keep structured data (JSON-LD etc.) on these, not the homepage.
+const EVENT_PATHS = ['/events', '/calendar', '/shows', '/events/', '/calendar/', '/schedule'];
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = process.env.LINEUP_MODEL || 'claude-sonnet-5';
@@ -77,9 +82,23 @@ async function extractEvents({ source, crawled, interests, todayYMD, windowEndYM
       // fall through to generic extraction
     }
   }
-  // 1. generic deterministic (JSON-LD / iCal / RSS)
+  // 1. generic deterministic (JSON-LD / iCal / RSS) on the landing page
   const det = extractDeterministic(crawled, source);
   if (det.events.length) return { events: det.events, method: det.method };
+  // 1b. probe the venue's likely events pages (structured data often lives there)
+  try {
+    const origin = new URL(source.url).origin;
+    const seen = new Set([source.url.replace(/\/$/, ''), source.url]);
+    for (const p of EVENT_PATHS) {
+      const u = origin + p;
+      if (seen.has(u.replace(/\/$/, ''))) continue;
+      seen.add(u.replace(/\/$/, ''));
+      const c = await crawlSource({ ...source, url: u });
+      if (!c.ok) continue;
+      const d = extractDeterministic(c, source);
+      if (d.events.length) return { events: d.events, method: `${d.method}@${p}` };
+    }
+  } catch (err) { /* bad URL — fall through */ }
   // 2. optional LLM fallback
   if (!llmEnabled()) return { events: [], method: null };
   const events = await extractWithLLM({ source, text: crawled.text, interests, todayYMD, windowEndYMD });
