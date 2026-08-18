@@ -35,6 +35,11 @@ function page(snap) {
   events.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e); daySet.add(e.date); });
   const days = [...daySet].sort();
 
+  // Per-venue generic art: hash the venue name to a stable hue; show the venue's
+  // initials on that tint until real album art loads.
+  const hueOf = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+  const initialsOf = (v) => String(v || '').replace(/^The\s+/i, '').split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+
   let uid = 0;
   const card = (e) => {
     const id = uid++;
@@ -42,8 +47,10 @@ function page(snap) {
     const term = artistTerm(e.title);
     const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
     const meta = [fmtTime(e.time), e.venue].filter(Boolean).join(' · ');
+    const hue = hueOf(e.venue || '');
+    const vbg = `linear-gradient(135deg,hsl(${hue},26%,84%),hsl(${hue},30%,70%))`;
     return `<div class="ev g-${g}" data-key="${key}">
-      <div class="thumb" data-term="${esc(term)}" data-uid="${id}">
+      <div class="thumb" data-term="${esc(term)}" data-uid="${id}" data-vi="${esc(initialsOf(e.venue))}" style="background-image:${vbg}">
         <button class="heart" aria-label="Save show">&#9825;</button>
         <button class="play" id="p${id}" disabled aria-label="Preview ${esc(term)}">&#9654;</button>
       </div>
@@ -88,9 +95,10 @@ function page(snap) {
   .ev{width:var(--cw);display:flex;flex-direction:column;padding-left:6px;border-left:3px solid var(--line)}
   .g-Music{border-left-color:var(--accent)} .g-Comedy{border-left-color:var(--pick)} .g-Sports{border-left-color:var(--gold)}
   .thumb{position:relative;width:100%;aspect-ratio:1;border-radius:7px;overflow:hidden;
-    background:linear-gradient(135deg,#e4e0d6,#d3ccbe);background-size:cover;background-position:center;border:1px solid var(--line)}
-  .thumb::after{content:"\\266A";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:1.5rem;color:rgba(25,29,35,.22)}
+    background-size:cover;background-position:center;border:1px solid var(--line)}
+  /* venue initials on the venue-tinted background until real art loads */
+  .thumb::after{content:attr(data-vi);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-weight:700;font-size:1.05rem;letter-spacing:.06em;color:rgba(25,29,35,.42)}
   .thumb.hasart::after{display:none}
   .heart{position:absolute;top:4px;left:4px;width:20px;height:20px;border:0;border-radius:50%;
     background:rgba(255,255,255,.85);color:#c0324b;font-size:.62rem;cursor:pointer;display:grid;place-items:center;line-height:1;opacity:0;transition:opacity .12s;z-index:2}
@@ -155,8 +163,11 @@ const io = new IntersectionObserver((ents)=>{ ents.forEach(en=>{ if(!en.isInters
   io.unobserve(en.target); if(en.target.dataset.term) loadPreview(en.target.dataset.uid, en.target.dataset.term); }); }, { rootMargin:'400px' });
 thumbs.forEach(t => io.observe(t));
 function setRbtn(on){ const b=$('rbtn'); b.innerHTML = on ? '&#10073;&#10073; Pause' : '&#9654; Play'; b.classList.toggle('on', on); }
-function markNow(uid, scroll){ document.querySelectorAll('.thumb.now').forEach(e=>e.classList.remove('now'));
-  const el=document.querySelector('.thumb[data-uid="'+uid+'"]'); if(el){ el.classList.add('now'); if(scroll) el.scrollIntoView({block:'nearest',behavior:'smooth'}); } }
+function markNow(uid, scroll){
+  document.querySelectorAll('.thumb.now').forEach(e=>{ e.classList.remove('now'); const p=e.querySelector('.play'); if(p) p.innerHTML='&#9654;'; });
+  const el=document.querySelector('.thumb[data-uid="'+uid+'"]');
+  if(el){ el.classList.add('now'); const p=el.querySelector('.play'); if(p) p.innerHTML='&#10073;&#10073;';
+    if(scroll) el.scrollIntoView({block:'nearest',behavior:'smooth'}); } }
 function playIndex(i, scroll){
   if (i < 0 || i >= queue.length){ stopAll(); return; }
   const it = queue[i];
@@ -179,12 +190,19 @@ function toggleRadio(){
   playIndex(0, true);
 }
 function skip(){ playIndex((qi === null ? -1 : qi) + 1, true); }
-function stopAll(){ audio.pause(); document.querySelectorAll('.thumb.now').forEach(e=>e.classList.remove('now'));
+function stopAll(){ audio.pause();
+  document.querySelectorAll('.thumb.now').forEach(e=>{ e.classList.remove('now'); const p=e.querySelector('.play'); if(p) p.innerHTML='&#9654;'; });
   $('now').classList.remove('on'); qi = null; current = null; setRbtn(false); }
 document.addEventListener('click', (ev)=>{ const b = ev.target.closest('.play'); if(!b) return;
-  ev.preventDefault(); const uid = b.closest('.thumb').dataset.uid; const i = uidIndex[uid]; if(i != null) playIndex(i, false); });
+  ev.preventDefault(); b.blur();
+  const uid = b.closest('.thumb').dataset.uid; const i = uidIndex[uid]; if(i != null){
+    if (current === uid && !audio.paused){ audio.pause(); setRbtn(false); const p=b; p.innerHTML='&#9654;'; return; } // tap again = pause
+    playIndex(i, false);
+  } });
+// buttons drop focus after click so space/enter can't accidentally re-trigger them
+document.addEventListener('click', (e)=>{ const b = e.target.closest('button'); if(b) b.blur(); });
 document.addEventListener('keydown', (e)=>{
-  if (e.target.matches('input,textarea,select')) return;
+  if (e.target.matches('input,textarea,select,button')) return;
   const k = e.key.toLowerCase();
   if (e.code === 'Space'){ e.preventDefault(); toggleRadio(); }
   else if (e.key === 'ArrowRight' || k === 's' || k === 'n'){ e.preventDefault(); skip(); }
@@ -194,7 +212,8 @@ audio.addEventListener('ended', skip);
 const HK = 'lineup_sf_hearts';
 let hearts; try { hearts = new Set(JSON.parse(localStorage.getItem(HK) || '[]')); } catch(e){ hearts = new Set(); }
 function updateHc(){ const el = $('hc'); if(el) el.textContent = hearts.size; }
-function saveHearts(){ try { localStorage.setItem(HK, JSON.stringify([...hearts])); } catch(e){} updateHc(); }
+function saveHearts(){ try { localStorage.setItem(HK, JSON.stringify([...hearts])); } catch(e){} updateHc();
+  if (hearts.size === 0 && document.body.classList.contains('hearts-only')){ document.body.classList.remove('hearts-only'); $('heartsBtn').classList.remove('on'); } }
 function markHeart(ev, on){ ev.classList.toggle('hearted', on); const h = ev.querySelector('.heart'); if(h) h.innerHTML = on ? '&#9829;' : '&#9825;'; }
 document.querySelectorAll('.ev').forEach(ev => { if (hearts.has(ev.dataset.key)) markHeart(ev, true); });
 updateHc();
@@ -205,7 +224,13 @@ document.addEventListener('click', (e) => {
   if (hearts.has(k)) { hearts.delete(k); markHeart(ev, false); } else { hearts.add(k); markHeart(ev, true); }
   saveHearts();
 });
-function toggleHeartsOnly(){ const on = document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on', on); }
+function toggleHeartsOnly(){
+  // never strand the user on an empty page: with no hearts the filter is a no-op
+  if (!document.body.classList.contains('hearts-only') && hearts.size === 0){
+    const b=$('heartsBtn'); b.style.transform='scale(1.15)'; setTimeout(()=>{b.style.transform='';},180); return;
+  }
+  const on = document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on', on);
+}
 </script>
 </body></html>`;
 }
