@@ -54,7 +54,7 @@ function page(snap) {
         <button class="heart" aria-label="Save show">&#9825;</button>
         <button class="play" id="p${id}" disabled aria-label="Preview ${esc(term)}">&#9654;</button>
       </div>
-      <div class="ea">${esc(e.title)}</div>
+      <a class="ea" href="${esc(e.url || '#')}" target="_blank" rel="noopener">${esc(e.title)}</a>
       <div class="cm">${esc(meta)}</div>
     </div>`;
   };
@@ -110,8 +110,18 @@ function page(snap) {
   .thumb.ready .play{opacity:1}
   .play.playing,.thumb.now .play{background:var(--pick);color:#fff}
   .thumb.now{box-shadow:0 0 0 2px var(--pick)}
-  .ea{font-size:.66rem;font-weight:600;line-height:1.12;margin-top:3px;
+  .ea{font-size:.66rem;font-weight:600;line-height:1.12;margin-top:3px;color:inherit;text-decoration:none;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ea:hover{text-decoration:underline}
+  .filters{display:flex;gap:.35rem;flex:1;justify-content:center}
+  .fbtn{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;
+    padding:.35rem .7rem;border-radius:16px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+  .fbtn.on.fb-Music{background:var(--accent);border-color:var(--accent);color:#fff}
+  .fbtn.on.fb-Comedy{background:var(--pick);border-color:var(--pick);color:#fff}
+  .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
+  body[data-filter="Music"] .ev:not(.g-Music){display:none}
+  body[data-filter="Comedy"] .ev:not(.g-Comedy){display:none}
+  body[data-filter="Sports"] .ev:not(.g-Sports){display:none}
   .cm{font-size:.58rem;color:var(--faint);margin-top:1px;line-height:1.2;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .empty{padding:2rem 0;color:var(--dim)}
@@ -130,6 +140,11 @@ function page(snap) {
 <body>
   <div class="top">
     <h1>Your Lineup</h1>
+    <div class="filters">
+      <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
+      <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
+      <button class="fbtn fb-Comedy" onclick="setFilter('Comedy')">Comedy</button>
+    </div>
     <div style="display:flex;gap:.5rem;flex:none">
       <button class="rbtn heartbtn" id="heartsBtn" onclick="toggleHeartsOnly()">&#9829; <span id="hc">0</span></button>
       <button class="rbtn" id="rbtn" onclick="toggleRadio()">&#9654; Play</button>
@@ -230,6 +245,22 @@ function toggleHeartsOnly(){
     const b=$('heartsBtn'); b.style.transform='scale(1.15)'; setTimeout(()=>{b.style.transform='';},180); return;
   }
   const on = document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on', on);
+  refreshDays();
+}
+// type filter: one of Music/Sports/Comedy, click again to clear
+let gFilter = null;
+function setFilter(g){
+  gFilter = (gFilter === g ? null : g);
+  if (gFilter) document.body.dataset.filter = gFilter; else delete document.body.dataset.filter;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.toggle('on', b.textContent === gFilter));
+  refreshDays();
+}
+// hide day rows left empty by the active filters
+function refreshDays(){
+  document.querySelectorAll('.daysec').forEach(d => {
+    const any = [...d.querySelectorAll('.ev')].some(e => e.offsetParent !== null);
+    d.style.display = any ? '' : 'none';
+  });
 }
 </script>
 </body></html>`;
