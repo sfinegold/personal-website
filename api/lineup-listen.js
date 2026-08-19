@@ -135,7 +135,21 @@ function page(snap) {
   .now button{border:1px solid var(--line);background:var(--bg);border-radius:18px;
     padding:.4rem .8rem;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);cursor:pointer}
   .now .sk{margin-left:auto}
-  @media (max-width:560px){ :root{--cw:72px} h1{font-size:1.05rem} .top{padding:.6rem .8rem .4rem} .content{padding:0 .8rem} .daylabel{top:46px} }
+  /* touch devices: hover-revealed controls must always be visible + tappable */
+  @media (hover:none){
+    .heart{opacity:.92;width:24px;height:24px;font-size:.7rem}
+    .thumb.ready .play{opacity:1;width:26px;height:26px;font-size:.6rem}
+  }
+  @media (max-width:560px){
+    :root{--cw:31vw}  /* 3 cards per row edge-to-edge on a phone */
+    h1{font-size:1.05rem}
+    .top{padding:.6rem .8rem .45rem;flex-wrap:wrap}
+    .filters{order:3;flex-basis:100%;justify-content:flex-start;margin-top:.4rem}
+    .content{padding:0 .8rem}
+    .cardrow{gap:.6rem}
+    .daylabel{top:84px}  /* header wraps to two rows on mobile */
+    .ea{font-size:.72rem}.cm{font-size:.62rem}
+  }
 </style></head>
 <body>
   <div class="top">
