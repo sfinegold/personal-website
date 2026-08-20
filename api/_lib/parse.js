@@ -28,10 +28,16 @@ function splitDateTime(iso) {
   return { date: dm[1], time };
 }
 
+function decodeEntities(t) {
+  return String(t)
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&rsquo;/g, '’');
+}
+
 function normalize(ev, source) {
   const url = ev.url || source.url;
   return {
-    title: ev.title,
+    title: decodeEntities(ev.title),
     date: ev.date,
     time: ev.time || null,
     category: source.category,

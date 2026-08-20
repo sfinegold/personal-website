@@ -141,7 +141,7 @@ function page(snap) {
     .thumb.ready .play{opacity:1;width:26px;height:26px;font-size:.6rem}
   }
   @media (max-width:560px){
-    :root{--cw:31vw}  /* 3 cards per row edge-to-edge on a phone */
+    :root{--cw:27vw}
     h1{font-size:1.05rem}
     .top{padding:.6rem .8rem .45rem;flex-wrap:wrap}
     .filters{order:3;flex-basis:100%;justify-content:flex-start;margin-top:.4rem}
