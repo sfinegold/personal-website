@@ -160,6 +160,7 @@
   .cclabel { font-size: 1.2vh; font-weight: 700; color: var(--muted); }
   .ccinput { border: 1px solid var(--line); border-radius: 0.6vh; padding: 0.6vh 0.5vw; font-size: 1.25vh; color: var(--muted); }
   .ccbtn { background: #14365c; color: #fff; font-size: 1.35vh; font-weight: 700; border-radius: 99px; padding: 0.7vh 0; text-align: center; margin-top: 0.4vh; }
+  .ls li::before { background: #fb923c; }
   .pchips { display: flex; gap: 0.8vw; margin-bottom: 1.4vh; flex: 0 0 auto; }
   .pchip { font-size: 1.5vh; font-weight: 700; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 0.5vh 1vw; }
   .pchip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -237,7 +238,7 @@
           <div class="fan"><span class="node">Pro</span><span class="node">Pro</span><span class="node">Pro</span></div>
         </div>
       </div>
-      <div style="margin-left:auto; font-size:2vh; color:var(--muted); text-align:right;">1:many intros · partial project details<br>lower price, sold to multiple pros</div>
+      <div style="margin-left:3vw; font-size:2vh; color:var(--muted);">1:many intros · partial project details<br>lower price, sold to multiple pros</div>
     </div>
 
     <div class="card accent" style="flex:0 0 auto; margin-bottom:1.8vh; display:flex; align-items:center; gap:2vw;">
@@ -248,7 +249,7 @@
           <span class="node">Single pro at a scheduled time</span>
         </div>
       </div>
-      <div style="margin-left:auto; font-size:2vh; color:var(--ink); text-align:right;">1:1 connection · full scope upfront<br><b>higher price, exclusive</b></div>
+      <div style="margin-left:3vw; font-size:2vh; color:var(--ink);">1:1 connection · full scope upfront<br><b>higher price, exclusive</b></div>
     </div>
 
     <h3 style="font-size:1.6vh;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2vh;font-weight:800;">The bet behind instant book</h3>
@@ -297,7 +298,7 @@
       <div style="font-size:2.2vh; line-height:1.35;">Recover revenue quickly and take pressure off pros, while keeping the instant book bet alive.</div>
     </div>
 
-    <div class="cols">
+    <div class="cols" style="flex:0 0 auto; align-items:stretch;">
       <div class="col" style="flex:0.85;">
         <div class="card" style="height:100%;">
           <h3 class="plain">Factors</h3>
@@ -319,8 +320,8 @@
           </ul>
         </div>
       </div>
-      <div class="col" style="display:grid;grid-template-rows:1fr 1fr;gap:2vh;">
-        <div class="card accent" style="min-height:0;">
+      <div class="col" style="display:flex;flex-direction:column;gap:2vh;">
+        <div class="card accent" style="flex:0 0 auto;">
           <h3>Decision</h3>
           <ul style="margin-bottom:0;">
             <li>Instant book option shown to <b>25% of customers</b></li>
@@ -328,7 +329,7 @@
             <li>The standard lead flow monetized well · lower instant book volume mollified pros</li>
           </ul>
         </div>
-        <div class="card" style="min-height:0;">
+        <div class="card" style="flex:1; min-height:0;">
           <h3 class="plain">Result</h3>
           <div class="big" style="font-size:4.2vh;">−4% → ~−1%<small>revenue per visitor, recovered</small><span class="note">support complaints down · revisit at end of half</span></div>
         </div>
@@ -719,31 +720,48 @@
   </section>
 
     <!-- 14 · WHY LIGHTSOURCE -->
-  <section class="slide dark">
-    <div class="kicker">Why I'm excited about LightSource</div>
-    <h2 style="color:#f5f8fd;">Sourcing is the same problem, deeper in the stack</h2>
-    <div style="font-size:2.2vh; color:#c7d2e5; line-height:1.5; margin-bottom:2.6vh;">I asked a supply chain manager at Apple what the job actually is. His answer: three responsibilities.</div>
-    <div class="cols" style="flex:0 0 auto; margin-bottom:2.6vh; align-items:stretch;">
+  <section class="slide ls" style="background:#141210; color:#f7f4ef;">
+    <div class="kicker" style="color:#fb923c;">Why I'm excited about LightSource</div>
+    <h2 style="color:#f7f4ef;">The parallels to Thumbtack are real, and the workflow goes deeper</h2>
+    <div style="font-size:2.1vh; color:#cfc8bd; line-height:1.5; margin-bottom:2.2vh;">I asked a supply chain manager at Apple what the job actually is. His answer: three responsibilities.</div>
+
+    <div class="cols" style="flex:0 0 auto; margin-bottom:2vh; align-items:stretch;">
       <div class="col">
-        <div class="card" style="background:#152036;border-color:#2b3a5e;height:100%;">
-          <h3>1 · Deliver</h3>
-          <ul style="color:#e3e9f5; margin-bottom:0;"><li style="margin-bottom:0;">Product <b>on time and at quantity</b></li></ul>
+        <div class="card" style="background:#201d18; border-color:#3a3428; height:100%;">
+          <h3 style="color:#fb923c;">1 · Deliver</h3>
+          <ul style="color:#ece7df; margin-bottom:0;"><li style="margin-bottom:0;">Product <b>on time and at quantity</b></li></ul>
         </div>
       </div>
       <div class="col">
-        <div class="card" style="background:#152036;border-color:#2b3a5e;height:100%;">
-          <h3>2 · Manage costs</h3>
-          <ul style="color:#e3e9f5; margin-bottom:0;"><li style="margin-bottom:0;">Every part, every quote, every run</li></ul>
+        <div class="card" style="background:#201d18; border-color:#3a3428; height:100%;">
+          <h3 style="color:#fb923c;">2 · Manage costs</h3>
+          <ul style="color:#ece7df; margin-bottom:0;"><li style="margin-bottom:0;">Every part, every quote, every run</li></ul>
         </div>
       </div>
       <div class="col">
-        <div class="card" style="background:#152036;border-color:#2b3a5e;height:100%;">
-          <h3>3 · Contracts</h3>
-          <ul style="color:#e3e9f5; margin-bottom:0;"><li style="margin-bottom:0;">Built and <b>in place</b> with suppliers</li></ul>
+        <div class="card" style="background:#201d18; border-color:#3a3428; height:100%;">
+          <h3 style="color:#fb923c;">3 · Contracts</h3>
+          <ul style="color:#ece7df; margin-bottom:0;"><li style="margin-bottom:0;">Built and <b>in place</b> with suppliers</li></ul>
         </div>
       </div>
     </div>
-    <div class="punch" style="flex:0 0 auto; background:#152036; border-left-color:var(--accent-mid); color:#e3e9f5;">LightSource can support all three, especially for companies without Apple's resources: parts sourced faster, and building physical product easier than it has ever been.</div>
+
+    <div class="cols" style="flex:0 0 auto; margin-bottom:2.2vh; align-items:stretch;">
+      <div class="col">
+        <div class="card" style="background:#201d18; border-color:#3a3428; height:100%;">
+          <h3 style="color:#fb923c;">The parallel</h3>
+          <ul style="color:#ece7df; margin-bottom:0;"><li style="margin-bottom:0;">Two sides converging on <b>scope, price, and commitment</b>: buyers and suppliers, like customers and pros</li></ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card" style="background:#201d18; border-color:#3a3428; height:100%;">
+          <h3 style="color:#fb923c;">The deeper workflow</h3>
+          <ul style="color:#ece7df; margin-bottom:0;"><li style="margin-bottom:0;">More <b>agentic surface</b>: search (find the right suppliers) and cost (tariffs, regulations, landed cost)</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="punch" style="flex:0 0 auto; background:#241e15; border-left-color:#f97316; color:#f0e9df;">LightSource can support all three, especially for companies without Apple's resources: parts sourced faster, and building physical product easier than it has ever been.</div>
   </section>
 
   <div class="counter" id="counter">1 / 10</div>
