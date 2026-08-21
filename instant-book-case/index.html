@@ -145,6 +145,11 @@
   .bub { background: var(--card); border-radius: 1vh 1vh 1vh 0.2vh; padding: 0.5vh 0.8vw; font-size: 1.32vh; color: var(--muted); align-self: flex-start; }
   .bub.me { background: var(--accent-soft); color: var(--accent); border-radius: 1vh 1vh 0.2vh 1vh; align-self: flex-end; font-weight: 600; }
   .pillnote { font-size: 1.3vh; border: 1px solid var(--accent-light); color: var(--accent); border-radius: 99px; padding: 0.3vh 0.7vw; font-weight: 700; }
+  .ccform { background: #fff; border: 1px solid var(--line); border-radius: 1vh; padding: 1.1vh 0.8vw; width: 12.5vw; box-shadow: 0 0.4vh 1.2vh rgba(15,21,34,0.1); display: flex; flex-direction: column; gap: 0.5vh; }
+  .ccform-title { font-size: 1.4vh; font-weight: 800; margin-bottom: 0.2vh; }
+  .cclabel { font-size: 1.2vh; font-weight: 700; color: var(--muted); }
+  .ccinput { border: 1px solid var(--line); border-radius: 0.6vh; padding: 0.6vh 0.5vw; font-size: 1.25vh; color: var(--muted); }
+  .ccbtn { background: #14365c; color: #fff; font-size: 1.35vh; font-weight: 700; border-radius: 99px; padding: 0.7vh 0; text-align: center; margin-top: 0.4vh; }
   .pchips { display: flex; gap: 0.8vw; margin-bottom: 1.4vh; flex: 0 0 auto; }
   .pchip { font-size: 1.5vh; font-weight: 700; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 0.5vh 1vw; }
   .pchip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -498,10 +503,17 @@
       <h3 class="plain" style="margin-bottom:1.2vh;">Require financial commitment to book</h3>
       <div style="display:flex; gap:2.2vw; align-items:center;">
         <div class="paydown">
-          <span class="node cust">Customer</span>
-          <span class="payarr">↓</span>
-          <div class="ccard"></div>
-          <div class="paycap">puts a card down to book</div>
+          <div class="ccform">
+            <div class="ccform-title">Confirm your booking</div>
+            <div class="cclabel">Card number</div>
+            <div class="ccinput">1234 5678 9012 3456</div>
+            <div style="display:flex;gap:0.4vw;">
+              <div class="ccinput" style="flex:1;">MM / YY</div>
+              <div class="ccinput" style="flex:1;">CVC</div>
+            </div>
+            <div class="ccbtn">Book now</div>
+          </div>
+          <div class="paycap">card required to book</div>
         </div>
         <ul style="flex:1; margin-bottom:0;">
           <li>The <b>upper bound of customer commitment</b></li>
@@ -554,7 +566,7 @@
   <section class="slide">
     <div class="kicker">The options I surfaced</div>
     <h2>Connect to Book: let the conversation come first and design incentives, not mandates</h2>
-    <div class="cols">
+    <div class="cols" style="flex:0 0 auto; align-items:stretch;">
       <div class="col">
         <div class="card" style="height:100%;">
           <h3 class="plain">Why it could win</h3>
@@ -566,12 +578,12 @@
           </ul>
         </div>
       </div>
-      <div class="col">
-        <div class="card accent" style="margin-bottom:2vh;">
+      <div class="col" style="display:flex;flex-direction:column;gap:2vh;">
+        <div class="card accent" style="flex:1;">
           <h3>The evidence</h3>
           <ul><li>We <b>surveyed pros</b> on the options: they preferred Connect to Book. The aggrieved side of the market endorsed the pivot.</li></ul>
         </div>
-        <div class="card">
+        <div class="card" style="flex:1;">
           <h3 class="plain">Ownership, plainly</h3>
           <ul>
             <li><b>Surfaced the options</b> for the Fulfillment pillar leads: the survey, the headroom case, the options analysis</li>
