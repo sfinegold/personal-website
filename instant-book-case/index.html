@@ -129,6 +129,12 @@
   .tslots { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vh 0.5vw; width: 100%; margin-bottom: 1.6vh; }
   .tslot { border: 1.5px solid var(--line); border-radius: 0.8vh; padding: 0.95vh 0.4vw; font-size: 1.45vh; font-weight: 600; cursor: pointer; color: var(--ink); text-align: center; }
   .tslot.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .paydown { display: flex; flex-direction: column; align-items: center; gap: 0.5vh; flex: 0 0 auto; }
+  .payarr { color: var(--accent-mid); font-weight: 800; font-size: 2vh; line-height: 1; }
+  .ccard { width: 8.6vh; height: 5.4vh; border-radius: 0.8vh; background: linear-gradient(135deg, #14365c, #2563eb); position: relative; box-shadow: 0 0.5vh 1.4vh rgba(15,21,34,0.28); }
+  .ccard::before { content: ""; position: absolute; top: 1.1vh; left: 0.9vh; width: 1.5vh; height: 1.15vh; background: #d9b64e; border-radius: 0.28vh; }
+  .ccard::after { content: "••••  4218"; position: absolute; bottom: 0.7vh; left: 0.9vh; color: rgba(255,255,255,0.88); font-size: 1.05vh; letter-spacing: 0.12vh; font-weight: 700; }
+  .paycap { font-size: 1.4vh; color: var(--muted); font-style: italic; }
   .pchips { display: flex; gap: 0.8vw; margin-bottom: 1.4vh; flex: 0 0 auto; }
   .pchip { font-size: 1.5vh; font-weight: 700; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 0.5vh 1vw; }
   .pchip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -470,26 +476,38 @@
           <div class="frow"><span class="fpill">Book</span><span class="onearr">→</span><span class="node tag">Clear booking flow: time, price, confirm</span></div>
           <div class="frow"><span class="fpill ghost">Message</span><span class="onearr">→</span><span class="node tag">Messaging flow: chat with the pro first</span></div>
         </div>
-        <ul style="margin-left:auto; max-width:30%;">
-          <li><b>+5% hire rate</b>, the largest the product had seen</li>
-          <li><b>Revenue neutral</b>: losses were duplicates</li>
-          <li style="margin-bottom:0;">"Did not intend" cancels <b>~20% → ~8%</b></li>
-        </ul>
+        <div style="margin-left:auto; max-width:30%;">
+          <h3 class="plain" style="font-size:1.5vh; margin-bottom:0.9vh;">Results</h3>
+          <ul style="margin-bottom:0;">
+            <li><b>+5% hire rate</b>, the largest the product had seen</li>
+            <li><b>Revenue neutral</b>: losses were duplicates</li>
+            <li style="margin-bottom:0;">"Did not intend" cancels <b>~20% → ~8%</b></li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="card" style="flex:0 0 auto; margin-bottom:1.8vh;">
       <span class="chip test">TEST 2 · PAINTED DOOR</span>
       <h3 class="plain" style="margin-bottom:1.2vh;">Require financial commitment to book</h3>
-      <div style="display:flex; gap:2vw;">
+      <div style="display:flex; gap:2.2vw; align-items:center;">
+        <div class="paydown">
+          <span class="node cust">Customer</span>
+          <span class="payarr">↓</span>
+          <div class="ccard"></div>
+          <div class="paycap">puts a card down to book</div>
+        </div>
         <ul style="flex:1; margin-bottom:0;">
           <li>The <b>upper bound of customer commitment</b></li>
           <li style="margin-bottom:0;">Removes the <b>duplicate projects</b> issue</li>
         </ul>
-        <ul style="flex:1.4; margin-bottom:0;">
-          <li><b>Hire rate +8%</b> · duplicate projects <b>down 80%</b></li>
-          <li style="margin-bottom:0;"><b>Revenue down significantly</b> · a huge drop in booking share</li>
-        </ul>
+        <div style="flex:1.3;">
+          <h3 class="plain" style="font-size:1.5vh; margin-bottom:0.9vh;">Results</h3>
+          <ul style="margin-bottom:0;">
+            <li><b>Hire rate +8%</b> · duplicate projects <b>down 80%</b></li>
+            <li style="margin-bottom:0;"><b>Revenue down significantly</b> · a huge drop in booking share</li>
+          </ul>
+        </div>
       </div>
     </div>
 
