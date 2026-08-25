@@ -74,9 +74,17 @@ function page(snap) {
   // Airbnb-style filter pills: top genres present in the data + a Liked filter
   const gc = {};
   events.forEach((e) => { const g = e.note && !/resident advisor/i.test(e.note) ? e.note : null; if (g) gc[g] = (gc[g] || 0) + 1; });
-  const topGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]).slice(0, 9);
-  const fbar = `<div class="fbar"><button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>` +
-    topGenres.map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join('') + `</div>`;
+  const allGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]);
+  const fbar = `<div class="fbar">
+    <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
+    <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>
+  </div>
+  <div class="fmask" id="fmask" onclick="closeGenres()"></div>
+  <div class="fmodal" id="fmodal" role="dialog" aria-label="Genre filters">
+    <div class="fmh">Genres<button onclick="closeGenres()">&#10005;</button></div>
+    <div class="fml">` + allGenres.map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join('') + `</div>
+    <div class="fmf"><button class="clr" onclick="setGenre(gSel)">Clear</button><button class="done" onclick="closeGenres()">Done</button></div>
+  </div>`;
 
   // right-rail mini calendar: months spanned by the window, event days clickable
   const daySet2 = new Set(days);
@@ -109,7 +117,8 @@ function page(snap) {
 
   return `<!doctype html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Your Lineup — San Francisco</title><meta name="robots" content="noindex">
+<title>Your Lineup — San Francisco</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23635BFF'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#F7F3EA;--bg2:#EFE8D8;--line:rgba(10,37,64,.16);--text:#0A2540;--dim:rgba(10,37,64,.64);
@@ -229,6 +238,16 @@ function page(snap) {
   .gp.liked{color:var(--pop);border-color:var(--pop)}
   .gp.liked.on{background:var(--pop);color:#fff}
   tr.row.ghide{display:none}
+  .fmask{display:none;position:fixed;inset:0;background:rgba(10,37,64,.45);z-index:80}
+  .fmodal{display:none;position:fixed;left:50%;top:14%;transform:translateX(-50%);width:min(480px,92vw);
+    background:#fff;border:1px solid var(--text);border-radius:14px;box-shadow:5px 5px 0 var(--text);z-index:81;overflow:hidden}
+  body.fopen .fmask,body.fopen .fmodal{display:block}
+  .fmh{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1rem;font-weight:700;border-bottom:1px solid var(--line)}
+  .fmh button{border:0;background:none;font-size:.95rem;cursor:pointer;color:var(--text)}
+  .fml{display:flex;flex-wrap:wrap;gap:.45rem;padding:1rem;max-height:46vh;overflow:auto}
+  .fmf{display:flex;justify-content:space-between;padding:.6rem 1rem;border-top:1px solid var(--line)}
+  .fmf .clr{border:0;background:none;text-decoration:underline;cursor:pointer;color:var(--text)}
+  .fmf .done{border:1px solid var(--text);background:var(--text);color:#fff;border-radius:9px;padding:.5rem 1.1rem;cursor:pointer}
   .hints{font-family:var(--mono);font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:2px}
   .hints a{color:var(--faint)}
   @media (max-width:560px){ .hints{display:none} }
@@ -411,9 +430,14 @@ let gSel = null;
 function setGenre(g){
   gSel = (gSel === g ? null : g);
   document.querySelectorAll('.gp[data-g]').forEach(b => b.classList.toggle('on', b.dataset.g === gSel));
+  const gb = $('genresBtn');
+  gb.innerHTML = gSel ? '&#9776; ' + gSel : '&#9776; Genres';
+  gb.classList.toggle('on', !!gSel);
   rows.forEach(r => r.classList.toggle('ghide', !!gSel && r.dataset.genre !== gSel));
   refreshHeaders();
 }
+function openGenres(){ document.body.classList.add('fopen'); }
+function closeGenres(){ document.body.classList.remove('fopen'); }
 function authClick(){
   if (me){ if(confirm('Sign out of '+me+'?')) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:'{"action":"logout"}'}).then(()=>location.reload()); return; }
   const email=prompt('Email for your sign-in link:'); if(!email) return;
