@@ -260,7 +260,7 @@ function page(snap) {
 </style></head>
 <body>
   <div class="top">
-    <div><h1>Your Lineup</h1><div class="hints">&#8593;&#8595; select &middot; space play/stop &middot; &#8592;&#8594; next artist &middot; enter opens &middot; <a href="/lineup/me">edit venues</a></div></div>
+    <h1>Your Lineup</h1>
     <div class="filters">
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
