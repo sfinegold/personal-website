@@ -76,11 +76,7 @@ function page(snap) {
   const gc = {};
   events.forEach((e) => { if (isGenre(e.note)) gc[e.note] = (gc[e.note] || 0) + 1; });
   const allGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]);
-  const fbar = `<div class="fbar">
-    <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
-    <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>
-  </div>
-  <div class="fmask" id="fmask" onclick="closeGenres()"></div>
+  const fbar = `<div class="fmask" id="fmask" onclick="closeGenres()"></div>
   <div class="fmodal" id="fmodal" role="dialog" aria-label="Genre filters">
     <div class="fmh">Genres<button onclick="closeGenres()">&#10005;</button></div>
     <div class="fml">` + allGenres.map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join('') + `</div>
@@ -264,6 +260,8 @@ function page(snap) {
   <div class="top">
     <h1>Your Lineup</h1>
     <div class="filters">
+      <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
+      <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
       <button class="fbtn fb-Comedy" onclick="setFilter('Comedy')">Comedy</button>
