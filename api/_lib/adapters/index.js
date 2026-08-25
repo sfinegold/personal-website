@@ -14,7 +14,8 @@
 const registry = {
   tribe: require('./tribe'), // The Events Calendar (WordPress plugin) JSON API
   eventdiscovery: require('./eventdiscovery'), // TicketWeb "event-discovery" plugin (The Independent, The New Parish)
-  ticketmaster: require('./ticketmaster'), // Discovery API (TICKETMASTER_API_KEY) — Shoreline/Fox/Warfield/Greek/arenas
+  ticketmaster: require('./ticketmaster'),
+  tmfestivals: require('./tmfestivals'), // Discovery API (TICKETMASTER_API_KEY) — Shoreline/Fox/Warfield/Greek/arenas
 };
 
 function getAdapter(name) {

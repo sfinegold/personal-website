@@ -11,6 +11,7 @@ const EFFORT_RANK = { low: 1, medium: 2, high: 3 };
 function withinWindow(ev, profile, todayYMD, windowEndYMD) {
   if (!ev.date) return false;
   if (ev.date < todayYMD) return false;
+  if (ev.note === 'Festival') return true; // festivals surface all year
   if (windowEndYMD && ev.date > windowEndYMD) return false;
   return true;
 }

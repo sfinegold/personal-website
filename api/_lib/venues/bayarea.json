@@ -922,5 +922,14 @@
     "category": "live-music",
     "setting": "indoor",
     "region": "aggregator"
+  },
+  {
+    "id": "festivals",
+    "name": "Bay Area Festivals",
+    "url": "https://www.ticketmaster.com",
+    "category": "live-music",
+    "setting": "outdoor",
+    "region": "SF",
+    "adapter": "tmfestivals"
   }
 ]
