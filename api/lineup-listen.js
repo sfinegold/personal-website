@@ -572,8 +572,16 @@ setFilter('Music'); // default view
   setSel(i); toggleDetail(i);
   const land = () => rows[i].scrollIntoView({ block: 'center', behavior: 'auto' });
   land();
-  setTimeout(land, 250);  // re-land after fonts/layout settle
-  setTimeout(land, 900);
+  // late layout shifts (lazy classes, sticky measurement) move the target —
+  // keep re-landing until the row's position is stable for two checks
+  let lastTop = null, stable = 0, tries = 0;
+  const iv = setInterval(() => {
+    const top = Math.round(rows[i].getBoundingClientRect().top);
+    if (top === lastTop) { stable++; } else { stable = 0; land(); }
+    lastTop = top; tries++;
+    if (stable >= 2 || tries > 20) clearInterval(iv);
+  }, 200);
+  window.addEventListener('load', land);
   playRow(i, false, true); // browsers may require one tap; the play button is in view
 })();
 setSel(rows.findIndex((_,i)=>visible(i)));
