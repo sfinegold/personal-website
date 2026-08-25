@@ -301,7 +301,8 @@ function toggleDetail(i){
     '<div class="dm">' + r.dataset.when + ' · ' + r.dataset.venue + '</div>' +
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
     '<a href="/lineup/venue/' + r.dataset.vid + '">Venue page</a>' +
-    '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a></div></div></div></td>';
+    '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a>' +
+    '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">&#128279; Share</a></div></div></div></td>';
   r.after(tr);
   loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art) d.style.backgroundImage='url("'+rec.art+'")'; });
 }
@@ -415,7 +416,30 @@ function jumpTo(ymd){
   el.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 
+function shareEvent(i){
+  const u = location.origin + '/lineup/sf?e=' + encodeURIComponent(rows[i].dataset.key);
+  (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(()=>{
+    const b = document.getElementById('shareBtn'); if (b) b.textContent = 'Link copied!';
+  }).catch(()=>prompt('Copy this link:', u));
+}
+
 setFilter('Music'); // default view
+
+// deep link: ?e=<key> opens that event's row ready to play
+(function(){
+  const k = new URLSearchParams(location.search).get('e');
+  if (!k) return;
+  const i = rows.findIndex(r => r.dataset.key === k);
+  if (i < 0) return;
+  if (rows[i].offsetParent === null) setFilter(gFilter); // clear default filter if it hides the shared row
+  // expand any collapsed week containing it
+  let w = rows[i].previousElementSibling;
+  while (w && !w.classList.contains('week')) w = w.previousElementSibling;
+  if (w && w.classList.contains('collapsed')) w.click();
+  setSel(i); toggleDetail(i);
+  rows[i].scrollIntoView({ block: 'center' });
+  playRow(i, false, true); // browsers may require one tap; the play button is focused in view
+})();
 setSel(rows.findIndex((_,i)=>visible(i)));
 </script>
 </body></html>`;
