@@ -123,6 +123,8 @@ function page(snap, og) {
 <meta property="og:title" content="${esc((og && og.title) || 'Your Lineup — San Francisco')}">
 <meta property="og:description" content="${esc((og && og.desc) || 'Live music, comedy and sports around the Bay — with 30-second previews.')}">
 <meta property="og:type" content="website">
+${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(og.image)}">` : ''}
+<meta name="theme-color" content="#635BFF">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23635BFF'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -677,7 +679,16 @@ module.exports = async (req, res) => {
       let cands = snap.grid.filter((x) => x.sourceId === vid);
       if (date) cands = cands.filter((x) => x.date === date);
       const hit = cands.find((x) => slugSrv(x.title).slice(0, 16) === aslug.slice(0, 16)) || cands[0];
-      if (hit) og = { title: `${hit.title} — ${fmtNice(hit.date)}`, desc: `${hit.venue}${hit.time ? ' · ' + fmtTime(hit.time) : ''} · via Lineup SF` };
+      if (hit) {
+        og = { title: `\u{1F3B6} ${hit.title} — ${fmtNice(hit.date)}`, desc: `\u{1F49C} ${hit.venue}${hit.time ? ' · ' + fmtTime(hit.time) : ''} · Lineup SF` };
+        try { // album art for the unfurl card (2s budget)
+          const ac = new AbortController(); const t = setTimeout(() => ac.abort(), 2000);
+          const it = await fetch('https://itunes.apple.com/search?media=music&entity=musicTrack&limit=1&term=' + encodeURIComponent(artistTerm(hit.title)), { signal: ac.signal }).then((r) => r.json());
+          clearTimeout(t);
+          const art = it.results && it.results[0] && it.results[0].artworkUrl100;
+          if (art) og.image = art.replace('100x100bb', '600x600bb');
+        } catch (err) { /* no art — text card */ }
+      }
     }
     res.statusCode = 200;
     res.end(page(snap, og));
