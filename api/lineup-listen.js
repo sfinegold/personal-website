@@ -163,10 +163,7 @@ function page(snap) {
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);background:var(--bg2);padding:5px 12px;border-bottom:1px solid var(--line)}
   tr.row td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
-  tr.row{cursor:pointer;border-left:3px solid transparent}
-  tr.g-Music td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
-  tr.g-Comedy td:first-child{box-shadow:inset 3px 0 0 var(--pick)}
-  tr.g-Sports td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+  tr.row{cursor:pointer}
   tr.row.selected{background:rgba(28,32,38,.06)}
   tr.row.playing td:first-child{box-shadow:inset 3px 0 0 var(--pick)}
   tr.row.playing .pbtn{background:var(--pick);color:#fff;border-color:var(--pick)}
@@ -268,7 +265,6 @@ function page(snap) {
   @media (max-width:560px){
     .c-price,.c-time{display:none}
     .c-act .share{display:none}                 /* row share hidden on mobile (still in expanded row) */
-    tr.g-Music td:first-child,tr.g-Comedy td:first-child,tr.g-Sports td:first-child{box-shadow:none} /* no left accent */
     table{font-size:.8rem}
     h1{font-size:1.1rem}
     .top{padding:.7rem .9rem .5rem;gap:.5rem}
