@@ -15,13 +15,13 @@ module.exports = async (req, res) => {
   const hint = (url.searchParams.get('hint') || '').trim().slice(0, 40);
   if (!artist) { res.statusCode = 400; return res.end('{"error":"no artist"}'); }
   const key = process.env.YOUTUBE_API_KEY || process.env.YOUTUBE_KEY;
-  const ck = 'lineup:yt2:' + (artist + '|' + hint).toLowerCase();
+  // channel override wins over everything, including old cached lookups
+  const ov = await getJSON('lineup:ytoverride:' + artist.toLowerCase(), null);
+  const ck = 'lineup:yt3:' + (artist + '|' + (ov && ov.channelId ? 'ch:' + ov.channelId : hint)).toLowerCase();
   try {
     const cached = await getJSON(ck, null);
     if (cached) return res.end(JSON.stringify({ artist, tracks: cached, cached: true }));
     if (!key) { res.statusCode = 503; return res.end('{"error":"no key"}'); }
-    // manual per-artist override: pin to a specific channel's top videos
-    const ov = await getJSON('lineup:ytoverride:' + artist.toLowerCase(), null);
     const q = ov && ov.channelId
       ? 'channelId=' + ov.channelId + '&order=viewCount&q='
       : 'videoCategoryId=10&q=' + encodeURIComponent(hint ? artist + ' ' + hint : artist);
