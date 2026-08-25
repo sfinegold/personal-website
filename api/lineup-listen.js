@@ -202,10 +202,13 @@ function setPlaying(i, on){
   rows[i].classList.toggle('playing', on);
   const b = rows[i].querySelector('.pbtn'); if (b) b.innerHTML = on ? '&#10073;&#10073;' : '&#9654;';
 }
-function playRow(i){
+function playRow(i, scroll, manual){
   if (i==null || i<0 || i>=rows.length) return;
   loadPreview(i).then(rec=>{
-    if (!rec.previewUrl){ playStep(i, 1); return; }
+    if (!rec.previewUrl){
+      if (manual){ $('nN').textContent = rows[i].querySelector('.c-name').textContent;
+        $('nS').textContent = 'no preview available'; $('now').classList.add('on'); return; }
+      playStep(i, 1); return; }
     if (playIdx!=null) setPlaying(playIdx, false);
     playIdx = i;
     audio.src = rec.previewUrl; audio.play().catch(()=>{});
