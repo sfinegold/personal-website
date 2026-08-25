@@ -380,7 +380,7 @@ function toggleDetail(i){
 rows.forEach((r,i)=>{
   r.addEventListener('click', ()=>{ setSel(i); toggleDetail(i); });
   r.querySelector('.share').addEventListener('click', (e)=>{ e.stopPropagation();
-    const u = location.origin + '/lineup/sf?e=' + encodeURIComponent(r.dataset.key);
+    const u = shareUrl(r);
     const b = e.currentTarget;
     (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
       .then(()=>{ b.innerHTML='&#10003;'; setTimeout(()=>{ b.innerHTML='&#128279;'; }, 1200); })
@@ -522,8 +522,13 @@ function jumpTo(ymd){
   el.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 
+function slugify(t){ return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,28).replace(/-+$/,''); }
+function shareUrl(r){
+  const date = (r.dataset.key.match(/\|(\d{4}-\d{2}-\d{2})$/) || [])[1] || '';
+  return location.origin + '/lineup/sf?e=' + slugify(r.dataset.term || r.querySelector('.c-name').textContent) + '--' + r.dataset.vid + '--' + date;
+}
 function shareEvent(i){
-  const u = location.origin + '/lineup/sf?e=' + encodeURIComponent(rows[i].dataset.key);
+  const u = shareUrl(rows[i]);
   (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(()=>{
     const b = document.getElementById('shareBtn'); if (b) b.textContent = 'Link copied!';
   }).catch(()=>prompt('Copy this link:', u));
@@ -546,7 +551,17 @@ setFilter('Music'); // default view
 (function(){
   const k = new URLSearchParams(location.search).get('e');
   if (!k) return;
-  const i = rows.findIndex(r => r.dataset.key === k);
+  let i = -1;
+  if (k.includes('--')) {
+    const parts = k.split('--');
+    const date = parts.pop(), vid = parts.pop(), aslug = parts.join('--');
+    const cands = rows.map((r, j) => ({ r, j }))
+      .filter(x => x.r.dataset.vid === vid && x.r.dataset.key.endsWith('|' + date));
+    const hit = cands.find(x => slugify(x.r.dataset.term).startsWith(aslug.slice(0, 12))) || cands[0];
+    if (hit) i = hit.j;
+  } else {
+    i = rows.findIndex(r => r.dataset.key === decodeURIComponent(k));
+  }
   if (i < 0) return;
   if (rows[i].offsetParent === null) setFilter(gFilter); // clear default filter if it hides the shared row
   // expand any collapsed week containing it
