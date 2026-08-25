@@ -603,8 +603,11 @@ setTopH(); window.addEventListener('resize', setTopH);
     document.body.classList.add('shared-view');
     const bar = document.createElement('div');
     bar.className = 'sharedbar';
-    bar.innerHTML = '&#9829; A friend shared ' + n + ' liked show' + (n===1?'':'s') +
-      ' &nbsp;<button onclick="document.body.classList.remove(\'shared-view\');this.parentNode.remove();refreshHeaders()">Show everything</button>';
+    bar.appendChild(document.createTextNode('\u2665 A friend shared ' + n + ' liked show' + (n===1?'':'s') + ' '));
+    const btn = document.createElement('button');
+    btn.textContent = 'Show everything';
+    btn.onclick = () => { document.body.classList.remove('shared-view'); bar.remove(); refreshHeaders(); };
+    bar.appendChild(btn);
     document.querySelector('.top').after(bar);
     setFilter(gFilter); // clear type filter so all shared shows are visible
     refreshHeaders();
