@@ -248,7 +248,7 @@ function page(snap) {
   .fmf{display:flex;justify-content:space-between;padding:.6rem 1rem;border-top:1px solid var(--line)}
   .fmf .clr{border:0;background:none;text-decoration:underline;cursor:pointer;color:var(--text)}
   .fmf .done{border:1px solid var(--text);background:var(--text);color:#fff;border-radius:9px;padding:.5rem 1.1rem;cursor:pointer}
-  .hints{flex:none;width:104px;position:sticky;top:calc(var(--topH,52px) + 12px);
+  .hints{position:fixed;left:14px;width:104px;top:calc(var(--topH,52px) + 16px);
     font-family:var(--mono);font-size:.56rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);line-height:1.5}
   .hints div{margin-bottom:.45rem}
   .hints a{color:var(--faint)}
