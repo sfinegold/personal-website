@@ -248,7 +248,7 @@ function toggleDetail(i){
 }
 rows.forEach((r,i)=>{
   r.addEventListener('click', ()=>{ setSel(i); toggleDetail(i); });
-  r.querySelector('.pbtn').addEventListener('click', (e)=>{ e.stopPropagation(); setSel(i); (playIdx===i && !audio.paused) ? togglePlay() : playRow(i); });
+  r.querySelector('.pbtn').addEventListener('click', (e)=>{ e.stopPropagation(); setSel(i); (playIdx===i && !audio.paused) ? togglePlay() : playRow(i, false, true); });
 });
 document.addEventListener('keydown', (e)=>{
   if (e.target.matches('input,textarea,select')) return;
