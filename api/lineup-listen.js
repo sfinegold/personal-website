@@ -146,7 +146,7 @@ function page(snap) {
   button.cd.has:hover{background:var(--pop)}
   tr.day{scroll-margin-top:calc(var(--topH,52px) + 44px)}
   @media (max-width:900px){ .cal{display:none} }
-  tr.week td{cursor:pointer;user-select:none;position:sticky;top:var(--topH,52px);z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
+  tr.week td{cursor:pointer;user-select:none;position:sticky;top:calc(var(--topH,52px) - 1px);z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);background:var(--bg2);padding:5px 12px;border-bottom:1px solid var(--line)}
@@ -498,7 +498,7 @@ const rio = new IntersectionObserver((ents)=>{ ents.forEach(en=>{ if(!en.isInter
 rows.forEach(r => rio.observe(r));
 
 // pin sticky week bands flush under the real header height (it varies by viewport)
-function setTopH(){ const t=document.querySelector('.top'); if(t) document.documentElement.style.setProperty('--topH', t.offsetHeight + 'px'); }
+function setTopH(){ const t=document.querySelector('.top'); if(t) document.documentElement.style.setProperty('--topH', Math.ceil(t.getBoundingClientRect().height) + 'px'); }
 setTopH(); window.addEventListener('resize', setTopH);
 
 setFilter('Music'); // default view
