@@ -145,7 +145,8 @@ function page(snap) {
   .fbtn.on.fb-Comedy{background:var(--pick);border-color:var(--pick);color:#fff}
   .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
   .main{max-width:1080px;margin:0 auto;display:flex;gap:14px;align-items:flex-start}
-  table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:0}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:0;overflow-anchor:none}
+  body{overflow-anchor:none}
   .cal{flex:none;width:196px;position:sticky;top:calc(var(--topH,52px) + 8px);padding:8px 0}
   .cm2{background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text);
     padding:8px 10px;margin-bottom:10px}
@@ -377,6 +378,7 @@ function setRbtn(on){ $('rbtn').innerHTML = on ? '&#10073;&#10073; Pause' : '&#9
 audio.addEventListener('ended', nextSong);
 
 function toggleDetail(i){
+  const keepY = window.scrollY;
   const old = document.querySelector('tr.detail');
   if (old){ old.remove(); if (openIdx === i){ openIdx = null; return; } }
   openIdx = i;
@@ -394,6 +396,7 @@ function toggleDetail(i){
     '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">&#128279; Share</a></div></div></div></td>';
   r.after(tr);
   loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art){ d.style.background='url("'+rec.art+'") center/cover'; const sp=d.querySelector('.di'); if(sp) sp.remove(); } });
+  window.scrollTo({ top: keepY }); // expand grows downward; the row stays put
 }
 rows.forEach((r,i)=>{
   r.addEventListener('click', ()=>{ setSel(i); toggleDetail(i); });
@@ -575,9 +578,11 @@ setFilter('Music'); // default view
   if (k.includes('--')) {
     const parts = k.split('--');
     const date = parts.pop(), vid = parts.pop(), aslug = parts.join('--');
-    const cands = rows.map((r, j) => ({ r, j }))
-      .filter(x => x.r.dataset.vid === vid && x.r.dataset.key.endsWith('|' + date));
-    const hit = cands.find(x => slugify(x.r.querySelector('.c-name').textContent).slice(0, 16) === aslug.slice(0, 16)) || cands[0];
+    let cands = rows.map((r, j) => ({ r, j })).filter(x => x.r.dataset.vid === vid);
+    if (date) cands = cands.filter(x => x.r.dataset.key.endsWith('|' + date));
+    const hit = cands.find(x => slugify(x.r.querySelector('.c-name').textContent).slice(0, 16) === aslug.slice(0, 16))
+      || cands.find(x => slugify(x.r.dataset.term).startsWith(aslug.slice(0, 10)))
+      || (date ? cands[0] : null);
     if (hit) i = hit.j;
   } else {
     i = rows.findIndex(r => r.dataset.key === decodeURIComponent(k));
