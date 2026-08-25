@@ -151,7 +151,7 @@ function page(snap) {
   tr.row.selected{background:rgba(28,32,38,.06)}
   tr.row.playing td:first-child{box-shadow:inset 3px 0 0 var(--pick)}
   tr.row.playing .pbtn{background:var(--pick);color:#fff;border-color:var(--pick)}
-  .c-act{width:104px}
+  .c-act{width:104px;text-align:right}
   .c-act{white-space:nowrap}
   .c-act button{vertical-align:middle}
   .pbtn{width:22px;height:22px;border-radius:50%;border:1px solid var(--text);background:#fff;font-size:.48rem;
