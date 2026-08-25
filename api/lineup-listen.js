@@ -123,7 +123,7 @@ function page(snap) {
   .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
   .main{max-width:1080px;margin:0 auto;display:flex;gap:14px;align-items:flex-start}
   table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:0}
-  .cal{flex:none;width:196px;position:sticky;top:60px;padding:8px 0}
+  .cal{flex:none;width:196px;position:sticky;top:calc(var(--topH,52px) + 8px);padding:8px 0}
   .cm2{background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text);
     padding:8px 10px;margin-bottom:10px}
   .cmh{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
@@ -132,9 +132,9 @@ function page(snap) {
   .cd.off{color:var(--faint)}
   button.cd.has{border:0;background:var(--accent);color:#fff;cursor:pointer;font-weight:700}
   button.cd.has:hover{background:var(--pop)}
-  tr.day{scroll-margin-top:96px}
+  tr.day{scroll-margin-top:calc(var(--topH,52px) + 44px)}
   @media (max-width:900px){ .cal{display:none} }
-  tr.week td{cursor:pointer;user-select:none;position:sticky;top:52px;z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
+  tr.week td{cursor:pointer;user-select:none;position:sticky;top:var(--topH,52px);z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);background:var(--bg2);padding:5px 12px;border-bottom:1px solid var(--line)}
@@ -422,6 +422,10 @@ function shareEvent(i){
     const b = document.getElementById('shareBtn'); if (b) b.textContent = 'Link copied!';
   }).catch(()=>prompt('Copy this link:', u));
 }
+
+// pin sticky week bands flush under the real header height (it varies by viewport)
+function setTopH(){ const t=document.querySelector('.top'); if(t) document.documentElement.style.setProperty('--topH', t.offsetHeight + 'px'); }
+setTopH(); window.addEventListener('resize', setTopH);
 
 setFilter('Music'); // default view
 
