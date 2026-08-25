@@ -157,6 +157,7 @@ function page(snap) {
   button.cd.has{border:0;background:var(--accent);color:#fff;cursor:pointer;font-weight:700}
   button.cd.has:hover{background:var(--pop)}
   tr.day{scroll-margin-top:calc(var(--topH,52px) + var(--wbH,32px) - 2px)}
+  tr.row{scroll-margin-top:calc(var(--topH,52px) + var(--wbH,32px) - 2px)}
   @media (max-width:900px){ .cal{display:none} }
   tr.week td{cursor:pointer;user-select:none;position:sticky;top:calc(var(--topH,52px) - 1px);z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
@@ -594,7 +595,7 @@ setFilter('Music'); // default view
   while (w && !w.classList.contains('week')) w = w.previousElementSibling;
   if (w && w.classList.contains('collapsed')) w.click();
   setSel(i); toggleDetail(i);
-  const land = () => rows[i].scrollIntoView({ block: 'center', behavior: 'auto' });
+  const land = () => rows[i].scrollIntoView({ block: 'start', behavior: 'auto' }); // row lands right under the week band
   land();
   // late layout shifts (lazy classes, sticky measurement) move the target —
   // keep re-landing until the row's position is stable for two checks
