@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(v.name)} — Upcoming Shows &amp; Tickets | Lineup SF</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ee5233'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232440a8'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@700;800&family=Instrument+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="canonical" href="${canonical}">
@@ -71,19 +71,19 @@ module.exports = async (req, res) => {
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--bg:#fbf7f0;--bg2:#f4ecdf;--card:#ffffff;--line:#e5dccd;--text:#14120f;--dim:#574c40;
-    --faint:#7a6d5e;--accent:#ee5233;--accent7:#b83c1e;--pick:#0f736b;
+  :root{--bg:#fafafa;--bg2:#f0f0f1;--card:#ffffff;--line:#e4e4e7;--text:#111113;--dim:#52525b;
+    --faint:#71717a;--accent:#2440a8;--accent7:#1a2f7d;--pick:#2440a8;
     --mono:"IBM Plex Mono","SF Mono",ui-monospace,Menlo,monospace}
   body{background:var(--bg);color:var(--text);font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.012em;
     -webkit-font-smoothing:antialiased;
-    background-image:linear-gradient(90deg,#ee5233 0%,#f5b72b 52%,#0f736b 100%);background-size:100% 3px;
+    background-image:linear-gradient(90deg,#1a2f7d 0%,#2440a8 52%,#7c96f4 100%);background-size:100% 3px;
     background-repeat:no-repeat;background-position:top}
   .wrap{max-width:920px;margin:0 auto;padding:1.2rem 1rem 3rem}
   .bk{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-decoration:none}
   .bk:hover{color:var(--accent)}
   .hero{border-radius:14px;padding:1.6rem 1.4rem;color:var(--bg);margin:.7rem 0 1.4rem;background:var(--text);position:relative}
   .hero::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;border-radius:2px;
-    background:linear-gradient(90deg,#ee5233 0%,#f5b72b 52%,#0f736b 100%)}
+    background:linear-gradient(90deg,#1a2f7d 0%,#2440a8 52%,#7c96f4 100%)}
   .hero h1{font-family:Jost,'Trebuchet MS',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:-.025em}
   .hero .m{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-top:.4rem}
   .hero a{color:#fff}
@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
     <div class="m">${esc(v.region === 'SF' ? 'San Francisco' : v.region)}, CA · ${esc(v.category.replace('-', ' '))} · <a href="${esc(v.url)}" rel="noopener">official site</a></div>
   </div>
   <h2>Upcoming shows${shows.length ? ` (${shows.length})` : ''}</h2>
-  ${shows.length ? `<table><tbody>${rows}</tbody></table>` : '<p style="color:#7a6d5e">No shows found in the current window — check the official site.</p>'}
+  ${shows.length ? `<table><tbody>${rows}</tbody></table>` : '<p style="color:#71717a">No shows found in the current window — check the official site.</p>'}
   <h2>More ${esc(v.region === 'SF' ? 'San Francisco' : v.region)} venues</h2>
   <div class="others">${others.map((o) => `<a href="/lineup/venue/${o.id}">${esc(o.name)}</a>`).join('')}</div>
   <div class="foot">Part of <a href="/lineup/sf">Lineup SF</a> — live-music discovery for the Bay Area. Listings via Ticketmaster &amp; venue calendars, updated weekly.</div>
