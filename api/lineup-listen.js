@@ -37,7 +37,7 @@ function fmtPrice(p) {
 }
 const groupOf = (c) => (c === 'comedy' ? 'Comedy' : c === 'sports' ? 'Sports' : 'Music');
 
-function page(snap) {
+function page(snap, og) {
   const events = (snap && snap.grid) || [];
   const start = (snap && snap.window && snap.window.start) || new Date().toISOString().slice(0, 10);
   const byDay = {};
@@ -653,13 +653,28 @@ setSel(rows.findIndex((_,i)=>visible(i)));
 </body></html>`;
 }
 
+const slugSrv = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64).replace(/-+$/, '');
+const fmtNice = (ymd) => new Date(ymd + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   try {
     const snap = await store.getSnapshot('me');
+    // dynamic OG for shared links so iMessage previews show artist + date
+    let og = null;
+    const q = new URL(req.url, 'http://x').searchParams;
+    const e = q.get('e');
+    if (e && e.includes('--') && snap && snap.grid) {
+      const parts = e.split('--');
+      const date = parts.pop(), vid = parts.pop(), aslug = parts.join('--');
+      let cands = snap.grid.filter((x) => x.sourceId === vid);
+      if (date) cands = cands.filter((x) => x.date === date);
+      const hit = cands.find((x) => slugSrv(x.title).slice(0, 16) === aslug.slice(0, 16)) || cands[0];
+      if (hit) og = { title: `${hit.title} — ${fmtNice(hit.date)}`, desc: `${hit.venue}${hit.time ? ' · ' + hit.time : ''} · via Lineup SF` };
+    }
     res.statusCode = 200;
-    res.end(page(snap));
+    res.end(page(snap, og));
   } catch (err) {
     res.statusCode = 500;
     res.end('<p>listen view error: ' + esc(err.message) + '</p>');
