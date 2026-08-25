@@ -89,7 +89,7 @@ const SAM = {
   interests: ['comedy', 'live-music', 'electronic', 'jazz', 'sports', 'theater'],
   favorites: ['electronic', 'live-music'],
   filters: {
-    lookaheadDays: 35,   // 5 weeks (for the grid view)
+    lookaheadDays: 130,  // through end of year (site indexes all upcoming concerts)
     maxPicks: 12,
     maxPerVenue: 3,   // no more than 3 events from any one venue in the digest
     preferEvents: true,
