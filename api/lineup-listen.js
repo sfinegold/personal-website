@@ -569,8 +569,11 @@ setFilter('Music'); // default view
   while (w && !w.classList.contains('week')) w = w.previousElementSibling;
   if (w && w.classList.contains('collapsed')) w.click();
   setSel(i); toggleDetail(i);
-  rows[i].scrollIntoView({ block: 'center' });
-  playRow(i, false, true); // browsers may require one tap; the play button is focused in view
+  const land = () => rows[i].scrollIntoView({ block: 'center', behavior: 'auto' });
+  land();
+  setTimeout(land, 250);  // re-land after fonts/layout settle
+  setTimeout(land, 900);
+  playRow(i, false, true); // browsers may require one tap; the play button is in view
 })();
 setSel(rows.findIndex((_,i)=>visible(i)));
 </script>
