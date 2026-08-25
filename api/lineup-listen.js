@@ -484,6 +484,12 @@ let heardPreview = false;
 function nextRowFrom(i, d){ let j = (i==null? (d>0?-1:rows.length) : i); do { j += d; } while (j>=0 && j<rows.length && !visible(j)); return (j>=0 && j<rows.length) ? j : null; }
 function arrowFlow(d){
   if ($('yt').classList.contains('on')){ ytStep(d); return; } // pan tracks within the open artist
+  // previewing + right arrow: graduate into the artist — open the row + YT player
+  if (d > 0 && playIdx != null && !audio.paused){
+    const i = playIdx; setSel(i);
+    if (openIdx !== i) toggleDetail(i);
+    openYT(i); return;
+  }
   d > 0 ? nextSong() : prevSong();
 }
 function closeYT(){ $('yt').classList.remove('on'); $('ytFrame').src=''; ytTracks=[]; }
