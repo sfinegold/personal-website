@@ -337,11 +337,11 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   <div class="cmask" onclick="closeCal()"></div>
   <div class="cmodal" role="dialog" aria-label="Jump to a date"><div class="fmh">Jump to a date<button onclick="closeCal()">&#10005;</button></div><div class="cbody">${calHtml}</div></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
-  <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
+  <span><button onclick="ytStep(-1)">&#8249; Prev</button> <button onclick="ytStep(1)">Next &#8250;</button> <button onclick="closeYT()">&#10005;</button></span></div>
   <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   <div class="tl" id="ytList"></div></div>
 <div class="now" id="now"><div class="a" id="nA"></div><div><div class="n" id="nN">—</div><div class="s" id="nS">now playing</div></div>
-    <div class="grp"><button onclick="prevSong()">&#9198; Prev</button><button onclick="nextSong()">Skip &#9197;</button><button onclick="stopAll()">Stop</button></div></div>
+    <div class="grp"><button onclick="prevSong()">Prev</button><button onclick="nextSong()">Skip</button><button onclick="stopAll()">Stop</button></div></div>
 <script>
 const audio = new Audio();
 const cache = {};
@@ -430,7 +430,7 @@ function toggleDetail(i){
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
     '<a href="/lineup/venue/' + r.dataset.vid + '">Venue page</a>' +
     '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a>' +
-    '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">&#128279; Share</a></div></div></div></td>';
+    '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">Share</a></div></div></div></td>';
   r.after(tr);
   loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art){ d.style.background='url("'+rec.art+'") center/cover'; const sp=d.querySelector('.di'); if(sp) sp.remove(); } });
   window.scrollTo({ top: keepY }); // expand grows downward; the row stays put
