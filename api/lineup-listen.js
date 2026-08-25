@@ -204,7 +204,8 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   .dm{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin:4px 0 8px}
   .dl{display:flex;gap:.5rem;flex-wrap:wrap}
   .dl a{font-family:var(--mono);font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
-    border:1px solid var(--accent);border-radius:12px;padding:3px 10px;text-decoration:none}
+    border:1px solid var(--accent);border-radius:12px;height:24px;padding:0 10px;text-decoration:none;
+    display:inline-flex;align-items:center;line-height:1}
   body.shared-view tr.row:not(.sharedlike){display:none}
   .sharedbar{max-width:1080px;margin:.5rem auto 0;padding:.55rem 1rem;background:#fff;border:1px solid var(--pop);
     border-radius:10px;color:var(--pop);font-size:.85rem;font-weight:600}
