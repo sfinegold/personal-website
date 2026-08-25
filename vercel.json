@@ -35,6 +35,10 @@
     {
       "source": "/lineup/venue/:id",
       "destination": "/api/lineup-venue?id=:id"
+    },
+    {
+      "source": "/lineup/yt",
+      "destination": "/api/lineup-yt"
     }
   ],
   "functions": {

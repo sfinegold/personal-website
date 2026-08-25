@@ -1,0 +1,33 @@
+// /lineup/yt?artist=NAME — top-5 music videos for an artist, for the in-page
+// YouTube browse player. Cached forever in Supabase (search costs 100 quota
+// units; cache hits cost none). Env: YOUTUBE_API_KEY or YOUTUBE_KEY.
+
+const { getJSON, setJSON } = require('./_lib/store');
+
+module.exports = async (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  const url = new URL(req.url, 'http://x');
+  const artist = (url.searchParams.get('artist') || '').trim().slice(0, 80);
+  if (!artist) { res.statusCode = 400; return res.end('{"error":"no artist"}'); }
+  const key = process.env.YOUTUBE_API_KEY || process.env.YOUTUBE_KEY;
+  const ck = 'lineup:yt:' + artist.toLowerCase();
+  try {
+    const cached = await getJSON(ck, null);
+    if (cached) return res.end(JSON.stringify({ artist, tracks: cached, cached: true }));
+    if (!key) { res.statusCode = 503; return res.end('{"error":"no key"}'); }
+    const r = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&maxResults=6&q='
+      + encodeURIComponent(artist) + '&key=' + key);
+    const d = await r.json();
+    if (d.error) { res.statusCode = 502; return res.end(JSON.stringify({ error: d.error.message })); }
+    const tracks = (d.items || [])
+      .filter((i) => i.id && i.id.videoId)
+      .slice(0, 5)
+      .map((i) => ({ id: i.id.videoId, title: i.snippet.title }));
+    await setJSON(ck, tracks);
+    res.end(JSON.stringify({ artist, tracks, cached: false }));
+  } catch (e) {
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: String(e.message || e) }));
+  }
+};

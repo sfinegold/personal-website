@@ -77,19 +77,21 @@ function page(snap) {
 <title>Your Lineup — San Francisco</title><meta name="robots" content="noindex">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--bg:#F7F5F0;--bg2:#EEEAE1;--line:rgba(28,32,38,.14);--text:#191D23;--dim:rgba(25,29,35,.62);
-    --faint:rgba(25,29,35,.40);--accent:#4A6E8F;--gold:#A8761E;--pick:#3B7A5C;
+  :root{--bg:#F7F3EA;--bg2:#EFE8D8;--line:rgba(10,37,64,.16);--text:#0A2540;--dim:rgba(10,37,64,.64);
+    --faint:rgba(10,37,64,.42);--accent:#635BFF;--gold:#EDA33B;--pick:#17877B;--pop:#E4572E;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
   body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;padding-bottom:84px}
   .top{position:sticky;top:0;z-index:40;background:var(--bg);padding:.8rem 1rem .5rem;border-bottom:2px solid var(--text);
+    background-image:linear-gradient(90deg,#635BFF,#00D4FF 45%,#E4572E);background-size:100% 4px;background-repeat:no-repeat;background-position:top;
     display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
   h1{font-size:1.25rem;font-weight:700}
   .rbtn{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
-    padding:.45rem .85rem;border-radius:18px;border:1px solid var(--pick);background:var(--pick);color:#fff;cursor:pointer}
+    padding:.45rem .85rem;border-radius:18px;border:1px solid var(--text);background:var(--pick);color:#fff;cursor:pointer;
+    box-shadow:2px 2px 0 var(--text)}
   .rbtn.on{background:transparent;color:var(--pick)}
-  .rbtn.heartbtn{border-color:#c0324b;background:transparent;color:#c0324b}
-  .rbtn.heartbtn.on{background:#c0324b;color:#fff}
+  .rbtn.heartbtn{border-color:var(--text);background:transparent;color:var(--pop);box-shadow:2px 2px 0 var(--text)}
+  .rbtn.heartbtn.on{background:var(--pop);color:#fff}
   .filters{display:flex;gap:.35rem}
   .fbtn{font-family:var(--mono);font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
     padding:.32rem .65rem;border-radius:15px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
@@ -97,7 +99,7 @@ function page(snap) {
   .fbtn.on.fb-Comedy{background:var(--pick);border-color:var(--pick);color:#fff}
   .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
   table{width:100%;max-width:1080px;margin:0 auto;border-collapse:collapse;font-size:.84rem}
-  tr.week td{position:sticky;top:52px;z-index:20;background:var(--text);color:var(--bg);
+  tr.week td{position:sticky;top:52px;z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);background:var(--bg2);padding:5px 12px;border-bottom:1px solid var(--line)}
@@ -120,7 +122,7 @@ function page(snap) {
     border:1px solid var(--pick);border-radius:12px;padding:2px 9px;text-decoration:none;white-space:nowrap}
   .tix:hover{background:var(--pick);color:#fff}
   .c-heart{width:34px;text-align:center}
-  .heart{border:0;background:none;color:#c0324b;font-size:.95rem;cursor:pointer}
+  .heart{border:0;background:none;color:var(--pop);font-size:.95rem;cursor:pointer}
   tr.detail td{background:var(--bg2);padding:12px;border-bottom:1px solid var(--line)}
   .dwrap{display:flex;gap:14px;align-items:center}
   .dart{width:110px;height:110px;border-radius:8px;background:linear-gradient(135deg,#e4e0d6,#d3ccbe);
@@ -144,6 +146,18 @@ function page(snap) {
   .now button{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:.35rem .7rem;
     font-family:var(--mono);font-size:.58rem;text-transform:uppercase;cursor:pointer;color:var(--dim)}
   .now .grp{margin-left:auto;display:flex;gap:.4rem}
+  .yt{position:fixed;right:12px;bottom:64px;z-index:70;width:336px;background:#fff;border:1px solid var(--text);
+    border-radius:10px;box-shadow:4px 4px 0 var(--text);display:none;overflow:hidden}
+  .yt.on{display:block}
+  .yt iframe{width:100%;height:189px;border:0;display:block}
+  .yt .tl{max-height:150px;overflow:auto}
+  .yt .tl button{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:#fff;
+    padding:6px 10px;font-size:.72rem;cursor:pointer;color:var(--text)}
+  .yt .tl button.on{background:var(--bg2);font-weight:700}
+  .yt .hd{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg2);
+    font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  .yt .hd button{border:0;background:none;cursor:pointer;font-size:.8rem;color:var(--text)}
+  @media (max-width:560px){ .yt{left:8px;right:8px;width:auto;bottom:70px} }
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
@@ -165,7 +179,11 @@ function page(snap) {
   </div>
   <table><tbody id="tb">${rowsHtml}</tbody></table>
   <div class="foot">&#8593;&#8595; select · space play/stop · &#8592;&#8594; skip · enter opens · <a href="/lineup/me">edit venues</a></div>
-  <div class="now" id="now"><div class="a" id="nA"></div><div><div class="n" id="nN">—</div><div class="s" id="nS">now playing</div></div>
+  <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
+  <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
+  <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <div class="tl" id="ytList"></div></div>
+<div class="now" id="now"><div class="a" id="nA"></div><div><div class="n" id="nN">—</div><div class="s" id="nS">now playing</div></div>
     <div class="grp"><button onclick="prevSong()">&#9198; Prev</button><button onclick="nextSong()">Skip &#9197;</button><button onclick="stopAll()">Stop</button></div></div>
 <script>
 const audio = new Audio();
@@ -245,7 +263,8 @@ function toggleDetail(i){
     '<div class="dt">' + r.querySelector('.c-name').textContent + '</div>' +
     '<div class="dm">' + r.dataset.when + ' · ' + r.dataset.venue + '</div>' +
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
-    '<a href="/lineup/venue/' + r.dataset.vid + '">Venue page</a></div></div></div></td>';
+    '<a href="/lineup/venue/' + r.dataset.vid + '">Venue page</a>' +
+    '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a></div></div></div></td>';
   r.after(tr);
   loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art) d.style.backgroundImage='url("'+rec.art+'")'; });
 }
@@ -315,6 +334,29 @@ fetch('/lineup/auth?whoami=1').then(r=>r.json()).then(d=>{
   fetch('/lineup/auth?hearts=1').then(r=>r.json()).then(h=>{ if(!h.keys) return;
     h.keys.forEach(k=>hearts.add(k)); rows.forEach(r=>{ if(hearts.has(r.dataset.key)) markHeart(r,true); }); saveHearts(); });
 }).catch(()=>{});
+
+// ---- YouTube browse player (top-5 per artist, opt-in) ----
+let ytTracks = [], ytIdx = 0;
+function openYT(i){
+  const term = rows[i].dataset.term;
+  audio.pause(); setRbtn(false); if(playIdx!=null) setPlaying(playIdx,false);
+  fetch('/lineup/yt?artist=' + encodeURIComponent(term)).then(r=>r.json()).then(d=>{
+    if (!d.tracks || !d.tracks.length){ alert('No YouTube tracks found for ' + term); return; }
+    ytTracks = d.tracks; ytIdx = 0;
+    $('ytTitle').textContent = term;
+    renderYT();
+    $('yt').classList.add('on');
+  }).catch(()=>alert('YouTube lookup failed'));
+}
+function renderYT(){
+  const t = ytTracks[ytIdx];
+  $('ytFrame').src = 'https://www.youtube-nocookie.com/embed/' + t.id + '?autoplay=1';
+  const tl = $('ytList'); tl.innerHTML = '';
+  ytTracks.forEach((x,j)=>{ const b=document.createElement('button'); b.textContent=(j+1)+'. '+x.title;
+    b.className = j===ytIdx?'on':''; b.onclick=()=>{ ytIdx=j; renderYT(); }; tl.appendChild(b); });
+}
+function ytStep(d){ if(!ytTracks.length) return; ytIdx=(ytIdx+d+ytTracks.length)%ytTracks.length; renderYT(); }
+function closeYT(){ $('yt').classList.remove('on'); $('ytFrame').src=''; ytTracks=[]; }
 
 setFilter('Music'); // default view
 setSel(rows.findIndex((_,i)=>visible(i)));
