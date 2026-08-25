@@ -191,8 +191,9 @@ function page(snap) {
   .ev.hearted .heart,tr.row.hearted .heart{background:none;color:var(--pop)}
   tr.detail td{background:var(--bg2);padding:12px;border-bottom:1px solid var(--line)}
   .dwrap{display:flex;gap:14px;align-items:center}
-  .dart{width:110px;height:110px;border-radius:8px;background:linear-gradient(135deg,#e4e0d6,#d3ccbe);
-    background-size:cover;background-position:center;flex:none;border:1px solid var(--line)}
+  .dart{width:110px;height:110px;border-radius:8px;background-size:cover;background-position:center;flex:none;
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .dart .di{font-family:var(--mono);font-weight:700;font-size:1.4rem;letter-spacing:.06em;color:rgba(10,37,64,.42)}
   .dt{font-size:1rem;font-weight:700}
   .dm{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin:4px 0 8px}
   .dl{display:flex;gap:.5rem;flex-wrap:wrap}
@@ -354,7 +355,10 @@ function toggleDetail(i){
   openIdx = i;
   const r = rows[i];
   const tr = document.createElement('tr'); tr.className = 'detail';
-  tr.innerHTML = '<td colspan="6"><div class="dwrap"><div class="dart" id="dart"></div><div>' +
+  const hueOf2 = (t)=>{let h=0;for(let k=0;k<t.length;k++)h=(h*31+t.charCodeAt(k))%360;return h;};
+  const vin = (r.dataset.venue||'').replace(/^The\s+/i,'').split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+  const vhue = hueOf2(r.dataset.venue||'');
+  tr.innerHTML = '<td colspan="6"><div class="dwrap"><div class="dart" id="dart" style="background:linear-gradient(135deg,hsl(' + vhue + ',26%,84%),hsl(' + vhue + ',30%,70%))"><span class="di">' + vin + '</span></div><div>' +
     '<div class="dt">' + r.querySelector('.c-name').textContent + '</div>' +
     '<div class="dm">' + r.dataset.when + ' · ' + r.dataset.venue + '</div>' +
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
@@ -362,7 +366,7 @@ function toggleDetail(i){
     '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a>' +
     '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">&#128279; Share</a></div></div></div></td>';
   r.after(tr);
-  loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art) d.style.backgroundImage='url("'+rec.art+'")'; });
+  loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art){ d.style.background='url("'+rec.art+'") center/cover'; const sp=d.querySelector('.di'); if(sp) sp.remove(); } });
 }
 rows.forEach((r,i)=>{
   r.addEventListener('click', ()=>{ setSel(i); toggleDetail(i); });
@@ -478,14 +482,8 @@ function ytStep(d){ if(!ytTracks.length) return; ytIdx=(ytIdx+d+ytTracks.length)
 let heardPreview = false;
 function nextRowFrom(i, d){ let j = (i==null? (d>0?-1:rows.length) : i); do { j += d; } while (j>=0 && j<rows.length && !visible(j)); return (j>=0 && j<rows.length) ? j : null; }
 function arrowFlow(d){
-  const base = (playIdx != null ? playIdx : (sel >= 0 ? sel : null));
-  if (heardPreview || $('yt').classList.contains('on')){
-    const j = nextRowFrom($('yt').classList.contains('on') && window._ytRow != null ? window._ytRow : base, d);
-    if (j == null) return;
-    window._ytRow = j; setSel(j); openYT(j, true);
-  } else {
-    d > 0 ? nextSong() : prevSong();
-  }
+  if ($('yt').classList.contains('on')){ ytStep(d); return; } // pan tracks within the open artist
+  d > 0 ? nextSong() : prevSong();
 }
 function closeYT(){ $('yt').classList.remove('on'); $('ytFrame').src=''; ytTracks=[]; }
 
