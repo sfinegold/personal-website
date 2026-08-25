@@ -46,6 +46,8 @@ async function ticketmaster(source, ctx = {}) {
       else if (/^music$/i.test(seg)) category = /dance|electronic/i.test(genre) ? 'electronic' : /jazz/i.test(genre) ? 'jazz' : 'live-music';
       else if (/comedy/i.test(genre) || /^comedy$/i.test(seg)) category = 'comedy';
       else if (/arts & theater/i.test(seg)) category = 'theater';
+      // arenas/ballparks: only explicit Sports events stay sports — anything else is a show
+      if (category === 'sports' && !/^sports$/i.test(seg)) category = 'live-music';
       return normalizeEvent(
         {
           title: e.name.trim(),
