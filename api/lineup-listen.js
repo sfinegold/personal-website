@@ -59,7 +59,7 @@ function page(snap) {
       const id = uid++;
       const g = groupOf(e.category);
       const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
-      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
+      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-genre="${esc(e.note && !/resident advisor/i.test(e.note) ? e.note : '')}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
         <td class="c-name">${esc(e.title)}</td>
         <td class="c-venue"><a href="/lineup/venue/${esc(e.sourceId || '')}" onclick="event.stopPropagation()">${esc(e.venue || '')}</a></td>
         <td class="c-time">${esc(fmtTime(e.time))}</td>
@@ -70,6 +70,13 @@ function page(snap) {
     }
   }
   if (!days.length) rowsHtml = '<tr><td colspan="6" class="empty">No shows in the current window.</td></tr>';
+
+  // Airbnb-style filter pills: top genres present in the data + a Liked filter
+  const gc = {};
+  events.forEach((e) => { const g = e.note && !/resident advisor/i.test(e.note) ? e.note : null; if (g) gc[g] = (gc[g] || 0) + 1; });
+  const topGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]).slice(0, 9);
+  const fbar = `<div class="fbar"><button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>` +
+    topGenres.map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join('') + `</div>`;
 
   // right-rail mini calendar: months spanned by the window, event days clickable
   const daySet2 = new Set(days);
@@ -208,6 +215,18 @@ function page(snap) {
   @media (max-width:560px){ .yt{left:8px;right:8px;width:auto;bottom:70px} }
   .wcaret{display:inline-block;width:1em;transition:transform .12s}
   tr.week.collapsed .wcaret{transform:rotate(-90deg)}
+  .fbar{display:flex;gap:.45rem;overflow-x:auto;padding:.55rem 1rem;max-width:1080px;margin:0 auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .fbar::-webkit-scrollbar{display:none}
+  .gp{flex:none;font-size:.74rem;padding:.38rem .8rem;border-radius:18px;border:1px solid var(--line);
+    background:#fff;color:var(--text);cursor:pointer;white-space:nowrap}
+  .gp span{color:var(--faint);font-size:.64rem}
+  .gp:hover{border-color:var(--text)}
+  .gp.on{background:var(--text);color:#fff;border-color:var(--text)}
+  .gp.on span{color:rgba(255,255,255,.6)}
+  .gp.liked{color:var(--pop);border-color:var(--pop)}
+  .gp.liked.on{background:var(--pop);color:#fff}
+  tr.row.ghide{display:none}
   .hints{flex:none;width:128px;position:sticky;top:calc(var(--topH,52px) + 8px);
     font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
     padding:10px 12px;background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text)}
@@ -233,6 +252,7 @@ function page(snap) {
       <button class="rbtn" id="rbtn" onclick="togglePlay()">&#9654; Play</button>
     </div>
   </div>
+  ${fbar}
   <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
@@ -384,7 +404,16 @@ rows.forEach(r=>{ if(hearts.has(r.dataset.key)) markHeart(r,true);
 updateHc();
 function toggleHeartsOnly(){
   if (!document.body.classList.contains('hearts-only') && hearts.size===0) return;
-  const on=document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on',on); refreshHeaders();
+  const on=document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on',on);
+  const lp=$('likedPill'); if(lp) lp.classList.toggle('on',on);
+  refreshHeaders();
+}
+let gSel = null;
+function setGenre(g){
+  gSel = (gSel === g ? null : g);
+  document.querySelectorAll('.gp[data-g]').forEach(b => b.classList.toggle('on', b.dataset.g === gSel));
+  rows.forEach(r => r.classList.toggle('ghide', !!gSel && r.dataset.genre !== gSel));
+  refreshHeaders();
 }
 function authClick(){
   if (me){ if(confirm('Sign out of '+me+'?')) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:'{"action":"logout"}'}).then(()=>location.reload()); return; }
