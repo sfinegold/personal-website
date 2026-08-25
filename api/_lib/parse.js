@@ -43,7 +43,7 @@ function normalize(ev, source) {
     category: source.category,
     price: ev.price != null ? ev.price : null,
     effort: defaultEffort(source),
-    note: (ev.note || '').slice(0, 120),
+    note: decodeEntities(decodeEntities(String(ev.note || '')).replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim().slice(0, 120),
     url,
     sourceId: source.id,
     venue: source.name,

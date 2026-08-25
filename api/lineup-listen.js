@@ -59,7 +59,7 @@ function page(snap) {
       const id = uid++;
       const g = groupOf(e.category);
       const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
-      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-genre="${esc(e.note && !/resident advisor/i.test(e.note) ? e.note : '')}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
+      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-genre="${esc(e.note && e.note.length <= 24 && !/[<&]/.test(e.note) && e.note.split(/\s+/).length <= 3 && !/resident advisor|undefined/i.test(e.note) ? e.note : '')}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
         <td class="c-name">${esc(e.title)}</td>
         <td class="c-venue"><a href="/lineup/venue/${esc(e.sourceId || '')}" onclick="event.stopPropagation()">${esc(e.venue || '')}</a></td>
         <td class="c-time">${esc(fmtTime(e.time))}</td>
@@ -72,8 +72,9 @@ function page(snap) {
   if (!days.length) rowsHtml = '<tr><td colspan="6" class="empty">No shows in the current window.</td></tr>';
 
   // Airbnb-style filter pills: top genres present in the data + a Liked filter
+  const isGenre = (t) => t && t.length <= 24 && !/[<&]/.test(t) && t.split(/\s+/).length <= 3 && !/resident advisor|undefined/i.test(t);
   const gc = {};
-  events.forEach((e) => { const g = e.note && !/resident advisor/i.test(e.note) ? e.note : null; if (g) gc[g] = (gc[g] || 0) + 1; });
+  events.forEach((e) => { if (isGenre(e.note)) gc[e.note] = (gc[e.note] || 0) + 1; });
   const allGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]);
   const fbar = `<div class="fbar">
     <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
