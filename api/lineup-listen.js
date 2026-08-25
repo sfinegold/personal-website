@@ -59,7 +59,7 @@ function page(snap) {
       const id = uid++;
       const g = groupOf(e.category);
       const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
-      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}">
+      rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
         <td class="c-play"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button></td>
         <td class="c-name">${esc(e.title)}</td>
         <td class="c-venue"><a href="/lineup/venue/${esc(e.sourceId || '')}" onclick="event.stopPropagation()">${esc(e.venue || '')}</a></td>
@@ -103,7 +103,7 @@ function page(snap) {
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
   body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;padding-bottom:84px}
-  .top{position:sticky;top:0;z-index:40;background:var(--bg);padding:.8rem 1rem .5rem;border-bottom:2px solid var(--text);
+  .top{position:sticky;top:0;z-index:40;background:var(--bg);padding:.8rem 1rem .5rem;
     background-image:linear-gradient(90deg,#635BFF,#00D4FF 45%,#E4572E);background-size:100% 4px;background-repeat:no-repeat;background-position:top;
     display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
   h1{font-size:1.25rem;font-weight:700}
@@ -375,7 +375,7 @@ let ytTracks = [], ytIdx = 0;
 function openYT(i){
   const term = rows[i].dataset.term;
   audio.pause(); setRbtn(false); if(playIdx!=null) setPlaying(playIdx,false);
-  fetch('/lineup/yt?artist=' + encodeURIComponent(term)).then(r=>r.json()).then(d=>{
+  fetch('/lineup/yt?artist=' + encodeURIComponent(term) + '&hint=' + encodeURIComponent(rows[i].dataset.hint || '')).then(r=>r.json()).then(d=>{
     if (!d.tracks || !d.tracks.length){ alert('No YouTube tracks found for ' + term); return; }
     ytTracks = d.tracks; ytIdx = 0;
     $('ytTitle').textContent = term;
