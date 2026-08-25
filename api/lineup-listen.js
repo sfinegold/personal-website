@@ -206,9 +206,12 @@ function page(snap) {
   @media (max-width:560px){ .yt{left:8px;right:8px;width:auto;bottom:70px} }
   .wcaret{display:inline-block;width:1em;transition:transform .12s}
   tr.week.collapsed .wcaret{transform:rotate(-90deg)}
-  .hints{text-align:center;font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--faint);padding:.35rem 0;border-bottom:1px solid var(--line);background:var(--bg)}
+  .hints{flex:none;width:128px;position:sticky;top:calc(var(--topH,52px) + 8px);
+    font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
+    padding:10px 12px;background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text)}
+  .hints div{margin:.3rem 0}
   .hints a{color:var(--accent)}
+  @media (max-width:900px){ .hints{display:none} }
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
@@ -228,8 +231,7 @@ function page(snap) {
       <button class="rbtn" id="rbtn" onclick="togglePlay()">&#9654; Play</button>
     </div>
   </div>
-  <div class="hints">&#8593;&#8595; select &middot; space play/stop &middot; &#8592;&#8594; skip &middot; enter opens &middot; <a href="/lineup/me">edit venues</a></div>
-  <div class="main"><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
+  <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
   <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
