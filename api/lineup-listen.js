@@ -65,7 +65,7 @@ function page(snap) {
         <td class="c-time">${esc(fmtTime(e.time))}</td>
         <td class="c-price">${esc(fmtPrice(e.price))}</td>
         <td class="c-tix">${e.url ? `<a class="tix" href="${esc(e.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Tickets</a>` : ''}</td>
-        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9825;</button></td>
+        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9825;</button><button class="share" aria-label="Share">&#128279;</button></td>
       </tr>`;
     }
   }
@@ -151,7 +151,7 @@ function page(snap) {
   tr.row.selected{background:rgba(28,32,38,.06)}
   tr.row.playing td:first-child{box-shadow:inset 3px 0 0 var(--pick)}
   tr.row.playing .pbtn{background:var(--pick);color:#fff;border-color:var(--pick)}
-  .c-act{width:74px}
+  .c-act{width:104px}
   .c-act{white-space:nowrap}
   .c-act button{vertical-align:middle}
   .pbtn{width:22px;height:22px;border-radius:50%;border:1px solid var(--text);background:#fff;font-size:.48rem;
@@ -166,6 +166,8 @@ function page(snap) {
     border:1px solid var(--pick);border-radius:11px;height:22px;display:inline-flex;align-items:center;padding:0 9px;
     text-decoration:none;white-space:nowrap;vertical-align:middle}
   .tix:hover{background:var(--pick);color:#fff}
+  .share{width:26px;height:22px;border:1px solid var(--accent);border-radius:11px;background:none;color:var(--accent);
+    font-size:.62rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;margin-left:6px}
   .heart{width:30px;height:22px;border:1px solid var(--pop);border-radius:11px;background:none;color:var(--pop);
     font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0}
   .ev.hearted .heart,tr.row.hearted .heart{background:none;color:var(--pop)}
@@ -215,7 +217,7 @@ function page(snap) {
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
-  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.76rem} h1{font-size:1.05rem} tr.row td{padding:6px 3px} .tix{padding:0 5px;font-size:.54rem;height:20px} .c-act{width:62px} .heart{width:26px;height:20px} .pbtn{width:20px;height:20px} }
+  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.76rem} h1{font-size:1.05rem} tr.row td{padding:6px 3px} .tix{padding:0 5px;font-size:.54rem;height:20px} .c-act{width:88px} .heart{width:26px;height:20px} .pbtn{width:20px;height:20px} }
 </style></head>
 <body>
   <div class="top">
@@ -324,6 +326,13 @@ function toggleDetail(i){
 }
 rows.forEach((r,i)=>{
   r.addEventListener('click', ()=>{ setSel(i); toggleDetail(i); });
+  r.querySelector('.share').addEventListener('click', (e)=>{ e.stopPropagation();
+    const u = location.origin + '/lineup/sf?e=' + encodeURIComponent(r.dataset.key);
+    const b = e.currentTarget;
+    (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
+      .then(()=>{ b.innerHTML='&#10003;'; setTimeout(()=>{ b.innerHTML='&#128279;'; }, 1200); })
+      .catch(()=>prompt('Copy this link:', u));
+  });
   r.querySelector('.pbtn').addEventListener('click', (e)=>{ e.stopPropagation(); setSel(i); (playIdx===i && !audio.paused) ? togglePlay() : playRow(i, false, true); });
 });
 document.addEventListener('keydown', (e)=>{
