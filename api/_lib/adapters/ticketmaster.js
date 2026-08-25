@@ -37,11 +37,19 @@ async function ticketmaster(source, ctx = {}) {
       seen.add(k);
       const price = e.priceRanges && e.priceRanges[0] && e.priceRanges[0].min != null
         ? Math.round(e.priceRanges[0].min) : null;
-      const genre = e.classifications && e.classifications[0] && e.classifications[0].genre
-        ? e.classifications[0].genre.name : '';
+      const cls = (e.classifications && e.classifications[0]) || {};
+      const genre = cls.genre ? cls.genre.name : '';
+      const seg = cls.segment ? cls.segment.name : '';
+      // per-EVENT category: arenas host concerts, ballparks host comedy nights, etc.
+      let category = source.category;
+      if (/^sports$/i.test(seg)) category = 'sports';
+      else if (/^music$/i.test(seg)) category = /dance|electronic/i.test(genre) ? 'electronic' : /jazz/i.test(genre) ? 'jazz' : 'live-music';
+      else if (/comedy/i.test(genre) || /^comedy$/i.test(seg)) category = 'comedy';
+      else if (/arts & theater/i.test(seg)) category = 'theater';
       return normalizeEvent(
         {
           title: e.name.trim(),
+          category,
           date,
           time: start.localTime ? start.localTime.slice(0, 5) : null,
           url: e.url || source.url,

@@ -40,7 +40,7 @@ function normalize(ev, source) {
     title: decodeEntities(ev.title),
     date: ev.date,
     time: ev.time || null,
-    category: source.category,
+    category: ev.category || source.category,
     price: ev.price != null ? ev.price : null,
     effort: defaultEffort(source),
     note: decodeEntities(decodeEntities(String(ev.note || '')).replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim().slice(0, 120),
