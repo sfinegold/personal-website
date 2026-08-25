@@ -74,7 +74,9 @@ function page(snap) {
 
   // right-rail mini calendar: months spanned by the window, event days clickable
   const daySet2 = new Set(days);
-  const months = [...new Set(days.map((d) => d.slice(0, 7)))];
+  const months = [];
+  { const [sy, sm] = start.split('-').map(Number);
+    for (let k = 0; k < 3; k++) { const mm = sm - 1 + k; months.push(`${sy + Math.floor(mm / 12)}-${String((mm % 12) + 1).padStart(2, '0')}`); } }
   const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   let calHtml = '';
   for (const m of months) {
