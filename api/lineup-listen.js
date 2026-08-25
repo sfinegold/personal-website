@@ -50,27 +50,26 @@ function page(snap) {
   for (const d of days) {
     while (d >= addDays(weekStart, 7)) { weekStart = addDays(weekStart, 7); weekShown = false; }
     if (!weekShown) {
-      rowsHtml += `<tr class="week"><td colspan="7"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
+      rowsHtml += `<tr class="week"><td colspan="6"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
       weekShown = true;
     }
-    rowsHtml += `<tr class="day" id="d-${d}"><td colspan="7">${esc(fmtDay(d))}</td></tr>`;
+    rowsHtml += `<tr class="day" id="d-${d}"><td colspan="6">${esc(fmtDay(d))}</td></tr>`;
     const evs = byDay[d].slice().sort((a, b) => (a.time || 'zz').localeCompare(b.time || 'zz'));
     for (const e of evs) {
       const id = uid++;
       const g = groupOf(e.category);
       const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
       rowsHtml += `<tr class="row g-${g}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
-        <td class="c-play"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button></td>
         <td class="c-name">${esc(e.title)}</td>
         <td class="c-venue"><a href="/lineup/venue/${esc(e.sourceId || '')}" onclick="event.stopPropagation()">${esc(e.venue || '')}</a></td>
         <td class="c-time">${esc(fmtTime(e.time))}</td>
         <td class="c-price">${esc(fmtPrice(e.price))}</td>
         <td class="c-tix">${e.url ? `<a class="tix" href="${esc(e.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Tickets</a>` : ''}</td>
-        <td class="c-heart"><button class="heart" aria-label="Save">&#9825;</button></td>
+        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9825;</button></td>
       </tr>`;
     }
   }
-  if (!days.length) rowsHtml = '<tr><td colspan="7" class="empty">No shows in the current window.</td></tr>';
+  if (!days.length) rowsHtml = '<tr><td colspan="6" class="empty">No shows in the current window.</td></tr>';
 
   // right-rail mini calendar: months spanned by the window, event days clickable
   const daySet2 = new Set(days);
@@ -81,7 +80,7 @@ function page(snap) {
       const mm = sm - 1 + k;
       const key = `${sy + Math.floor(mm / 12)}-${String((mm % 12) + 1).padStart(2, '0')}`;
       if (key > endYmd.slice(0, 7)) break;
-      months.push(key);
+      if (days.some((d) => d.slice(0, 7) === key)) months.push(key);
     } }
   const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   let calHtml = '';
@@ -152,18 +151,24 @@ function page(snap) {
   tr.row.selected{background:rgba(28,32,38,.06)}
   tr.row.playing td:first-child{box-shadow:inset 3px 0 0 var(--pick)}
   tr.row.playing .pbtn{background:var(--pick);color:#fff;border-color:var(--pick)}
-  .c-play{width:34px}
-  .pbtn{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:.5rem;
-    cursor:pointer;color:var(--text)}
+  .c-act{width:74px}
+  .c-act{white-space:nowrap}
+  .c-act button{vertical-align:middle}
+  .pbtn{width:22px;height:22px;border-radius:50%;border:1px solid var(--text);background:#fff;font-size:.48rem;
+    cursor:pointer;color:var(--text);display:inline-flex;align-items:center;justify-content:center;margin-right:6px;visibility:hidden}
+  tr.row.ready .pbtn{visibility:visible}
+  tr.row.nomusic .pbtn{display:none}
   .c-name{font-weight:600}
   .c-venue a{color:var(--accent);text-decoration:none}
   .c-venue a:hover{text-decoration:underline}
   .c-time,.c-price{font-family:var(--mono);font-size:.72rem;color:var(--dim);white-space:nowrap}
   .tix{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--pick);
-    border:1px solid var(--pick);border-radius:12px;padding:2px 9px;text-decoration:none;white-space:nowrap}
+    border:1px solid var(--pick);border-radius:11px;height:22px;display:inline-flex;align-items:center;padding:0 9px;
+    text-decoration:none;white-space:nowrap;vertical-align:middle}
   .tix:hover{background:var(--pick);color:#fff}
-  .c-heart{width:34px;text-align:center}
-  .heart{border:0;background:none;color:var(--pop);font-size:.95rem;cursor:pointer}
+  .heart{width:30px;height:22px;border:1px solid var(--pop);border-radius:11px;background:none;color:var(--pop);
+    font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0}
+  .ev.hearted .heart,tr.row.hearted .heart{background:none;color:var(--pop)}
   tr.detail td{background:var(--bg2);padding:12px;border-bottom:1px solid var(--line)}
   .dwrap{display:flex;gap:14px;align-items:center}
   .dart{width:110px;height:110px;border-radius:8px;background:linear-gradient(135deg,#e4e0d6,#d3ccbe);
@@ -207,7 +212,7 @@ function page(snap) {
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
-  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.76rem} h1{font-size:1.05rem} tr.row td{padding:6px 3px} .tix{padding:2px 5px;font-size:.54rem} .c-play{width:28px} .c-heart{width:26px} .pbtn{width:22px;height:22px} }
+  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.76rem} h1{font-size:1.05rem} tr.row td{padding:6px 3px} .tix{padding:0 5px;font-size:.54rem;height:20px} .c-act{width:62px} .heart{width:26px;height:20px} .pbtn{width:20px;height:20px} }
 </style></head>
 <body>
   <div class="top">
@@ -305,7 +310,7 @@ function toggleDetail(i){
   openIdx = i;
   const r = rows[i];
   const tr = document.createElement('tr'); tr.className = 'detail';
-  tr.innerHTML = '<td colspan="7"><div class="dwrap"><div class="dart" id="dart"></div><div>' +
+  tr.innerHTML = '<td colspan="6"><div class="dwrap"><div class="dart" id="dart"></div><div>' +
     '<div class="dt">' + r.querySelector('.c-name').textContent + '</div>' +
     '<div class="dm">' + r.dataset.when + ' · ' + r.dataset.venue + '</div>' +
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
@@ -431,6 +436,13 @@ function shareEvent(i){
     const b = document.getElementById('shareBtn'); if (b) b.textContent = 'Link copied!';
   }).catch(()=>prompt('Copy this link:', u));
 }
+
+// lazily check preview availability: show play only where music exists
+const rio = new IntersectionObserver((ents)=>{ ents.forEach(en=>{ if(!en.isIntersecting) return;
+  rio.unobserve(en.target); const i = +en.target.dataset.uid;
+  loadPreview(i).then(rec=>{ en.target.classList.add(rec.previewUrl ? 'ready' : 'nomusic'); });
+}); }, { rootMargin: '300px' });
+rows.forEach(r => rio.observe(r));
 
 // pin sticky week bands flush under the real header height (it varies by viewport)
 function setTopH(){ const t=document.querySelector('.top'); if(t) document.documentElement.style.setProperty('--topH', t.offsetHeight + 'px'); }
