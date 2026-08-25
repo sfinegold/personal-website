@@ -371,7 +371,11 @@ function togglePlay(){
 }
 function stopAll(){ audio.pause(); if(playIdx!=null) setPlaying(playIdx,false); playIdx=null; $('now').classList.remove('on'); setRbtn(false); }
 function setRbtn(on){ $('rbtn').innerHTML = on ? '&#10073;&#10073; Pause' : '&#9654; Play'; $('rbtn').classList.toggle('on', on); }
-audio.addEventListener('ended', nextSong);
+audio.addEventListener('ended', () => { // stay on this show when a preview ends
+  if (playIdx != null) setPlaying(playIdx, false);
+  setRbtn(false);
+  $('nS').textContent = 'preview ended';
+});
 
 function toggleDetail(i){
   const keepY = window.scrollY;
