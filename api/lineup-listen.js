@@ -691,6 +691,31 @@ module.exports = async (req, res) => {
         } catch (err) { /* no art — text card */ }
       }
     }
+    // liked-list links unfurl with the artists inside
+    const likesId = q.get('likes');
+    if (!og && likesId && snap && snap.grid) {
+      const rec = await store.getJSON('lineup:likeshare:' + likesId.replace(/[^a-z0-9]/gi, '').slice(0, 20), null);
+      if (rec && rec.keys && rec.keys.length) {
+        const set = new Set(rec.keys);
+        const hits = snap.grid.filter((x) => set.has(`${x.sourceId}|${x.title}|${x.date}`));
+        const names = [...new Set(hits.map((x) => artistTerm(x.title)))];
+        const shown = names.slice(0, 3).join(', ');
+        const n = rec.keys.length;
+        og = {
+          title: `\u{1F49C} ${n} show${n === 1 ? '' : 's'} picked for you \u2014 Lineup SF`,
+          desc: names.length ? shown + (names.length > 3 ? ` + ${names.length - 3} more` : '') + ' \u00b7 tap to listen' : 'A friend shared their liked shows \u00b7 tap to listen',
+        };
+        if (hits[0]) {
+          try {
+            const ac = new AbortController(); const t = setTimeout(() => ac.abort(), 2000);
+            const it = await fetch('https://itunes.apple.com/search?media=music&entity=musicTrack&limit=1&term=' + encodeURIComponent(artistTerm(hits[0].title)), { signal: ac.signal }).then((r) => r.json());
+            clearTimeout(t);
+            const art = it.results && it.results[0] && it.results[0].artworkUrl100;
+            if (art) og.image = art.replace('100x100bb', '600x600bb');
+          } catch (err) { /* text card */ }
+        }
+      }
+    }
     res.statusCode = 200;
     res.end(page(snap, og));
   } catch (err) {
