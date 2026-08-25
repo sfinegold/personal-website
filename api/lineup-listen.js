@@ -229,12 +229,9 @@ function page(snap) {
   .gp.liked{color:var(--pop);border-color:var(--pop)}
   .gp.liked.on{background:var(--pop);color:#fff}
   tr.row.ghide{display:none}
-  .hints{flex:none;width:128px;position:sticky;top:calc(var(--topH,52px) + 8px);
-    font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
-    padding:10px 12px;background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text)}
-  .hints div{margin:.3rem 0}
-  .hints a{color:var(--accent)}
-  @media (max-width:900px){ .hints{display:none} }
+  .hints{font-family:var(--mono);font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:2px}
+  .hints a{color:var(--faint)}
+  @media (max-width:560px){ .hints{display:none} }
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
@@ -242,7 +239,7 @@ function page(snap) {
 </style></head>
 <body>
   <div class="top">
-    <h1>Your Lineup</h1>
+    <div><h1>Your Lineup</h1><div class="hints">&#8593;&#8595; select &middot; space play/stop &middot; &#8592;&#8594; next artist &middot; enter opens &middot; <a href="/lineup/me">edit venues</a></div></div>
     <div class="filters">
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
@@ -255,7 +252,7 @@ function page(snap) {
     </div>
   </div>
   ${fbar}
-  <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
+  <div class="main"><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
   <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -362,8 +359,8 @@ document.addEventListener('keydown', (e)=>{
   if (e.code==='Space'){ e.preventDefault(); togglePlay(); }
   else if (e.key==='ArrowDown'){ e.preventDefault(); move(1); }
   else if (e.key==='ArrowUp'){ e.preventDefault(); move(-1); }
-  else if (e.key==='ArrowRight'){ e.preventDefault(); nextSong(); }
-  else if (e.key==='ArrowLeft'){ e.preventDefault(); prevSong(); }
+  else if (e.key==='ArrowRight'){ e.preventDefault(); arrowFlow(1); }
+  else if (e.key==='ArrowLeft'){ e.preventDefault(); arrowFlow(-1); }
   else if (e.key==='Enter'){ e.preventDefault(); if (sel>=0) toggleDetail(sel); }
   else if (e.key==='Escape'){ const d=document.querySelector('tr.detail'); if(d){d.remove(); openIdx=null;} else stopAll(); }
 });
@@ -431,11 +428,11 @@ fetch('/lineup/auth?whoami=1').then(r=>r.json()).then(d=>{
 
 // ---- YouTube browse player (top-5 per artist, opt-in) ----
 let ytTracks = [], ytIdx = 0;
-function openYT(i){
+function openYT(i, auto){
   const term = rows[i].dataset.term;
   audio.pause(); setRbtn(false); if(playIdx!=null) setPlaying(playIdx,false);
   fetch('/lineup/yt?artist=' + encodeURIComponent(term) + '&hint=' + encodeURIComponent(rows[i].dataset.hint || '')).then(r=>r.json()).then(d=>{
-    if (!d.tracks || !d.tracks.length){ alert('No YouTube tracks found for ' + term); return; }
+    if (!d.tracks || !d.tracks.length){ if (auto) { playRow(i, true); } else alert('No YouTube tracks found for ' + term); return; }
     ytTracks = d.tracks; ytIdx = 0;
     $('ytTitle').textContent = term;
     renderYT();
@@ -450,6 +447,20 @@ function renderYT(){
     b.className = j===ytIdx?'on':''; b.onclick=()=>{ ytIdx=j; renderYT(); }; tl.appendChild(b); });
 }
 function ytStep(d){ if(!ytTracks.length) return; ytIdx=(ytIdx+d+ytTracks.length)%ytTracks.length; renderYT(); }
+// arrow flow: first listen is the 30s preview; from then on, arrows move artist-to-artist
+// in the full-song YouTube player (open panel steps tracks handled in openYT rows)
+let heardPreview = false;
+function nextRowFrom(i, d){ let j = (i==null? (d>0?-1:rows.length) : i); do { j += d; } while (j>=0 && j<rows.length && !visible(j)); return (j>=0 && j<rows.length) ? j : null; }
+function arrowFlow(d){
+  const base = (playIdx != null ? playIdx : (sel >= 0 ? sel : null));
+  if (heardPreview || $('yt').classList.contains('on')){
+    const j = nextRowFrom($('yt').classList.contains('on') && window._ytRow != null ? window._ytRow : base, d);
+    if (j == null) return;
+    window._ytRow = j; setSel(j); openYT(j, true);
+  } else {
+    d > 0 ? nextSong() : prevSong();
+  }
+}
 function closeYT(){ $('yt').classList.remove('on'); $('ytFrame').src=''; ytTracks=[]; }
 
 // collapsible week bands: click a week header to fold/unfold its rows
