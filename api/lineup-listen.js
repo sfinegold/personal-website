@@ -266,6 +266,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 70px -28px rgba(17,17,19,.4);z-index:81}
   body.copen .cmask,body.copen .cmodal{display:block}
   .cmodal .cbody{padding:10px 12px}
+  .cmodal .fmh{position:sticky;top:0;background:var(--card);z-index:1}
   .fmask{display:none;position:fixed;inset:0;background:rgba(17,17,19,.4);z-index:80}
   .fmodal{display:none;position:fixed;left:50%;top:14%;transform:translateX(-50%);width:min(480px,92vw);
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 70px -28px rgba(17,17,19,.4);z-index:81;overflow:hidden}
