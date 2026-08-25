@@ -100,9 +100,8 @@ function page(snap) {
   .thumb::after{content:attr(data-vi);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-family:var(--mono);font-weight:700;font-size:1.05rem;letter-spacing:.06em;color:rgba(25,29,35,.42)}
   .thumb.hasart::after{display:none}
-  .heart{position:absolute;top:4px;left:4px;width:20px;height:20px;border:0;border-radius:50%;
-    background:rgba(255,255,255,.85);color:#c0324b;font-size:.62rem;cursor:pointer;display:grid;place-items:center;line-height:1;opacity:0;transition:opacity .12s;z-index:2}
-  .thumb:hover .heart{opacity:1}
+  .heart{position:absolute;top:4px;left:4px;width:30px;height:20px;border:0;border-radius:10px;
+    background:rgba(255,255,255,.85);color:#c0324b;font-size:.72rem;cursor:pointer;display:grid;place-items:center;line-height:1;opacity:1;z-index:2}
   .ev.hearted .heart{opacity:1;background:#c0324b;color:#fff}
   .play{position:absolute;right:4px;bottom:4px;width:22px;height:22px;border-radius:50%;border:0;
     background:rgba(255,255,255,.94);color:var(--text);font-size:.52rem;cursor:pointer;display:grid;place-items:center;
