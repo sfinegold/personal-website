@@ -207,7 +207,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     border:1px solid var(--accent);border-radius:12px;height:24px;padding:0 10px;text-decoration:none;
     display:inline-flex;align-items:center;line-height:1}
   body.shared-view tr.row:not(.sharedlike){display:none}
-  .sharedbar{max-width:1080px;margin:.5rem auto 0;padding:.55rem 1rem;background:#fff;border:1px solid var(--pop);
+  .sharedbar{flex-basis:100%;order:9;margin:.35rem 0 .1rem;padding:.5rem .9rem;background:#fff;border:1px solid var(--pop);
     border-radius:10px;color:var(--pop);font-size:.85rem;font-weight:600}
   .sharedbar button{margin-left:.6rem;border:1px solid var(--line);background:var(--bg);border-radius:12px;
     padding:.25rem .7rem;font-size:.7rem;cursor:pointer;color:var(--text)}
@@ -611,7 +611,8 @@ setTopH(); window.addEventListener('resize', setTopH);
     btn.textContent = 'Show everything';
     btn.onclick = () => { document.body.classList.remove('shared-view'); bar.remove(); refreshHeaders(); };
     bar.appendChild(btn);
-    document.querySelector('.top').after(bar);
+    document.querySelector('.top').appendChild(bar); // inside the sticky header so week bands pin below it
+    setTopH();
     setFilter(gFilter); // clear type filter so all shared shows are visible
     refreshHeaders();
   }).catch(()=>{});
