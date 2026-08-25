@@ -27,20 +27,38 @@
     {
       "source": "/lineup/sf",
       "destination": "/api/lineup-listen"
+    },
+    {
+      "source": "/lineup/auth",
+      "destination": "/api/lineup-auth"
     }
   ],
   "functions": {
-    "api/lineup-milton.js": { "maxDuration": 60 },
-    "api/lineup-me.js": { "maxDuration": 60 }
+    "api/lineup-milton.js": {
+      "maxDuration": 60
+    },
+    "api/lineup-me.js": {
+      "maxDuration": 60
+    }
   },
   "headers": [
     {
       "source": "/music-learning/curriculum.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/music-learning/feedback.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
     }
   ]
 }

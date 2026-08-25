@@ -160,6 +160,7 @@ function page(snap) {
       <button class="fbtn fb-Comedy" onclick="setFilter('Comedy')">Comedy</button>
     </div>
     <div style="display:flex;gap:.5rem;flex:none">
+      <button class="rbtn heartbtn" id="authBtn" onclick="authClick()" style="border-color:var(--line);color:var(--dim)">Sign in</button>
       <button class="rbtn heartbtn" id="heartsBtn" onclick="toggleHeartsOnly()">&#9829; <span id="hc">0</span></button>
       <button class="rbtn" id="rbtn" onclick="toggleRadio()">&#9654; Play</button>
     </div>
@@ -237,7 +238,8 @@ document.addEventListener('keydown', (e)=>{
   else if (e.key === 'ArrowRight' || k === 's' || k === 'n'){ e.preventDefault(); skip(); }
   else if (e.key === 'Escape'){ stopAll(); }
 });
-audio.addEventListener('ended', skip);
+audio.addEventListener("ended", skip);
+setFilter("Music"); // default view: music only
 const HK = 'lineup_sf_hearts';
 let hearts; try { hearts = new Set(JSON.parse(localStorage.getItem(HK) || '[]')); } catch(e){ hearts = new Set(); }
 function updateHc(){ const el = $('hc'); if(el) el.textContent = hearts.size; }
@@ -253,6 +255,27 @@ document.addEventListener('click', (e) => {
   if (hearts.has(k)) { hearts.delete(k); markHeart(ev, false); } else { hearts.add(k); markHeart(ev, true); }
   saveHearts();
 });
+// ---- magic-link sign-in + cross-device hearts sync ----
+let me = null;
+function authClick(){
+  if (me){ if(confirm('Sign out of '+me+'?')) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:'{"action":"logout"}'}).then(()=>location.reload()); return; }
+  const email = prompt('Email for your sign-in link:');
+  if (!email) return;
+  fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'request',email})})
+    .then(r=>r.json()).then(d=>alert(d.sent?'Check your email for the sign-in link.':'Could not send — check the address.'));
+}
+function pushHearts(){ if(me) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'hearts',keys:[...hearts]})}).catch(()=>{}); }
+fetch('/lineup/auth?whoami=1').then(r=>r.json()).then(d=>{
+  if(!d.email) return;
+  me = d.email; $('authBtn').textContent = me.split('@')[0];
+  fetch('/lineup/auth?hearts=1').then(r=>r.json()).then(h=>{
+    if(!h.keys) return;
+    h.keys.forEach(k=>hearts.add(k));
+    document.querySelectorAll('.ev').forEach(ev=>{ if(hearts.has(ev.dataset.key)) markHeart(ev,true); });
+    saveHearts();
+  });
+}).catch(()=>{});
+
 function toggleHeartsOnly(){
   // never strand the user on an empty page: with no hearts the filter is a no-op
   if (!document.body.classList.contains('hearts-only') && hearts.size === 0){
