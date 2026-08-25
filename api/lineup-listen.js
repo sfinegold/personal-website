@@ -73,13 +73,18 @@ function page(snap) {
 
   // Airbnb-style filter pills: top genres present in the data + a Liked filter
   const isGenre = (t) => t && t.length <= 24 && !/[<&]/.test(t) && t.split(/\s+/).length <= 3 && !/resident advisor|undefined/i.test(t);
-  const gc = {};
-  events.forEach((e) => { if (isGenre(e.note)) gc[e.note] = (gc[e.note] || 0) + 1; });
-  const allGenres = Object.entries(gc).sort((a, b) => b[1] - a[1]);
+  const gg = {};
+  events.forEach((e) => { if (isGenre(e.note)) { const grp = groupOf(e.category); (gg[grp] = gg[grp] || {})[e.note] = (gg[grp][e.note] || 0) + 1; } });
+  const sections = ['Music', 'Sports', 'Comedy']
+    .filter((grp) => gg[grp])
+    .map((grp) => `<div class="fsec gb-${grp}">${grp}</div>` +
+      Object.entries(gg[grp]).sort((a, b) => b[1] - a[1])
+        .map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join(''))
+    .join('');
   const fbar = `<div class="fmask" id="fmask" onclick="closeGenres()"></div>
   <div class="fmodal" id="fmodal" role="dialog" aria-label="Genre filters">
     <div class="fmh">Genres<button onclick="closeGenres()">&#10005;</button></div>
-    <div class="fml">` + allGenres.map(([g, n]) => `<button class="gp" data-g="${esc(g)}" onclick="setGenre(this.dataset.g)">${esc(g)} <span>${n}</span></button>`).join('') + `</div>
+    <div class="fml">` + sections + `</div>
     <div class="fmf"><button class="clr" onclick="setGenre(gSel)">Clear</button><button class="done" onclick="closeGenres()">Done</button></div>
   </div>`;
 
@@ -243,6 +248,11 @@ function page(snap) {
   .fmh{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1rem;font-weight:700;border-bottom:1px solid var(--line)}
   .fmh button{border:0;background:none;font-size:.95rem;cursor:pointer;color:var(--text)}
   .fml{display:flex;flex-wrap:wrap;gap:.45rem;padding:1rem;max-height:46vh;overflow:auto}
+  .fsec{width:100%;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    margin:.5rem 0 .1rem;padding-left:.2rem;border-left:3px solid var(--line)}
+  .fsec.gb-Music{border-left-color:var(--accent);color:var(--accent)}
+  .fsec.gb-Sports{border-left-color:var(--gold);color:var(--gold)}
+  .fsec.gb-Comedy{border-left-color:var(--pick);color:var(--pick)}
   .fmf{display:flex;justify-content:space-between;padding:.6rem 1rem;border-top:1px solid var(--line)}
   .fmf .clr{border:0;background:none;text-decoration:underline;cursor:pointer;color:var(--text)}
   .fmf .done{border:1px solid var(--text);background:var(--text);color:#fff;border-radius:9px;padding:.5rem 1.1rem;cursor:pointer}
