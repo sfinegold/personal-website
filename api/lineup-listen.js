@@ -522,10 +522,11 @@ function jumpTo(ymd){
   el.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 
-function slugify(t){ return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,28).replace(/-+$/,''); }
+function slugify(t){ return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64).replace(/-+$/,''); }
 function shareUrl(r){
-  const date = (r.dataset.key.match(/\|(\d{4}-\d{2}-\d{2})$/) || [])[1] || '';
-  return location.origin + '/lineup/sf?e=' + slugify(r.dataset.term || r.querySelector('.c-name').textContent) + '--' + r.dataset.vid + '--' + date;
+  const date = r.dataset.key.split('|').pop(); // key = sourceId|title|date
+  const full = r.querySelector('.c-name').textContent; // full show name in the link
+  return location.origin + '/lineup/sf?e=' + slugify(full) + '--' + r.dataset.vid + '--' + date;
 }
 function shareEvent(i){
   const u = shareUrl(rows[i]);
@@ -557,7 +558,7 @@ setFilter('Music'); // default view
     const date = parts.pop(), vid = parts.pop(), aslug = parts.join('--');
     const cands = rows.map((r, j) => ({ r, j }))
       .filter(x => x.r.dataset.vid === vid && x.r.dataset.key.endsWith('|' + date));
-    const hit = cands.find(x => slugify(x.r.dataset.term).startsWith(aslug.slice(0, 12))) || cands[0];
+    const hit = cands.find(x => slugify(x.r.querySelector('.c-name').textContent).slice(0, 16) === aslug.slice(0, 16)) || cands[0];
     if (hit) i = hit.j;
   } else {
     i = rows.findIndex(r => r.dataset.key === decodeURIComponent(k));
