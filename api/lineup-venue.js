@@ -61,33 +61,43 @@ module.exports = async (req, res) => {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(v.name)} — Upcoming Shows &amp; Tickets | Lineup SF</title>
 <meta name="description" content="${esc(desc)}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23635BFF'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
 <link rel="canonical" href="${canonical}">
 <meta property="og:title" content="${esc(v.name)} — Upcoming Shows">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${canonical}">
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#F7F5F0;color:#191D23;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:860px;margin:0 auto;padding:1.2rem 1rem 3rem}
-  .hero{border-radius:12px;padding:1.6rem 1.4rem;color:#fff;margin-bottom:1rem;
-    background:linear-gradient(135deg,hsl(${hue},32%,42%),hsl(${hue},36%,28%))}
-  .hero h1{font-size:1.7rem}
-  .hero .m{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-top:.3rem}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#F7F3EA;--bg2:#EFE8D8;--line:rgba(10,37,64,.16);--text:#0A2540;--dim:rgba(10,37,64,.64);
+    --faint:rgba(10,37,64,.42);--accent:#635BFF;--gold:#EDA33B;--pick:#17877B;--pop:#E4572E;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(90deg,#635BFF,#00D4FF 45%,#E4572E);background-size:100% 4px;
+    background-repeat:no-repeat;background-position:top}
+  .wrap{max-width:920px;margin:0 auto;padding:1.2rem 1rem 3rem}
+  .bk{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+  .bk:hover{color:var(--accent)}
+  .hero{border-radius:14px;padding:1.6rem 1.4rem;color:#fff;margin:.7rem 0 1.1rem;background:linear-gradient(90deg,#0A2540,#635BFF)}
+  .hero h1{font-size:1.7rem;font-weight:800}
+  .hero .m{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-top:.4rem}
   .hero a{color:#fff}
+  h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:1.4rem 0 .5rem}
   table{width:100%;border-collapse:collapse;font-size:.88rem}
-  td{padding:8px 8px;border-bottom:1px solid rgba(28,32,38,.14);vertical-align:middle}
-  .d,.t{font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:rgba(25,29,35,.62);white-space:nowrap}
+  td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .d,.t{font-family:var(--mono);font-size:.72rem;color:var(--dim);white-space:nowrap}
   .n{font-weight:600}
-  .tix{font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:#3B7A5C;
-    border:1px solid #3B7A5C;border-radius:12px;padding:2px 9px;text-decoration:none;white-space:nowrap}
-  .tix:hover{background:#3B7A5C;color:#fff}
-  h2{font-size:1rem;margin:1.4rem 0 .5rem}
-  .others a{display:inline-block;margin:0 .5rem .4rem 0;color:#33556F;font-size:.82rem}
-  .foot{margin-top:2rem;font-family:ui-monospace,Menlo,monospace;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:rgba(25,29,35,.4)}
-  .foot a{color:#33556F}
+  .tix{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--pick);
+    border:1px solid var(--pick);border-radius:11px;height:22px;display:inline-flex;align-items:center;padding:0 9px;text-decoration:none;white-space:nowrap}
+  .tix:hover{background:var(--pick);color:#fff}
+  .others a{display:inline-block;font-size:.78rem;color:var(--accent);border:1px solid var(--line);border-radius:15px;padding:.3rem .7rem;margin:0 .35rem .45rem 0;text-decoration:none}
+  .others a:hover{border-color:var(--accent)}
+  .foot{margin-top:2rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .foot a{color:var(--accent)}
 </style></head>
 <body><div class="wrap">
+  <a class="bk" href="/lineup/sf">&#8592; Your Lineup</a>
   <div class="hero">
     <h1>${esc(v.name)}</h1>
     <div class="m">${esc(v.region === 'SF' ? 'San Francisco' : v.region)}, CA · ${esc(v.category.replace('-', ' '))} · <a href="${esc(v.url)}" rel="noopener">official site</a></div>
