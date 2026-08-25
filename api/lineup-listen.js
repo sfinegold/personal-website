@@ -200,6 +200,11 @@ function page(snap) {
   .dl{display:flex;gap:.5rem;flex-wrap:wrap}
   .dl a{font-family:var(--mono);font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
     border:1px solid var(--accent);border-radius:12px;padding:3px 10px;text-decoration:none}
+  body.shared-view tr.row:not(.sharedlike){display:none}
+  .sharedbar{max-width:1080px;margin:.5rem auto 0;padding:.55rem 1rem;background:#fff;border:1px solid var(--pop);
+    border-radius:10px;color:var(--pop);font-size:.85rem;font-weight:600}
+  .sharedbar button{margin-left:.6rem;border:1px solid var(--line);background:var(--bg);border-radius:12px;
+    padding:.25rem .7rem;font-size:.7rem;cursor:pointer;color:var(--text)}
   body[data-filter="Music"] tr.row:not(.g-Music){display:none}
   body[data-filter="Comedy"] tr.row:not(.g-Comedy){display:none}
   body[data-filter="Sports"] tr.row:not(.g-Sports){display:none}
@@ -288,6 +293,7 @@ function page(snap) {
     <div class="filters">
       <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
       <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>
+      <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share liked</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
       <button class="fbtn fb-Comedy" onclick="setFilter('Comedy')">Comedy</button>
@@ -449,7 +455,7 @@ function refreshHeaders(){
 const HK='lineup_sf_hearts';
 let hearts; try{ hearts=new Set(JSON.parse(localStorage.getItem(HK)||'[]')); }catch(e){ hearts=new Set(); }
 let me=null;
-function updateHc(){ $('hc').textContent = hearts.size; }
+function updateHc(){ $('hc').textContent = hearts.size; if (typeof syncShareBtn==='function') syncShareBtn(); }
 function markHeart(r,on){ r.classList.toggle('hearted',on); }
 function pushHearts(){ if(me) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'hearts',keys:[...hearts]})}).catch(()=>{}); }
 function saveHearts(){ try{ localStorage.setItem(HK, JSON.stringify([...hearts])); }catch(e){} updateHc(); pushHearts(); }
@@ -457,6 +463,18 @@ rows.forEach(r=>{ if(hearts.has(r.dataset.key)) markHeart(r,true);
   r.querySelector('.heart').addEventListener('click',(e)=>{ e.stopPropagation();
     const k=r.dataset.key; hearts.has(k)? (hearts.delete(k),markHeart(r,false)) : (hearts.add(k),markHeart(r,true)); saveHearts(); }); });
 updateHc();
+function shareLiked(){
+  fetch('/lineup/auth', {method:'POST', headers:{'content-type':'application/json'},
+    body: JSON.stringify({action:'sharelikes', keys:[...hearts]})})
+    .then(r=>r.json()).then(d=>{
+      if (!d.id) return alert('Could not create link');
+      const u = location.origin + '/lineup/sf?likes=' + d.id;
+      (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
+        .then(()=>{ const b=$('shareLikes'); b.innerHTML='&#10003; Link copied'; setTimeout(()=>{b.innerHTML='&#128279; Share liked';},1500); })
+        .catch(()=>prompt('Copy this link:', u));
+    }).catch(()=>alert('Could not create link'));
+}
+function syncShareBtn(){ const b=$('shareLikes'); if(b) b.style.display = hearts.size ? '' : 'none'; }
 function toggleHeartsOnly(){
   if (!document.body.classList.contains('hearts-only') && hearts.size===0) return;
   const on=document.body.classList.toggle('hearts-only'); $('heartsBtn').classList.toggle('on',on);
@@ -568,6 +586,27 @@ rows.forEach(r => rio.observe(r));
 function setTopH(){ const t=document.querySelector('.top'); if(t) document.documentElement.style.setProperty('--topH', Math.ceil(t.getBoundingClientRect().height) + 'px');
   const w=document.querySelector('tr.week td'); if(w) document.documentElement.style.setProperty('--wbH', Math.ceil(w.getBoundingClientRect().height) + 'px'); }
 setTopH(); window.addEventListener('resize', setTopH);
+
+// shared like-list view: ?likes=<id> shows a friend's hearted shows
+(function(){
+  const id = new URLSearchParams(location.search).get('likes');
+  if (!id) return;
+  fetch('/lineup/auth?likeshare=' + encodeURIComponent(id)).then(r=>r.json()).then(d=>{
+    if (!d.keys || !d.keys.length) return;
+    const set = new Set(d.keys);
+    let n = 0;
+    rows.forEach(r => { if (set.has(r.dataset.key)) { r.classList.add('sharedlike'); n++; } });
+    if (!n) return;
+    document.body.classList.add('shared-view');
+    const bar = document.createElement('div');
+    bar.className = 'sharedbar';
+    bar.innerHTML = '&#9829; A friend shared ' + n + ' liked show' + (n===1?'':'s') +
+      ' &nbsp;<button onclick="document.body.classList.remove(\'shared-view\');this.parentNode.remove();refreshHeaders()">Show everything</button>';
+    document.querySelector('.top').after(bar);
+    setFilter(gFilter); // clear type filter so all shared shows are visible
+    refreshHeaders();
+  }).catch(()=>{});
+})();
 
 setFilter('Music'); // default view
 

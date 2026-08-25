@@ -40,6 +40,12 @@ module.exports = async (req, res) => {
 
   if (req.method === 'GET' && url.searchParams.get('whoami')) return json(res, 200, { email: userFromCookie(req) });
 
+  if (req.method === 'GET' && url.searchParams.get('likeshare')) {
+    const id = url.searchParams.get('likeshare').replace(/[^a-z0-9]/gi, '').slice(0, 20);
+    const rec = await getJSON(`lineup:likeshare:${id}`, null);
+    return json(res, rec ? 200 : 404, { keys: rec ? rec.keys : null });
+  }
+
   if (req.method === 'GET' && url.searchParams.get('hearts')) {
     const email = userFromCookie(req);
     if (!email) return json(res, 401, { keys: null });
@@ -74,6 +80,11 @@ module.exports = async (req, res) => {
       if (!email) return json(res, 401, { ok: false });
       await setJSON(`lineup:hearts:${email}`, (body.keys || []).slice(0, 2000));
       return json(res, 200, { ok: true });
+    }
+    if (body.action === 'sharelikes' && Array.isArray(body.keys) && body.keys.length) {
+      const id = crypto.randomBytes(5).toString('hex');
+      await setJSON(`lineup:likeshare:${id}`, { keys: body.keys.slice(0, 500), at: new Date().toISOString() });
+      return json(res, 200, { id });
     }
     if (body.action === 'logout') {
       res.setHeader('Set-Cookie', 'lineup_user=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure');
