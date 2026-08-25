@@ -61,7 +61,9 @@ module.exports = async (req, res) => {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(v.name)} — Upcoming Shows &amp; Tickets | Lineup SF</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23635BFF'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ee5233'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='800' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@700;800&family=Instrument+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="canonical" href="${canonical}">
 <meta property="og:title" content="${esc(v.name)} — Upcoming Shows">
 <meta property="og:description" content="${esc(desc)}">
@@ -69,32 +71,34 @@ module.exports = async (req, res) => {
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--bg:#F7F3EA;--bg2:#EFE8D8;--line:rgba(10,37,64,.16);--text:#0A2540;--dim:rgba(10,37,64,.64);
-    --faint:rgba(10,37,64,.42);--accent:#635BFF;--gold:#EDA33B;--pick:#17877B;--pop:#E4572E;
-    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-  body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  :root{--bg:#fbf7f0;--bg2:#f4ecdf;--card:#ffffff;--line:#e5dccd;--text:#14120f;--dim:#574c40;
+    --faint:#7a6d5e;--accent:#ee5233;--accent7:#b83c1e;--pick:#0f736b;
+    --mono:"IBM Plex Mono","SF Mono",ui-monospace,Menlo,monospace}
+  body{background:var(--bg);color:var(--text);font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.012em;
     -webkit-font-smoothing:antialiased;
-    background-image:linear-gradient(90deg,#635BFF,#00D4FF 45%,#E4572E);background-size:100% 4px;
+    background-image:linear-gradient(90deg,#ee5233 0%,#f5b72b 52%,#0f736b 100%);background-size:100% 3px;
     background-repeat:no-repeat;background-position:top}
   .wrap{max-width:920px;margin:0 auto;padding:1.2rem 1rem 3rem}
   .bk{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-decoration:none}
   .bk:hover{color:var(--accent)}
-  .hero{border-radius:14px;padding:1.6rem 1.4rem;color:#fff;margin:.7rem 0 1.1rem;background:linear-gradient(90deg,#0A2540,#635BFF)}
-  .hero h1{font-size:1.7rem;font-weight:800}
+  .hero{border-radius:14px;padding:1.6rem 1.4rem;color:var(--bg);margin:.7rem 0 1.4rem;background:var(--text);position:relative}
+  .hero::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;border-radius:2px;
+    background:linear-gradient(90deg,#ee5233 0%,#f5b72b 52%,#0f736b 100%)}
+  .hero h1{font-family:Jost,'Trebuchet MS',sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:-.025em}
   .hero .m{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-top:.4rem}
   .hero a{color:#fff}
-  h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:1.4rem 0 .5rem}
+  h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:1.4rem 0 .5rem}
   table{width:100%;border-collapse:collapse;font-size:.88rem}
   td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
-  .d,.t{font-family:var(--mono);font-size:.72rem;color:var(--dim);white-space:nowrap}
+  .d,.t{font-family:var(--mono);font-size:.72rem;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
   .n{font-weight:600}
   .tix{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--pick);
     border:1px solid var(--pick);border-radius:11px;height:22px;display:inline-flex;align-items:center;padding:0 9px;text-decoration:none;white-space:nowrap}
   .tix:hover{background:var(--pick);color:#fff}
-  .others a{display:inline-block;font-size:.78rem;color:var(--accent);border:1px solid var(--line);border-radius:15px;padding:.3rem .7rem;margin:0 .35rem .45rem 0;text-decoration:none}
+  .others a{display:inline-block;font-size:.78rem;color:var(--accent7);border:1px solid var(--line);border-radius:999px;background:var(--card);padding:.3rem .7rem;margin:0 .35rem .45rem 0;text-decoration:none}
   .others a:hover{border-color:var(--accent)}
   .foot{margin-top:2rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-  .foot a{color:var(--accent)}
+  .foot a{color:var(--accent7)}
 </style></head>
 <body><div class="wrap">
   <a class="bk" href="/lineup/sf">&#8592; Your Lineup</a>
@@ -103,7 +107,7 @@ module.exports = async (req, res) => {
     <div class="m">${esc(v.region === 'SF' ? 'San Francisco' : v.region)}, CA · ${esc(v.category.replace('-', ' '))} · <a href="${esc(v.url)}" rel="noopener">official site</a></div>
   </div>
   <h2>Upcoming shows${shows.length ? ` (${shows.length})` : ''}</h2>
-  ${shows.length ? `<table><tbody>${rows}</tbody></table>` : '<p style="color:rgba(25,29,35,.62)">No shows found in the current window — check the official site.</p>'}
+  ${shows.length ? `<table><tbody>${rows}</tbody></table>` : '<p style="color:#7a6d5e">No shows found in the current window — check the official site.</p>'}
   <h2>More ${esc(v.region === 'SF' ? 'San Francisco' : v.region)} venues</h2>
   <div class="others">${others.map((o) => `<a href="/lineup/venue/${o.id}">${esc(o.name)}</a>`).join('')}</div>
   <div class="foot">Part of <a href="/lineup/sf">Lineup SF</a> — live-music discovery for the Bay Area. Listings via Ticketmaster &amp; venue calendars, updated weekly.</div>

@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
       const link = `https://samfinegold.me/lineup/auth?token=${t}`;
       await sendEmail({
         to: body.email, subject: 'Your Lineup sign-in link',
-        html: `<p style="font-family:sans-serif;font-size:16px">Tap to sign in to Lineup:</p><p><a href="${link}" style="font-family:sans-serif;font-size:18px;font-weight:700;color:#3B7A5C">Sign in to Lineup &rarr;</a></p><p style="font-family:sans-serif;color:#888;font-size:13px">Link expires in 15 minutes. If you didn't request this, ignore it.</p>`,
+        html: `<p style="font-family:sans-serif;font-size:16px">Tap to sign in to Lineup:</p><p><a href="${link}" style="font-family:sans-serif;font-size:18px;font-weight:700;color:#b83c1e">Sign in to Lineup &rarr;</a></p><p style="font-family:sans-serif;color:#888;font-size:13px">Link expires in 15 minutes. If you didn't request this, ignore it.</p>`,
         text: `Sign in to Lineup: ${link} (expires in 15 minutes)`,
       });
       return json(res, 200, { sent: true });
