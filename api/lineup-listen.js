@@ -254,6 +254,18 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   .gp.liked{color:var(--pop);border-color:var(--pop)}
   .gp.liked.on{background:var(--pop);color:#fff}
   tr.row.ghide{display:none}
+  tr.row.shide{display:none}
+  .search input{font-size:.8rem;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);
+    padding:.34rem .8rem;width:150px;outline:none;-webkit-appearance:none}
+  .search input::placeholder{color:var(--faint)}
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(36,64,168,.15)}
+  .calbtn{display:none}
+  @media (max-width:900px){ .calbtn{display:inline-flex} }
+  .cmask{display:none;position:fixed;inset:0;background:rgba(17,17,19,.4);z-index:80}
+  .cmodal{display:none;position:fixed;left:50%;top:8%;transform:translateX(-50%);width:min(320px,92vw);max-height:78vh;overflow:auto;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 70px -28px rgba(17,17,19,.4);z-index:81}
+  body.copen .cmask,body.copen .cmodal{display:block}
+  .cmodal .cbody{padding:10px 12px}
   .fmask{display:none;position:fixed;inset:0;background:rgba(17,17,19,.4);z-index:80}
   .fmodal{display:none;position:fixed;left:50%;top:14%;transform:translateX(-50%);width:min(480px,92vw);
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 70px -28px rgba(17,17,19,.4);z-index:81;overflow:hidden}
@@ -295,13 +307,17 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     .heart{width:28px;height:22px}
     .pbtn{width:22px;height:22px;margin-right:8px}
     .content{padding:0 .5rem}
+    .search input{width:110px;font-size:16px;padding:.24rem .7rem}
   }
 </style></head>
 <body>
   <div class="top">
     <h1>Your Lineup</h1>
     <div class="filters">
+      <span class="search"><input id="q" type="search" placeholder="Search" autocomplete="off"
+        oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur()}"></span>
       <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
+      <button class="gp calbtn" onclick="openCal()">Dates</button>
       <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Lineup</button>
       <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share lineup</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
@@ -315,7 +331,9 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     </div>
   </div>
   ${fbar}
-  <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
+  <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div>/ search</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
+  <div class="cmask" onclick="closeCal()"></div>
+  <div class="cmodal" role="dialog" aria-label="Jump to a date"><div class="fmh">Jump to a date<button onclick="closeCal()">&#10005;</button></div><div class="cbody">${calHtml}</div></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
   <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -435,6 +453,7 @@ document.addEventListener('keydown', (e)=>{
   else if (e.key==='ArrowLeft'){ e.preventDefault(); arrowFlow(-1); }
   else if (e.key==='Enter'){ e.preventDefault(); if (sel>=0) toggleDetail(sel); }
   else if (e.key==='Escape'){ const d=document.querySelector('tr.detail'); if(d){d.remove(); openIdx=null;} else stopAll(); }
+  else if (e.key==='/'){ e.preventDefault(); const q=$('q'); if(q) q.focus(); }
 });
 
 // filters
@@ -501,6 +520,16 @@ function setGenre(g){
   rows.forEach(r => r.classList.toggle('ghide', !!gSel && r.dataset.genre !== gSel));
   refreshHeaders();
 }
+let hay = null;
+function doSearch(v){
+  const q = String(v||'').trim().toLowerCase();
+  if (!hay) hay = rows.map(r => (r.querySelector('.c-name').textContent + ' ' + (r.dataset.venue||'') + ' ' + (r.dataset.genre||'')).toLowerCase());
+  if (q) document.querySelectorAll('tr.week.collapsed').forEach(w => w.click()); // matches inside collapsed weeks must be visible
+  rows.forEach((r,i) => r.classList.toggle('shide', !!q && hay[i].indexOf(q) === -1));
+  refreshHeaders();
+}
+function openCal(){ document.body.classList.add('copen'); }
+function closeCal(){ document.body.classList.remove('copen'); }
 function openGenres(){ document.body.classList.add('fopen'); }
 function closeGenres(){ document.body.classList.remove('fopen'); }
 function authClick(){
@@ -563,6 +592,7 @@ document.querySelectorAll('tr.week').forEach(w => {
 });
 
 function jumpTo(ymd){
+  closeCal();
   const el = document.getElementById('d-' + ymd);
   if (!el) return;
   // if inside a collapsed week, expand it first
