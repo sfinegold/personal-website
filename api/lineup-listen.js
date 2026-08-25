@@ -53,7 +53,7 @@ function page(snap) {
       rowsHtml += `<tr class="week"><td colspan="7"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
       weekShown = true;
     }
-    rowsHtml += `<tr class="day"><td colspan="7">${esc(fmtDay(d))}</td></tr>`;
+    rowsHtml += `<tr class="day" id="d-${d}"><td colspan="7">${esc(fmtDay(d))}</td></tr>`;
     const evs = byDay[d].slice().sort((a, b) => (a.time || 'zz').localeCompare(b.time || 'zz'));
     for (const e of evs) {
       const id = uid++;
@@ -71,6 +71,27 @@ function page(snap) {
     }
   }
   if (!days.length) rowsHtml = '<tr><td colspan="7" class="empty">No shows in the current window.</td></tr>';
+
+  // right-rail mini calendar: months spanned by the window, event days clickable
+  const daySet2 = new Set(days);
+  const months = [...new Set(days.map((d) => d.slice(0, 7)))];
+  const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let calHtml = '';
+  for (const m of months) {
+    const [Y, M] = m.split('-').map(Number);
+    const first = new Date(Date.UTC(Y, M - 1, 1));
+    const dow = first.getUTCDay();
+    const dim = new Date(Date.UTC(Y, M, 0)).getUTCDate();
+    let cells = '';
+    for (let i = 0; i < dow; i++) cells += '<span></span>';
+    for (let dd = 1; dd <= dim; dd++) {
+      const ymd = m + '-' + String(dd).padStart(2, '0');
+      cells += daySet2.has(ymd)
+        ? `<button class="cd has" onclick="jumpTo('${ymd}')">${dd}</button>`
+        : `<span class="cd off">${dd}</span>`;
+    }
+    calHtml += `<div class="cm2"><div class="cmh">${MN[M - 1]} ${Y}</div><div class="cg">${cells}</div></div>`;
+  }
 
   return `<!doctype html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -98,7 +119,19 @@ function page(snap) {
   .fbtn.on.fb-Music{background:var(--accent);border-color:var(--accent);color:#fff}
   .fbtn.on.fb-Comedy{background:var(--pick);border-color:var(--pick);color:#fff}
   .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
-  table{width:100%;max-width:1080px;margin:0 auto;border-collapse:collapse;font-size:.84rem}
+  .main{max-width:1080px;margin:0 auto;display:flex;gap:14px;align-items:flex-start}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:0}
+  .cal{flex:none;width:196px;position:sticky;top:60px;padding:8px 0}
+  .cm2{background:#fff;border:1px solid var(--text);border-radius:10px;box-shadow:3px 3px 0 var(--text);
+    padding:8px 10px;margin-bottom:10px}
+  .cmh{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+  .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cd{font-size:.62rem;text-align:center;padding:2px 0;border-radius:4px}
+  .cd.off{color:var(--faint)}
+  button.cd.has{border:0;background:var(--accent);color:#fff;cursor:pointer;font-weight:700}
+  button.cd.has:hover{background:var(--pop)}
+  tr.day{scroll-margin-top:96px}
+  @media (max-width:900px){ .cal{display:none} }
   tr.week td{cursor:pointer;user-select:none;position:sticky;top:52px;z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
@@ -179,7 +212,7 @@ function page(snap) {
       <button class="rbtn" id="rbtn" onclick="togglePlay()">&#9654; Play</button>
     </div>
   </div>
-  <table><tbody id="tb">${rowsHtml}</tbody></table>
+  <div class="main"><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
   <div class="foot">&#8593;&#8595; select · space play/stop · &#8592;&#8594; skip · enter opens · <a href="/lineup/me">edit venues</a></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
@@ -369,6 +402,16 @@ document.querySelectorAll('tr.week').forEach(w => {
     if (!on) refreshHeaders(); // re-apply filter-driven hiding after expand
   });
 });
+
+function jumpTo(ymd){
+  const el = document.getElementById('d-' + ymd);
+  if (!el) return;
+  // if inside a collapsed week, expand it first
+  let w = el.previousElementSibling;
+  while (w && !w.classList.contains('week')) w = w.previousElementSibling;
+  if (w && w.classList.contains('collapsed')) w.click();
+  el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
 
 setFilter('Music'); // default view
 setSel(rows.findIndex((_,i)=>visible(i)));
