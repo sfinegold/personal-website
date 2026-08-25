@@ -147,7 +147,7 @@ function page(snap) {
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
-  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.78rem} h1{font-size:1.05rem} }
+  @media (max-width:560px){ .c-price,.c-time{display:none} table{font-size:.76rem} h1{font-size:1.05rem} tr.row td{padding:6px 3px} .tix{padding:2px 5px;font-size:.54rem} .c-play{width:28px} .c-heart{width:26px} .pbtn{width:22px;height:22px} }
 </style></head>
 <body>
   <div class="top">
