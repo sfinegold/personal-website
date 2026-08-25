@@ -298,8 +298,8 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     <h1>Your Lineup</h1>
     <div class="filters">
       <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
-      <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Liked</button>
-      <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share liked</button>
+      <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Lineup</button>
+      <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share lineup</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
       <button class="fbtn fb-Comedy" onclick="setFilter('Comedy')">Comedy</button>
@@ -476,7 +476,7 @@ function shareLiked(){
       if (!d.id) return alert('Could not create link');
       const u = location.origin + '/lineup/sf?likes=' + d.id;
       (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject())
-        .then(()=>{ const b=$('shareLikes'); b.innerHTML='&#10003; Link copied'; setTimeout(()=>{b.innerHTML='&#128279; Share liked';},1500); })
+        .then(()=>{ const b=$('shareLikes'); b.innerHTML='&#10003; Link copied'; setTimeout(()=>{b.innerHTML='&#128279; Share lineup';},1500); })
         .catch(()=>prompt('Copy this link:', u));
     }).catch(()=>alert('Could not create link'));
 }
@@ -606,7 +606,7 @@ setTopH(); window.addEventListener('resize', setTopH);
     document.body.classList.add('shared-view');
     const bar = document.createElement('div');
     bar.className = 'sharedbar';
-    bar.appendChild(document.createTextNode('\u2665 A friend shared ' + n + ' liked show' + (n===1?'':'s') + ' '));
+    bar.appendChild(document.createTextNode('\u2665 Someone sent you their lineup \u2014 ' + n + ' show' + (n===1?'':'s') + ' '));
     const btn = document.createElement('button');
     btn.textContent = 'Show everything';
     btn.onclick = () => { document.body.classList.remove('shared-view'); bar.remove(); refreshHeaders(); };
@@ -702,7 +702,7 @@ module.exports = async (req, res) => {
         const shown = names.slice(0, 3).join(', ');
         const n = rec.keys.length;
         og = {
-          title: `\u{1F49C} ${n} show${n === 1 ? '' : 's'} picked for you \u2014 Lineup SF`,
+          title: `\u{1F49C} A lineup for you \u2014 ${n} show${n === 1 ? '' : 's'}`,
           desc: names.length ? shown + (names.length > 3 ? ` + ${names.length - 3} more` : '') + ' \u00b7 tap to listen' : 'A friend shared their liked shows \u00b7 tap to listen',
         };
         if (hits[0]) {
