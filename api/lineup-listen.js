@@ -309,6 +309,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     .pbtn{width:22px;height:22px;margin-right:8px}
     .content{padding:0 .5rem}
     .search input{width:110px;font-size:16px;padding:.24rem .7rem}
+    #authBtn{position:absolute;top:.6rem;right:.9rem}   /* .top is sticky (positioned), so this pins to its corner */
   }
 </style></head>
 <body>
