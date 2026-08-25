@@ -248,9 +248,11 @@ function page(snap) {
   .fmf{display:flex;justify-content:space-between;padding:.6rem 1rem;border-top:1px solid var(--line)}
   .fmf .clr{border:0;background:none;text-decoration:underline;cursor:pointer;color:var(--text)}
   .fmf .done{border:1px solid var(--text);background:var(--text);color:#fff;border-radius:9px;padding:.5rem 1.1rem;cursor:pointer}
-  .hints{font-family:var(--mono);font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:2px}
+  .hints{flex:none;width:104px;position:sticky;top:calc(var(--topH,52px) + 12px);
+    font-family:var(--mono);font-size:.56rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);line-height:1.5}
+  .hints div{margin-bottom:.45rem}
   .hints a{color:var(--faint)}
-  @media (max-width:560px){ .hints{display:none} }
+  @media (max-width:900px){ .hints{display:none} }
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
@@ -271,7 +273,7 @@ function page(snap) {
     </div>
   </div>
   ${fbar}
-  <div class="main"><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
+  <div class="main"><aside class="hints"><div>&#8593;&#8595; select</div><div>space play/stop</div><div>&#8592;&#8594; skip</div><div>enter opens</div><div><a href="/lineup/me">edit venues</a></div></aside><table><tbody id="tb">${rowsHtml}</tbody></table><aside class="cal">${calHtml}</aside></div>
   <div class="yt" id="yt"><div class="hd"><span id="ytTitle">—</span>
   <span><button onclick="ytStep(-1)">&#9198;</button> <button onclick="ytStep(1)">&#9197;</button> <button onclick="closeYT()">&#10005;</button></span></div>
   <iframe id="ytFrame" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
