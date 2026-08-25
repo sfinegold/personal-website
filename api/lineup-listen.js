@@ -145,7 +145,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   .rbtn.on{background:transparent;color:var(--accent7)}
   .rbtn.heartbtn{border-color:var(--pop);background:transparent;color:var(--pop)}
   .rbtn.heartbtn.on{background:var(--pop);color:#fff}
-  .filters{display:flex;gap:.35rem}
+  .filters{display:flex;gap:.35rem;flex-wrap:wrap;min-width:0}
   .fbtn{font-family:var(--mono);font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
     padding:.32rem .65rem;border-radius:15px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
   .fbtn.on.fb-Music{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -262,7 +262,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   .calbtn{display:none}
   @media (max-width:900px){ .calbtn{display:inline-flex} }
   .cmask{display:none;position:fixed;inset:0;background:rgba(17,17,19,.4);z-index:80}
-  .cmodal{display:none;position:fixed;left:50%;top:8%;transform:translateX(-50%);width:min(320px,92vw);max-height:78vh;overflow:auto;
+  .cmodal{display:none;position:fixed;left:50%;top:8%;transform:translateX(-50%);width:min(320px,calc(100vw - 24px));max-height:78vh;overflow:auto;
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 70px -28px rgba(17,17,19,.4);z-index:81}
   body.copen .cmask,body.copen .cmodal{display:block}
   .cmodal .cbody{padding:10px 12px}
