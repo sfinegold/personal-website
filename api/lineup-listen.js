@@ -599,7 +599,7 @@ function jumpTo(ymd){
   let w = el.previousElementSibling;
   while (w && !w.classList.contains('week')) w = w.previousElementSibling;
   if (w && w.classList.contains('collapsed')) w.click();
-  el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  el.scrollIntoView({ block: 'start', behavior: 'auto' }); // smooth stalls over long distances (same fix as deep links)
 }
 
 function slugify(t){ return String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64).replace(/-+$/,''); }
