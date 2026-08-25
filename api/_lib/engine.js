@@ -121,7 +121,7 @@ async function runProfile(profileId, options = {}) {
     kept,
     grid: ranked.kept.map((e) => ({
       title: e.title, venue: e.venue, sourceId: e.sourceId,
-      date: e.date, time: e.time, category: e.category, url: e.url,
+      date: e.date, time: e.time, category: e.category, url: e.url, price: e.price != null ? e.price : null,
     })),
     at: now.toISOString(),
   });

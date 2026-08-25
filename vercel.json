@@ -31,6 +31,10 @@
     {
       "source": "/lineup/auth",
       "destination": "/api/lineup-auth"
+    },
+    {
+      "source": "/lineup/venue/:id",
+      "destination": "/api/lineup-venue?id=:id"
     }
   ],
   "functions": {
