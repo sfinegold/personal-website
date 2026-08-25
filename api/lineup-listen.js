@@ -674,7 +674,7 @@ module.exports = async (req, res) => {
       let cands = snap.grid.filter((x) => x.sourceId === vid);
       if (date) cands = cands.filter((x) => x.date === date);
       const hit = cands.find((x) => slugSrv(x.title).slice(0, 16) === aslug.slice(0, 16)) || cands[0];
-      if (hit) og = { title: `${hit.title} — ${fmtNice(hit.date)}`, desc: `${hit.venue}${hit.time ? ' · ' + hit.time : ''} · via Lineup SF` };
+      if (hit) og = { title: `${hit.title} — ${fmtNice(hit.date)}`, desc: `${hit.venue}${hit.time ? ' · ' + fmtTime(hit.time) : ''} · via Lineup SF` };
     }
     res.statusCode = 200;
     res.end(page(snap, og));
