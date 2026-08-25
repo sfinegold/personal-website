@@ -65,7 +65,7 @@ function page(snap) {
         <td class="c-time">${esc(fmtTime(e.time))}</td>
         <td class="c-price">${esc(fmtPrice(e.price))}</td>
         <td class="c-tix">${e.url ? `<a class="tix" href="${esc(e.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Tickets</a>` : ''}</td>
-        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9825;</button><button class="share" aria-label="Share">&#128279;</button></td>
+        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9829;</button><button class="share" aria-label="Share">&#128279;</button></td>
       </tr>`;
     }
   }
@@ -175,8 +175,10 @@ function page(snap) {
   .tix:hover{background:var(--pick);color:#fff}
   .share{width:26px;height:22px;border:1px solid var(--accent);border-radius:11px;background:none;color:var(--accent);
     font-size:.62rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;margin-left:6px}
-  .heart{width:30px;height:22px;border:1px solid var(--pop);border-radius:11px;background:none;color:var(--pop);
-    font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0}
+  .heart{width:30px;height:22px;border:1px solid var(--pop);border-radius:11px;background:none;
+    font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;
+    color:transparent;-webkit-text-stroke:1.1px var(--pop)}
+  tr.row.hearted .heart{color:var(--pop);-webkit-text-stroke:0}
   .ev.hearted .heart,tr.row.hearted .heart{background:none;color:var(--pop)}
   tr.detail td{background:var(--bg2);padding:12px;border-bottom:1px solid var(--line)}
   .dwrap{display:flex;gap:14px;align-items:center}
@@ -395,7 +397,7 @@ const HK='lineup_sf_hearts';
 let hearts; try{ hearts=new Set(JSON.parse(localStorage.getItem(HK)||'[]')); }catch(e){ hearts=new Set(); }
 let me=null;
 function updateHc(){ $('hc').textContent = hearts.size; }
-function markHeart(r,on){ r.classList.toggle('hearted',on); const h=r.querySelector('.heart'); if(h) h.innerHTML=on?'&#9829;':'&#9825;'; }
+function markHeart(r,on){ r.classList.toggle('hearted',on); }
 function pushHearts(){ if(me) fetch('/lineup/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'hearts',keys:[...hearts]})}).catch(()=>{}); }
 function saveHearts(){ try{ localStorage.setItem(HK, JSON.stringify([...hearts])); }catch(e){} updateHc(); pushHearts(); }
 rows.forEach(r=>{ if(hearts.has(r.dataset.key)) markHeart(r,true);
