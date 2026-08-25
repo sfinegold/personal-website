@@ -50,7 +50,7 @@ function page(snap) {
   for (const d of days) {
     while (d >= addDays(weekStart, 7)) { weekStart = addDays(weekStart, 7); weekShown = false; }
     if (!weekShown) {
-      rowsHtml += `<tr class="week"><td colspan="7">Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
+      rowsHtml += `<tr class="week"><td colspan="7"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
       weekShown = true;
     }
     rowsHtml += `<tr class="day"><td colspan="7">${esc(fmtDay(d))}</td></tr>`;
@@ -99,7 +99,7 @@ function page(snap) {
   .fbtn.on.fb-Comedy{background:var(--pick);border-color:var(--pick);color:#fff}
   .fbtn.on.fb-Sports{background:var(--gold);border-color:var(--gold);color:#fff}
   table{width:100%;max-width:1080px;margin:0 auto;border-collapse:collapse;font-size:.84rem}
-  tr.week td{position:sticky;top:52px;z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
+  tr.week td{cursor:pointer;user-select:none;position:sticky;top:52px;z-index:20;background:linear-gradient(90deg,#0A2540,#635BFF);color:#fff;
     font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px}
   tr.day td{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;
     color:var(--dim);background:var(--bg2);padding:5px 12px;border-bottom:1px solid var(--line)}
@@ -158,6 +158,8 @@ function page(snap) {
     font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
   .yt .hd button{border:0;background:none;cursor:pointer;font-size:.8rem;color:var(--text)}
   @media (max-width:560px){ .yt{left:8px;right:8px;width:auto;bottom:70px} }
+  .wcaret{display:inline-block;width:1em;transition:transform .12s}
+  tr.week.collapsed .wcaret{transform:rotate(-90deg)}
   .foot{max-width:1080px;margin:.8rem auto;padding:0 1rem;font-family:var(--mono);font-size:.58rem;
     letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
   .foot a{color:var(--accent)}
@@ -357,6 +359,16 @@ function renderYT(){
 }
 function ytStep(d){ if(!ytTracks.length) return; ytIdx=(ytIdx+d+ytTracks.length)%ytTracks.length; renderYT(); }
 function closeYT(){ $('yt').classList.remove('on'); $('ytFrame').src=''; ytTracks=[]; }
+
+// collapsible week bands: click a week header to fold/unfold its rows
+document.querySelectorAll('tr.week').forEach(w => {
+  w.addEventListener('click', () => {
+    const on = w.classList.toggle('collapsed');
+    let el = w.nextElementSibling;
+    while (el && !el.classList.contains('week')) { el.style.display = on ? 'none' : ''; el = el.nextElementSibling; }
+    if (!on) refreshHeaders(); // re-apply filter-driven hiding after expand
+  });
+});
 
 setFilter('Music'); // default view
 setSel(rows.findIndex((_,i)=>visible(i)));
