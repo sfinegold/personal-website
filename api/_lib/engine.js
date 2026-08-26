@@ -71,6 +71,11 @@ async function runProfile(profileId, options = {}) {
 
   // Deterministic events + any curated events (written by the Claude routine for
   // JS-rendered venues the parser can't read).
+  const deadRec = await store.getJSON('lineup:deadlinks', { urls: [] });
+  const deadLinks = new Set(deadRec.urls || []);
+  const venueUrlById = {};
+  for (const src of sources) venueUrlById[src.id] = src.url;
+
   const curated = await store.getCurated(profile.id);
   const allEvents = perSource.flatMap((r) => r.events).concat(curated);
 
@@ -121,7 +126,10 @@ async function runProfile(profileId, options = {}) {
     kept,
     grid: ranked.kept.map((e) => ({
       title: e.title, venue: e.venue, sourceId: e.sourceId,
-      date: e.date, time: e.time, category: e.category, url: e.url, price: e.price != null ? e.price : null, note: e.note || '',
+      date: e.date, time: e.time, category: e.category,
+      // linkcheck (scripts/lineup-linkcheck.js) marks dead ticket pages; fall back to the venue site
+      url: deadLinks.has(e.url) ? (venueUrlById[e.sourceId] || e.url) : e.url,
+      price: e.price != null ? e.price : null, note: e.note || '',
     })),
     at: now.toISOString(),
   });

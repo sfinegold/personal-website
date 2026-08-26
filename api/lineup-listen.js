@@ -365,12 +365,25 @@ let sel = -1, playIdx = null, openIdx = null;
 function big(u){ return u ? u.replace(/\\/[0-9]+x[0-9]+bb?\\./,'/300x300bb.') : u; }
 function visible(i){ return rows[i] && rows[i].offsetParent !== null; }
 
+function artistMatches(term, artist){
+  // iTunes fuzzy search can return a phonetic cousin ("Rose Blood" -> Shawn Mendes).
+  // Only trust the preview when the matched artist plausibly IS the act in the title.
+  if (!artist) return false;
+  const norm = (x) => String(x).toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+  const t = norm(term), a = norm(artist);
+  if (!t || !a) return false;
+  if (t.includes(a) || a.includes(t)) return true;
+  const tw = new Set(t.split(' ')), aw = a.split(' ');
+  const hits = aw.filter(w => w.length > 1 && tw.has(w)).length;
+  return hits / aw.length >= 0.6;
+}
 function loadPreview(i){
   const r = rows[i]; const uid = r.dataset.uid;
   if (cache[uid]) return cache[uid].p ? cache[uid].p : Promise.resolve(cache[uid]);
   cache[uid] = {};
   cache[uid].p = fetch('/api/outside-lands?preview=' + encodeURIComponent(r.dataset.term)).then(x=>x.json()).then(p=>{
     const rec = { previewUrl:(p&&p.previewUrl)||null, art:(p&&p.artwork)?big(p.artwork):null };
+    if (rec.previewUrl && !artistMatches(r.dataset.term, p.artist)){ rec.previewUrl = null; rec.art = null; } // wrong act: show nothing
     cache[uid] = rec; return rec;
   }).catch(()=>{ cache[uid]={previewUrl:null,art:null}; return cache[uid]; });
   return cache[uid].p;
@@ -444,7 +457,7 @@ function toggleDetail(i){
     '<div class="dm">' + r.dataset.when + ' · ' + r.dataset.venue + '</div>' +
     '<div class="dl">' + (r.dataset.url ? '<a href="'+r.dataset.url+'" target="_blank" rel="noopener">Tickets</a>' : '') +
     '<a href="/lineup/venue/' + r.dataset.vid + '">Venue page</a>' +
-    '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a>' +
+    (rows[i].classList.contains('ready') ? '<a href="#" onclick="event.preventDefault();openYT(' + i + ')">&#9654; Top tracks</a>' : '') +
     '<a href="#" id="shareBtn" onclick="event.preventDefault();shareEvent(' + i + ')">Share</a></div></div></div></td>';
   r.after(tr);
   loadPreview(i).then(rec=>{ const d=$('dart'); if(d && rec.art){ d.style.background='url("'+rec.art+'") center/cover'; const sp=d.querySelector('.di'); if(sp) sp.remove(); } });
