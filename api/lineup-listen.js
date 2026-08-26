@@ -65,7 +65,7 @@ function page(snap, og) {
         <td class="c-time">${esc(fmtTime(e.time))}</td>
         <td class="c-price">${esc(fmtPrice(e.price))}</td>
         <td class="c-tix">${e.url ? `<a class="tix" href="${esc(e.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Tickets</a>` : ''}</td>
-        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save">&#9829;</button><button class="share" aria-label="Share">&#128279;</button></td>
+        <td class="c-act"><button class="pbtn" id="p${id}" aria-label="Play preview">&#9654;</button><button class="heart" aria-label="Save"><svg class="hico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button><button class="share" aria-label="Share">&#128279;</button></td>
       </tr>`;
     }
   }
@@ -194,10 +194,10 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
   .share{width:26px;height:22px;border:1px solid var(--accent);border-radius:11px;background:none;color:var(--accent);
     font-size:.62rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;margin-left:6px}
   .heart{width:30px;height:22px;border:1px solid var(--pop);border-radius:11px;background:none;
-    font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;
-    color:transparent;-webkit-text-stroke:1.1px var(--pop)}
-  tr.row.hearted .heart{color:var(--pop);-webkit-text-stroke:0}
-  .ev.hearted .heart,tr.row.hearted .heart{background:none;color:var(--pop)}
+    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;color:var(--pop)}
+  .hico{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;flex:none}
+  tr.row.hearted .heart .hico{fill:currentColor}
+  .gp.liked.on .hico,.rbtn.heartbtn.on .hico{fill:currentColor}
   tr.detail td{background:var(--bg2);padding:12px;border-bottom:1px solid var(--line)}
   .dwrap{display:flex;gap:14px;align-items:center}
   .dart{width:110px;height:110px;border-radius:8px;background-size:cover;background-position:center;flex:none;
@@ -320,7 +320,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
         oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur()}"></span>
       <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
       <button class="gp calbtn" onclick="openCal()">Dates</button>
-      <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()">&#9829; Lineup</button>
+      <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()"><svg class="hico" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Lineup</button>
       <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share lineup</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>
       <button class="fbtn fb-Sports" onclick="setFilter('Sports')">Sports</button>
@@ -328,7 +328,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     </div>
     <div style="display:flex;gap:.4rem">
       <button class="rbtn heartbtn" id="authBtn" onclick="authClick()" style="border-color:var(--line);color:var(--dim)">Sign in</button>
-      <button class="rbtn heartbtn" id="heartsBtn" onclick="toggleHeartsOnly()">&#9829; <span id="hc">0</span></button>
+      <button class="rbtn heartbtn" id="heartsBtn" onclick="toggleHeartsOnly()"><svg class="hico" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span id="hc">0</span></button>
       <button class="rbtn" id="rbtn" onclick="togglePlay()">&#9654; Play</button>
     </div>
   </div>
@@ -402,6 +402,7 @@ function playStep(from, d){
 function nextSong(){ playStep(playIdx==null? -1 : playIdx, 1); }
 function prevSong(){ playStep(playIdx==null? rows.length : playIdx, -1); }
 function togglePlay(){
+  if (sel>=0 && sel!==playIdx){ playRow(sel, false, true); return; } // space plays the selected row (re-targets playback)
   if (playIdx!=null && !audio.paused){ audio.pause(); setRbtn(false); setPlaying(playIdx,false); return; }
   if (playIdx!=null && audio.src){ audio.play(); setRbtn(true); setPlaying(playIdx,true); return; }
   playRow(sel>=0? sel : 0);
