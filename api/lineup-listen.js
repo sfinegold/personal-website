@@ -45,12 +45,19 @@ function page(snap, og) {
   const days = Object.keys(byDay).sort();
 
   let uid = 0, rowsHtml = '';
-  let weekStart = start;
+  const mondayOf = (ymd) => addDays(ymd, -((new Date(ymd + 'T12:00:00Z').getUTCDay() + 6) % 7));
+  const todayYMD = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+  const thisMonday = mondayOf(todayYMD);
+  const weekTag = (monday) => {
+    const n = Math.round((Date.parse(monday) - Date.parse(thisMonday)) / 6048e5);
+    return n <= 0 ? 'This week' : n === 1 ? 'Next week' : `In ${n} weeks`;
+  };
+  let weekStart = mondayOf(start);
   let weekShown = false;
   for (const d of days) {
     while (d >= addDays(weekStart, 7)) { weekStart = addDays(weekStart, 7); weekShown = false; }
     if (!weekShown) {
-      rowsHtml += `<tr class="week"><td colspan="6"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}</td></tr>`;
+      rowsHtml += `<tr class="week"><td colspan="6"><span class="wcaret">&#9662;</span> Week of ${esc(fmtRange(weekStart, addDays(weekStart, 6)))}<span class="wtag">${esc(weekTag(weekStart))}</span></td></tr>`;
       weekShown = true;
     }
     rowsHtml += `<tr class="day" id="d-${d}"><td colspan="6">${esc(fmtDay(d))}</td></tr>`;
@@ -108,9 +115,9 @@ function page(snap, og) {
   for (const m of months) {
     const [Y, M] = m.split('-').map(Number);
     const first = new Date(Date.UTC(Y, M - 1, 1));
-    const dow = first.getUTCDay();
+    const dow = (first.getUTCDay() + 6) % 7; // Monday-first columns
     const dim = new Date(Date.UTC(Y, M, 0)).getUTCDate();
-    let cells = '';
+    let cells = ['M','T','W','T','F','S','S'].map((w) => `<span class="cwd">${w}</span>`).join('');
     for (let i = 0; i < dow; i++) cells += '<span></span>';
     for (let dd = 1; dd <= dim; dd++) {
       const ymd = m + '-' + String(dd).padStart(2, '0');
@@ -244,6 +251,8 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
   .yt .hd button{border:0;background:none;cursor:pointer;font-size:.8rem;color:var(--text)}
   @media (max-width:560px){ .yt{left:8px;right:8px;width:auto;bottom:70px} }
+  .wtag{float:right;opacity:.75;letter-spacing:.16em}
+  .cwd{font-size:.55rem;text-align:center;color:var(--faint);font-family:var(--mono);padding:1px 0}
   .wcaret{display:inline-block;width:1em;transition:transform .12s}
   tr.week.collapsed .wcaret{transform:rotate(-90deg)}
   .fbar{display:flex;gap:.45rem;overflow-x:auto;padding:.55rem 1rem;max-width:1080px;margin:0 auto;

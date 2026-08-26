@@ -7,7 +7,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAE6eeA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78424,
+      -122.43329
+    ]
   },
   {
     "id": "warfield",
@@ -17,7 +21,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAJe6lA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78274,
+      -122.41038
+    ]
   },
   {
     "id": "gamh",
@@ -27,7 +35,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAJk7aA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.785,
+      -122.41884
+    ]
   },
   {
     "id": "independent",
@@ -37,7 +49,11 @@
     "setting": "indoor",
     "region": "SF",
     "adapter": "eventdiscovery",
-    "tmVenueId": "KovZpZAAl7AA"
+    "tmVenueId": "KovZpZAAl7AA",
+    "loc": [
+      37.77551,
+      -122.43775
+    ]
   },
   {
     "id": "chapel",
@@ -47,7 +63,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917AOMf",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76055,
+      -122.42119
+    ]
   },
   {
     "id": "bimbos",
@@ -57,7 +77,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAJeFvA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80378,
+      -122.41542
+    ]
   },
   {
     "id": "rickshaw",
@@ -67,7 +91,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAa1JaA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77622,
+      -122.42038
+    ]
   },
   {
     "id": "cafedunord",
@@ -77,7 +105,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917ANZn",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76659,
+      -122.4303
+    ]
   },
   {
     "id": "bottomofthehill",
@@ -87,7 +119,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "ZFr9jZ6veA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7757,
+      -122.3952
+    ]
   },
   {
     "id": "brickmortar",
@@ -97,7 +133,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAanJFA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76972,
+      -122.42038
+    ]
   },
   {
     "id": "theeparkside",
@@ -107,7 +147,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "Z7r9jZaesw",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7757,
+      -122.3952
+    ]
   },
   {
     "id": "elrio",
@@ -115,7 +159,11 @@
     "url": "https://www.elriosf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.74675,
+      -122.41933
+    ]
   },
   {
     "id": "knockout",
@@ -123,7 +171,11 @@
     "url": "https://theknockoutsf.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.74518,
+      -122.41999
+    ]
   },
   {
     "id": "neckofthewoods",
@@ -133,7 +185,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917AYqw",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78323,
+      -122.46378
+    ]
   },
   {
     "id": "amados",
@@ -143,7 +199,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "Z7r9jZa7wF",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7496,
+      -122.4153
+    ]
   },
   {
     "id": "regency",
@@ -153,7 +213,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAEet6A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78758,
+      -122.42166
+    ]
   },
   {
     "id": "augusthall",
@@ -163,7 +227,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917ALXF",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78757,
+      -122.4096
+    ]
   },
   {
     "id": "masonic",
@@ -173,7 +241,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAJ6nlA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.79142,
+      -122.41329
+    ]
   },
   {
     "id": "palacefinearts",
@@ -181,7 +253,11 @@
     "url": "https://palaceoffinearts.org",
     "category": "live-music",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.80292,
+      -122.4484
+    ]
   },
   {
     "id": "herbst",
@@ -191,7 +267,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAatadA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77965,
+      -122.42055
+    ]
   },
   {
     "id": "midway",
@@ -201,7 +281,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917AiWC",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.74944,
+      -122.38574
+    ]
   },
   {
     "id": "billgraham",
@@ -211,7 +295,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpaKope",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77848,
+      -122.41747
+    ]
   },
   {
     "id": "cowpalace",
@@ -221,7 +309,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAFktvA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.70568,
+      -122.41989
+    ]
   },
   {
     "id": "chasecenter",
@@ -231,7 +323,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917Ah1H",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76797,
+      -122.38746
+    ]
   },
   {
     "id": "oraclepark",
@@ -241,7 +337,11 @@
     "setting": "outdoor",
     "region": "SF",
     "tmVenueId": "KovZpZAJF7EA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77841,
+      -122.38944
+    ]
   },
   {
     "id": "1015",
@@ -251,7 +351,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAa17tA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77264,
+      -122.40992
+    ]
   },
   {
     "id": "publicworks",
@@ -261,7 +365,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZA1lvEA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76906,
+      -122.4194
+    ]
   },
   {
     "id": "greatnorthern",
@@ -271,7 +379,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917ALXB",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.76765,
+      -122.40649
+    ]
   },
   {
     "id": "audiosf",
@@ -279,7 +391,11 @@
     "url": "https://www.audiosf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.77137,
+      -122.41381
+    ]
   },
   {
     "id": "halcyon",
@@ -289,7 +405,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "Z7r9jZadlk",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7731,
+      -122.411
+    ]
   },
   {
     "id": "monarch",
@@ -299,7 +419,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZ917Ai8x",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.78099,
+      -122.40835
+    ]
   },
   {
     "id": "f8",
@@ -307,7 +431,11 @@
     "url": "https://www.f8sf.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.77528,
+      -122.40995
+    ]
   },
   {
     "id": "temple",
@@ -323,7 +451,11 @@
     "url": "https://theendup.com",
     "category": "electronic",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.77727,
+      -122.40384
+    ]
   },
   {
     "id": "dnalounge",
@@ -333,7 +465,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAalvFA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77108,
+      -122.4126
+    ]
   },
   {
     "id": "sfjazz",
@@ -343,7 +479,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "Z7r9jZadk_",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7795,
+      -122.4195
+    ]
   },
   {
     "id": "blackcat",
@@ -353,7 +493,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "Z7r9jZaAry",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7933,
+      -122.4212
+    ]
   },
   {
     "id": "keysjazz",
@@ -369,7 +513,11 @@
     "url": "https://www.mrtipplessf.com",
     "category": "jazz",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.77637,
+      -122.41857
+    ]
   },
   {
     "id": "davies",
@@ -379,7 +527,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAEeAaA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7776,
+      -122.42035
+    ]
   },
   {
     "id": "sfopera",
@@ -389,7 +541,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAFkItA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.77872,
+      -122.42134
+    ]
   },
   {
     "id": "gracecathedral",
@@ -399,7 +555,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAFFt7A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.79106,
+      -122.41118
+    ]
   },
   {
     "id": "ybca",
@@ -409,7 +569,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "ZFr9jZFav1",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.7731,
+      -122.411
+    ]
   },
   {
     "id": "sterngrove",
@@ -417,7 +581,11 @@
     "url": "https://sterngrove.org",
     "category": "live-music",
     "setting": "outdoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.73609,
+      -122.4786
+    ]
   },
   {
     "id": "foxoakland",
@@ -427,7 +595,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpaKoXe",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80772,
+      -122.27006
+    ]
   },
   {
     "id": "paramount",
@@ -437,7 +609,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAFkIlA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80987,
+      -122.26859
+    ]
   },
   {
     "id": "newparish",
@@ -447,7 +623,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "adapter": "eventdiscovery",
-    "tmVenueId": "KovZpZA1dkJA"
+    "tmVenueId": "KovZpZA1dkJA",
+    "loc": [
+      37.80776,
+      -122.27273
+    ]
   },
   {
     "id": "starline",
@@ -457,7 +637,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAkntEA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.8123,
+      -122.27255
+    ]
   },
   {
     "id": "yoshis",
@@ -467,7 +651,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZA1FJAA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.79595,
+      -122.27829
+    ]
   },
   {
     "id": "uptown",
@@ -477,7 +665,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAFJIeA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80861,
+      -122.26953
+    ]
   },
   {
     "id": "elismilehigh",
@@ -487,7 +679,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAJaetA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.82579,
+      -122.26968
+    ]
   },
   {
     "id": "goldenbull",
@@ -497,7 +693,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpa2ZUe",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80416,
+      -122.27035
+    ]
   },
   {
     "id": "storkclub",
@@ -505,7 +705,11 @@
     "url": "https://www.storkcluboakland.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "loc": [
+      37.81314,
+      -122.26838
+    ]
   },
   {
     "id": "oaklandarena",
@@ -515,7 +719,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAJe6nA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.75155,
+      -122.20157
+    ]
   },
   {
     "id": "uctheatre",
@@ -525,7 +733,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZAIE7aA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.87182,
+      -122.26976
+    ]
   },
   {
     "id": "greekberkeley",
@@ -533,7 +745,11 @@
     "url": "https://thegreekberkeley.com",
     "category": "live-music",
     "setting": "outdoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "loc": [
+      37.87367,
+      -122.25424
+    ]
   },
   {
     "id": "cornerstone",
@@ -543,7 +759,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZA6eJEA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.86635,
+      -122.2672
+    ]
   },
   {
     "id": "ashkenaz",
@@ -551,7 +771,11 @@
     "url": "https://ashkenaz.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "loc": [
+      37.88014,
+      -122.29535
+    ]
   },
   {
     "id": "freight",
@@ -561,7 +785,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "ZFr9jZFv1F",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.866,
+      -122.2866
+    ]
   },
   {
     "id": "zellerbach",
@@ -571,7 +799,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpa9Spe",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.86909,
+      -122.26069
+    ]
   },
   {
     "id": "gilman",
@@ -581,7 +813,11 @@
     "setting": "indoor",
     "region": "East Bay",
     "tmVenueId": "KovZpZA6d6nA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.87954,
+      -122.29932
+    ]
   },
   {
     "id": "starryplough",
@@ -589,7 +825,11 @@
     "url": "https://www.starryploughpub.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "East Bay"
+    "region": "East Bay",
+    "loc": [
+      37.85301,
+      -122.26608
+    ]
   },
   {
     "id": "frost",
@@ -607,7 +847,11 @@
     "setting": "outdoor",
     "region": "Peninsula",
     "tmVenueId": "KovZpZA6ta1A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.42672,
+      -122.08072
+    ]
   },
   {
     "id": "mvcpa",
@@ -617,7 +861,11 @@
     "setting": "indoor",
     "region": "Peninsula",
     "tmVenueId": "ZFr9jZkFAa",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.3872,
+      -122.0744
+    ]
   },
   {
     "id": "guild",
@@ -627,7 +875,11 @@
     "setting": "indoor",
     "region": "Peninsula",
     "tmVenueId": "Z7r9jZa7m7",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.4524,
+      -122.1842
+    ]
   },
   {
     "id": "clubfox",
@@ -637,7 +889,11 @@
     "setting": "indoor",
     "region": "Peninsula",
     "tmVenueId": "Z7r9jZadSu",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.4921,
+      -122.2073
+    ]
   },
   {
     "id": "foxrwc",
@@ -647,7 +903,11 @@
     "setting": "indoor",
     "region": "Peninsula",
     "tmVenueId": "KovZpZAata6A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.48648,
+      -122.22928
+    ]
   },
   {
     "id": "bing",
@@ -657,7 +917,11 @@
     "setting": "indoor",
     "region": "Peninsula",
     "tmVenueId": "Z7r9jZad3P",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.4162,
+      -122.1722
+    ]
   },
   {
     "id": "ritzsj",
@@ -667,7 +931,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZ917AOqb",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.33,
+      -121.88581
+    ]
   },
   {
     "id": "sapcenter",
@@ -677,7 +945,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "Za5ju3rKuqZymCqU5fgF9FIezqgkI4FU",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.3328,
+      -121.9012
+    ]
   },
   {
     "id": "sjcivic",
@@ -687,7 +959,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAJk71A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.33046,
+      -121.88967
+    ]
   },
   {
     "id": "continental",
@@ -695,7 +971,11 @@
     "url": "https://thecontinentalbar.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "loc": [
+      37.33065,
+      -121.8867
+    ]
   },
   {
     "id": "improvsj",
@@ -703,7 +983,11 @@
     "url": "https://improv.com/sanjose",
     "category": "comedy",
     "setting": "indoor",
-    "region": "South Bay"
+    "region": "South Bay",
+    "loc": [
+      37.33563,
+      -121.88829
+    ]
   },
   {
     "id": "mountainwinery",
@@ -713,7 +997,11 @@
     "setting": "outdoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAE6edA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.25872,
+      -122.06322
+    ]
   },
   {
     "id": "californiatheatre",
@@ -723,7 +1011,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAa17EA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.33074,
+      -121.88657
+    ]
   },
   {
     "id": "levis",
@@ -733,7 +1025,11 @@
     "setting": "outdoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAJaFkA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.40368,
+      -121.97034
+    ]
   },
   {
     "id": "paypalpark",
@@ -743,7 +1039,11 @@
     "setting": "outdoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAEvF6A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.35123,
+      -121.92454
+    ]
   },
   {
     "id": "catalyst",
@@ -753,7 +1053,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpapJfe",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      36.97128,
+      -122.02591
+    ]
   },
   {
     "id": "moesalley",
@@ -763,7 +1067,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZA67J6A",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      36.98769,
+      -121.98289
+    ]
   },
   {
     "id": "riotheatre",
@@ -773,7 +1081,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZA1endA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      36.97992,
+      -122.01049
+    ]
   },
   {
     "id": "kuumbwa",
@@ -783,7 +1095,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "ZFr9jZFdv6",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.0412,
+      -122.124
+    ]
   },
   {
     "id": "felton",
@@ -793,7 +1109,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "Z7r9jZadDV",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.0802,
+      -122.0522
+    ]
   },
   {
     "id": "crepeplace",
@@ -803,7 +1123,11 @@
     "setting": "indoor",
     "region": "South Bay",
     "tmVenueId": "KovZpZAFJkEA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      36.97949,
+      -122.01092
+    ]
   },
   {
     "id": "sweetwater",
@@ -813,7 +1137,11 @@
     "setting": "indoor",
     "region": "Marin",
     "tmVenueId": "KovZ917A5zV",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.90705,
+      -122.5481
+    ]
   },
   {
     "id": "hopmonk",
@@ -821,7 +1149,11 @@
     "url": "https://www.hopmonk.com/novato",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Marin"
+    "region": "Marin",
+    "loc": [
+      38.08849,
+      -122.55345
+    ]
   },
   {
     "id": "marincenter",
@@ -831,7 +1163,11 @@
     "setting": "indoor",
     "region": "Marin",
     "tmVenueId": "KovZpa3nJe",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      38.00242,
+      -122.53354
+    ]
   },
   {
     "id": "ranchonicasio",
@@ -839,7 +1175,11 @@
     "url": "https://www.ranchonicasio.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Marin"
+    "region": "Marin",
+    "loc": [
+      38.06225,
+      -122.69832
+    ]
   },
   {
     "id": "smileys",
@@ -847,7 +1187,11 @@
     "url": "https://www.smileyssaloon.com",
     "category": "live-music",
     "setting": "indoor",
-    "region": "Marin"
+    "region": "Marin",
+    "loc": [
+      37.91019,
+      -122.68513
+    ]
   },
   {
     "id": "cobbs",
@@ -857,7 +1201,11 @@
     "setting": "indoor",
     "region": "SF",
     "tmVenueId": "KovZpZAEkFEA",
-    "adapter": "ticketmaster"
+    "adapter": "ticketmaster",
+    "loc": [
+      37.80291,
+      -122.41422
+    ]
   },
   {
     "id": "punchline",
@@ -865,7 +1213,11 @@
     "url": "https://www.punchlinecomedyclub.com",
     "category": "comedy",
     "setting": "indoor",
-    "region": "SF"
+    "region": "SF",
+    "loc": [
+      37.79553,
+      -122.40012
+    ]
   },
   {
     "id": "funcheap",
