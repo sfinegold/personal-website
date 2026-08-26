@@ -333,6 +333,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
         oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur()}"></span>
       <button class="gp" id="genresBtn" onclick="openGenres()">&#9776; Genres</button>
       <button class="gp calbtn" onclick="openCal()">Dates</button>
+      <a class="gp" href="/lineup/map" style="text-decoration:none;display:inline-flex;align-items:center">Map</a>
       <button class="gp liked" id="likedPill" onclick="toggleHeartsOnly()"><svg class="hico" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Lineup</button>
       <button class="gp liked" id="shareLikes" onclick="shareLiked()" style="display:none">&#128279; Share lineup</button>
       <button class="fbtn fb-Music" onclick="setFilter('Music')">Music</button>

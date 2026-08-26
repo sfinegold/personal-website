@@ -25,6 +25,10 @@
       "destination": "/api/lineup-me"
     },
     {
+      "source": "/lineup/map",
+      "destination": "/api/lineup-map"
+    },
+    {
       "source": "/lineup/sf",
       "destination": "/api/lineup-listen"
     },
