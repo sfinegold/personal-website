@@ -54,7 +54,9 @@ async function ticketmaster(source, ctx = {}) {
           category,
           date,
           time: start.localTime ? start.localTime.slice(0, 5) : null,
-          url: e.url || source.url,
+          // Z-prefixed ids are partner-fed listings (AXS/box-office venues) whose
+          // ticketmaster.com pages often 404 — send those to the venue site instead.
+          url: (e.url && !/\/event\/Z/.test(e.url)) ? e.url : source.url,
           price: price === 0 ? 'free' : price,
           note: genre && genre !== 'Undefined' ? genre : '',
         },
