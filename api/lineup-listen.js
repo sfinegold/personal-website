@@ -59,8 +59,10 @@ function page(snap, og) {
       const id = uid++;
       const g = groupOf(e.category);
       const key = esc(`${e.sourceId}|${e.title}|${e.date}`);
-      // festival-named events have no single artist: suppress the preview rather than fuzzy-match a wrong song
-      const fest = e.note === 'Festival' || /\b(festival|fest)$/i.test(artistTerm(e.title));
+      // event-noun titles (festivals, themed parties, raves, karaoke...) have no artist to
+      // look up: suppress the preview rather than fuzzy-match a wrong song
+      const NOARTIST = /\b(festival|fest|party|rave|prom|gala|takeover|block party)\s*$|\b(karaoke|open mic|silent disco|trivia|bingo|night market)\b/i;
+      const fest = e.note === 'Festival' || NOARTIST.test(artistTerm(e.title)) || NOARTIST.test(String(e.title || '').replace(/[!.\s]+$/, ''));
       rowsHtml += `<tr class="row g-${g}${fest ? ' nomusic' : ''}" id="r${id}" data-uid="${id}" data-key="${key}" data-term="${esc(artistTerm(e.title))}" data-url="${esc(e.url || '')}" data-vid="${esc(e.sourceId || '')}" data-venue="${esc(e.venue || '')}" data-when="${esc(fmtDay(e.date))} · ${esc(fmtTime(e.time))}" data-genre="${esc(e.note && e.note.length <= 24 && !/[<&]/.test(e.note) && e.note.split(/\s+/).length <= 3 && !/resident advisor|undefined/i.test(e.note) ? e.note : '')}" data-hint="${esc((e.note && !/resident advisor/i.test(e.note) ? e.note : ({electronic:'dj set','live-music':'band',jazz:'jazz',comedy:'stand up comedy',classical:'classical'})[e.category] || '')).slice(0,40)}">
         <td class="c-name">${esc(e.title)}</td>
         <td class="c-venue"><a href="/lineup/venue/${esc(e.sourceId || '')}" onclick="event.stopPropagation()">${esc(e.venue || '')}</a></td>
