@@ -109,7 +109,7 @@ module.exports = async (req, res) => {
   .foot a{color:var(--accent7)}
 </style></head>
 <body><div class="wrap">
-  <a class="bk" href="/lineup/sf">&#8592; Your Lineup</a>
+  <a class="bk" href="/lineup/sf">&#8592; Lineup</a>
   <div class="hero">
     <h1>${esc(v.name)}</h1>
     <div class="m">${esc(v.region === 'SF' ? 'San Francisco' : v.region)}, CA · ${esc(v.category.replace('-', ' '))} · <a href="${esc(v.url)}" rel="noopener">official site</a></div>

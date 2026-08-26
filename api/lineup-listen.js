@@ -130,8 +130,8 @@ function page(snap, og) {
 
   return `<!doctype html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>${esc((og && og.title) || 'Your Lineup — San Francisco')}</title>
-<meta property="og:title" content="${esc((og && og.title) || 'Your Lineup — San Francisco')}">
+<title>${esc((og && og.title) || 'Lineup — San Francisco')}</title>
+<meta property="og:title" content="${esc((og && og.title) || 'Lineup — San Francisco')}">
 <meta property="og:description" content="${esc((og && og.desc) || 'Live music, comedy and sports around the Bay — with 30-second previews.')}">
 <meta property="og:type" content="website">
 ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(og.image)}">` : ''}
@@ -151,6 +151,13 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
     background-image:linear-gradient(90deg,#1a2f7d 0%,#2440a8 52%,#7c96f4 100%);background-size:100% 3px;background-repeat:no-repeat;background-position:top;
     display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
   h1{font-family:Jost,'Trebuchet MS',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.025em}
+  h1.brand{display:flex;align-items:center;gap:2px}
+  .lmark{width:27px;height:27px;border-radius:7px;background:var(--accent);color:#fff;flex:none;
+    display:inline-flex;align-items:center;justify-content:center;font-size:1.08rem;line-height:1;
+    transform-origin:50% 60%;animation:lwiggle 30s ease-in-out 6s infinite}
+  @keyframes lwiggle{0%,3.4%,100%{transform:rotate(0)}
+    .6%{transform:rotate(-9deg)}1.4%{transform:rotate(8deg)}2.2%{transform:rotate(-5deg)}2.9%{transform:rotate(3deg)}}
+  @media (prefers-reduced-motion:reduce){.lmark{animation:none}}
   .rbtn{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
     padding:.45rem .85rem;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
   .rbtn.on{background:transparent;color:var(--accent7)}
@@ -327,7 +334,7 @@ ${og && og.image ? `<meta property="og:image" content="${esc(og.image)}"><meta n
 </style></head>
 <body>
   <div class="top">
-    <h1>Your Lineup</h1>
+    <h1 class="brand"><span class="lmark">L</span><span>ineup</span></h1>
     <div class="filters">
       <span class="search"><input id="q" type="search" placeholder="Search" autocomplete="off"
         oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur()}"></span>

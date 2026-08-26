@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
 </style></head>
 <body>
   <div class="top">
-    <a class="bk" href="/lineup/sf">&#8592; Your Lineup</a>
+    <a class="bk" href="/lineup/sf">&#8592; Lineup</a>
     <h1>Venue Map</h1>
     <span class="legend">${pins.length} venues &middot; badge = upcoming shows</span>
   </div>
