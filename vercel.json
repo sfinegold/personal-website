@@ -1,6 +1,46 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "buildmylineup.app"
+        }
+      ],
+      "destination": "/api/lineup-listen"
+    },
+    {
+      "source": "/venue/:id",
+      "has": [
+        {
+          "type": "host",
+          "value": "buildmylineup.app"
+        }
+      ],
+      "destination": "/api/lineup-venue?id=:id"
+    },
+    {
+      "source": "/map",
+      "has": [
+        {
+          "type": "host",
+          "value": "buildmylineup.app"
+        }
+      ],
+      "destination": "/api/lineup-map"
+    },
+    {
+      "source": "/auth",
+      "has": [
+        {
+          "type": "host",
+          "value": "buildmylineup.app"
+        }
+      ],
+      "destination": "/api/lineup-auth"
+    },
+    {
       "source": "/charlottes-grand-adventure",
       "destination": "/api/charlotte"
     },
