@@ -119,5 +119,23 @@ module.exports = async (req, res) => {
   <h2>More ${esc(v.region === 'SF' ? 'San Francisco' : v.region)} venues</h2>
   <div class="others">${others.map((o) => `<a href="/lineup/venue/${o.id}">${esc(o.name)}</a>`).join('')}</div>
   <div class="foot">Part of <a href="/lineup/sf">Lineup SF</a> — live-music discovery for the Bay Area. Listings via Ticketmaster &amp; venue calendars, updated weekly.</div>
+  <script>
+  (function(){
+    var HK = 'lineup_sf_hearts', hearts;
+    try { hearts = new Set(JSON.parse(localStorage.getItem(HK) || '[]')); } catch (e) { hearts = new Set(); }
+    document.querySelectorAll('.ht').forEach(function(b){
+      if (hearts.has(b.dataset.k)) b.classList.add('on');
+      b.addEventListener('click', function(ev){
+        ev.preventDefault();
+        var k = b.dataset.k;
+        if (hearts.has(k)) hearts.delete(k); else hearts.add(k);
+        b.classList.toggle('on', hearts.has(k));
+        try { localStorage.setItem(HK, JSON.stringify(Array.from(hearts))); } catch (e) {}
+        fetch('/lineup/auth', { method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'hearts', keys: Array.from(hearts) }) }).catch(function(){});
+      });
+    });
+  })();
+  </script>
 </div></body></html>`);
 };
