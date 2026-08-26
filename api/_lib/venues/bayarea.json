@@ -1283,5 +1283,17 @@
     "setting": "outdoor",
     "region": "SF",
     "adapter": "tmfestivals"
+  },
+  {
+    "id": "clubdarc",
+    "name": "Club Darc",
+    "url": "https://clubdarc.com",
+    "category": "electronic",
+    "setting": "indoor",
+    "region": "SF",
+    "loc": [
+      37.7717,
+      -122.3867
+    ]
   }
 ]

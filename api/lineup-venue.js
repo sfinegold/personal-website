@@ -13,6 +13,7 @@ function fmtTime(t) {
   return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 const fmtPrice = (p) => (p === 'free' || p === 0 ? 'Free' : typeof p === 'number' ? '$' + p : '');
+const slugify = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64).replace(/-+$/, '');
 const hueOf = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
 
 module.exports = async (req, res) => {
@@ -50,10 +51,11 @@ module.exports = async (req, res) => {
 
   const rows = shows.map((e) => `<tr>
     <td class="d">${esc(fmtDay(e.date))}</td>
-    <td class="n">${esc(e.title)}</td>
+    <td class="n"><a class="nm" href="/lineup/sf?e=${slugify(e.title)}--${esc(v.id)}--${e.date}">${esc(e.title)}</a></td>
     <td class="t">${esc(fmtTime(e.time))}</td>
     <td class="t">${esc(fmtPrice(e.price))}</td>
     <td>${e.url ? `<a class="tix" href="${esc(e.url)}" target="_blank" rel="noopener">Tickets</a>` : ''}</td>
+    <td class="c-h"><button class="ht" data-k="${esc(`${e.sourceId}|${e.title}|${e.date}`)}" aria-label="Save"><svg class="hico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button></td>
   </tr>`).join('');
 
   res.statusCode = 200;
@@ -95,6 +97,12 @@ module.exports = async (req, res) => {
   .tix{font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--pick);
     border:1px solid var(--pick);border-radius:11px;height:22px;display:inline-flex;align-items:center;padding:0 9px;text-decoration:none;white-space:nowrap}
   .tix:hover{background:var(--pick);color:#fff}
+  .nm{color:var(--text);text-decoration:none}
+  .nm:hover{color:var(--accent7);text-decoration:underline}
+  .ht{width:30px;height:22px;border:1px solid var(--accent);border-radius:999px;background:none;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;padding:0;color:var(--accent)}
+  .hico{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px}
+  .ht.on .hico{fill:currentColor}
   .others a{display:inline-block;font-size:.78rem;color:var(--accent7);border:1px solid var(--line);border-radius:999px;background:var(--card);padding:.3rem .7rem;margin:0 .35rem .45rem 0;text-decoration:none}
   .others a:hover{border-color:var(--accent)}
   .foot{margin-top:2rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
