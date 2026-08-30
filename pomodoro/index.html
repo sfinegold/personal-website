@@ -74,8 +74,10 @@
   .btn[disabled]{opacity:.35;cursor:default}
   .btn[disabled]:hover{background:transparent;color:var(--accent-hi)}
 
+  /* Deliberately narrow and centred: the music is accompaniment, so the player
+     should not be the biggest block on a page whose subject is the countdown. */
   .stagewrap{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    overflow:hidden;margin-bottom:.6rem;position:relative}
+    overflow:hidden;margin:0 auto .6rem;position:relative;width:100%;max-width:320px}
   /* Collapse by height, never display:none — several browsers unload or pause
      a hidden YouTube iframe, which would kill the audio you wanted to keep. */
   .stage{position:relative;padding-top:56.25%;height:0;
@@ -199,7 +201,7 @@
     </div>
     <div class="pbar">
       <div class="np" id="np">No music loaded</div>
-      <button class="mini" id="shuffleBtn" title="Play a different video">Skip track</button>
+      <button class="mini" id="shuffleBtn" title="Play a different video">Next</button>
       <button class="mini" id="hideBtn" title="Keep the audio, hide the picture">Hide</button>
     </div>
     <div class="note" id="note"></div>
@@ -573,7 +575,10 @@ function pauseMusic(){
   try{ player.pauseVideo(); }catch(e){}
 }
 function setNP(item){
-  document.getElementById('np').textContent = item ? ('♪ ' + (item.title || item.id)) : 'No music loaded';
+  const el = document.getElementById('np');
+  const t = item ? (item.title || item.id) : 'No music loaded';
+  el.textContent = item ? ('♪ ' + t) : t;
+  el.title = t;                       // the bar is narrow, so long names ellipsis
 }
 let noteTimer = null;
 function showNote(msg){
