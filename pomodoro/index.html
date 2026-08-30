@@ -17,15 +17,17 @@
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{
-    /* Light blue paper. The accent, warn and hard values are NOT the dark-theme
-       ones lightened — those wash out to 2:1 here. Each was re-picked to clear
-       4.5:1 on this background (3:1 for the clock, which is large text). */
-    --bg:#E4EFF8; --bg-2:#FFFFFF;
-    --card:rgba(255,255,255,.62); --card-2:rgba(255,255,255,.92);
-    --text:#16232E; --dim:rgba(22,35,46,.66); --faint:rgba(22,35,46,.42);
-    --accent:#3E6E96; --accent-hi:#2C5478; --line:rgba(22,35,46,.14);
-    --ok:#276B4E; --warn:#A8761E; --hard:#B03A4E;
-    --on-accent:#FFFFFF;
+    /* Beige paper, tomato red, leaf green. Dark green carries the timer.
+       Each value re-picked for contrast on beige rather than carried over
+       from the blue theme, which washes out here. */
+    --bg:#F3EADB; --bg-2:#FBF6EC;
+    --card:rgba(255,255,255,.55); --card-2:rgba(255,255,255,.85);
+    --text:#2A241C; --dim:rgba(42,36,28,.66); --faint:rgba(42,36,28,.42);
+    --green:#1F4D38; --green-hi:#12321F; --green-mid:#2E6B4F;
+    --red:#C0392B; --red-hi:#8C2822; --red-lite:#D64A38;
+    --accent:#2E6B4F; --accent-hi:#1F4D38; --line:rgba(42,36,28,.14);
+    --ok:#1F4D38; --warn:#A8761E; --hard:#A8322A;
+    --on-accent:#FBF6EC;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
   }
@@ -45,7 +47,7 @@
      level, rather than crowding the top of the page. */
   .app{width:100%;max-width:640px;position:relative;z-index:1;padding-top:1.5rem}
   .logo{display:block;margin:0 auto clamp(1.75rem,11vh,6rem);
-    width:min(230px,62vw);height:auto;color:var(--accent-hi)}
+    width:min(230px,62vw);height:auto}
 
   .top{display:flex;align-items:baseline;justify-content:center;gap:1.1rem;margin-bottom:.3rem}
   .phase{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
@@ -60,7 +62,7 @@
   /* A thin numeral reads calm; a heavy one reads urgent. This is not a HIIT timer. */
   .clock{font-family:var(--mono);font-size:clamp(4.5rem,26vw,8rem);line-height:1;
     font-variant-numeric:tabular-nums;font-weight:300;letter-spacing:-.02em;
-    margin:.1rem 0;transition:color .4s;text-align:center}
+    margin:.1rem 0;transition:color .4s;text-align:center;color:var(--green)}
   .clock.warn{color:var(--warn)}
   .clock.final{color:var(--hard)}
   .track{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin:.5rem 0 .5rem}
@@ -97,7 +99,7 @@
   .mini{background:none;border:0;color:var(--faint);font-family:var(--mono);font-size:.68rem;
     letter-spacing:.08em;text-transform:uppercase;padding:.25rem .4rem}
   .mini:hover{color:var(--text)}
-  .tap{position:absolute;inset:0;display:none;place-items:center;background:rgba(228,239,248,.9);z-index:2}
+  .tap{position:absolute;inset:0;display:none;place-items:center;background:rgba(243,234,219,.92);z-index:2}
   .stagewrap.needtap .tap{display:grid}
   .note{padding:.5rem .7rem;font-size:.78rem;color:var(--warn);display:none;border-top:1px solid var(--line)}
   .note.on{display:block}
@@ -166,8 +168,10 @@
 
   <!-- Globe-and-wordmark: meridians behind, the word knocked out of them on a
        plate the colour of the page, and two dashes breaking the ellipse. -->
+  <!-- Tomato colours in the linework rather than a red fill: red globe, dark
+       green wordmark, beige plate so the meridians stop at the letters. -->
   <svg class="logo" viewBox="0 0 340 108" role="img" aria-label="Pomodoro">
-    <g fill="none" stroke="currentColor" stroke-width="2.1">
+    <g fill="none" stroke="var(--red)" stroke-width="2.1">
       <ellipse cx="170" cy="54" rx="128" ry="44"/>
       <ellipse cx="170" cy="54" rx="86"  ry="44"/>
       <ellipse cx="170" cy="54" rx="40"  ry="44"/>
@@ -177,11 +181,11 @@
     </g>
     <rect x="44" y="35" width="252" height="38" fill="var(--bg)"/>
     <text x="170" y="66" text-anchor="middle" textLength="230"
-          lengthAdjust="spacingAndGlyphs" fill="currentColor"
+          lengthAdjust="spacingAndGlyphs" fill="var(--green-hi)"
           font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
           font-size="34" font-weight="800" letter-spacing="1"
           transform="translate(170,54) skewX(-11) translate(-170,-54)">POMODORO</text>
-    <path d="M4 54 H44 M296 54 H336" stroke="currentColor" stroke-width="3.6"
+    <path d="M4 54 H44 M296 54 H336" stroke="var(--red)" stroke-width="3.6"
           stroke-linecap="butt"/>
   </svg>
 
