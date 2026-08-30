@@ -234,7 +234,7 @@
         <input type="number" id="mLong" min="1" max="90" step="1"></div>
       <div class="row"><label for="autoCont">Continue the cycle automatically</label>
         <span class="sw"><input type="checkbox" id="autoCont"><span></span></span></div>
-      <div class="row"><label for="spoken">Spoken cues and warnings</label>
+      <div class="row"><label for="spoken">Speak the start cue</label>
         <span class="sw"><input type="checkbox" id="spoken"><span></span></span></div>
       <div class="row"><label for="musicBreaks">Keep music playing through breaks</label>
         <span class="sw"><input type="checkbox" id="musicBreaks"><span></span></span></div>
@@ -247,7 +247,7 @@
   </details>
 
   <div class="foot">
-    Warnings at 10 and 2 minutes · space bar starts and pauses<br>
+    Soft gong at 10 and 5 minutes · space bar starts and pauses<br>
     <a href="/">samfinegold.me</a>
   </div>
 </div>
@@ -290,8 +290,10 @@ const DEFAULTS = {
   autoContinue:true, spoken:true, musicOnBreaks:true,
   order:'shuffle', hideVideo:false, panelOpen:false,
 };
-const WARN_MINS = [10, 2];
-const WORD = { 10:'Ten', 2:'Two', 5:'Five', 1:'One' };
+/* Warnings are a gong, not a voice: one strike at ten minutes, two at five.
+   Speech proved to fail silently in the browser, and Web Audio does not. */
+const WARN_MINS = [10, 5];
+const GONG_STRIKES = { 10:1, 5:2 };
 
 /* ---------------- storage ---------------- */
 function load(){
@@ -340,6 +342,43 @@ function beep(freq=800, dur=150, count=1){
   }catch(e){}
 }
 
+/* Soft gong. What separates a struck bowl from a beep is that its partials are
+   INHARMONIC — a plain harmonic stack reads as an organ note — and that the
+   upper ones die away first. Web Audio, deliberately: speech turned out to fail
+   silently on this page, and this does not. */
+function gong(f=146.83, dur=4.5, vol=.22){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const master = audioCtx.createGain(), lp = audioCtx.createBiquadFilter();
+    lp.type='lowpass'; lp.frequency.value = 2200;        // takes off the glassy edge
+    master.connect(lp); lp.connect(audioCtx.destination);
+    master.gain.setValueAtTime(.0001, now);
+    master.gain.linearRampToValueAtTime(vol, now + .015); // soft swell, not a click
+    master.gain.exponentialRampToValueAtTime(.0004, now + dur);
+    const ratios=[1, 2.00, 2.76, 5.40, 8.93];            // struck-plate ratios
+    const level =[1,  .45,  .32,  .16,  .08];
+    const decay =[1,  .80,  .62,  .40,  .28];            // highs fade first
+    ratios.forEach((r,i)=>{
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type='sine';
+      o.frequency.value = f*r;
+      o.detune.value = (i%2?1:-1)*(2+i*1.5);             // slight beating between partials
+      g.gain.setValueAtTime(level[i], now);
+      g.gain.exponentialRampToValueAtTime(.0004, now + dur*decay[i]);
+      o.connect(g); g.connect(master);
+      o.start(now); o.stop(now + dur + .1);
+    });
+  }catch(e){}
+}
+/* n strikes, spaced. One = ten minutes, two = five, so you can tell them apart
+   without looking, which is the entire point of an audio cue. */
+function gongStrikes(n, f){
+  duckFor(n > 1 ? 3200 : 2200);
+  for(let i=0;i<n;i++) setTimeout(()=>gong(f), i*1200);
+}
+
 /* ---------------- ducking ---------------- */
 /* iOS ignores setVolume entirely — system volume is the only volume — so on
    that path we pause the video under the announcement instead. */
@@ -372,6 +411,14 @@ function unduck(){                       // idempotent, so the guard can fire sa
   clearTimeout(duckGuard); duckGuard = null;
   if(canDuckByVolume) rampVolume(12, preDuck, 400);
   else if(S.running && !S.atBoundary && musicShouldPlay()){ try{ player.playVideo(); }catch(e){} }
+}
+/* Duck for a known length of time — used by the gong, whose 4.5s decay would
+   otherwise vanish under a full-volume stream. */
+function duckFor(ms){
+  speechToken++;                        // any in-flight speech restore is now stale
+  duck();
+  clearTimeout(duckGuard);
+  duckGuard = setTimeout(unduck, ms);
 }
 
 /* ---------------- speech ---------------- */
@@ -407,19 +454,33 @@ function announce(text, opts){
   duckGuard = setTimeout(mineUnduck, cap);      // fires whatever happens next
 
   if(!CFG.spoken || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined'){
-    beep(660, 140, 2);
-    setTimeout(mineUnduck, 700);
+    gong(196, 3.2, .2);
+    setTimeout(mineUnduck, 1800);
     return;
   }
   try{
-    speechSynthesis.cancel();
+    /* Only cancel when something is genuinely speaking. An unconditional
+       cancel() was destroying the previous cue: the live page showed the start
+       line dying with error(canceled) the moment a warning fired. */
+    if(speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = .95; u.pitch = 1; u.volume = 1;
     if(chosenVoice) u.voice = chosenVoice;
+    let started = false;
+    u.onstart = () => { started = true; };
     if(!opts.suppressOnEnd){ u.onend = mineUnduck; }
     u.onerror = mineUnduck;
     speechSynthesis.speak(u);
-  }catch(e){ beep(660,140,2); mineUnduck(); }
+    /* Speech can fail with NO event at all — not even onerror. A missing
+       onstart is the only signal, so fall back to the gong rather than to
+       silence. */
+    setTimeout(() => {
+      if(started || mine !== speechToken) return;
+      try{ speechSynthesis.cancel(); }catch(e){}
+      gong(196, 3.2, .2);
+      setTimeout(mineUnduck, 1800);
+    }, 700);
+  }catch(e){ gong(196,3.2,.2); mineUnduck(); }
 }
 function primeSpeech(){                        // iOS unlocks TTS only from a gesture
   if(!('speechSynthesis' in window)) return;
@@ -641,7 +702,7 @@ function tick(){
   if(crossed.length){
     crossed.forEach(m => S.fired[m] = true);
     const m = Math.min(...crossed);
-    if(rem > 5000) announce(`${WORD[m] || m} minutes left`);
+    if(rem > 5000) gongStrikes(GONG_STRIKES[m] || 1);
   }
   S.last = rem;
 
@@ -662,7 +723,7 @@ function completePhase(){
      announce it into an empty room. */
   if(overshoot > 90000){ holdAtBoundary(false); return; }
 
-  beep(880, 180, 2);
+  gong(220, 3.6, .2);                 /* one sound language, not a bowl next to a sine */
   if(CFG.autoContinue) beginPhase(true);
   else holdAtBoundary(true);
 }
@@ -718,8 +779,9 @@ function paint(){
   const total = phaseMs();
   const clock = document.getElementById('clock');
   clock.textContent = fmt(rem);
-  clock.classList.toggle('warn',  S.running && S.phase==='focus' && rem<=10*60000 && rem>2*60000);
-  clock.classList.toggle('final', S.running && rem<=2*60000);
+  /* colour changes track the two gongs: amber from the first, rose from the second */
+  clock.classList.toggle('warn',  S.running && S.phase==='focus' && rem<=10*60000 && rem>5*60000);
+  clock.classList.toggle('final', S.running && rem<=5*60000);
 
   const lab = document.getElementById('phaseLabel');
   lab.textContent = LABEL[S.phase];
