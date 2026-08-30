@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>">
+<title>Pomodoro</title>
+<meta name="description" content="A focus timer with spoken cues and a music queue you control.">
+<meta property="og:title" content="Pomodoro">
+<meta property="og:description" content="25 minutes of focus, spoken warnings, and your own queue of focus music.">
+<meta property="og:url" content="https://samfinegold.me/pomodoro">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0b1622; --bg-2:#0f1c2b; --card:rgba(255,255,255,.035); --card-2:rgba(255,255,255,.055);
+    --text:#e8ecf1; --dim:rgba(232,236,241,.55); --faint:rgba(232,236,241,.32);
+    --accent:#6b8aad; --accent-hi:#8fafc8; --line:rgba(255,255,255,.08);
+    --ok:#68A98C; --warn:#D9974A; --hard:#C77D8A;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;letter-spacing:.01em;min-height:100vh;
+    display:flex;justify-content:center;
+    padding:2rem 1rem calc(2rem + env(safe-area-inset-bottom));
+    -webkit-tap-highlight-color:transparent}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.5;
+    background:linear-gradient(var(--line) 1px,transparent 1px),
+               linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:120px 120px}
+  :focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px;border-radius:4px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  .app{width:100%;max-width:640px;position:relative;z-index:1}
+
+  .top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.3rem}
+  .phase{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--accent-hi)}
+  .phase.short{color:var(--ok)} .phase.long{color:var(--warn)}
+  .dots{display:flex;gap:7px;align-items:center}
+  .dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--accent);opacity:.4}
+  .dot.done{background:var(--accent);opacity:.9}
+  .dot.now{background:var(--accent-hi);border-color:var(--accent-hi);opacity:1;
+    box-shadow:0 0 0 3px rgba(143,175,200,.16)}
+
+  /* A thin numeral reads calm; a heavy one reads urgent. This is not a HIIT timer. */
+  .clock{font-family:var(--mono);font-size:clamp(4.5rem,26vw,8rem);line-height:1;
+    font-variant-numeric:tabular-nums;font-weight:300;letter-spacing:-.02em;
+    margin:.1rem 0;transition:color .4s}
+  .clock.warn{color:var(--warn)}
+  .clock.final{color:var(--hard)}
+  .track{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin:.5rem 0 .5rem}
+  .fill{height:100%;width:0;background:var(--accent);transition:width .3s linear}
+  .sub{font-size:.82rem;color:var(--faint);min-height:1.2em;margin-bottom:1.3rem}
+
+  .controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+  button{font-family:inherit;cursor:pointer;border-radius:8px;transition:background .15s,color .15s}
+  .btn{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.7rem 1.1rem;border:1px solid var(--accent);background:transparent;color:var(--accent-hi)}
+  .btn:hover{background:var(--accent);color:var(--bg)}
+  .btn.primary{background:var(--accent);color:var(--bg);font-weight:600;flex:1;min-width:9rem}
+  .btn.primary:hover{background:var(--accent-hi)}
+  .btn.ghost{border-color:var(--line);color:var(--dim)}
+  .btn.ghost:hover{background:var(--card-2);color:var(--text)}
+  .btn[disabled]{opacity:.35;cursor:default}
+  .btn[disabled]:hover{background:transparent;color:var(--accent-hi)}
+
+  .stagewrap{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    overflow:hidden;margin-bottom:.6rem;position:relative}
+  /* Collapse by height, never display:none — several browsers unload or pause
+     a hidden YouTube iframe, which would kill the audio you wanted to keep. */
+  .stage{position:relative;padding-top:56.25%;height:0;
+    transition:padding-top .25s ease,opacity .25s ease}
+  .stagewrap.audio .stage{padding-top:0;opacity:0}
+  .stagewrap.gone .stage{display:none}
+  .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .pbar{display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;border-top:1px solid var(--line)}
+  .stagewrap.audio .pbar,.stagewrap.gone .pbar{border-top:0}
+  .np{flex:1;min-width:0;font-family:var(--mono);font-size:.72rem;color:var(--dim);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mini{background:none;border:0;color:var(--faint);font-family:var(--mono);font-size:.68rem;
+    letter-spacing:.08em;text-transform:uppercase;padding:.25rem .4rem}
+  .mini:hover{color:var(--text)}
+  .tap{position:absolute;inset:0;display:none;place-items:center;background:rgba(11,22,34,.82);z-index:2}
+  .stagewrap.needtap .tap{display:grid}
+  .note{padding:.5rem .7rem;font-size:.78rem;color:var(--warn);display:none;border-top:1px solid var(--line)}
+  .note.on{display:block}
+
+  details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:.6rem}
+  summary{padding:.7rem .8rem;cursor:pointer;font-family:var(--mono);font-size:.7rem;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dim);list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:'▸ ';color:var(--faint)}
+  details[open] summary::before{content:'▾ '}
+  summary:hover{color:var(--text)}
+  .panel{padding:0 .8rem .8rem}
+
+  .qadd{display:flex;gap:.4rem;margin-bottom:.6rem}
+  input[type=text],input[type=number],select{background:var(--bg-2);color:var(--text);
+    border:1px solid var(--line);border-radius:7px;padding:.5rem .6rem;
+    font-family:inherit;font-size:.85rem;min-width:0}
+  .qadd input{flex:1}
+  .qitem{display:flex;align-items:center;gap:.35rem;padding:.4rem 0;border-top:1px solid var(--line)}
+  .qitem:first-child{border-top:0}
+  .qname{flex:1;min-width:0;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;cursor:text}
+  .qname.raw{font-family:var(--mono);color:var(--faint)}
+  .qitem.playing .qname{color:var(--accent-hi);font-weight:600}
+  .qitem.dead .qname{color:var(--hard);text-decoration:line-through}
+  .badge{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 .3rem;flex:none}
+  .qbtn{background:none;border:0;color:var(--faint);font-size:.85rem;padding:.25rem .3rem;line-height:1;flex:none}
+  .qbtn:hover{color:var(--text)}
+  .qbtn.del:hover{color:var(--hard)}
+  .qfoot{display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    margin-top:.6rem;font-size:.74rem;color:var(--faint)}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding:.5rem 0;border-top:1px solid var(--line);font-size:.85rem}
+  .row:first-child{border-top:0}
+  .row input[type=number]{width:4.5rem;text-align:right}
+  .row label{color:var(--dim)}
+  .sw{position:relative;width:38px;height:21px;flex:none}
+  .sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+  .sw span{position:absolute;inset:0;background:var(--card-2);border:1px solid var(--line);
+    border-radius:999px;transition:background .15s}
+  .sw span::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;
+    border-radius:50%;background:var(--faint);transition:transform .15s,background .15s}
+  .sw input:checked + span{background:rgba(107,138,173,.35);border-color:var(--accent)}
+  .sw input:checked + span::after{transform:translateX(17px);background:var(--accent-hi)}
+
+  .foot{margin-top:1.3rem;font-size:.72rem;color:var(--faint);text-align:center;line-height:1.7}
+  .foot a{color:var(--dim)}
+
+  @media (max-width:520px){
+    body{padding:1.25rem .75rem calc(1.25rem + env(safe-area-inset-bottom))}
+    .btn{padding:.85rem .8rem}                     /* ~44px, thumb-sized */
+    .btn.primary{min-width:100%}
+    /* Title on its own line, actions below it, so nothing is a 20px target. */
+    .qitem{flex-wrap:wrap;padding:.5rem 0}
+    .qname{flex:1 0 100%;white-space:normal;margin-bottom:.35rem}
+    .qbtn{min-width:40px;min-height:36px;font-size:1rem;
+      border:1px solid var(--line);border-radius:7px}
+    .mini{padding:.5rem .5rem}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div class="phase" id="phaseLabel">Focus</div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="clock" id="clock">25:00</div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="sub" id="sub">Press start when you are ready.</div>
+
+  <div class="controls">
+    <button class="btn primary" id="startBtn">Start</button>
+    <button class="btn ghost" id="skipBtn">Skip</button>
+    <button class="btn ghost" id="resetBtn" disabled>Reset</button>
+  </div>
+
+  <div class="stagewrap" id="stagewrap">
+    <div class="stage"><div id="ytHost"></div>
+      <div class="tap"><button class="btn" id="tapBtn">Tap to start audio</button></div>
+    </div>
+    <div class="pbar">
+      <div class="np" id="np">No music loaded</div>
+      <button class="mini" id="shuffleBtn" title="Play a different video">Skip track</button>
+      <button class="mini" id="hideBtn" title="Keep the audio, hide the picture">Hide</button>
+    </div>
+    <div class="note" id="note"></div>
+  </div>
+
+  <details id="queuePanel">
+    <summary id="qSummary">Music queue</summary>
+    <div class="panel">
+      <div class="qadd">
+        <input type="text" id="qInput" placeholder="Paste YouTube links or IDs"
+               autocomplete="off" spellcheck="false">
+        <button class="btn" id="qAdd">Add</button>
+      </div>
+      <div id="qList"></div>
+      <div class="qfoot">
+        <span id="qCount"></span>
+        <button class="mini" id="qReset">Reset to defaults</button>
+      </div>
+    </div>
+  </details>
+
+  <details id="settingsPanel">
+    <summary>Settings</summary>
+    <div class="panel">
+      <div class="row"><label for="mFocus">Focus minutes</label>
+        <input type="number" id="mFocus" min="1" max="180" step="1"></div>
+      <div class="row"><label for="mShort">Short break</label>
+        <input type="number" id="mShort" min="1" max="60" step="1"></div>
+      <div class="row"><label for="mLong">Long break, every 4th round</label>
+        <input type="number" id="mLong" min="1" max="90" step="1"></div>
+      <div class="row"><label for="autoCont">Continue the cycle automatically</label>
+        <span class="sw"><input type="checkbox" id="autoCont"><span></span></span></div>
+      <div class="row"><label for="spoken">Spoken cues and warnings</label>
+        <span class="sw"><input type="checkbox" id="spoken"><span></span></span></div>
+      <div class="row"><label for="musicBreaks">Keep music playing through breaks</label>
+        <span class="sw"><input type="checkbox" id="musicBreaks"><span></span></span></div>
+      <div class="row"><label for="orderSel">Play order</label>
+        <select id="orderSel">
+          <option value="shuffle">Shuffle</option>
+          <option value="order">In queue order</option>
+        </select></div>
+    </div>
+  </details>
+
+  <div class="foot">
+    Warnings at 10 and 2 minutes · space bar starts and pauses<br>
+    <a href="/">samfinegold.me</a>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   Pomodoro — focus timer, spoken cues, user-managed music queue.
+
+   Three things here are deliberately not what the neighbouring
+   workout-timer does, each for a reason worth keeping:
+
+   1. The countdown runs off a wall-clock deadline rather than a
+      decrementing counter. Browsers throttle background tabs to roughly
+      one timer tick a minute — invisible over a 30-second rest, badly
+      wrong over 25 minutes.
+   2. Warnings fire on *crossing* a threshold, never on landing exactly on
+      it, for the same reason. A throttled tab jumps straight past 10:00.
+   3. Reordering uses buttons, not HTML5 drag events, which do not fire on
+      touch at all. This page gets used on a phone.
+   ===================================================================== */
+
+const KEY = 'sam_pomodoro_v1';
+
+/* Every seed below was confirmed to actually play in an embedded player —
+   not merely to exist. Three obvious candidates (including Lofi Girl's
+   main stream) return error 150, "embedding not allowed", and were cut. */
+const SEED = [
+  { id:'5yx6BWlEVcY', title:'Chillhop Radio — jazzy & lofi hip hop beats' },
+  { id:'4xDzrJKXOOY', title:'synthwave radio — beats to chill/game to' },
+  { id:'n61ULEU7CO0', title:'Best of lofi hip hop 2021 — beats to relax/study to' },
+  { id:'S_MOd40zlYU', title:'dark ambient radio — music to escape/dream to' },
+  { id:'MYPVQccHhAQ', title:'Cozy Coffee Shop — smooth piano jazz' },
+  { id:'7NOSDKb0HlU', title:'lofi hip hop radio — beats to study/relax to' },
+  { id:'lTRiuFIWV54', title:'1 A.M Study Session — lofi hip hop' },
+  { id:'qH3fETPsqXU', title:'24/7 chill lofi hip hop radio' },
+];
+
+const DEFAULTS = {
+  focus:25, short:5, long:15, longEvery:4,
+  autoContinue:true, spoken:true, musicOnBreaks:true,
+  order:'shuffle', hideVideo:false, panelOpen:false,
+};
+const WARN_MINS = [10, 2];
+const WORD = { 10:'Ten', 2:'Two', 5:'Five', 1:'One' };
+
+/* ---------------- storage ---------------- */
+function load(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
+    const q = Array.isArray(raw.queue) && raw.queue.length
+      ? raw.queue.map(v => typeof v === 'string' ? { id:v, title:null } : v)  // migrate bare ids
+      : SEED.map(v => ({ ...v }));
+    return { settings: Object.assign({}, DEFAULTS, raw.settings || {}), queue: q };
+  }catch(e){
+    return { settings: { ...DEFAULTS }, queue: SEED.map(v => ({ ...v })) };
+  }
+}
+/* try/catch on save as well as load — this throws in Safari private mode. */
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify({ v:1, settings:CFG, queue:QUEUE })); }catch(e){}
+}
+let { settings:CFG, queue:QUEUE } = load();
+
+/* ---------------- phases ---------------- */
+const MINS = { focus:()=>CFG.focus, short:()=>CFG.short, long:()=>CFG.long };
+const LABEL = { focus:'Focus', short:'Break', long:'Long break' };
+
+const S = {
+  phase:'focus', completed:0, deadline:0, held:0,
+  running:false, fired:{}, last:Infinity, ticker:null, wakeLock:null, atBoundary:false,
+};
+const phaseMs = () => Math.max(1, MINS[S.phase]()) * 60000;
+
+/* ---------------- audio ---------------- */
+let audioCtx = null;
+function beep(freq=800, dur=150, count=1){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    for(let i=0;i<count;i++){
+      setTimeout(()=>{
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.value = .25;
+        gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + dur/1000);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + dur/1000);
+      }, i*(dur+80));
+    }
+  }catch(e){}
+}
+
+/* ---------------- ducking ---------------- */
+/* iOS ignores setVolume entirely — system volume is the only volume — so on
+   that path we pause the video under the announcement instead. */
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let canDuckByVolume = !IOS;
+let ducked = false, duckGuard = null, preDuck = 60, rampTimer = null;
+
+function rampVolume(from, to, ms){
+  clearInterval(rampTimer);
+  const steps = Math.max(1, Math.round(ms/25));
+  let i = 0;
+  rampTimer = setInterval(()=>{
+    i++;
+    const v = Math.round(from + (to-from) * (i/steps));
+    try{ player && player.setVolume(v); }catch(e){}
+    if(i >= steps) clearInterval(rampTimer);
+  }, 25);
+}
+function duck(){
+  if(ducked || !player) return;
+  ducked = true;
+  try{ preDuck = player.getVolume(); }catch(e){ preDuck = 60; }
+  if(canDuckByVolume) rampVolume(preDuck, 12, 250);
+  else { try{ player.pauseVideo(); }catch(e){} }
+}
+function unduck(){                       // idempotent, so the guard can fire safely
+  if(!ducked) return;
+  ducked = false;
+  clearTimeout(duckGuard); duckGuard = null;
+  if(canDuckByVolume) rampVolume(12, preDuck, 400);
+  else if(S.running && !S.atBoundary && musicShouldPlay()){ try{ player.playVideo(); }catch(e){} }
+}
+
+/* ---------------- speech ---------------- */
+/* utterance.onend is genuinely unreliable — it does not fire when cancelled,
+   can be dropped when the tab backgrounds, and never fires in most headless
+   browsers. Leaving the music ducked forever is the single most annoying way
+   this page could fail, so the restore timer is armed BEFORE speaking. */
+let chosenVoice = null;
+function pickVoice(){
+  try{
+    const vs = speechSynthesis.getVoices() || [];
+    chosenVoice = vs.find(v => /^en[-_]/i.test(v.lang) && v.localService) ||
+                  vs.find(v => /^en[-_]/i.test(v.lang)) || null;
+  }catch(e){}
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.addEventListener('voiceschanged', pickVoice);
+}
+/* Every announcement carries a token. speechSynthesis.cancel() fires the
+   PREVIOUS utterance's handlers, and without the token that stale onerror
+   unducks the announcement that has only just started — leaving the voice
+   competing with music at full volume. */
+let speechToken = 0;
+function announce(text, opts){
+  opts = opts || {};
+  const mine = ++speechToken;
+  const mineUnduck = () => { if(mine === speechToken) unduck(); };
+
+  duck();
+  const cap = Math.min(12000, 900 + text.length*75 + 4000);
+  clearTimeout(duckGuard);
+  duckGuard = setTimeout(mineUnduck, cap);      // fires whatever happens next
+
+  if(!CFG.spoken || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined'){
+    beep(660, 140, 2);
+    setTimeout(mineUnduck, 700);
+    return;
+  }
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = .95; u.pitch = 1; u.volume = 1;
+    if(chosenVoice) u.voice = chosenVoice;
+    if(!opts.suppressOnEnd){ u.onend = mineUnduck; }
+    u.onerror = mineUnduck;
+    speechSynthesis.speak(u);
+  }catch(e){ beep(660,140,2); mineUnduck(); }
+}
+function primeSpeech(){                        // iOS unlocks TTS only from a gesture
+  if(!('speechSynthesis' in window)) return;
+  try{
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0; speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------------- YouTube ---------------- */
+/* Default host, not youtube-nocookie: the IFrame API itself loads a script
+   from www.youtube.com, so nocookie buys no privacy while adding a config
+   surface with known JS-API quirks. */
+let player = null, apiReady = false, playerReady = false, playerDead = false;
+let currentId = null, skipStreak = 0, bag = [], pinnedNext = null;
+
+const apiTimeout = setTimeout(() => {
+  if(!apiReady) degrade('Could not reach YouTube. The timer still works.');
+}, 8000);
+
+window.onYouTubeIframeAPIReady = function(){
+  apiReady = true; clearTimeout(apiTimeout);
+  const first = pickNext();
+  if(!first){ degrade('Your queue is empty. Add a video below.'); return; }
+  currentId = first.id;
+  const pv = {
+    autoplay:0,        // we call playVideo() from the gesture instead
+    playsinline:1,     // without this iOS hands off to native fullscreen and we lose the API
+    controls:1, rel:0, iv_load_policy:3,
+    fs:0,              // fullscreen would hide the countdown, which is the point of the page
+    disablekb:1,       // otherwise the iframe swallows the space bar, our pause key
+    modestbranding:1, enablejsapi:1,
+  };
+  if(location.protocol.startsWith('http')) pv.origin = location.origin;
+  player = new YT.Player('ytHost', {
+    width:'100%', height:'100%', videoId:first.id, playerVars:pv,
+    events:{
+      onReady: () => { playerReady = true; probeVolume(); setNP(first); renderQueue(); },
+      onStateChange: onState,
+      onError: e => onError(e.data),
+    }
+  });
+  renderQueue();
+};
+(function loadYT(){
+  if(window.YT && window.YT.Player) return window.onYouTubeIframeAPIReady();
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  s.async = true;
+  s.onerror = () => degrade('Could not reach YouTube. The timer still works.');
+  document.head.appendChild(s);
+})();
+
+function degrade(msg){
+  playerDead = true;
+  document.getElementById('stagewrap').classList.add('gone');
+  showNote(msg);
+}
+function probeVolume(){
+  if(IOS){ canDuckByVolume = false; return; }
+  try{
+    const v0 = player.getVolume();
+    player.setVolume(Math.max(0, v0-10));
+    setTimeout(()=>{
+      try{
+        canDuckByVolume = player.getVolume() !== v0;
+        player.setVolume(v0);
+      }catch(e){}
+    }, 160);
+  }catch(e){ canDuckByVolume = false; }
+}
+
+function onState(e){
+  if(e.data === YT.PlayerState.PLAYING){
+    skipStreak = 0;
+    document.getElementById('stagewrap').classList.remove('needtap');
+    clearNote();
+  }
+  /* A 45-minute VOD finishing mid-pomodoro must roll on, not sit on the
+     end screen. */
+  if(e.data === YT.PlayerState.ENDED) playNext(true);
+}
+
+/* Livestream IDs rotate and owners disable embedding, so a dead video must
+   not read as a broken app: flag it, skip on, and cap the streak. */
+function onError(code){
+  const item = QUEUE.find(v => v.id === currentId);
+  if(item){ item.dead = true; item.err = code; save(); }
+  renderQueue();
+  const aliveN = QUEUE.filter(v => !v.dead).length;
+  skipStreak++;
+  if(aliveN === 0 || skipStreak >= Math.min(aliveN + 1, 5)){
+    skipStreak = 0;
+    showNote('None of these videos would play here. Add another link below.');
+    document.getElementById('queuePanel').open = true;
+    return;                                   // the timer keeps running regardless
+  }
+  showNote('Skipped a video that would not play (error ' + code + ').');
+  playNext(true);
+}
+
+const alive = () => QUEUE.filter(v => !v.dead);
+function pickNext(){
+  if(pinnedNext){
+    const p = QUEUE.find(v => v.id === pinnedNext && !v.dead);
+    pinnedNext = null;
+    if(p) return p;
+  }
+  const pool = alive().length ? alive() : QUEUE;
+  if(!pool.length) return null;
+  if(CFG.order === 'order'){
+    const i = pool.findIndex(v => v.id === currentId);
+    return pool[(i + 1) % pool.length];
+  }
+  /* Shuffle bag rather than Math.random — pure random repeats itself and
+     reads as broken. */
+  bag = bag.filter(id => pool.some(v => v.id === id));
+  if(!bag.length){
+    bag = pool.map(v => v.id);
+    for(let i = bag.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    if(bag.length > 1 && bag[0] === currentId) bag.push(bag.shift());
+  }
+  const id = bag.shift();
+  return pool.find(v => v.id === id) || pool[0];
+}
+function playNext(autoplay){
+  const item = pickNext();
+  if(!item) return;
+  currentId = item.id;
+  setNP(item); renderQueue();
+  if(!playerReady) return;
+  try{ autoplay ? player.loadVideoById(item.id) : player.cueVideoById(item.id); }catch(e){}
+}
+const musicShouldPlay = () => S.phase === 'focus' || CFG.musicOnBreaks;
+
+function playMusic(){
+  if(!playerReady || playerDead) return;
+  try{ player.playVideo(); }catch(e){}
+  setTimeout(()=>{
+    try{
+      const st = player.getPlayerState();
+      if(st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING){
+        document.getElementById('stagewrap').classList.add('needtap');
+      }
+    }catch(e){}
+  }, 1400);
+}
+function pauseMusic(){
+  if(!playerReady || playerDead) return;
+  try{ player.pauseVideo(); }catch(e){}
+}
+function setNP(item){
+  document.getElementById('np').textContent = item ? ('♪ ' + (item.title || item.id)) : 'No music loaded';
+}
+let noteTimer = null;
+function showNote(msg){
+  const n = document.getElementById('note');
+  n.textContent = msg; n.classList.add('on');
+  clearTimeout(noteTimer); noteTimer = setTimeout(clearNote, 7000);
+}
+function clearNote(){ document.getElementById('note').classList.remove('on'); }
+
+/* ---------------- wake lock (from workout-timer) ---------------- */
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator) || S.wakeLock) return;
+  try{
+    S.wakeLock = await navigator.wakeLock.request('screen');
+    S.wakeLock.addEventListener('release', () => { S.wakeLock = null; });
+  }catch(e){}
+}
+async function releaseWakeLock(){
+  if(!S.wakeLock) return;
+  const l = S.wakeLock; S.wakeLock = null;
+  try{ await l.release(); }catch(e){}
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState !== 'visible') return;
+  if(S.running) requestWakeLock();
+  tick();                                   // a throttled tab catches up at once
+});
+
+/* ---------------- timer ---------------- */
+const remaining = () => S.held ? S.held : Math.max(0, S.deadline - Date.now());
+
+function beginPhase(speak){
+  S.fired = {};
+  S.last = phaseMs();
+  S.deadline = Date.now() + phaseMs();
+  S.held = 0;
+  S.running = true;
+  S.atBoundary = false;
+  if(musicShouldPlay()) playMusic(); else pauseMusic();
+  if(speak) announce(S.phase === 'focus'
+    ? "It's time to focus"
+    : (S.phase === 'short' ? `Take a ${CFG.short} minute break` : `Long break. ${CFG.long} minutes.`));
+  requestWakeLock();
+  clearInterval(S.ticker);
+  S.ticker = setInterval(tick, 250);
+  paint();
+}
+
+function warningsFor(){ return S.phase === 'focus' ? WARN_MINS : []; }
+
+function tick(){
+  if(!S.running || S.held) { paint(); return; }
+  const rem = remaining();
+
+  /* Crossed-threshold, not equality. If one throttled jump crosses both
+     thresholds, burn both but speak only the smallest — announcing "ten
+     minutes left" when two remain is worse than saying nothing. */
+  const crossed = warningsFor().filter(m =>
+    !S.fired[m] && S.last > m*60000 && rem <= m*60000);
+  if(crossed.length){
+    crossed.forEach(m => S.fired[m] = true);
+    const m = Math.min(...crossed);
+    if(rem > 5000) announce(`${WORD[m] || m} minutes left`);
+  }
+  S.last = rem;
+
+  if(rem <= 0){ completePhase(); return; }
+  paint();
+}
+
+function completePhase(){
+  clearInterval(S.ticker);
+  const overshoot = Date.now() - S.deadline;
+  if(S.phase === 'focus') S.completed++;
+  S.phase = S.phase === 'focus'
+    ? (S.completed % CFG.longEvery === 0 ? 'long' : 'short')
+    : 'focus';
+
+  /* The deadline is wall-clock, so a sleeping laptop wakes with the phase
+     long over. Auto-advancing there would start a fresh 25 minutes and
+     announce it into an empty room. */
+  if(overshoot > 90000){ holdAtBoundary(false); return; }
+
+  beep(880, 180, 2);
+  if(CFG.autoContinue) beginPhase(true);
+  else holdAtBoundary(true);
+}
+
+function holdAtBoundary(speak){
+  S.running = false; S.held = 0; S.deadline = 0; S.atBoundary = true;
+  pauseMusic(); releaseWakeLock();
+  if(speak) announce('Time is up');
+  paint();
+}
+
+function pause(){
+  if(!S.running || S.held) return;
+  S.held = remaining();
+  pauseMusic(); releaseWakeLock();
+  clearInterval(S.ticker);
+  paint();
+}
+function resume(){
+  if(!S.running || !S.held) return;
+  S.deadline = Date.now() + S.held;
+  S.held = 0;
+  if(musicShouldPlay()) playMusic();
+  requestWakeLock();
+  clearInterval(S.ticker);
+  S.ticker = setInterval(tick, 250);
+  paint();
+}
+function reset(){
+  clearInterval(S.ticker);
+  Object.assign(S, { phase:'focus', completed:0, deadline:0, held:0,
+                     running:false, fired:{}, last:Infinity, atBoundary:false });
+  pauseMusic(); releaseWakeLock();
+  document.title = 'Pomodoro';
+  paint();
+}
+function skipPhase(){
+  clearInterval(S.ticker);
+  if(S.phase === 'focus') S.completed++;
+  S.phase = S.phase === 'focus'
+    ? (S.completed % CFG.longEvery === 0 ? 'long' : 'short')
+    : 'focus';
+  if(S.running) beginPhase(true);
+  else { S.atBoundary = false; S.held = 0; S.deadline = 0; S.fired = {}; paint(); }
+}
+
+/* ---------------- render ---------------- */
+const two = n => String(n).padStart(2,'0');
+const fmt = ms => { const t = Math.ceil(ms/1000); return two(Math.floor(t/60)) + ':' + two(t%60); };
+
+function paint(){
+  const rem = S.running || S.held ? remaining() : phaseMs();
+  const total = phaseMs();
+  const clock = document.getElementById('clock');
+  clock.textContent = fmt(rem);
+  clock.classList.toggle('warn',  S.running && S.phase==='focus' && rem<=10*60000 && rem>2*60000);
+  clock.classList.toggle('final', S.running && rem<=2*60000);
+
+  const lab = document.getElementById('phaseLabel');
+  lab.textContent = LABEL[S.phase];
+  lab.className = 'phase ' + S.phase;
+
+  document.getElementById('fill').style.width =
+    (S.running || S.held ? (1 - rem/total) * 100 : 0) + '%';
+
+  const done = S.completed % CFG.longEvery;
+  document.getElementById('dots').innerHTML = Array.from({length:CFG.longEvery}, (_,i) => {
+    const n = i + 1;
+    const cls = n <= done ? 'done' : (n === done + 1 && S.phase === 'focus' ? 'now' : '');
+    return `<span class="dot ${cls}" title="Round ${n} of ${CFG.longEvery}"></span>`;
+  }).join('');
+
+  document.getElementById('startBtn').textContent =
+    !S.running ? (S.atBoundary ? 'Start ' + LABEL[S.phase].toLowerCase() : 'Start')
+               : (S.held ? 'Resume' : 'Pause');
+  document.getElementById('resetBtn').disabled = !S.running && !S.completed && !S.atBoundary;
+
+  const sub = document.getElementById('sub');
+  if(S.held)                 sub.textContent = 'Paused.';
+  else if(S.atBoundary)      sub.textContent = 'Cycle stopped. Start when you are ready.';
+  else if(!S.running)        sub.textContent = 'Press start when you are ready.';
+  else if(S.phase==='focus') sub.textContent = `Round ${done+1} of ${CFG.longEvery}` +
+                               (CFG.autoContinue ? '' : ' · stopping at the end of this phase');
+  else                       sub.textContent = 'Step away from the screen.';
+
+  document.title = S.running && !S.held ? `${fmt(rem)} · ${LABEL[S.phase]}` : 'Pomodoro';
+}
+
+/* ---------------- queue ---------------- */
+function parseId(input){
+  const s = String(input || '').trim();
+  if(!s) return null;
+  if(/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  const m = s.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|live\/|embed\/|shorts\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if(m) return m[1];
+  try{
+    const u = new URL(s.startsWith('http') ? s : 'https://' + s);
+    const v = u.searchParams.get('v');
+    if(v && /^[A-Za-z0-9_-]{11}$/.test(v)) return v;
+    if(u.searchParams.get('list')) return 'PLAYLIST';
+  }catch(e){}
+  return null;
+}
+
+/* Public oEmbed — keyless, and it reflects the caller's origin so this works
+   straight from the browser. A 200 only proves the id exists, never that it
+   will play: onError is the only truth for that. */
+async function fetchTitle(id){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 5000);
+  try{
+    const r = await fetch('https://www.youtube.com/oembed?format=json&url=' +
+      encodeURIComponent('https://www.youtube.com/watch?v=' + id), { signal: ctl.signal });
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j && j.title ? j.title : null;
+  }catch(e){ return null; }
+  finally{ clearTimeout(t); }
+}
+
+function renderQueue(){
+  const list = document.getElementById('qList');
+  list.innerHTML = '';
+  QUEUE.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'qitem' + (v.id === currentId ? ' playing' : '') + (v.dead ? ' dead' : '');
+
+    const name = document.createElement('div');
+    name.className = 'qname' + (v.title ? '' : ' raw');
+    name.textContent = v.title || v.id;
+    name.title = v.dead ? `Would not play here (error ${v.err || '?'}) — click ▶ to retry`
+                        : 'Click to rename';
+    name.onclick = () => {
+      const n = prompt('Name this video', v.title || v.id);
+      if(n != null){ v.title = n.trim() || null; save(); renderQueue(); if(v.id===currentId) setNP(v); }
+    };
+    row.appendChild(name);
+
+    if(pinnedNext === v.id){
+      const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'next';
+      row.appendChild(b);
+    }
+    const mk = (txt, title, fn, cls) => {
+      const b = document.createElement('button');
+      b.className = 'qbtn' + (cls ? ' ' + cls : '');
+      b.textContent = txt; b.title = title; b.onclick = fn;
+      return b;
+    };
+    row.appendChild(mk('▲','Move up',   () => move(i,-1)));
+    row.appendChild(mk('▼','Move down', () => move(i, 1)));
+    row.appendChild(mk('⤒','Play next', () => { pinnedNext = v.id; renderQueue(); }));
+    row.appendChild(mk('▶','Play now',  () => {
+      v.dead = false; v.err = null; save();
+      currentId = v.id; setNP(v); renderQueue();
+      if(playerReady){ try{ player.loadVideoById(v.id); }catch(e){} }
+    }));
+    row.appendChild(mk('✕','Remove', () => { QUEUE.splice(i,1); save(); renderQueue(); }, 'del'));
+    list.appendChild(row);
+  });
+
+  const n = QUEUE.length, bad = QUEUE.filter(v => v.dead).length;
+  document.getElementById('qCount').textContent =
+    `${n} video${n===1?'':'s'}` + (bad ? ` · ${bad} would not play` : '');
+  const cur = QUEUE.find(v => v.id === currentId);
+  document.getElementById('qSummary').textContent =
+    `Music queue · ${n} video${n===1?'':'s'}` + (cur ? ` · ${(cur.title || cur.id).slice(0,40)}` : '');
+}
+
+function move(i, d){
+  const j = i + d;
+  if(j < 0 || j >= QUEUE.length) return;
+  [QUEUE[i], QUEUE[j]] = [QUEUE[j], QUEUE[i]];
+  save(); renderQueue();
+}
+
+async function addFromInput(){
+  const el = document.getElementById('qInput');
+  const tokens = el.value.split(/[\s,]+/).filter(Boolean);     // paste several at once
+  if(!tokens.length) return;
+  const added = [];
+  let playlist = false, bad = 0;
+  for(const tk of tokens){
+    const id = parseId(tk);
+    if(id === 'PLAYLIST'){ playlist = true; continue; }
+    if(!id){ bad++; continue; }
+    if(QUEUE.some(v => v.id === id)) continue;
+    const item = { id, title:null };
+    QUEUE.push(item); added.push(item);
+  }
+  save(); renderQueue(); el.value = '';
+  if(playlist) showNote('That is a playlist link — open a video inside it and paste that URL.');
+  else if(bad && !added.length) showNote('That does not look like a YouTube link or video ID.');
+  for(const item of added){                       // never block the add on the network
+    const t = await fetchTitle(item.id);
+    if(t){ item.title = t; save(); renderQueue(); }
+  }
+}
+
+/* ---------------- settings ---------------- */
+function bindSettings(){
+  const nums = { mFocus:'focus', mShort:'short', mLong:'long' };
+  for(const [elId, key] of Object.entries(nums)){
+    const el = document.getElementById(elId);
+    el.value = CFG[key];
+    el.onchange = () => {
+      const n = Math.max(1, Math.min(180, parseInt(el.value,10) || DEFAULTS[key]));
+      el.value = n; CFG[key] = n; save();
+      if(!S.running) paint();
+    };
+  }
+  const toggles = { autoCont:'autoContinue', spoken:'spoken', musicBreaks:'musicOnBreaks' };
+  for(const [elId, key] of Object.entries(toggles)){
+    const el = document.getElementById(elId);
+    el.checked = !!CFG[key];
+    el.onchange = () => {
+      CFG[key] = el.checked; save();
+      if(key === 'musicOnBreaks' && S.running && !S.held){
+        musicShouldPlay() ? playMusic() : pauseMusic();
+      }
+      paint();
+    };
+  }
+  const ord = document.getElementById('orderSel');
+  ord.value = CFG.order;
+  ord.onchange = () => { CFG.order = ord.value; bag = []; save(); };
+}
+
+/* ---------------- wiring ---------------- */
+document.getElementById('startBtn').onclick = () => {
+  try{ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); }catch(e){}
+  primeSpeech();
+  if(!S.running) beginPhase(true);
+  else if(S.held) resume();
+  else pause();
+};
+document.getElementById('skipBtn').onclick  = skipPhase;
+document.getElementById('resetBtn').onclick = reset;
+document.getElementById('tapBtn').onclick   = () => {
+  document.getElementById('stagewrap').classList.remove('needtap');
+  playMusic();
+};
+document.getElementById('shuffleBtn').onclick = () => playNext(S.running && !S.held && musicShouldPlay());
+document.getElementById('hideBtn').onclick = () => { CFG.hideVideo = !CFG.hideVideo; save(); applyHide(); };
+function applyHide(){
+  document.getElementById('stagewrap').classList.toggle('audio', !!CFG.hideVideo);
+  document.getElementById('hideBtn').textContent = CFG.hideVideo ? 'Show' : 'Hide';
+}
+document.getElementById('qAdd').onclick = addFromInput;
+document.getElementById('qInput').addEventListener('keydown', e => { if(e.key === 'Enter') addFromInput(); });
+document.getElementById('qReset').onclick = () => {
+  if(!confirm('Replace your queue with the original eight videos?')) return;
+  QUEUE = SEED.map(v => ({ ...v })); bag = []; save(); renderQueue();
+};
+const qp = document.getElementById('queuePanel');
+qp.open = !!CFG.panelOpen;
+qp.addEventListener('toggle', () => { CFG.panelOpen = qp.open; save(); });
+
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  // not every keydown target is an Element — guard before calling matches()
+  if(t && typeof t.matches === 'function' && t.matches('input,textarea,select,button')) return;
+  if(e.code === 'Space'){ e.preventDefault(); document.getElementById('startBtn').click(); }
+});
+
+/* Debug hook. Without it, checking the 10-minute warning means waiting
+   fifteen minutes. Left in deliberately — this is a personal page. */
+window.__pom = {
+  S, get CFG(){ return CFG; }, get QUEUE(){ return QUEUE; },
+  setRemaining: sec => { S.deadline = Date.now() + sec*1000; S.held = 0; tick(); },
+  forceEnd: () => { S.deadline = Date.now(); tick(); },
+  simulateError: code => onError(code || 150),
+  degrade, announce, unduck, get ducked(){ return ducked; },
+  volume: () => { try{ return player.getVolume(); }catch(e){ return null; } },
+  state: () => { try{ return player.getPlayerState(); }catch(e){ return null; } },
+};
+
+bindSettings(); applyHide(); renderQueue(); paint();
+</script>
+</body>
+</html>
