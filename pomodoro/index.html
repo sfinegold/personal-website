@@ -7,7 +7,7 @@
 <title>Pomodoro</title>
 <meta name="description" content="A focus timer with spoken cues and a music queue you control.">
 <meta property="og:title" content="Pomodoro">
-<meta property="og:description" content="25 minutes of focus, a soft gong at 10 and 5, and your own queue of focus music.">
+<meta property="og:description" content="25 minutes of focus, a bell at 10 and 5, and your own queue of focus music.">
 <meta property="og:image" content="https://samfinegold.me/pomodoro/share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -256,7 +256,7 @@
   </details>
 
   <div class="foot">
-    Soft gong at 10 and 5 minutes · space bar starts and pauses<br>
+    Bell at 10 and 5 minutes · space bar starts and pauses<br>
     <a href="/">samfinegold.me</a>
   </div>
 </div>
@@ -296,13 +296,13 @@ const SEED = [
 
 const DEFAULTS = {
   focus:25, short:5, long:15, longEvery:4,
-  autoContinue:true, spoken:true, musicOnBreaks:true,
+  autoContinue:true, spoken:true, musicOnBreaks:false,
   order:'shuffle', hideVideo:false, panelOpen:false,
 };
 /* Warnings are a gong, not a voice: one strike at ten minutes, two at five.
    Speech proved to fail silently in the browser, and Web Audio does not. */
 const WARN_MINS = [10, 5];
-const GONG_STRIKES = { 10:1, 5:2 };
+const GONG_PATTERN = { 10:[196], 5:[196,147] };   // G3 ; G3->D3 falling
 
 /* ---------------- storage ---------------- */
 function load(){
@@ -311,16 +311,25 @@ function load(){
     const q = Array.isArray(raw.queue) && raw.queue.length
       ? raw.queue.map(v => typeof v === 'string' ? { id:v, title:null } : v)  // migrate bare ids
       : SEED.map(v => ({ ...v }));
-    return { settings: Object.assign({}, DEFAULTS, raw.settings || {}), queue: q };
+    const st = Object.assign({}, DEFAULTS, raw.settings || {});
+    /* Settings migration. Music now stops for the break and returns with the
+       next focus block; without this, anyone who already has the page would
+       keep the old always-on behaviour from their saved blob. */
+    if((raw.settingsVersion || 1) < 2){ st.musicOnBreaks = false; }
+    return { settings: st, queue: q, settingsVersion: 2 };
   }catch(e){
     return { settings: { ...DEFAULTS }, queue: SEED.map(v => ({ ...v })) };
   }
 }
 /* try/catch on save as well as load — this throws in Safari private mode. */
 function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify({ v:1, settings:CFG, queue:QUEUE })); }catch(e){}
+  try{ localStorage.setItem(KEY, JSON.stringify({ v:1, settingsVersion:2, settings:CFG, queue:QUEUE })); }catch(e){}
 }
-let { settings:CFG, queue:QUEUE } = load();
+let { settings:CFG, queue:QUEUE, settingsVersion:SV } = load();
+/* Persist the migrated version straight away. Otherwise it is only written on
+   the next save, and until then every reload would re-apply the migration --
+   silently undoing it if you deliberately turned break music back on. */
+if(SV === 2) save();
 
 /* ---------------- phases ---------------- */
 const MINS = { focus:()=>CFG.focus, short:()=>CFG.short, long:()=>CFG.long };
@@ -351,29 +360,44 @@ function beep(freq=800, dur=150, count=1){
   }catch(e){}
 }
 
-/* Soft gong. What separates a struck bowl from a beep is that its partials are
-   INHARMONIC — a plain harmonic stack reads as an organ note — and that the
-   upper ones die away first. Web Audio, deliberately: speech turned out to fail
-   silently on this page, and this does not. */
-function gong(f=146.83, dur=4.5, vol=.22){
+/* Struck bell. Three things make it distinctive rather than a soft hum:
+   inharmonic partials (a harmonic stack reads as an organ note), a short
+   filtered-noise transient so you hear the mallet hit the metal, and a brief
+   downward pitch glide, which is what real struck metal actually does. */
+function gong(f=196, dur=4.2, vol=.26){
   try{
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if(audioCtx.state === 'suspended') audioCtx.resume();
     const now = audioCtx.currentTime;
     const master = audioCtx.createGain(), lp = audioCtx.createBiquadFilter();
-    lp.type='lowpass'; lp.frequency.value = 2200;        // takes off the glassy edge
+    lp.type='lowpass'; lp.frequency.value = 4200;   /* higher than before: more bite */
     master.connect(lp); lp.connect(audioCtx.destination);
     master.gain.setValueAtTime(.0001, now);
-    master.gain.linearRampToValueAtTime(vol, now + .015); // soft swell, not a click
+    master.gain.linearRampToValueAtTime(vol, now + .008);
     master.gain.exponentialRampToValueAtTime(.0004, now + dur);
-    const ratios=[1, 2.00, 2.76, 5.40, 8.93];            // struck-plate ratios
-    const level =[1,  .45,  .32,  .16,  .08];
-    const decay =[1,  .80,  .62,  .40,  .28];            // highs fade first
+
+    /* the strike: a bright noise burst, gone in 60ms */
+    const len = Math.floor(audioCtx.sampleRate * .06);
+    const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for(let i=0;i<len;i++) ch[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 3);
+    const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+    const bp = audioCtx.createBiquadFilter(); bp.type='bandpass';
+    bp.frequency.value = f*7; bp.Q.value = 1.1;
+    const ng = audioCtx.createGain(); ng.gain.value = .5;
+    noise.connect(bp); bp.connect(ng); ng.connect(master);
+    noise.start(now); noise.stop(now + .07);
+
+    /* the body */
+    const ratios=[1, 2.00, 2.76, 5.40, 8.93];
+    const level =[1,  .52,  .40,  .22,  .12];
+    const decay =[1,  .78,  .60,  .38,  .25];
     ratios.forEach((r,i)=>{
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.type='sine';
-      o.frequency.value = f*r;
-      o.detune.value = (i%2?1:-1)*(2+i*1.5);             // slight beating between partials
+      o.frequency.setValueAtTime(f*r*1.035, now);          /* short downward glide */
+      o.frequency.exponentialRampToValueAtTime(f*r, now + .10);
+      o.detune.value = (i%2?1:-1)*(2+i*1.5);               /* partials beat together */
       g.gain.setValueAtTime(level[i], now);
       g.gain.exponentialRampToValueAtTime(.0004, now + dur*decay[i]);
       o.connect(g); g.connect(master);
@@ -381,11 +405,9 @@ function gong(f=146.83, dur=4.5, vol=.22){
     });
   }catch(e){}
 }
-/* n strikes, spaced. One = ten minutes, two = five, so you can tell them apart
-   without looking, which is the entire point of an audio cue. */
-function gongStrikes(n, f){
-  duckFor(n > 1 ? 3200 : 2200);
-  for(let i=0;i<n;i++) setTimeout(()=>gong(f), i*1200);
+function gongStrikes(pitches){
+  duckFor(pitches.length > 1 ? 3400 : 2400);
+  pitches.forEach((f,i)=> setTimeout(()=>gong(f), i*760));
 }
 
 /* ---------------- ducking ---------------- */
@@ -711,7 +733,7 @@ function tick(){
   if(crossed.length){
     crossed.forEach(m => S.fired[m] = true);
     const m = Math.min(...crossed);
-    if(rem > 5000) gongStrikes(GONG_STRIKES[m] || 1);
+    if(rem > 5000) gongStrikes(GONG_PATTERN[m] || [196]);
   }
   S.last = rem;
 
@@ -732,7 +754,7 @@ function completePhase(){
      announce it into an empty room. */
   if(overshoot > 90000){ holdAtBoundary(false); return; }
 
-  gong(220, 3.6, .2);                 /* one sound language, not a bowl next to a sine */
+  gong(262, 4.0, .26);                /* higher and brighter than either warning */
   if(CFG.autoContinue) beginPhase(true);
   else holdAtBoundary(true);
 }
