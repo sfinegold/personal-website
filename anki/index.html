@@ -67,7 +67,13 @@
   .card.revealed{cursor:default}
   .dir{position:absolute;top:.8rem;left:1rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;
     text-transform:uppercase;color:var(--faint)}
-  .leech{position:absolute;top:.7rem;right:1rem;display:none;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+  .say{position:absolute;top:.5rem;right:.6rem;width:40px;height:40px;border:0;background:transparent;color:var(--faint);
+    display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .say:hover{color:var(--accent-hi);background:var(--card-2)}
+  .say svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .say.playing{color:var(--accent-hi)}
+  .card[data-dir=rev]:not(.revealed) .say,body.nospeech .say{display:none}
+  .leech{position:absolute;top:.7rem;right:3.2rem;display:none;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--leech);border:1px solid var(--leech);border-radius:4px;padding:.15rem .4rem}
   .card.is-leech .leech{display:block}
   .main{font-size:clamp(1.7rem,7vw,2.3rem);font-weight:300;line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
@@ -78,7 +84,8 @@
   @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
   .hint{font-size:.86rem;color:var(--dim);font-style:italic;margin-top:.9rem;line-height:1.45}
   .hint:empty{display:none}
-  .ex{margin-top:.9rem;font-size:.86rem;line-height:1.5;color:var(--dim)}
+  .ex{margin-top:.9rem;font-size:.86rem;line-height:1.5;color:var(--dim);cursor:pointer;border-radius:8px;padding:.3rem .5rem;margin-left:-.5rem;margin-right:-.5rem}
+  .ex:hover{background:var(--card-2)}
   .ex:empty{display:none}
   .ex .ex-tr{color:var(--text)}
   .ex .ex-el{font-size:.8rem}
@@ -156,7 +163,8 @@
   .note:first-child{border-top:0}
   .note .l1{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
   .note .tr{font-weight:600;font-size:.98rem}
-  .note .el{color:var(--dim);font-size:.86rem;margin-left:.4rem}
+  .note .el{color:var(--dim);font-size:.86rem;margin-left:.4rem;cursor:pointer;text-decoration:underline dotted var(--line);text-underline-offset:3px}
+  body.nospeech .note .el{cursor:inherit;text-decoration:none}
   .note .en{color:var(--dim);font-size:.86rem;margin-top:.15rem}
   .state{display:flex;gap:.3rem;flex-shrink:0}
   .st{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);
@@ -204,6 +212,7 @@
     <div class="card" id="card" tabindex="0" role="button" aria-label="Flashcard. Tap to reveal.">
       <div class="dir" id="dir"></div>
       <div class="leech">leech</div>
+      <button class="say" id="sayBtn" aria-label="Play Greek pronunciation" title="Play (p)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18 5.5a8.5 8.5 0 0 1 0 13"/></svg></button>
       <div class="front"><div class="main" id="fMain"></div><div class="sub" id="fSub"></div></div>
       <div class="back" id="back">
         <div class="main" id="bMain"></div><div class="sub" id="bSub"></div>
@@ -260,6 +269,7 @@
       <div class="row"><label for="sNew">New cards per day<small>Anki default is 20. Each phrase is two cards.</small></label><input type="number" id="sNew" min="0" max="999"></div>
       <div class="row"><label for="sRev">Reviews per day<small>Anki default is 200.</small></label><input type="number" id="sRev" min="0" max="9999"></div>
       <div class="row"><label for="sTr">Transliteration first<small>Off shows Greek script as the main line.</small></label><input type="checkbox" id="sTr"></div>
+      <div class="row"><label for="sSay">Auto-play Greek<small>Speaks the Greek side when it appears, using this device's Greek voice.</small></label><input type="checkbox" id="sSay"></div>
       <div class="row"><label for="sDir">Direction<small>Filters what you study. Progress is kept for both.</small></label>
         <select id="sDir"><option value="both">Both</option><option value="fwd">Greek → English</option><option value="rev">English → Greek</option></select></div>
     </div>
@@ -275,7 +285,7 @@
     </div>
     <h2 class="ttl">Keys</h2>
     <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
-      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>u — undo &nbsp; b s , — browse stats settings &nbsp; esc — back
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the Greek<br>u — undo &nbsp; b s , — browse stats settings &nbsp; esc — back
     </div>
   </section>
 </div>
@@ -290,7 +300,7 @@
   var DECK = window.DECKS && window.DECKS.greek;
   var KEY = 'sam_anki_v1';
   var UNDO_MAX = 20;
-  var DEF_SETTINGS = { newPerDay: 20, revPerDay: 200, trFirst: true, dirs: 'both', learnAhead: 20 };
+  var DEF_SETTINGS = { newPerDay: 20, revPerDay: 200, trFirst: true, dirs: 'both', learnAhead: 20, autoSay: true };
   var $ = function (id) { return document.getElementById(id); };
   var app = $('app');
 
@@ -398,6 +408,37 @@
     toast('Undone');
   }
 
+  /* ---------- speech (device Greek voice, no network) ---------- */
+  var synth = window.speechSynthesis || null, voice = null, spokenKey = '';
+  function pickVoice() {
+    if (!synth) return;
+    var el = synth.getVoices().filter(function (v) { return /^el([-_]|$)/i.test(v.lang); });
+    if (!el.length) { voice = null; return; }
+    voice = el.filter(function (v) { return /melina|google|neural|premium|enhanced|natural/i.test(v.name); })[0] || el[0];
+  }
+  if (synth) { pickVoice(); if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', pickVoice); else synth.onvoiceschanged = pickVoice; }
+  else document.body.classList.add('nospeech');
+  function speak(text, quiet) {
+    if (!synth) { if (!quiet) toast('No speech on this device'); return false; }
+    if (!voice) pickVoice();
+    if (!voice) { if (!quiet) toast('No Greek voice on this device'); return false; }
+    try {
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(String(text).replace(/;/g, ''));
+      u.voice = voice; u.lang = voice.lang; u.rate = 0.9;
+      var btn = $('sayBtn');
+      u.onstart = function () { btn.classList.add('playing'); };
+      u.onend = u.onerror = function () { btn.classList.remove('playing'); };
+      synth.speak(u);
+      return true;
+    } catch (e) { return false; }
+  }
+  function sayCurrent(quiet) {
+    var c = current && cardsIdx[current]; if (!c) return;
+    if (c.dir === 'rev' && !revealed) return;   // never read out the answer early
+    speak(c.note.el, quiet);
+  }
+
   /* ---------- render ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
   function fmtEta(ms) {
@@ -440,8 +481,13 @@
     else { $('fMain').textContent = n.en; $('fSub').textContent = ''; $('bMain').textContent = gk[0]; $('bSub').textContent = gk[1]; }
     $('hint').textContent = n.note || '';
     $('ex').innerHTML = n.ex ? '<div class="ex-tr">' + esc(n.ex.tr) + '</div><div class="ex-el">' + esc(n.ex.el) + '</div><div class="ex-en">' + esc(n.ex.en) + '</div>' : '';
+    card.dataset.dir = c.dir;
     card.classList.toggle('revealed', revealed);
     card.classList.toggle('is-leech', !!(c.state && c.state.leech));
+    var greekShowing = c.dir === 'fwd' || revealed;
+    var key = c.id + ':' + (greekShowing ? 'el' : 'en');
+    if (greekShowing && key !== spokenKey && store.settings.autoSay) sayCurrent(true);
+    spokenKey = key;
     card.setAttribute('aria-label', revealed ? 'Flashcard, revealed.' : 'Flashcard. Tap to reveal.');
     if (revealed) {
       var ns = S.nextStates(c.state, Date.now(), cfg(), undefined, c.id);
@@ -508,6 +554,7 @@
   function fillSettings() {
     $('sNew').value = store.settings.newPerDay; $('sRev').value = store.settings.revPerDay;
     $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
+    $('sSay').checked = !!store.settings.autoSay;
   }
 
   function setView(v) {
@@ -525,6 +572,12 @@
 
   /* ---------- events ---------- */
   $('card').addEventListener('click', function () { if (!revealed) reveal(); });
+  $('sayBtn').addEventListener('click', function (e) { e.stopPropagation(); sayCurrent(false); });
+  $('ex').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var c = current && cardsIdx[current];
+    if (c && c.note.ex && revealed) speak(c.note.ex.el, false);
+  });
   $('showBtn').addEventListener('click', reveal);
   document.querySelectorAll('.grade').forEach(function (b) { b.addEventListener('click', function () { rate(b.dataset.r); }); });
   $('undoBtn').addEventListener('click', undo);
@@ -537,6 +590,8 @@
     browseTag = browseTag === b.dataset.tag ? '' : b.dataset.tag; renderBrowse();
   });
   $('list').addEventListener('click', function (e) {
+    var el = e.target.closest('.el');
+    if (el && synth) { var n = notesById[el.closest('.note').dataset.id]; if (n) speak(n.el, false); return; }
     var row = e.target.closest('.note'); if (row) row.classList.toggle('open');
   });
 
@@ -544,10 +599,11 @@
     store.settings.newPerDay = Math.max(0, Math.min(999, parseInt($('sNew').value, 10) || 0));
     store.settings.revPerDay = Math.max(0, Math.min(9999, parseInt($('sRev').value, 10) || 0));
     store.settings.trFirst = $('sTr').checked;
+    store.settings.autoSay = $('sSay').checked;
     store.settings.dirs = $('sDir').value;
     save(); current = null; render();
   }
-  ['sNew', 'sRev', 'sTr', 'sDir'].forEach(function (id) { $(id).addEventListener('change', settingChanged); });
+  ['sNew', 'sRev', 'sTr', 'sSay', 'sDir'].forEach(function (id) { $(id).addEventListener('change', settingChanged); });
 
   $('exportBtn').addEventListener('click', function () {
     var d = new Date(), ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -589,6 +645,7 @@
     if (k === ',') { setView('settings'); return; }
     if (k === 'u') { undo(); return; }
     if (view !== 'study') return;
+    if (k === 'p') { sayCurrent(false); return; }
     if (k === ' ' || k === 'Enter') { e.preventDefault(); if (!current) return; if (!revealed) reveal(); else rate('good'); return; }
     if (revealed && k >= '1' && k <= '4') rate(['again', 'hard', 'good', 'easy'][k - 1]);
   });
