@@ -164,6 +164,10 @@
     text-transform:uppercase;color:#FFFFFF;background:#B3261E;border:1px solid #B3261E;border-radius:4px;padding:.15rem .4rem}
   .card.is-leech .leech{display:block}
   .main{font-size:clamp(2.1rem,9vw,2.9rem);font-weight:600;line-height:1.15;letter-spacing:-.01em;overflow-wrap:anywhere}
+  /* Long answers (fact decks) step the size down so the whole text fits the card. */
+  .main.len-m{font-size:clamp(1.55rem,6.5vw,2.1rem);line-height:1.2}
+  .main.len-l{font-size:clamp(1.2rem,5vw,1.6rem);line-height:1.3;font-weight:500;letter-spacing:0}
+  .main.len-xl{font-size:clamp(1.02rem,4.2vw,1.3rem);line-height:1.35;font-weight:500;letter-spacing:0}
   .sub{font-size:1.3rem;font-weight:500;color:var(--dim);margin-top:.5rem;line-height:1.35;overflow-wrap:anywhere}
   .sub:empty{display:none}
   .back{display:none;width:100%;margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--line)}
@@ -1116,6 +1120,7 @@
     $('dir').textContent = dirLabel(c.dir);
     if (c.dir === 'fwd') { $('fMain').textContent = gk[0]; $('fSub').textContent = gk[1]; $('bMain').textContent = n.en; $('bSub').textContent = ''; }
     else { $('fMain').textContent = n.en; $('fSub').textContent = ''; $('bMain').textContent = gk[0]; $('bSub').textContent = gk[1]; }
+    ['fMain', 'bMain'].forEach(function (id) { var el = $(id), len = el.textContent.length; el.className = 'main' + (len > 160 ? ' len-xl' : len > 80 ? ' len-l' : len > 40 ? ' len-m' : ''); });
     $('hint').textContent = n.note || '';
     $('memo').innerHTML = n.memo ? '<span class="lbl">Remember</span>' + esc(n.memo) : '';
     $('parts').innerHTML = partsHtml(n);
