@@ -29,8 +29,6 @@
   html{font-size:16px}
   body{background:var(--bg);color:var(--text);font-family:var(--sans);
     -webkit-font-smoothing:antialiased;letter-spacing:.01em;min-height:100vh;
-    display:flex;justify-content:center;
-    padding:1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
     -webkit-tap-highlight-color:transparent}
   body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.6;
     background:linear-gradient(var(--grid) 1px,transparent 1px),
@@ -41,16 +39,26 @@
   button{font-family:inherit;cursor:pointer;border-radius:8px;transition:background .15s,color .15s,border-color .15s;color:inherit}
   a{color:var(--text)}
 
-  .app{width:100%;max-width:640px;position:relative;z-index:1;display:flex;flex-direction:column;
-    min-height:calc(100vh - 2.75rem - env(safe-area-inset-bottom));min-height:calc(100dvh - 2.75rem - env(safe-area-inset-bottom))}
+  .app{width:100%;max-width:640px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;
+    padding:calc(.5rem + env(safe-area-inset-top)) 1rem calc(.6rem + env(safe-area-inset-bottom));
+    min-height:100vh;min-height:100svh}
+  /* Study and Done are locked to one screen: header, card, grades, nothing to scroll past. */
+  .app[data-view=study],.app[data-view=done]{height:100vh;height:100svh;overflow:hidden}
 
   /* ---- top bar ---- */
-  .top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:.4rem}
-  .brand{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text);
-    background:none;border:0;padding:.4rem 0;min-height:36px;text-align:left;border-radius:0}
-  .brand-pre{color:var(--dim)} .brand-caret{color:var(--dim);font-size:.6rem}
-  .brand:hover #deckName{text-decoration:underline;text-underline-offset:3px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex:none;min-height:44px}
+  .home{width:38px;height:38px;border-radius:50%;background:var(--text);color:#FFFFFF;border:0;flex:none;
+    display:flex;align-items:center;justify-content:center;padding:0}
+  .home svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .home:hover{background:#000}
+  .app[data-view=home] .home{background:#FFFFFF;color:var(--text)}
+  .tabs{display:flex;gap:.1rem;flex:none;margin-top:.2rem}
+  .app[data-view=study] .tabs,.app[data-view=done] .tabs,.app[data-view=decks] .tabs,.app[data-view=study] .track,.app[data-view=done] .track{display:none}
   .decklist{display:flex;flex-direction:column;gap:.5rem}
+  .menu{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+  .menu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
+  .menu .btn span{color:var(--dim);font-size:.7rem}
+  .app[data-view=decks] #view-decks{display:flex}
   .deck{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:12px;padding:.9rem 1rem;text-align:left;width:100%}
   .deck.on{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
   .deck:hover{background:var(--text);color:#FFFFFF}
@@ -61,26 +69,27 @@
   .d-counts{font-family:var(--mono);font-size:.74rem;color:var(--dim);margin-top:.4rem}
   .d-counts b{color:inherit;font-weight:600}
   .deck.off{opacity:.6}
-  .counts{display:flex;gap:.55rem;font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums}
+  .counts{display:flex;gap:.55rem;font-family:var(--mono);font-size:.88rem;font-variant-numeric:tabular-nums;margin-left:auto}
   .counts b{font-weight:600}
   .counts b+b::before{content:'·';color:var(--faint);margin-right:.55rem;font-weight:400}
   .c-new{color:var(--new)} .c-learn{color:var(--learn)} .c-due{color:var(--due)}
-  .tabs{display:flex;gap:.1rem;margin-left:auto}
   .tab{background:none;border:0;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
     color:var(--dim);padding:.4rem .45rem;border-bottom:2px solid transparent;border-radius:0}
   .tab:hover{color:var(--text)}
   .tab.on{color:var(--text);border-bottom-color:#FFFFFF}
-  .track{height:3px;background:rgba(11,15,20,.18);border-radius:2px;overflow:hidden;margin:.2rem 0 1rem}
+  .track{height:3px;background:rgba(11,15,20,.18);border-radius:2px;overflow:hidden;margin:.4rem 0 1rem;flex:none}
   .fill{height:100%;width:0;background:#FFFFFF;transition:width .3s}
 
-  .view{display:none;flex:1;flex-direction:column}
+  .view{display:none;flex:1;flex-direction:column;min-height:0}
+  #view-study,#view-done{padding-top:.75rem}
   .app[data-view=study] #view-study,.app[data-view=done] #view-done,.app[data-view=browse] #view-browse,.app[data-view=decks] #view-decks,
   .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings{display:flex}
 
   /* ---- study ---- */
-  .card{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:14px;padding:1.6rem 1.25rem 2.4rem;
-    flex:1;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  .card{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:2.6rem 1.25rem 2.4rem;
+    flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;-webkit-overflow-scrolling:touch;
     text-align:center;position:relative;cursor:pointer;user-select:none;-webkit-user-select:none}
+  .inner{margin:auto;width:100%}
   .card.revealed{cursor:default}
   .dir{position:absolute;top:.8rem;left:1rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;
     text-transform:uppercase;color:var(--faint)}
@@ -112,7 +121,7 @@
     text-transform:uppercase;color:var(--faint)}
   .card.revealed .tapnote{display:none}
 
-  .answers{margin-top:.9rem;min-height:60px}
+  .answers{flex:none;margin-top:.75rem;min-height:60px}
   .btn{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
     padding:.8rem 1.1rem;border:1px solid var(--text);background:#FFFFFF;color:var(--text);min-height:44px}
   .btn:hover{background:var(--text);color:#FFFFFF}
@@ -134,16 +143,16 @@
   .grade.good .g-label{color:var(--good)} .grade.easy .g-label{color:var(--easy)}
   .grade:hover,.grade:active{background:var(--text);border-color:var(--text)}
   .grade:hover .g-label,.grade:active .g-label,.grade:hover .g-ivl,.grade:active .g-ivl{color:#FFFFFF}
-  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:.8rem}
+  .foot{flex:none;display:flex;align-items:center;justify-content:space-between;margin-top:.15rem}
   .mini{background:none;border:0;color:var(--faint);font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
-    text-transform:uppercase;padding:.5rem .4rem;min-height:36px}
+    text-transform:uppercase;padding:.4rem .4rem;min-height:32px}
   .mini:hover{color:var(--text)}
   .mini[disabled]{opacity:.35;cursor:default}
   .left{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 
   /* ---- done ---- */
-  .done{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:14px;padding:2.2rem 1.25rem;text-align:center;
-    flex:1;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem}
+  .done{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:2.2rem 1.25rem;text-align:center;
+    flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem}
   .done h2{font-weight:300;font-size:1.6rem;letter-spacing:.02em}
   .done p{color:var(--dim);font-size:.92rem;line-height:1.5}
   .done .eta{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin-top:.4rem}
@@ -201,13 +210,13 @@
   .toast.on{opacity:1;transform:translateX(-50%)}
 
   @media (max-width:520px){
-    body{padding:.9rem .85rem calc(1.25rem + env(safe-area-inset-bottom))}
     .top{gap:.5rem}
     .tab{padding:.5rem .4rem;min-height:36px}
-    .card{padding:1.4rem .9rem 2.2rem}
+    .card{padding:2.4rem .9rem 2.2rem}
     .grades{gap:.35rem}
     .grade{min-height:64px}
     .answers{min-height:64px}
+    .app{padding-left:.85rem;padding-right:.85rem}
     .tiles{grid-template-columns:repeat(2,1fr)}
   }
 </style>
@@ -215,17 +224,17 @@
 <body>
 <div class="app" id="app" data-view="study">
   <header class="top">
-    <button class="brand" id="deckBtn" title="Decks (d)"><span class="brand-pre">Anki ·</span> <span id="deckName">…</span> <span class="brand-caret">▾</span></button>
+    <button class="home" id="homeBtn" aria-label="Home" title="Home (h)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
     <div class="counts" title="new · learning · due" aria-label="Counts">
       <b class="c-new" id="cNew">0</b><b class="c-learn" id="cLearn">0</b><b class="c-due" id="cDue">0</b>
     </div>
-    <nav class="tabs" aria-label="Views">
-      <button class="tab on" data-go="study">Study</button>
-      <button class="tab" data-go="browse">Browse</button>
-      <button class="tab" data-go="stats">Stats</button>
-      <button class="tab" data-go="settings">Settings</button>
-    </nav>
   </header>
+  <nav class="tabs" aria-label="Views">
+    <button class="tab" data-go="study">Study</button>
+    <button class="tab" data-go="browse">Browse</button>
+    <button class="tab" data-go="stats">Stats</button>
+    <button class="tab" data-go="settings">Settings</button>
+  </nav>
   <div class="track"><div class="fill" id="fill"></div></div>
 
   <section class="view" id="view-study">
@@ -233,11 +242,13 @@
       <div class="dir" id="dir"></div>
       <div class="leech">leech</div>
       <button class="say" id="sayBtn" aria-label="Play pronunciation" title="Play (p)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18 5.5a8.5 8.5 0 0 1 0 13"/></svg></button>
-      <div class="front"><div class="main" id="fMain"></div><div class="sub" id="fSub"></div></div>
-      <div class="back" id="back">
-        <div class="main" id="bMain"></div><div class="sub" id="bSub"></div>
-        <div class="hint" id="hint"></div>
-        <div class="ex" id="ex"></div>
+      <div class="inner">
+        <div class="front"><div class="main" id="fMain"></div><div class="sub" id="fSub"></div></div>
+        <div class="back" id="back">
+          <div class="main" id="bMain"></div><div class="sub" id="bSub"></div>
+          <div class="hint" id="hint"></div>
+          <div class="ex" id="ex"></div>
+        </div>
       </div>
       <div class="tapnote">tap to reveal</div>
     </div>
@@ -270,7 +281,12 @@
   <section class="view" id="view-decks">
     <h2 class="ttl">Decks</h2>
     <div class="decklist" id="deckList"></div>
-    <p class="empty">Each deck keeps its own progress and daily counts. New decks are added by Claude as files in the site.</p>
+    <div class="menu">
+      <button class="btn" data-go="browse">Browse <span>phrases and their state</span></button>
+      <button class="btn" data-go="stats">Stats <span>deck and today</span></button>
+      <button class="btn" data-go="settings">Settings <span>limits, direction, export</span></button>
+    </div>
+    <p class="empty">Tap a deck to study it. Each deck keeps its own progress and daily counts.</p>
   </section>
 
   <section class="view" id="view-browse">
@@ -310,7 +326,7 @@
     </div>
     <h2 class="ttl">Keys</h2>
     <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
-      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase<br>u — undo &nbsp; b s d , — browse stats decks settings &nbsp; esc — back
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase<br>u — undo &nbsp; h — home &nbsp; b s , — browse stats settings &nbsp; esc — back
     </div>
   </section>
 </div>
@@ -527,11 +543,11 @@
     else if (view === 'stats') renderStats();
     else if (view === 'decks') renderDecks();
     app.dataset.view = view === 'study' ? (current ? 'study' : 'done') : view;
+    document.title = (deck() ? deck().meta.name + ' · ' : '') + 'Flashcards';
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.go === view); });
   }
   function renderTop() {
     var c = queueInfo.counts, b = P();
-    $('deckName').textContent = deck().meta.name;
     $('cNew').textContent = c.new; $('cLearn').textContent = c.learn; $('cDue').textContent = c.due;
     var done = b.day.newDone + b.day.revDone;
     var total = done + c.new + c.due + c.learn;
@@ -672,7 +688,8 @@
   $('undoBtn').addEventListener('click', undo);
   $('undoBtn2').addEventListener('click', undo);
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
-  $('deckBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
+  $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
+  document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
   $('deckList').addEventListener('click', function (e) {
     var b = e.target.closest('.deck[data-deck]'); if (b) switchDeck(b.dataset.deck);
   });
@@ -735,7 +752,7 @@
     if (k === 'Escape') { setView('study'); return; }
     if (k === 'b') { setView('browse'); return; }
     if (k === 's') { setView('stats'); return; }
-    if (k === 'd') { setView('decks'); return; }
+    if (k === 'd' || k === 'h') { setView('decks'); return; }
     if (k === ',') { setView('settings'); return; }
     if (k === 'u') { undo(); return; }
     if (view !== 'study') return;
