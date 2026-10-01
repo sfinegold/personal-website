@@ -113,7 +113,7 @@
       ]
     },
     {
-      "source": "/anki/decks/greek.js",
+      "source": "/anki/decks/:file*",
       "headers": [
         {
           "key": "Cache-Control",
