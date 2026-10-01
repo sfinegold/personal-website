@@ -928,8 +928,8 @@
       if (!mergeLocal) { store.decks = {}; store.streak = null; }
       store.sync = Object.assign(freshSync(), { token: j.token, uid: j.user.uid, email: j.user.email, name: j.user.name, dirty: mergeLocal });
       save(); $(f.code).value = ''; fillSettings();
-      if (f === WF) view = 'decks';
-      return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); });
+      if (f === WF) { view = 'decks'; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); window.scrollTo(0, 0); }
+      return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); window.scrollTo(0, 0); });
     }).catch(function (e) { $(f.note).textContent = e.message; if (e.status === 400 && /first and last/.test(e.message)) { $(f.names).style.display = ''; $(f.first).focus(); } });
   }
   // First visit on a device: ask for a sign-in once. Skipping holds for a week.
@@ -1384,8 +1384,9 @@
   function setView(v) {
     view = v;
     if (v === 'settings') fillSettings();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // close the keyboard
     render();
-    if (v === 'browse' || v === 'decks') window.scrollTo(0, 0);
+    window.scrollTo(0, 0);   // a view left scrolled (the welcome form under the keyboard) would push the next one under the status bar
   }
 
   /* ---------- add a card (Claude drafts it, the person checks it) ---------- */
