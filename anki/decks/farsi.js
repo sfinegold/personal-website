@@ -445,7 +445,7 @@ window.DECKS.farsi = {
     {id:'feel-hava-sarde', term:'هوا سرده', tr:'havā sarde', en:'It\'s cold (weather)', memo:'havā = weather + sard = cold + -e = is. Think \'sardines are kept cold\'.',
      parts:[{t:'هوا', tr:'havā', m:'weather'}, {t:'سرد', tr:'sard', m:'cold'}, {t:'ه', tr:'e', m:'is'}],
      tags:['feelings','time']},
-    {id:'feel-dust-daram', term:'دوست دارم', tr:'dust dāram', en:'I like it / I love it', memo:'dust = friend (a cousin of... think \'dost\', buddy) + dāram = I have: \'I have (it as a) friend\' = I like / love it.',
+    {id:'feel-dust-daram', term:'دوست دارم', tr:'dust dāram', en:'I like it / I love it', memo:'dust = friend (Hindi \'dost\' is the same word) + dāram = I have: \'I have it as a friend\' = I like / love it.',
      parts:[{t:'دوست', tr:'dust', m:'friend'}, {t:'دار', tr:'dār', m:'have'}, {t:'م', tr:'am', m:'I'}],
      tags:['feelings','verbs'],
      ex:{term:'ایران رو دوست دارم.', tr:'Irān ro dust dāram.', en:'I like Iran.'}},
