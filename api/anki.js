@@ -130,7 +130,7 @@ module.exports = async (req, res) => {
         if (!user && (!first || !last)) return res.status(400).json({ error: 'Enter your first and last name to create your account.', needName: true });
         await setJSON(kCode(uid), { hash: '', exp: 0, tries: CODE_TRIES, sentAt: pending.sentAt });   // single use
         if (!user) {
-          user = { uid, email, first, last, name: cleanName(first + ' ' + last), created: new Date().toISOString(), updated: null };
+          user = { uid, email, first, last, name: first, created: new Date().toISOString(), updated: null };
           await setJSON(kUser(uid), user);
           await setJSON(kState(uid), emptyDoc());
         }

@@ -928,8 +928,8 @@
       if (!mergeLocal) { store.decks = {}; store.streak = null; }
       store.sync = Object.assign(freshSync(), { token: j.token, uid: j.user.uid, email: j.user.email, name: j.user.name, dirty: mergeLocal });
       save(); $(f.code).value = ''; fillSettings();
-      if (f === WF) { view = 'decks'; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); window.scrollTo(0, 0); }
-      return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); window.scrollTo(0, 0); });
+      if (f === WF) { view = 'decks'; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); resetScroll(); }
+      return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); resetScroll(); });
     }).catch(function (e) { $(f.note).textContent = e.message; if (e.status === 400 && /first and last/.test(e.message)) { $(f.names).style.display = ''; $(f.first).focus(); } });
   }
   // First visit on a device: ask for a sign-in once. Skipping holds for a week.
@@ -1386,7 +1386,21 @@
     if (v === 'settings') fillSettings();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // close the keyboard
     render();
-    window.scrollTo(0, 0);   // a view left scrolled (the welcome form under the keyboard) would push the next one under the status bar
+    resetScroll();
+  }
+  // iOS keeps the offset the keyboard caused after a field loses focus, which pushes the next
+  // view under the status bar. Reset now, again once the keyboard animation is done, and
+  // whenever the visual viewport settles while no field is focused.
+  function resetScroll() {
+    window.scrollTo(0, 0);
+    setTimeout(function () { window.scrollTo(0, 0); }, 60);
+    setTimeout(function () { window.scrollTo(0, 0); }, 400);
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function () {
+      var el = document.activeElement, typing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA');
+      if (!typing && (window.scrollY || window.visualViewport.offsetTop)) resetScroll();
+    });
   }
 
   /* ---------- add a card (Claude drafts it, the person checks it) ---------- */
