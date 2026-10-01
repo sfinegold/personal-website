@@ -121,8 +121,16 @@
   .d-counts b{color:inherit;font-weight:600}
   .deck.off{opacity:.6}
   .counts{display:flex;gap:.55rem;font-family:var(--mono);font-size:.88rem;font-variant-numeric:tabular-nums}
-  .mute{margin-left:auto;margin-right:.6rem;width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--text);
-    display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+  .top .sp{flex:1}
+  .mute,.gear{margin-right:.6rem;width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--text);
+    display:flex;align-items:center;justify-content:center;padding:0;flex:none;cursor:pointer}
+  .gear{margin-right:0;margin-left:.45rem}
+  .gear svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .gear:hover{background:rgba(255,255,255,.6)}
+  .app[data-view=settings] .gear{background:var(--text);color:#FFFFFF}
+  .signin{margin-left:.6rem;flex:none;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:var(--text);color:#FFFFFF;
+    border:0;border-radius:999px;padding:0 .75rem;height:30px;cursor:pointer}
+  .signin:hover{background:#2A3038}
   .mute svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .mute .ic-off{display:none} .mute.off .ic-on{display:none} .mute.off .ic-off{display:block}
   .mute.off{color:var(--dim)}
@@ -374,10 +382,13 @@
 <div class="app" id="app" data-view="study">
   <header class="top">
     <button class="home" id="homeBtn" aria-label="Home" title="Home (h)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
+    <span class="sp"></span>
     <button class="mute" id="muteBtn" aria-label="Mute auto-play" title="Mute auto-play (m)"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic-on"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18 5.5a8.5 8.5 0 0 1 0 13"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" class="ic-off"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
     <div class="counts" title="new · learning · due" aria-label="Counts">
       <b class="c-new" id="cNew">0</b><b class="c-learn" id="cLearn">0</b><b class="c-due" id="cDue">0</b>
     </div>
+    <button class="signin" id="signinBtn" title="Sign in to keep your progress">Sign in</button>
+    <button class="gear" id="gearBtn" aria-label="Settings" title="Settings (,)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </header>
   <nav class="tabs" aria-label="Views">
     <button class="tab" data-go="study">Study</button>
@@ -556,7 +567,7 @@
         </div>
       </div>
       <div id="signedIn" style="display:none">
-        <div class="row"><label>Signed in as<small id="sWho"></small></label><button class="btn ghost" id="syncOutBtn">Sign out</button></div>
+        <div class="row"><label>Signed in as<small id="sWho"></small></label><button class="btn danger" id="syncOutBtn">Sign out</button></div>
         <div class="row"><label for="sName">Display name<small>Shown on the home screen.</small></label><input type="text" id="sName" maxlength="24"></div>
       </div>
     </div>
@@ -936,12 +947,14 @@
       return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); resetScroll(); });
     }).catch(function (e) { $(f.note).textContent = e.message; if (e.status === 400 && /first and last/.test(e.message)) { $(f.names).style.display = ''; $(f.first).focus(); } });
   }
-  // First visit on a device: ask for a sign-in once. Skipping holds for a week.
-  function needWelcome() { return !hasProfile() && !store.sync.lastEmail && !(store.sync.skipAt && Date.now() - store.sync.skipAt < 7 * 86400000); }
+  // Not signed in: the welcome screen asks on every launch. "Skip for now" holds for this browser session only,
+  // and the Sign in pill stays in the top bar until the person signs in.
+  function skippedThisSession() { try { return sessionStorage.getItem('anki_skip') === '1'; } catch (e) { return false; } }
+  function needWelcome() { return !hasProfile() && !skippedThisSession(); }
   function signOut() {
     if (!confirm('Sign out on this device? Progress stays here and on the account.')) return;
     var tok = store.sync.token, who = store.sync.email;
-    store.sync = Object.assign(freshSync(), { lastEmail: who }); save(); setSync('idle'); fillSettings(); toast('Signed out');
+    store.sync = Object.assign(freshSync(), { lastEmail: who }); save(); setSync('idle'); fillSettings(); renderTop(); toast('Signed out');
     if (tok) fetch(API + '?op=signout', { method: 'POST', headers: { 'x-anki-token': tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'signout' }) }).catch(function () {});
   }
   function renameAccount() {
@@ -1112,6 +1125,7 @@
     $('undoBtn').disabled = !canUndo; $('undoBtn2').disabled = !canUndo;
     $('muteBtn').classList.toggle('off', !store.settings.autoSay);
     $('muteBtn').style.display = deck() && deck().meta.speech === false ? 'none' : '';
+    $('signinBtn').style.display = hasProfile() ? 'none' : '';
     $('muteBtn').setAttribute('aria-label', store.settings.autoSay ? 'Mute auto-play' : 'Unmute auto-play');
   }
   function renderCard() {
@@ -1560,7 +1574,9 @@
   $('wCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(WF); });
   $('wLast').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(WF); });
   $('sLast').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(SF); });
-  $('wSkip').addEventListener('click', function () { store.sync.skipAt = Date.now(); save(); setView('study'); });
+  $('wSkip').addEventListener('click', function () { try { sessionStorage.setItem('anki_skip', '1'); } catch (e) {} setView('study'); });
+  $('signinBtn').addEventListener('click', function () { $('wNote').textContent = ''; setView('welcome'); });
+  $('gearBtn').addEventListener('click', function () { setView(view === 'settings' ? 'study' : 'settings'); });
 
   var toastT;
   function toast(msg) {
