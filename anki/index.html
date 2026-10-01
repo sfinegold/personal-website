@@ -402,8 +402,10 @@
     var d = deckOf(id), bucket = P(id), out = [];
     var dirs = filterDirs ? store.settings.dirs : 'both';
     d.data.notes.forEach(function (n, i) {
-      if (dirs !== 'rev') out.push({ id: n.id + ':fwd', noteId: n.id, dir: 'fwd', order: i * 2, note: n, state: bucket.cards[n.id + ':fwd'] || null });
-      if (dirs !== 'fwd') out.push({ id: n.id + ':rev', noteId: n.id, dir: 'rev', order: i * 2 + 1, note: n, state: bucket.cards[n.id + ':rev'] || null });
+      // Notes flagged priority:true are introduced before the rest, otherwise file order.
+      var base = (n.priority ? 0 : 1000000) + i * 2;
+      if (dirs !== 'rev') out.push({ id: n.id + ':fwd', noteId: n.id, dir: 'fwd', order: base, note: n, state: bucket.cards[n.id + ':fwd'] || null });
+      if (dirs !== 'fwd') out.push({ id: n.id + ':rev', noteId: n.id, dir: 'rev', order: base + 1, note: n, state: bucket.cards[n.id + ':rev'] || null });
     });
     return out;
   }

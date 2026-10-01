@@ -52,6 +52,7 @@ function validateDeck(deck, meta) {
     else check(n.tr === undefined, w + ': tr not allowed (deck is not translit)');
     check(Array.isArray(n.tags) && n.tags.length > 0 && n.tags.every(str), w + ': tags must be a non-empty array of strings');
     if (n.note !== undefined) check(str(n.note), w + ': note must be a non-empty string if present');
+    if (n.priority !== undefined) check(n.priority === true, w + ': priority must be true if present (omit it otherwise)');
     if (n.ex !== undefined) {
       check(n.ex && str(n.ex.term) && str(n.ex.en), w + ': ex needs term and en');
       if (meta.translit) check(n.ex && str(n.ex.tr), w + ': ex needs tr');

@@ -21,7 +21,10 @@
  *                  and `term` is the main line)
  *   3. Run `node anki/deck.test.js`, commit, push. Never change an existing id.
  *
- * Note fields in a deck file: { id, term, tr?, en, tags, note?, ex?:{term, tr?, en} }
+ * Note fields in a deck file: { id, term, tr?, en, tags, note?, ex?:{term, tr?, en}, priority? }
+ *   priority: true  puts the note's cards at the front of the new-card queue, ahead of
+ *             unseen notes without the flag. Use it when Sam asks for a set "next".
+ *             Remove the flag later (or leave it; it only affects unseen cards).
  *   term  the phrase in the target language's own script
  *   tr    transliteration (only when translit is true)
  *   en    English
