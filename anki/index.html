@@ -63,6 +63,16 @@
   .app[data-view=study] .tabs,.app[data-view=done] .tabs,.app[data-view=decks] .tabs,.app[data-view=study] .track,.app[data-view=done] .track{display:none}
   .decklist{display:flex;flex-direction:column;gap:.5rem}
   .menu{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+  .syncline{display:block;width:100%;background:none;border:0;text-align:left;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--dim);padding:.6rem .2rem 0;min-height:32px}
+  .syncline.err{color:#B3261E}
+  .pnote{font-size:.86rem;color:var(--dim);line-height:1.5;margin-bottom:.8rem}
+  .plist{display:flex;flex-direction:column;gap:.35rem;margin:.6rem 0}
+  .prow{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:#FFFFFF;border:1px solid var(--line);border-radius:10px;padding:.5rem .6rem .5rem .8rem}
+  .prow .pname{font-weight:600}
+  .prow .pmeta{font-family:var(--mono);font-size:.62rem;color:var(--faint);margin-left:.4rem}
+  .prow .btn{padding:.45rem .7rem;min-height:36px;font-size:.62rem}
+  .prow.on{border-color:var(--text)}
   .menu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
   .menu .btn span{color:var(--dim);font-size:.7rem}
   .app[data-view=decks] #view-decks{display:flex}
@@ -346,6 +356,7 @@
   <section class="view" id="view-decks">
     <h2 class="ttl">Decks</h2>
     <div class="decklist" id="deckList"></div>
+    <button class="syncline" id="syncStatus"></button>
     <div class="menu">
       <button class="btn" data-go="browse">Phrases <span>search, themes, progress</span></button>
       <button class="btn" data-go="stats">Stats <span>deck and today</span></button>
@@ -376,6 +387,15 @@
   </section>
 
   <section class="view" id="view-settings">
+    <h2 class="ttl">Profile &amp; sync</h2>
+    <div class="panel" id="syncPanel">
+      <p class="pnote" id="syncNote">Keep your progress on every device and give each person their own profile. Enter the family passphrase to connect.</p>
+      <div class="row" id="rowPass"><label for="sPass">Passphrase</label><input type="password" id="sPass" autocomplete="current-password" placeholder="passphrase"></div>
+      <div class="actions" id="syncActions"><button class="btn" id="connectBtn">Connect</button></div>
+      <div id="profileList"></div>
+      <div class="row" id="rowNewProfile" style="display:none"><label for="sNewProfile">New profile<small>A name, e.g. Caroline.</small></label><input type="text" id="sNewProfile" placeholder="name" maxlength="24"></div>
+      <div class="actions" id="newProfileActions" style="display:none"><button class="btn" id="newProfileBtn">Create profile</button><button class="btn ghost" id="syncOutBtn">Sign out</button></div>
+    </div>
     <h2 class="ttl">Study</h2>
     <div class="panel">
       <div class="row"><label for="sNew">New cards per day<small>Anki default is 20. Each phrase is two cards.</small></label><input type="number" id="sNew" min="0" max="999"></div>
@@ -404,6 +424,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="/anki/scheduler.js"></script>
+<script src="/anki/merge.js"></script>
 <script src="/anki/decks/index.js"></script>
 <script>
 (function () {
@@ -420,7 +441,8 @@
 
   /* ---------- storage (v2: progress per deck) ---------- */
   function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null, boost: [] }; }
-  function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {} }; }
+  function freshSync() { return { pass: '', profileId: '', profileName: '', lastSync: 0, lastError: '', dirty: false }; }
+  function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {}, sync: freshSync(), updated: null }; }
   function normalise(o) {
     if (!o || typeof o !== 'object') return null;
     if (o.v === 1 && typeof o.cards === 'object') {
@@ -431,6 +453,9 @@
     var s = fresh();
     s.settings = Object.assign(s.settings, o.settings || {});
     s.deck = (o.deck && INDEX.some(function (d) { return d.id === o.deck; })) ? o.deck : INDEX[0].id;
+    s.sync = Object.assign(freshSync(), o.sync || {});
+    s.updated = o.updated || null;
+    if (o.streak) s.streak = o.streak;
     Object.keys(o.decks || {}).forEach(function (id) {
       var b = o.decks[id] || {}, nb = freshBucket();
       nb.cards = (b.cards && typeof b.cards === 'object') ? b.cards : {};
@@ -544,7 +569,7 @@
     b.cards[c.id] = S.answer(c.state, r, now, cfg(), undefined, store.deck + '/' + c.id);
     if (!prev) b.day.newDone++;
     else if (prev.type === 'review') b.day.revDone++;
-    save();
+    save(); markDirty();
     lastNoteId = c.noteId;
     pickNext();
     render();
@@ -554,13 +579,125 @@
     if (!u) return;
     if (u.prev) b.cards[u.id] = u.prev; else delete b.cards[u.id];
     b.day = u.prevDay;
-    save();
+    save(); markDirty();
     view = 'study';
     rebuild();
     if (cardsIdx[u.id]) { current = u.id; revealed = false; lastNoteId = null; }
     else pickNext();
     render();
     toast('Undone');
+  }
+
+  /* ---------- sync: profiles on the server, merged with local ---------- */
+  var M = window.AnkiMerge;
+  var API = '/api/anki';
+  var pushTimer = null, pushing = false, syncState = 'idle';   // idle | saving | synced | offline | off
+  function hasProfile() { return !!(store.sync && store.sync.profileId && store.sync.pass); }
+  function hasLocalProgress() { return Object.keys(store.decks).some(function (id) { return Object.keys(store.decks[id].cards || {}).length > 0; }); }
+  function docOut() {
+    var decks = {};
+    Object.keys(store.decks).forEach(function (id) { var b = store.decks[id]; decks[id] = { cards: b.cards, day: b.day, stamp: b.stamp, boost: b.boost, undo: [] }; });
+    return { v: 2, updated: new Date().toISOString(), settings: store.settings, decks: decks, deck: store.deck, streak: store.streak || null };
+  }
+  function adopt(doc) {
+    var merged = M.mergeState(store, doc);   // keeps this device's undo, takes the later card states
+    Object.keys(merged.decks).forEach(function (id) {
+      var b = freshBucket(); Object.assign(b, merged.decks[id]);
+      b.undo = (store.decks[id] && store.decks[id].undo) || [];
+      store.decks[id] = b;
+    });
+    if (merged.settings) store.settings = Object.assign({}, DEF_SETTINGS, merged.settings);
+    if (merged.streak) store.streak = merged.streak;
+    store.updated = doc.updated || store.updated;
+  }
+  function api(op, params, body, keepalive) {
+    var url = API + '?op=' + encodeURIComponent(op) + Object.keys(params || {}).map(function (k) { return '&' + k + '=' + encodeURIComponent(params[k]); }).join('');
+    var opts = { method: body ? 'POST' : 'GET', headers: { 'x-anki-pass': store.sync.pass || '' }, keepalive: !!keepalive };
+    if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(Object.assign({ op: op }, body)); }
+    return fetch(url, opts).then(function (r) {
+      return r.text().then(function (t) {
+        var j = {}; try { j = JSON.parse(t || '{}'); } catch (e) {}
+        if (!r.ok) { var err = new Error(j.error || ('HTTP ' + r.status)); err.status = r.status; throw err; }
+        return j;
+      });
+    });
+  }
+  function setSync(state, err) {
+    syncState = state;
+    if (err !== undefined) store.sync.lastError = err || '';
+    if (view === 'decks') renderSyncLine();
+  }
+  function renderSyncLine() {
+    var el = $('syncStatus'); if (!el) return;
+    el.classList.remove('err');
+    if (!hasProfile()) { el.textContent = 'Not synced · set up a profile in Settings'; return; }
+    var name = store.sync.profileName || 'profile';
+    if (syncState === 'saving') el.textContent = name + ' · saving…';
+    else if (syncState === 'offline') { el.textContent = name + ' · offline, will sync' + (store.sync.lastError ? ' (' + store.sync.lastError + ')' : ''); el.classList.add('err'); }
+    else el.textContent = name + ' · synced ' + (store.sync.lastSync ? fmtAgo(Date.now() - store.sync.lastSync) : '');
+  }
+  function fmtAgo(ms) { var m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? m + 'm ago' : Math.round(m / 60) + 'h ago'; }
+  function markDirty() {
+    if (!hasProfile()) return;
+    store.sync.dirty = true; save();
+    clearTimeout(pushTimer); pushTimer = setTimeout(function () { pushState(false); }, 1500);
+  }
+  function pushState(keepalive) {
+    if (!hasProfile() || pushing) return Promise.resolve();
+    pushing = true; setSync('saving');
+    return api('save', { }, { profile: store.sync.profileId, state: docOut() }, keepalive).then(function (doc) {
+      adopt(doc); store.sync.dirty = false; store.sync.lastSync = Date.now(); save(); setSync('synced', '');
+    }).catch(function (e) {
+      setSync('offline', e.status === 401 ? 'wrong passphrase' : e.status === 503 ? 'server not configured' : 'no connection');
+    }).then(function () { pushing = false; });
+  }
+  function pullState() {
+    if (!hasProfile()) return Promise.resolve();
+    return api('state', { profile: store.sync.profileId }).then(function (doc) {
+      var before = docOut(); adopt(doc); save();
+      var changed = M.differs(docOut(), doc) || store.sync.dirty;
+      store.sync.lastSync = Date.now(); setSync('synced', '');
+      current = null; render();
+      if (changed) return pushState(false);
+    }).catch(function (e) {
+      setSync('offline', e.status === 401 ? 'wrong passphrase' : e.status === 503 ? 'server not configured' : 'no connection');
+      render();
+    });
+  }
+  function useProfile(p) {
+    if (store.sync.profileId === p.id) return;
+    var switching = hasProfile();
+    var start = switching ? pushState(false) : Promise.resolve();
+    var mergeLocal = !switching && hasLocalProgress() ? confirm('Merge this device\'s progress into "' + p.name + '"?\n\nOK merges it in. Cancel replaces it with the profile\'s progress.') : false;
+    start.then(function () {
+      if (switching || !mergeLocal) { store.decks = {}; store.streak = null; }
+      store.sync.profileId = p.id; store.sync.profileName = p.name; store.sync.dirty = mergeLocal; save();
+      return pullState();
+    }).then(function () { toast('Using profile ' + p.name); fillSettings(); return refreshProfiles(); });
+  }
+  function refreshProfiles() {
+    if (!store.sync.pass || view !== 'settings') return Promise.resolve();
+    return api('profiles').then(function (j) { renderProfiles(j.profiles || []); }).catch(function () {});
+  }
+  function renderProfiles(list) {
+    var el = $('profileList');
+    el.innerHTML = '<div class="plist">' + (list.length ? list.map(function (p) {
+      var on = p.id === store.sync.profileId;
+      return '<div class="prow' + (on ? ' on' : '') + '"><span><span class="pname">' + esc(p.name) + '</span><span class="pmeta">' + (p.updated ? 'studied ' + fmtAgo(Date.now() - Date.parse(p.updated)) : 'new') + '</span></span>' +
+        '<button class="btn" data-profile="' + esc(p.id) + '" data-name="' + esc(p.name) + '"' + (on ? ' disabled' : '') + '>' + (on ? 'In use' : 'Use') + '</button></div>';
+    }).join('') : '<div class="empty">No profiles yet. Create one below.</div>') + '</div>';
+    $('rowNewProfile').style.display = ''; $('newProfileActions').style.display = '';
+  }
+  function connect() {
+    store.sync.pass = $('sPass').value.trim(); save();
+    $('syncNote').textContent = 'Connecting…';
+    return api('profiles').then(function (j) {
+      $('syncNote').textContent = 'Connected. Pick your profile, or create one.';
+      renderProfiles(j.profiles || []);
+    }).catch(function (e) {
+      $('profileList').innerHTML = '';
+      $('syncNote').textContent = e.status === 503 ? 'Sync is not set up on the server yet: ' + e.message : e.status === 401 ? 'That passphrase is not right.' : 'Could not reach the server: ' + e.message;
+    });
   }
 
   /* ---------- speech (device voice for the deck's language) ---------- */
@@ -850,8 +987,17 @@
         '<div class="d-counts"><b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></button>';
     });
     $('deckList').innerHTML = html;
+    renderSyncLine();
   }
   function fillSettings() {
+    $('sPass').value = store.sync.pass || '';
+    if (hasProfile()) {
+      $('syncNote').textContent = 'Syncing as ' + store.sync.profileName + '. Connect again to switch profile or add one.';
+      $('rowNewProfile').style.display = ''; $('newProfileActions').style.display = '';
+    } else {
+      $('rowNewProfile').style.display = 'none'; $('newProfileActions').style.display = 'none';
+      $('profileList').innerHTML = '';
+    }
     $('sNew').value = store.settings.newPerDay; $('sRev').value = store.settings.revPerDay;
     $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
     $('sSay').checked = !!store.settings.autoSay;
@@ -886,12 +1032,30 @@
   $('undoBtn').addEventListener('click', undo);
   $('undoBtn2').addEventListener('click', undo);
   $('moreBtn').addEventListener('click', function () {
-    var b = P(); b.day.extraNew = (+b.day.extraNew || 0) + 20; save();
+    var b = P(); b.day.extraNew = (+b.day.extraNew || 0) + 20; save(); markDirty();
     current = null; lastNoteId = null; view = 'study'; render();
     toast('+20 new cards today');
   });
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
   $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
+  $('syncStatus').addEventListener('click', function () { setView('settings'); });
+  $('connectBtn').addEventListener('click', connect);
+  $('sPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') connect(); });
+  $('profileList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-profile]'); if (!b) return;
+    useProfile({ id: b.dataset.profile, name: b.dataset.name });
+  });
+  $('newProfileBtn').addEventListener('click', function () {
+    var name = $('sNewProfile').value.trim(); if (!name) { toast('Give the profile a name'); return; }
+    api('create', {}, { name: name }).then(function (j) { $('sNewProfile').value = ''; useProfile(j.profile); })
+      .catch(function (e) { toast('Could not create: ' + e.message); });
+  });
+  $('syncOutBtn').addEventListener('click', function () {
+    if (!confirm('Stop syncing on this device? Progress stays here.')) return;
+    store.sync = freshSync(); save(); setSync('idle'); fillSettings(); toast('Sync off');
+  });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
+  window.addEventListener('pagehide', function () { if (store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
   $('deckList').addEventListener('click', function (e) {
     var b = e.target.closest('.deck[data-deck]'); if (b) switchDeck(b.dataset.deck);
@@ -920,7 +1084,7 @@
       if (act.dataset.act === 'boost') {
         var b = P(d.meta.id), i = b.boost.indexOf(n.id);
         if (i >= 0) b.boost.splice(i, 1); else b.boost.push(n.id);
-        save(); if (d.meta.id === store.deck) current = null;
+        save(); markDirty(); if (d.meta.id === store.deck) current = null;
         toast(i >= 0 ? 'Removed from next' : 'Will come up next' + (d.meta.id === store.deck ? '' : ' in ' + d.meta.name));
         renderBrowse();
         var again = $('list').querySelector('.note[data-id="' + n.id + '"][data-deck="' + d.meta.id + '"]'); if (again) again.classList.add('open');
@@ -929,7 +1093,7 @@
       if (act.dataset.act === 'reset') {
         if (!confirm('Reset "' + (n.tr || n.term) + '" to new in both directions?')) return;
         var bk = P(d.meta.id); delete bk.cards[n.id + ':fwd']; delete bk.cards[n.id + ':rev'];
-        save(); if (d.meta.id === store.deck) current = null; toast('Card reset'); renderBrowse(); return;
+        save(); markDirty(); if (d.meta.id === store.deck) current = null; toast('Card reset'); renderBrowse(); return;
       }
     }
     var el = e.target.closest('.el');
@@ -943,7 +1107,7 @@
     store.settings.trFirst = $('sTr').checked;
     store.settings.autoSay = $('sSay').checked;
     store.settings.dirs = $('sDir').value;
-    save(); current = null; render();
+    save(); markDirty(); current = null; render();
   }
   ['sNew', 'sRev', 'sTr', 'sSay', 'sDir'].forEach(function (id) { $(id).addEventListener('change', settingChanged); });
 
@@ -965,7 +1129,7 @@
       if (!s) { toast('Not a progress file'); return; }
       var n = 0; Object.keys(s.decks).forEach(function (id) { n += Object.keys(s.decks[id].cards).length; });
       if (!confirm('Replace this browser\'s progress with the file (' + n + ' cards across ' + Object.keys(s.decks).length + ' deck' + (Object.keys(s.decks).length === 1 ? '' : 's') + ')?')) return;
-      store = s; save(); current = null; lastNoteId = null; pickVoice(); setView('study'); toast('Imported ' + n + ' cards');
+      var keepSync = store.sync; store = s; store.sync = keepSync; save(); markDirty(); current = null; lastNoteId = null; pickVoice(); setView('study'); toast('Imported ' + n + ' cards');
     };
     rd.readAsText(f);
   });
@@ -973,7 +1137,7 @@
     var name = deck().meta.name;
     if (!confirm('Reset progress for ' + name + '? Every card in this deck goes back to new. Other decks are untouched.')) return;
     if (!confirm('Really? This cannot be undone.')) return;
-    store.decks[store.deck] = freshBucket(); save(); current = null; lastNoteId = null; setView('study'); toast('Progress reset');
+    store.decks[store.deck] = freshBucket(); save(); markDirty(); current = null; lastNoteId = null; setView('study'); toast('Progress reset');
   });
 
   document.addEventListener('keydown', function (e) {
@@ -1023,6 +1187,7 @@
     save();
     pickVoice();
     render();
+    if (hasProfile()) pullState();
   });
 })();
 </script>
