@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Flashcards icon: white brain tissue on blue, zoomed so the hemisphere runs off every edge. -->
+  <rect width="1024" height="1024" fill="#5FB8EC"/>
+  <g transform="translate(512 512) scale(1.58 1.78) translate(-515 -470)" fill="#FFFFFF" stroke="#5FB8EC" stroke-linecap="round" stroke-linejoin="round">
+    <!-- cerebellum, tucked under the back -->
+    <g transform="rotate(-12 760 700)">
+      <ellipse cx="760" cy="700" rx="150" ry="78" stroke-width="20"/>
+      <path d="M650 688 c 40 -22, 110 -22, 160 4 M655 718 c 50 -22, 120 -18, 170 10 M690 746 c 40 -18, 100 -16, 145 10" fill="none" stroke-width="16"/>
+    </g>
+    <!-- cerebrum outline -->
+    <path d="M150 520 C 120 420, 170 280, 300 220 C 400 150, 560 140, 680 190 C 820 230, 900 340, 880 470 C 870 560, 820 620, 740 650 C 700 695, 650 715, 600 690 C 520 740, 420 760, 340 700 C 260 660, 180 620, 150 520 Z" stroke-width="20"/>
+    <!-- folds: meandering sulci that curl at the tips, fanning around the lateral fissure -->
+    <g fill="none" stroke-width="27">
+      <path d="M205 560 c 100 -12, 190 -38, 290 -58 c 60 -12, 110 -18, 160 -14 c 24 2, 36 14, 34 30"/>
+      <path d="M195 320 c 45 18, 25 70, 65 92 c 40 22, 28 72, 68 92 c 22 10, 36 0, 36 -20"/>
+      <path d="M305 228 c 32 42, -8 84, 30 124 c 38 40, 8 82, 36 120 c 14 18, 34 14, 40 -8"/>
+      <path d="M430 172 c 30 46, -16 92, 12 138 c 28 46, -12 92, 12 144 c 10 20, 30 20, 40 2"/>
+      <path d="M560 178 c 36 48, -2 92, 36 140 c 34 46, 2 96, 28 146 c 10 18, 32 16, 36 -4"/>
+      <path d="M690 230 c 42 48, 12 92, 50 138 c 32 42, 10 84, 30 128 c 8 18, 28 20, 36 4"/>
+      <path d="M810 350 c 26 48, -8 84, 14 130 c 14 30, 12 60, 4 86"/>
+      <path d="M172 440 c 38 -22, 70 20, 108 -2 c 24 -14, 46 -6, 60 10 c 10 12, 6 26, -8 30"/>
+      <path d="M236 262 c 24 8, 30 34, 10 54 c -16 16, -40 10, -46 -8"/>
+      <path d="M262 600 c 60 22, 100 -22, 160 8 c 60 30, 100 -12, 158 10 c 16 6, 26 18, 22 32"/>
+      <path d="M334 676 c 50 22, 90 -16, 140 4 c 40 18, 80 -10, 112 8"/>
+      <path d="M600 520 c 50 10, 90 40, 120 80 c 10 14, 20 24, 34 34"/>
+    </g>
+  </g>
+</svg>
