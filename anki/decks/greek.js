@@ -31,7 +31,7 @@ window.DECKS = window.DECKS || {};
 window.DECKS.greek = {
   id: 'greek',
   name: 'Conversational Greek',
-  version: 2,
+  version: 3,
   updated: '2026-10-01',
 
   notes: [
@@ -406,6 +406,20 @@ window.DECKS.greek = {
      ex:{term:'Χωριστά, παρακαλώ.', tr:'choristá, parakaló.', en:'Separate bills, please.'}},
     {id:'rest-ya-to-spiti', term:'Για το σπίτι', tr:'ya to spíti', en:'To take away', tags:['restaurant','food'], priority:true,
      note:'Literally "for the house". Also πακέτο (pakéto).'},
+
+    {id:'rest-trapezi-ya-atoma', term:'Τραπέζι για ... άτομα', tr:'trapézi ya ... átoma', en:'Table for ... people', tags:['restaurant','food','numbers'], priority:true,
+     note:'Two is δύο; three and four take the people form τρεις, τέσσερις; from five on numbers do not change.',
+     ex:{term:'Ένα τραπέζι για πέντε άτομα, παρακαλώ.', tr:'éna trapézi ya pénde átoma, parakaló.', en:'A table for five people, please.'}},
+    {id:'rest-posa-atoma', term:'Πόσα άτομα;', tr:'pósa átoma?', en:'How many people?', tags:['restaurant','food','numbers'], priority:true,
+     note:'What the host asks at the door. Answer with just the number.'},
+    {id:'rest-imaste-dio', term:'Είμαστε δύο', tr:'ímaste dío', en:'There are two of us', tags:['restaurant','food','numbers'], priority:true,
+     note:'The natural reply. Είμαστε τρεις, είμαστε τέσσερις, είμαστε πέντε.'},
+    {id:'rest-trapezi-ya-enan', term:'Τραπέζι για έναν', tr:'trapézi ya énan', en:'Table for one', tags:['restaurant','food','numbers'], priority:true,
+     note:'Or για ένα άτομο (for one person).'},
+    {id:'rest-trapezi-ya-tris', term:'Τραπέζι για τρεις', tr:'trapézi ya tris', en:'Table for three', tags:['restaurant','food','numbers'], priority:true},
+    {id:'rest-trapezi-ya-tesseris', term:'Τραπέζι για τέσσερις', tr:'trapézi ya tésseris', en:'Table for four', tags:['restaurant','food','numbers'], priority:true},
+    {id:'rest-trapezi-ya-pende', term:'Τραπέζι για πέντε', tr:'trapézi ya pénde', en:'Table for five', tags:['restaurant','food','numbers'], priority:true},
+    {id:'rest-trapezi-ya-exi', term:'Τραπέζι για έξι', tr:'trapézi ya éxi', en:'Table for six', tags:['restaurant','food','numbers'], priority:true},
 
     /* ---------------- CONNECTORS ---------------- */
     {id:'con-ke', term:'Και', tr:'ke', en:'And', tags:['connectors'],
