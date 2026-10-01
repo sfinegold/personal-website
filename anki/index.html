@@ -201,6 +201,16 @@
     border:1px solid var(--line);border-radius:8px;padding:0 .7rem;min-height:40px;white-space:nowrap}
   .scope.all{background:var(--text);color:#FFFFFF;border-color:var(--text)}
   .themes{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem}
+  .dsec{background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.9);border-radius:12px;margin-bottom:.6rem;overflow:hidden}
+  .dsec summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;padding:.8rem .9rem}
+  .dsec summary::-webkit-details-marker{display:none}
+  .dsec summary .d-name{font-size:1.02rem}
+  .dsec summary .d-sub{margin:0;font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;white-space:nowrap}
+  .dsec summary::after{content:'▸';color:var(--faint);margin-left:.4rem}
+  .dsec[open] summary::after{content:'▾'}
+  .dsec .body{padding:0 .7rem .7rem}
+  .dsec .chips{margin-bottom:.6rem}
+  .dsec .themes{margin-bottom:.2rem}
   .theme{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:10px;padding:.65rem .85rem;text-align:left;width:100%}
   .theme .t1{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
   .theme .t-name{font-weight:600;text-transform:capitalize}
@@ -334,11 +344,7 @@
       <input type="search" id="q" placeholder="Search phrases, meanings, parts…" autocomplete="off" autocapitalize="off">
       <button class="scope" id="scopeBtn" title="Search this deck or all decks">This deck</button>
     </div>
-    <div id="browseHome">
-      <div class="chips" id="stateChips"></div>
-      <h2 class="ttl">Themes</h2>
-      <div class="themes" id="themes"></div>
-    </div>
+    <div id="browseHome"></div>
     <div id="browseResults">
       <div class="crumb" id="crumb"></div>
       <div class="list" id="list"></div>
@@ -479,7 +485,7 @@
 
   /* ---------- session state ---------- */
   var view = 'study', current = null, revealed = false, lastNoteId = null, queueInfo = null, cardsIdx = {};
-  var browseTag = '', browseQ = '', browseState = '', browseScope = 'deck';
+  var browseTag = '', browseQ = '', browseState = '', browseScope = 'deck', browseDeck = '';
   function norm(str) { return String(str || '').normalize('NFD').replace(/[\u0300-\u036f\u200c]/g, '').toLowerCase(); }
 
   function rollDay(now) {
@@ -506,7 +512,7 @@
   function switchDeck(id) {
     if (!deckOf(id) || id === store.deck) { view = 'study'; render(); return; }
     store.deck = id; save();
-    current = null; lastNoteId = null; revealed = false; browseTag = ''; browseQ = ''; browseState = ''; $('q').value = '';
+    current = null; lastNoteId = null; revealed = false; browseTag = ''; browseQ = ''; browseState = ''; browseDeck = ''; $('q').value = '';
     pickVoice();
     view = 'study'; render();
     toast(deckOf(id).meta.name);
@@ -712,36 +718,49 @@
     var rc = retiredCount();
     $('retired').textContent = deck().data.notes.length + ' phrases in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
   }
-  function renderBrowseHome(now) {
-    var d = deck(), notes = d.data.notes;
+  function deckOverview(d, now) {
+    var notes = d.data.notes, id = d.meta.id;
     var counts = { all: notes.length, new: 0, learn: 0, due: 0, mature: 0, leech: 0 };
     var tags = {};
     notes.forEach(function (n) {
-      var sts = noteStates(d.meta.id, n);
+      var sts = noteStates(id, n);
       if (sts.indexOf('new') >= 0) counts.new++;
       if (sts.indexOf('learn') >= 0) counts.learn++;
       if (sts.indexOf('mature') >= 0) counts.mature++;
       if (sts.indexOf('leech') >= 0) counts.leech++;
-      if (noteDue(d.meta.id, n, now)) counts.due++;
+      if (noteDue(id, n, now)) counts.due++;
       n.tags.forEach(function (t) {
         var g = tags[t] || (tags[t] = { n: 0, mature: 0, review: 0, learn: 0, cards: 0 });
         g.n++;
         sts.forEach(function (st) { g.cards++; if (st === 'mature') g.mature++; else if (st === 'review' || st === 'leech') g.review++; else if (st === 'learn') g.learn++; });
       });
     });
-    $('stateChips').innerHTML = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['due', 'Due now'], ['mature', 'Mature'], ['leech', 'Leeches']].map(function (c) {
-      return '<button class="chip" data-state="' + c[0] + '">' + c[1] + ' ' + counts[c[0]] + '</button>';
-    }).join('');
-    $('themes').innerHTML = Object.keys(tags).map(function (t) {
-      var g = tags[t], pc = function (x) { return g.cards ? Math.round(x / g.cards * 100) : 0; };
-      return '<button class="theme" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' phrases · ' + pc(g.mature + g.review) + '% learned</span></div>' +
-        '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
+    return { counts: counts, tags: tags };
+  }
+  function renderBrowseHome(now) {
+    var order = [deck()].concat(INDEX.map(function (m) { return deckOf(m.id); }).filter(function (d) { return d && d.meta.id !== store.deck; }));
+    $('browseHome').innerHTML = order.map(function (d) {
+      var o = deckOverview(d, now), id = d.meta.id, c = o.counts;
+      var learned = 0, cards = 0;
+      Object.keys(o.tags).forEach(function (t) { learned += o.tags[t].mature + o.tags[t].review; cards += o.tags[t].cards; });
+      var chips = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['due', 'Due now'], ['mature', 'Mature'], ['leech', 'Leeches']].map(function (x) {
+        return '<button class="chip" data-deck="' + esc(id) + '" data-state="' + x[0] + '">' + x[1] + ' ' + c[x[0]] + '</button>';
+      }).join('');
+      var themes = Object.keys(o.tags).map(function (t) {
+        var g = o.tags[t], pc = function (x) { return g.cards ? Math.round(x / g.cards * 100) : 0; };
+        return '<button class="theme" data-deck="' + esc(id) + '" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' phrases · ' + pc(g.mature + g.review) + '% learned</span></div>' +
+          '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
+      }).join('');
+      return '<details class="dsec" data-deck="' + esc(id) + '"' + (id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' phrases · ' + c.due + ' due</span></summary>' +
+        '<div class="body"><div class="chips statechips">' + chips + '</div><div class="themes">' + themes + '</div></div></details>';
     }).join('') + '<div class="legend">bar: mature · review · learning · (empty = new)</div>';
   }
   function renderBrowseList(now, q) {
-    var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [deck()];
-    var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : browseTag ? browseTag : ({ all: 'All phrases', new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
-    $('crumb').innerHTML = '<button id="crumbBack">‹ Themes</button><span></span>';
+    var listDeck = (!q && browseDeck && deckOf(browseDeck)) || deck();
+    var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [q ? deck() : listDeck];
+    var what = browseTag ? browseTag : ({ all: 'All phrases', new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
+    var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : (listDeck.meta.id === store.deck ? what : listDeck.meta.name + ' › ' + what);
+    $('crumb').innerHTML = '<button id="crumbBack">‹ Decks</button><span></span>';
     var html = '', total = 0;
     decksToSearch.forEach(function (d) {
       var rows = '';
@@ -865,17 +884,16 @@
 
   $('q').addEventListener('input', function () { browseQ = this.value; browseTag = ''; browseState = ''; renderBrowse(); });
   $('scopeBtn').addEventListener('click', function () { browseScope = browseScope === 'all' ? 'deck' : 'all'; renderBrowse(); });
-  $('stateChips').addEventListener('click', function (e) {
-    var b = e.target.closest('.chip'); if (!b) return;
-    browseState = b.dataset.state; browseTag = ''; renderBrowse(); window.scrollTo(0, 0);
-  });
-  $('themes').addEventListener('click', function (e) {
-    var b = e.target.closest('.theme'); if (!b) return;
-    browseTag = b.dataset.tag; browseState = ''; renderBrowse(); window.scrollTo(0, 0);
+  $('browseHome').addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip[data-state]'), theme = e.target.closest('.theme[data-tag]');
+    if (chip) { browseDeck = chip.dataset.deck; browseState = chip.dataset.state; browseTag = ''; }
+    else if (theme) { browseDeck = theme.dataset.deck; browseTag = theme.dataset.tag; browseState = ''; }
+    else return;
+    renderBrowse(); window.scrollTo(0, 0);
   });
   $('crumb').addEventListener('click', function (e) {
     if (!e.target.closest('#crumbBack')) return;
-    browseQ = ''; $('q').value = ''; browseTag = ''; browseState = ''; renderBrowse();
+    browseQ = ''; $('q').value = ''; browseTag = ''; browseState = ''; browseDeck = ''; renderBrowse();
   });
   $('list').addEventListener('click', function (e) {
     var row = e.target.closest('.note'); if (!row) return;
