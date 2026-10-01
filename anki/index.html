@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+<title>Greek Flashcards</title>
+<meta name="description" content="Spaced-repetition flashcards for conversational Greek, scheduled the way Anki does it.">
+<meta property="og:title" content="Greek Flashcards">
+<meta property="og:description" content="Conversational Greek, one card at a time. Again, Hard, Good, Easy.">
+<meta property="og:url" content="https://samfinegold.me/anki">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    /* Paper and sea: the beige of the pomodoro page with an Aegean blue accent.
+       The three count colours follow Anki's own convention: new blue, learning
+       red, due green, so the numbers read the same way they do in Anki. */
+    --bg:#F4EEE3; --bg-2:#FBF7EF;
+    --card:rgba(255,255,255,.62); --card-2:rgba(255,255,255,.9);
+    --text:#23201B; --dim:rgba(35,32,27,.64); --faint:rgba(35,32,27,.4);
+    --accent:#1D5C8A; --accent-hi:#143F60; --on-accent:#FBF7EF;
+    --line:rgba(35,32,27,.14);
+    --new:#2A6FDB; --learn:#C0392B; --due:#2E6B4F; --leech:#A8761E;
+    --again:#C0392B; --hard:#A8761E; --good:#2E6B4F; --easy:#1D5C8A;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  html{font-size:16px}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;letter-spacing:.01em;min-height:100vh;
+    display:flex;justify-content:center;
+    padding:1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
+    -webkit-tap-highlight-color:transparent}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.5;
+    background:linear-gradient(var(--line) 1px,transparent 1px),
+               linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:120px 120px}
+  :focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px;border-radius:4px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  button{font-family:inherit;cursor:pointer;border-radius:8px;transition:background .15s,color .15s,border-color .15s;color:inherit}
+  a{color:var(--accent)}
+
+  .app{width:100%;max-width:640px;position:relative;z-index:1;display:flex;flex-direction:column;min-height:calc(100vh - 3rem)}
+
+  /* ---- top bar ---- */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:.4rem}
+  .brand{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-hi)}
+  .counts{display:flex;gap:.7rem;font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums}
+  .counts b{font-weight:600}
+  .c-new{color:var(--new)} .c-learn{color:var(--learn)} .c-due{color:var(--due)}
+  .tabs{display:flex;gap:.1rem;margin-left:auto}
+  .tab{background:none;border:0;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);padding:.4rem .45rem;border-bottom:1px solid transparent;border-radius:0}
+  .tab:hover{color:var(--text)}
+  .tab.on{color:var(--accent-hi);border-bottom-color:var(--accent-hi)}
+  .track{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin:.2rem 0 1rem}
+  .fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+
+  .view{display:none;flex:1;flex-direction:column}
+  .app[data-view=study] #view-study,.app[data-view=done] #view-done,.app[data-view=browse] #view-browse,
+  .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings{display:flex}
+
+  /* ---- study ---- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.6rem 1.25rem;
+    min-height:min(46vh,380px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;position:relative;cursor:pointer;user-select:none;-webkit-user-select:none}
+  .card.revealed{cursor:default}
+  .dir{position:absolute;top:.8rem;left:1rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--faint)}
+  .leech{position:absolute;top:.7rem;right:1rem;display:none;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--leech);border:1px solid var(--leech);border-radius:4px;padding:.15rem .4rem}
+  .card.is-leech .leech{display:block}
+  .main{font-size:clamp(1.7rem,7vw,2.3rem);font-weight:300;line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
+  .sub{font-size:1.05rem;color:var(--dim);margin-top:.45rem;line-height:1.35;overflow-wrap:anywhere}
+  .sub:empty{display:none}
+  .back{display:none;width:100%;margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--line)}
+  .card.revealed .back{display:block;animation:rise .18s ease-out both}
+  @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .hint{font-size:.86rem;color:var(--dim);font-style:italic;margin-top:.9rem;line-height:1.45}
+  .hint:empty{display:none}
+  .ex{margin-top:.9rem;font-size:.86rem;line-height:1.5;color:var(--dim)}
+  .ex:empty{display:none}
+  .ex .ex-tr{color:var(--text)}
+  .ex .ex-el{font-size:.8rem}
+  .ex .ex-en{font-size:.8rem;color:var(--faint)}
+  .tapnote{position:absolute;bottom:.8rem;left:0;right:0;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint)}
+  .card.revealed .tapnote{display:none}
+
+  .answers{margin-top:.9rem;min-height:4.4rem}
+  .btn{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.8rem 1.1rem;border:1px solid var(--accent);background:transparent;color:var(--accent-hi);min-height:44px}
+  .btn:hover{background:var(--accent);color:var(--on-accent)}
+  .btn.primary{background:var(--accent);color:var(--on-accent);font-weight:600;width:100%}
+  .btn.primary:hover{background:var(--accent-hi)}
+  .btn.ghost{border-color:var(--line);color:var(--dim)}
+  .btn.ghost:hover{background:var(--card-2);color:var(--text)}
+  .btn.danger{border-color:var(--again);color:var(--again)}
+  .btn.danger:hover{background:var(--again);color:var(--on-accent)}
+  .btn[disabled]{opacity:.35;cursor:default}
+  .btn[disabled]:hover{background:transparent;color:var(--accent-hi)}
+  .card.revealed ~ .answers #showBtn{display:none}
+  .grades{display:none;grid-template-columns:repeat(4,1fr);gap:.45rem}
+  .card.revealed ~ .answers .grades{display:grid}
+  .grade{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.55rem .25rem;min-height:56px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem}
+  .grade .g-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+  .grade .g-ivl{font-family:var(--mono);font-size:.78rem;color:var(--dim);font-variant-numeric:tabular-nums}
+  .grade.again .g-label{color:var(--again)} .grade.hard .g-label{color:var(--hard)}
+  .grade.good .g-label{color:var(--good)} .grade.easy .g-label{color:var(--easy)}
+  .grade:hover,.grade:active{background:var(--card-2);border-color:var(--text)}
+  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:.8rem}
+  .mini{background:none;border:0;color:var(--faint);font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+    text-transform:uppercase;padding:.5rem .4rem;min-height:36px}
+  .mini:hover{color:var(--text)}
+  .mini[disabled]{opacity:.35;cursor:default}
+  .left{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---- done ---- */
+  .done{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:2.2rem 1.25rem;text-align:center;
+    min-height:min(46vh,380px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem}
+  .done h2{font-weight:300;font-size:1.6rem;letter-spacing:.02em}
+  .done p{color:var(--dim);font-size:.92rem;line-height:1.5}
+  .done .eta{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-hi);margin-top:.4rem}
+
+  /* ---- generic panels ---- */
+  h2.ttl{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:.2rem 0 .9rem;font-weight:400}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:.8rem}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.6rem 0;border-top:1px solid var(--line)}
+  .row:first-child{border-top:0;padding-top:0}
+  .row label{font-size:.9rem}
+  .row small{display:block;color:var(--faint);font-size:.74rem;margin-top:.15rem;line-height:1.4}
+  input[type=number],input[type=text],input[type=search],select{background:var(--bg-2);color:var(--text);border:1px solid var(--line);
+    border-radius:7px;padding:.5rem .6rem;font-family:inherit;font-size:16px;min-width:0;min-height:40px}
+  input[type=number]{width:5.5rem;text-align:right;font-family:var(--mono)}
+  input[type=checkbox]{width:1.2rem;height:1.2rem;accent-color:var(--accent)}
+  .actions{display:flex;gap:.5rem;flex-wrap:wrap}
+  .actions .btn{flex:1;text-align:center}
+
+  /* ---- stats ---- */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.8rem .6rem;text-align:center}
+  .tile b{display:block;font-family:var(--mono);font-size:1.5rem;font-weight:300;font-variant-numeric:tabular-nums}
+  .tile span{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .tile.t-new b{color:var(--new)} .tile.t-learn b{color:var(--learn)} .tile.t-due b{color:var(--due)} .tile.t-leech b{color:var(--leech)}
+
+  /* ---- browse ---- */
+  .filter{display:flex;gap:.5rem;margin-bottom:.6rem}
+  .filter input{flex:1}
+  .chips{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem}
+  .chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:.3rem .65rem;font-family:var(--mono);
+    font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);min-height:30px}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .note{padding:.7rem .9rem;border-top:1px solid var(--line);cursor:pointer}
+  .note:first-child{border-top:0}
+  .note .l1{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
+  .note .tr{font-weight:600;font-size:.98rem}
+  .note .el{color:var(--dim);font-size:.86rem;margin-left:.4rem}
+  .note .en{color:var(--dim);font-size:.86rem;margin-top:.15rem}
+  .state{display:flex;gap:.3rem;flex-shrink:0}
+  .st{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);
+    border-radius:4px;padding:.12rem .35rem;color:var(--faint);white-space:nowrap}
+  .st.new{color:var(--new);border-color:var(--new)} .st.learn,.st.relearn{color:var(--learn);border-color:var(--learn)}
+  .st.review{color:var(--due);border-color:var(--due)} .st.leech{color:var(--leech);border-color:var(--leech)} .st.off{opacity:.45}
+  .note .more{display:none;margin-top:.5rem;font-size:.84rem;color:var(--dim);line-height:1.5}
+  .note.open .more{display:block}
+  .retired{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:.8rem .2rem}
+  .empty{padding:1rem;color:var(--faint);font-size:.9rem}
+
+  .toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+    background:var(--text);color:var(--bg);font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;padding:.6rem .9rem;
+    border-radius:8px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:5;max-width:90vw;text-align:center}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+
+  @media (max-width:520px){
+    body{padding:.9rem .85rem calc(1.25rem + env(safe-area-inset-bottom))}
+    .top{gap:.5rem}
+    .tab{padding:.5rem .4rem;min-height:36px}
+    .card{padding:1.4rem .9rem;min-height:min(44vh,360px)}
+    .grades{gap:.35rem}
+    .grade{min-height:60px}
+    .tiles{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app" data-view="study">
+  <header class="top">
+    <div class="brand">Anki · Greek</div>
+    <div class="counts" title="new · learning · due" aria-label="Counts">
+      <b class="c-new" id="cNew">0</b><b class="c-learn" id="cLearn">0</b><b class="c-due" id="cDue">0</b>
+    </div>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab on" data-go="study">Study</button>
+      <button class="tab" data-go="browse">Browse</button>
+      <button class="tab" data-go="stats">Stats</button>
+      <button class="tab" data-go="settings">Settings</button>
+    </nav>
+  </header>
+  <div class="track"><div class="fill" id="fill"></div></div>
+
+  <section class="view" id="view-study">
+    <div class="card" id="card" tabindex="0" role="button" aria-label="Flashcard. Tap to reveal.">
+      <div class="dir" id="dir"></div>
+      <div class="leech">leech</div>
+      <div class="front"><div class="main" id="fMain"></div><div class="sub" id="fSub"></div></div>
+      <div class="back" id="back">
+        <div class="main" id="bMain"></div><div class="sub" id="bSub"></div>
+        <div class="hint" id="hint"></div>
+        <div class="ex" id="ex"></div>
+      </div>
+      <div class="tapnote">tap to reveal</div>
+    </div>
+    <div class="answers">
+      <button class="btn primary" id="showBtn">Show answer</button>
+      <div class="grades" id="grades">
+        <button class="grade again" data-r="again"><span class="g-label">Again</span><span class="g-ivl"></span></button>
+        <button class="grade hard" data-r="hard"><span class="g-label">Hard</span><span class="g-ivl"></span></button>
+        <button class="grade good" data-r="good"><span class="g-label">Good</span><span class="g-ivl"></span></button>
+        <button class="grade easy" data-r="easy"><span class="g-label">Easy</span><span class="g-ivl"></span></button>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="mini" id="undoBtn" disabled>Undo</button>
+      <span class="left" id="left"></span>
+    </div>
+  </section>
+
+  <section class="view" id="view-done">
+    <div class="done">
+      <h2 id="doneTitle">Done for today</h2>
+      <p id="doneText"></p>
+      <div class="eta" id="doneEta"></div>
+    </div>
+    <div class="foot">
+      <button class="mini" id="undoBtn2" disabled>Undo</button>
+      <span class="left" id="doneDeck"></span>
+    </div>
+  </section>
+
+  <section class="view" id="view-browse">
+    <div class="filter"><input type="search" id="q" placeholder="Search Greek, transliteration or English" autocomplete="off"></div>
+    <div class="chips" id="chips"></div>
+    <div class="list" id="list"></div>
+    <div class="retired" id="retired"></div>
+  </section>
+
+  <section class="view" id="view-stats">
+    <h2 class="ttl">Deck</h2>
+    <div class="tiles" id="tiles"></div>
+    <h2 class="ttl" style="margin-top:1.2rem">Today</h2>
+    <div class="tiles" id="tilesToday"></div>
+    <p class="empty" id="statsNote"></p>
+  </section>
+
+  <section class="view" id="view-settings">
+    <h2 class="ttl">Study</h2>
+    <div class="panel">
+      <div class="row"><label for="sNew">New cards per day<small>Anki default is 20. Each phrase is two cards.</small></label><input type="number" id="sNew" min="0" max="999"></div>
+      <div class="row"><label for="sRev">Reviews per day<small>Anki default is 200.</small></label><input type="number" id="sRev" min="0" max="9999"></div>
+      <div class="row"><label for="sTr">Transliteration first<small>Off shows Greek script as the main line.</small></label><input type="checkbox" id="sTr"></div>
+      <div class="row"><label for="sDir">Direction<small>Filters what you study. Progress is kept for both.</small></label>
+        <select id="sDir"><option value="both">Both</option><option value="fwd">Greek → English</option><option value="rev">English → Greek</option></select></div>
+    </div>
+    <h2 class="ttl">Progress</h2>
+    <div class="panel">
+      <p style="font-size:.86rem;color:var(--dim);line-height:1.5;margin-bottom:.8rem">Progress lives in this browser only. Export before switching phones or clearing data.</p>
+      <div class="actions">
+        <button class="btn" id="exportBtn">Export</button>
+        <button class="btn" id="importBtn">Import</button>
+        <button class="btn danger" id="resetBtn">Reset</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
+    <h2 class="ttl">Keys</h2>
+    <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>u — undo &nbsp; b s , — browse stats settings &nbsp; esc — back
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="/anki/scheduler.js"></script>
+<script src="/anki/decks/greek.js"></script>
+<script>
+(function () {
+  'use strict';
+  var S = window.AnkiSched;
+  var DECK = window.DECKS && window.DECKS.greek;
+  var KEY = 'sam_anki_v1';
+  var UNDO_MAX = 20;
+  var DEF_SETTINGS = { newPerDay: 20, revPerDay: 200, trFirst: true, dirs: 'both', learnAhead: 20 };
+  var $ = function (id) { return document.getElementById(id); };
+  var app = $('app');
+
+  if (!S || !DECK) {
+    $('fMain').textContent = 'Could not load the deck.';
+    return;
+  }
+
+  /* ---------- storage ---------- */
+  function fresh() {
+    return { v: 1, cards: {}, day: { day: 0, newDone: 0, revDone: 0 }, settings: Object.assign({}, DEF_SETTINGS), undo: [], deck: null };
+  }
+  function normalise(o) {
+    if (!o || o.v !== 1 || typeof o.cards !== 'object') return null;
+    var s = fresh();
+    s.cards = o.cards || {};
+    s.day = Object.assign(s.day, o.day || {});
+    s.settings = Object.assign(s.settings, o.settings || {});
+    s.undo = Array.isArray(o.undo) ? o.undo : [];
+    s.deck = o.deck || null;
+    return s;
+  }
+  function load() {
+    try { var raw = localStorage.getItem(KEY); if (raw) { var s = normalise(JSON.parse(raw)); if (s) return s; } } catch (e) {}
+    return fresh();
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+  var store = load();
+  function cfg() { return { newPerDay: +store.settings.newPerDay || 0, revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 }; }
+
+  /* ---------- deck ---------- */
+  var notesById = {};
+  DECK.notes.forEach(function (n) { notesById[n.id] = n; });
+  function allCards() {
+    var out = [];
+    DECK.notes.forEach(function (n, i) {
+      out.push({ id: n.id + ':fwd', noteId: n.id, dir: 'fwd', order: i * 2, note: n, state: store.cards[n.id + ':fwd'] || null });
+      out.push({ id: n.id + ':rev', noteId: n.id, dir: 'rev', order: i * 2 + 1, note: n, state: store.cards[n.id + ':rev'] || null });
+    });
+    return out;
+  }
+  function activeCards() {
+    var d = store.settings.dirs;
+    return allCards().filter(function (c) { return d === 'both' || c.dir === d; });
+  }
+  function retiredCount() {
+    var n = 0;
+    Object.keys(store.cards).forEach(function (id) { if (!notesById[id.split(':')[0]]) n++; });
+    return n;
+  }
+
+  /* ---------- session state ---------- */
+  var view = 'study', current = null, revealed = false, lastNoteId = null, queueInfo = null, cardsIdx = {};
+  var browseTag = '', browseQ = '';
+
+  function rollDay(now) {
+    var t = S.dayNum(now);
+    if (store.day.day !== t) { store.day = { day: t, newDone: 0, revDone: 0 }; save(); }
+  }
+  function rebuild() {
+    var now = Date.now();
+    rollDay(now);
+    var cards = activeCards();
+    cardsIdx = {};
+    cards.forEach(function (c) { cardsIdx[c.id] = c; });
+    queueInfo = S.buildQueue(cards, now, store.day, cfg());
+  }
+  function pickNext() {
+    rebuild();
+    var q = queueInfo.queue;
+    revealed = false;
+    if (!q.length) { current = null; return; }
+    var id = q[0];
+    if (q.length > 1 && cardsIdx[id].noteId === lastNoteId) id = q[1];
+    current = id;
+  }
+
+  function reveal() { if (!current || revealed) return; revealed = true; render(); }
+  function rate(r) {
+    if (!current || !revealed) return;
+    var c = cardsIdx[current];
+    var now = Date.now();
+    var prev = c.state ? Object.assign({}, c.state) : null;
+    store.undo.push({ id: c.id, prev: prev, prevDay: Object.assign({}, store.day), at: now });
+    if (store.undo.length > UNDO_MAX) store.undo.shift();
+    store.cards[c.id] = S.answer(c.state, r, now, cfg(), undefined, c.id);
+    if (!prev) store.day.newDone++;
+    else if (prev.type === 'review') store.day.revDone++;
+    save();
+    lastNoteId = c.noteId;
+    pickNext();
+    render();
+  }
+  function undo() {
+    var u = store.undo.pop();
+    if (!u) return;
+    if (u.prev) store.cards[u.id] = u.prev; else delete store.cards[u.id];
+    store.day = u.prevDay;
+    save();
+    view = 'study';
+    rebuild();
+    if (cardsIdx[u.id]) { current = u.id; revealed = false; lastNoteId = null; }
+    else pickNext();
+    render();
+    toast('Undone');
+  }
+
+  /* ---------- render ---------- */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
+  function fmtEta(ms) {
+    var m = Math.max(1, Math.round(ms / 60000));
+    if (m < 60) return m + 'm';
+    var h = Math.round(m / 60);
+    return h < 24 ? h + 'h' : Math.round(h / 24) + 'd';
+  }
+
+  function render() {
+    if (view === 'study') {
+      if (current && !cardsIdx[current]) current = null;
+      if (!current) pickNext();
+    } else rebuild();
+    renderTop();
+    if (view === 'study') { if (current) renderCard(); else renderDone(); }
+    else if (view === 'browse') renderBrowse();
+    else if (view === 'stats') renderStats();
+    app.dataset.view = view === 'study' ? (current ? 'study' : 'done') : view;
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.go === view); });
+  }
+  function renderTop() {
+    var c = queueInfo.counts;
+    $('cNew').textContent = c.new; $('cLearn').textContent = c.learn; $('cDue').textContent = c.due;
+    var done = store.day.newDone + store.day.revDone;
+    var total = done + c.new + c.due + c.learn;
+    $('fill').style.width = (total ? Math.round(done / total * 100) : 100) + '%';
+    var canUndo = store.undo.length > 0;
+    $('undoBtn').disabled = !canUndo; $('undoBtn2').disabled = !canUndo;
+  }
+  function sides(n) {
+    var tf = store.settings.trFirst;
+    return tf ? [n.tr, n.el] : [n.el, n.tr];
+  }
+  function renderCard() {
+    var c = cardsIdx[current], n = c.note, gk = sides(n);
+    var card = $('card');
+    $('dir').textContent = c.dir === 'fwd' ? 'EL → EN' : 'EN → EL';
+    if (c.dir === 'fwd') { $('fMain').textContent = gk[0]; $('fSub').textContent = gk[1]; $('bMain').textContent = n.en; $('bSub').textContent = ''; }
+    else { $('fMain').textContent = n.en; $('fSub').textContent = ''; $('bMain').textContent = gk[0]; $('bSub').textContent = gk[1]; }
+    $('hint').textContent = n.note || '';
+    $('ex').innerHTML = n.ex ? '<div class="ex-tr">' + esc(n.ex.tr) + '</div><div class="ex-el">' + esc(n.ex.el) + '</div><div class="ex-en">' + esc(n.ex.en) + '</div>' : '';
+    card.classList.toggle('revealed', revealed);
+    card.classList.toggle('is-leech', !!(c.state && c.state.leech));
+    card.setAttribute('aria-label', revealed ? 'Flashcard, revealed.' : 'Flashcard. Tap to reveal.');
+    if (revealed) {
+      var ns = S.nextStates(c.state, Date.now(), cfg(), undefined, c.id);
+      document.querySelectorAll('.grade').forEach(function (b) { b.querySelector('.g-ivl').textContent = ns[b.dataset.r].label; });
+    }
+    var left = queueInfo.queue.length;
+    $('left').textContent = left + (left === 1 ? ' card left' : ' cards left') + (queueInfo.ahead ? ' · ahead' : '');
+  }
+  function renderDone() {
+    var d = store.day, c = queueInfo.counts;
+    var did = [];
+    if (d.newDone) did.push(d.newDone + ' new');
+    if (d.revDone) did.push(d.revDone + (d.revDone === 1 ? ' review' : ' reviews'));
+    var nothingToDo = !c.new && !c.due && !c.learn;
+    $('doneTitle').textContent = did.length ? 'Done for today' : (nothingToDo ? 'Nothing due' : 'Nothing due right now');
+    $('doneText').textContent = did.length ? 'Today: ' + did.join(', ') + '.' : (nothingToDo ? 'Come back tomorrow, or raise new cards per day in Settings.' : '');
+    var eta = '';
+    if (queueInfo.nextLearnDue) eta = 'Next learning card in ' + fmtEta(queueInfo.nextLearnDue - Date.now());
+    $('doneEta').textContent = eta;
+    $('doneDeck').textContent = DECK.notes.length + ' phrases · v' + DECK.version;
+  }
+  function stLabel(st) {
+    if (!st) return { cls: 'new', txt: 'new' };
+    if (st.type === 'review') return { cls: st.leech ? 'leech' : 'review', txt: S.fmtDays(st.ivl) + (st.leech ? ' leech' : '') };
+    return { cls: st.type, txt: st.type === 'relearn' ? 'relearn' : 'learn' };
+  }
+  function renderBrowse() {
+    var tags = {};
+    DECK.notes.forEach(function (n) { n.tags.forEach(function (t) { tags[t] = (tags[t] || 0) + 1; }); });
+    $('chips').innerHTML = Object.keys(tags).map(function (t) {
+      return '<button class="chip' + (browseTag === t ? ' on' : '') + '" data-tag="' + esc(t) + '">' + esc(t) + ' ' + tags[t] + '</button>';
+    }).join('');
+    var q = browseQ.trim().toLowerCase();
+    var dirs = store.settings.dirs;
+    var html = '';
+    DECK.notes.forEach(function (n) {
+      if (browseTag && n.tags.indexOf(browseTag) < 0) return;
+      if (q && (n.el + ' ' + n.tr + ' ' + n.en + ' ' + (n.note || '')).toLowerCase().indexOf(q) < 0) return;
+      var f = stLabel(store.cards[n.id + ':fwd']), r = stLabel(store.cards[n.id + ':rev']);
+      html += '<div class="note" data-id="' + esc(n.id) + '"><div class="l1"><div><span class="tr">' + esc(n.tr) + '</span><span class="el">' + esc(n.el) + '</span></div>' +
+        '<div class="state"><span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '" title="Greek to English">→EN ' + esc(f.txt) + '</span>' +
+        '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '" title="English to Greek">→EL ' + esc(r.txt) + '</span></div></div>' +
+        '<div class="en">' + esc(n.en) + '</div>' +
+        '<div class="more">' + (n.note ? '<div>' + esc(n.note) + '</div>' : '') +
+        (n.ex ? '<div style="margin-top:.3rem">' + esc(n.ex.tr) + ' · ' + esc(n.ex.el) + ' · ' + esc(n.ex.en) + '</div>' : '') +
+        '<div style="margin-top:.3rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">' + esc(n.tags.join(' · ')) + '</div></div></div>';
+    });
+    $('list').innerHTML = html || '<div class="empty">No matches.</div>';
+    var rc = retiredCount();
+    $('retired').textContent = DECK.notes.length + ' phrases' + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+  }
+  function tile(cls, v, label) { return '<div class="tile ' + cls + '"><b>' + v + '</b><span>' + label + '</span></div>'; }
+  function renderStats() {
+    var now = Date.now();
+    var o = S.stats(activeCards(), now);
+    $('tiles').innerHTML = tile('', o.total, 'cards') + tile('t-new', o.new, 'new') + tile('t-learn', o.learn, 'learning') +
+      tile('', o.review, 'review') + tile('t-due', o.mature, 'mature') + tile('t-leech', o.leech, 'leeches');
+    var c = queueInfo.counts;
+    $('tilesToday').innerHTML = tile('t-new', store.day.newDone, 'new done') + tile('t-due', store.day.revDone, 'reviews done') + tile('', c.new + c.due + c.learn, 'remaining');
+    var dirs = store.settings.dirs;
+    $('statsNote').textContent = (dirs === 'both' ? 'Both directions' : dirs === 'fwd' ? 'Greek → English only' : 'English → Greek only') +
+      ' · mature = interval of 21 days or more · deck v' + DECK.version + ' (' + DECK.updated + ')';
+  }
+  function fillSettings() {
+    $('sNew').value = store.settings.newPerDay; $('sRev').value = store.settings.revPerDay;
+    $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
+  }
+
+  function setView(v) {
+    view = v;
+    if (v === 'settings') fillSettings();
+    render();
+    if (v === 'browse') { /* keep scroll at top */ window.scrollTo(0, 0); }
+  }
+
+  var toastT;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.classList.add('on');
+    clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2600);
+  }
+
+  /* ---------- events ---------- */
+  $('card').addEventListener('click', function () { if (!revealed) reveal(); });
+  $('showBtn').addEventListener('click', reveal);
+  document.querySelectorAll('.grade').forEach(function (b) { b.addEventListener('click', function () { rate(b.dataset.r); }); });
+  $('undoBtn').addEventListener('click', undo);
+  $('undoBtn2').addEventListener('click', undo);
+  document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
+
+  $('q').addEventListener('input', function () { browseQ = this.value; renderBrowse(); });
+  $('chips').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    browseTag = browseTag === b.dataset.tag ? '' : b.dataset.tag; renderBrowse();
+  });
+  $('list').addEventListener('click', function (e) {
+    var row = e.target.closest('.note'); if (row) row.classList.toggle('open');
+  });
+
+  function settingChanged() {
+    store.settings.newPerDay = Math.max(0, Math.min(999, parseInt($('sNew').value, 10) || 0));
+    store.settings.revPerDay = Math.max(0, Math.min(9999, parseInt($('sRev').value, 10) || 0));
+    store.settings.trFirst = $('sTr').checked;
+    store.settings.dirs = $('sDir').value;
+    save(); current = null; render();
+  }
+  ['sNew', 'sRev', 'sTr', 'sDir'].forEach(function (id) { $(id).addEventListener('change', settingChanged); });
+
+  $('exportBtn').addEventListener('click', function () {
+    var d = new Date(), ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    var blob = new Blob([JSON.stringify(store, null, 1)], { type: 'application/json' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'anki-progress-' + ymd + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    toast('Exported');
+  });
+  $('importBtn').addEventListener('click', function () { $('importFile').value = ''; $('importFile').click(); });
+  $('importFile').addEventListener('change', function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      var s = null;
+      try { s = normalise(JSON.parse(rd.result)); } catch (e) {}
+      if (!s) { toast('Not a progress file'); return; }
+      var n = Object.keys(s.cards).length;
+      if (!confirm('Replace this browser\'s progress with the file (' + n + ' cards)?')) return;
+      store = s; save(); current = null; lastNoteId = null; setView('study'); toast('Imported ' + n + ' cards');
+    };
+    rd.readAsText(f);
+  });
+  $('resetBtn').addEventListener('click', function () {
+    if (!confirm('Reset all progress? Every card goes back to new.')) return;
+    if (!confirm('Really? This cannot be undone.')) return;
+    var keep = store.settings;
+    store = fresh(); store.settings = keep; save(); current = null; lastNoteId = null; setView('study'); toast('Progress reset');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) { if (e.key === 'Escape') { t.blur(); setView('study'); } return; }
+    if (e.metaKey || e.ctrlKey) { if (e.key === 'z') { e.preventDefault(); undo(); } return; }
+    var k = e.key;
+    if (k === 'Escape') { setView('study'); return; }
+    if (k === 'b') { setView('browse'); return; }
+    if (k === 's') { setView('stats'); return; }
+    if (k === ',') { setView('settings'); return; }
+    if (k === 'u') { undo(); return; }
+    if (view !== 'study') return;
+    if (k === ' ' || k === 'Enter') { e.preventDefault(); if (!current) return; if (!revealed) reveal(); else rate('good'); return; }
+    if (revealed && k >= '1' && k <= '4') rate(['again', 'hard', 'good', 'easy'][k - 1]);
+  });
+
+  // Learning cards come due while the page sits open; pick them up without a reload.
+  setInterval(function () {
+    if (view !== 'study') return;
+    if (!current) { pickNext(); render(); }
+  }, 10000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && view === 'study' && !current) { pickNext(); render(); } });
+
+  /* ---------- boot ---------- */
+  (function deckStamp() {
+    var cur = { id: DECK.id, version: DECK.version, updated: DECK.updated, notes: DECK.notes.length };
+    var seen = store.deck;
+    if (seen && seen.id === cur.id && (seen.version !== cur.version || seen.updated !== cur.updated)) {
+      var diff = cur.notes - (seen.notes || 0);
+      setTimeout(function () { toast('Deck updated' + (diff > 0 ? ' · +' + diff + ' phrases' : '') + ' · v' + cur.version); }, 400);
+    }
+    store.deck = cur; save();
+  })();
+  render();
+})();
+</script>
+</body>
+</html>
