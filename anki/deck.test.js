@@ -25,6 +25,7 @@ const ids = new Set();
   check(d.file === d.id + '.js', w + ': file must be <id>.js');
   ['name', 'lang', 'langName', 'code'].forEach(k => check(str(d[k]), w + ': ' + k + ' missing'));
   check(typeof d.translit === 'boolean', w + ': translit must be true or false');
+  if (d.creature !== undefined) check(d.creature && str(d.creature.emoji) && str(d.creature.name) && str(d.creature.kind), w + ': creature needs emoji, name and kind');
   const file = path.join(__dirname, 'decks', d.file || '');
   check(fs.existsSync(file), w + ': file not found');
   if (!fs.existsSync(file)) return;

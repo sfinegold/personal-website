@@ -19,6 +19,10 @@
  *        translit  true if notes carry a `tr` transliteration line (Greek, Japanese,
  *                  Russian...), false for Latin-script languages (then `tr` is omitted
  *                  and `term` is the main line)
+ *        creature  { emoji, name, kind }: the deck's companion. Its health follows how
+ *                  recently the deck was studied and how many cards are due. Pick an
+ *                  animal tied to the language's culture (owl for Greek, fox for
+ *                  Japanese, Persian cat for Farsi). Without one the deck gets 🐣.
  *   3. Run `node anki/deck.test.js`, commit, push. Never change an existing id.
  *
  * Note fields in a deck file: { id, term, tr?, en, tags, note?, ex?:{term, tr?, en}, priority? }
@@ -38,7 +42,10 @@
  *   en    English
  */
 window.DECK_INDEX = [
-  { id: 'greek', file: 'greek.js', name: 'Conversational Greek', lang: 'el', langName: 'Greek', code: 'EL', translit: true },
-  { id: 'japanese', file: 'japanese.js', name: 'Conversational Japanese', lang: 'ja', langName: 'Japanese', code: 'JA', translit: true },
-  { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', langName: 'Farsi', code: 'FA', translit: true },
+  { id: 'greek', file: 'greek.js', name: 'Conversational Greek', lang: 'el', langName: 'Greek', code: 'EL', translit: true,
+    creature: { emoji: '🦉', name: 'Sophia', kind: 'owl' } },
+  { id: 'japanese', file: 'japanese.js', name: 'Conversational Japanese', lang: 'ja', langName: 'Japanese', code: 'JA', translit: true,
+    creature: { emoji: '🦊', name: 'Kitsu', kind: 'fox' } },
+  { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', langName: 'Farsi', code: 'FA', translit: true,
+    creature: { emoji: '🐈', name: 'Pari', kind: 'cat' } },
 ];

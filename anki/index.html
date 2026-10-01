@@ -63,6 +63,34 @@
   .app[data-view=study] .tabs,.app[data-view=done] .tabs,.app[data-view=decks] .tabs,.app[data-view=study] .track,.app[data-view=done] .track{display:none}
   .decklist{display:flex;flex-direction:column;gap:.5rem}
   .menu{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+  .streak{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:12px;padding:.75rem .9rem;margin-bottom:.9rem;
+    display:flex;align-items:center;gap:.7rem}
+  .streak .fire{font-size:1.6rem;line-height:1}
+  .streak .fire.off{filter:grayscale(1);opacity:.45}
+  .streak b{font-size:1.05rem}
+  .streak small{display:block;color:var(--dim);font-size:.8rem;margin-top:.1rem}
+  .deck .d-row{display:flex;align-items:center;gap:.7rem}
+  .deck .d-pet{font-size:2rem;line-height:1;flex:none;display:inline-block}
+  .deck .d-pet.hungry{animation:wobble 2.4s ease-in-out infinite}
+  .deck .d-pet.sick{filter:grayscale(.7);opacity:.7;transform:rotate(-12deg)}
+  .deck .d-pet.asleep{opacity:.5}
+  .deck .d-pet.happy{animation:bob 3s ease-in-out infinite}
+  .deck .d-mood{font-size:.8rem;color:var(--dim);margin-top:.2rem}
+  .pet{position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center;margin:0 auto .4rem}
+  .pet-emoji{font-size:4.2rem;line-height:1;display:inline-block}
+  .pet.happy .pet-emoji{animation:hop .9s cubic-bezier(.3,1.4,.5,1) 2}
+  .pet.big .pet-emoji{animation:hop .9s cubic-bezier(.3,1.4,.5,1) 4}
+  .pet.hungry .pet-emoji{animation:wobble 2.4s ease-in-out infinite}
+  .pet.sick .pet-emoji{filter:grayscale(.7);opacity:.75;transform:rotate(-12deg)}
+  .pet.asleep .pet-emoji{opacity:.55}
+  .pet-line{font-size:.92rem;color:var(--dim);margin-bottom:.9rem}
+  .burst{position:absolute;inset:0;pointer-events:none}
+  .burst i{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0}
+  .pet.celebrate .burst i{animation:fly .9s ease-out forwards}
+  @keyframes hop{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-22px) scale(1.08,.94)}60%{transform:translateY(0) scale(.96,1.04)}100%{transform:translateY(0) scale(1)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @keyframes wobble{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  @keyframes fly{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1)}}
   .syncline{display:block;width:100%;background:none;border:0;text-align:left;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;
     text-transform:uppercase;color:var(--dim);padding:.6rem .2rem 0;min-height:32px}
   .syncline.err{color:#B3261E}
@@ -342,6 +370,8 @@
 
   <section class="view" id="view-done">
     <div class="done">
+      <div class="pet" id="pet"><span class="pet-emoji" id="petEmoji">🐣</span><div class="burst" id="burst"></div></div>
+      <div class="pet-line" id="petLine"></div>
       <h2 id="doneTitle">Done for today</h2>
       <p id="doneText"></p>
       <div class="eta" id="doneEta"></div>
@@ -354,6 +384,7 @@
   </section>
 
   <section class="view" id="view-decks">
+    <div class="streak" id="streakLine"></div>
     <h2 class="ttl">Decks</h2>
     <div class="decklist" id="deckList"></div>
     <button class="syncline" id="syncStatus"></button>
@@ -425,6 +456,7 @@
 
 <script src="/anki/scheduler.js"></script>
 <script src="/anki/merge.js"></script>
+<script src="/anki/streak.js"></script>
 <script src="/anki/decks/index.js"></script>
 <script>
 (function () {
@@ -569,9 +601,10 @@
     b.cards[c.id] = S.answer(c.state, r, now, cfg(), undefined, store.deck + '/' + c.id);
     if (!prev) b.day.newDone++;
     else if (prev.type === 'review') b.day.revDone++;
-    save(); markDirty();
     lastNoteId = c.noteId;
     pickNext();
+    recordAnswer(r, !current && !queueInfo.nextLearnDue);
+    save(); markDirty();
     render();
   }
   function undo() {
@@ -609,6 +642,7 @@
     if (merged.settings) store.settings = Object.assign({}, DEF_SETTINGS, merged.settings);
     if (merged.streak) store.streak = merged.streak;
     store.updated = doc.updated || store.updated;
+    combo = 0;
   }
   function api(op, params, body, keepalive) {
     var url = API + '?op=' + encodeURIComponent(op) + Object.keys(params || {}).map(function (k) { return '&' + k + '=' + encodeURIComponent(params[k]); }).join('');
@@ -736,6 +770,69 @@
     speak(c.note.term, quiet);
   }
 
+  /* ---------- streak and creatures ---------- */
+  var K = window.AnkiStreak;
+  var combo = 0, celebratedDay = 0;
+  function creatureOf(meta) { return meta.creature || { emoji: '🐣', name: 'Pip', kind: 'chick' }; }
+  function lastStudied(deckId) {
+    var cards = P(deckId).cards, t = 0;
+    Object.keys(cards).forEach(function (k) { if (cards[k].last > t) t = cards[k].last; });
+    return t;
+  }
+  function creatureState(meta, now) {
+    var id = meta.id, t = lastStudied(id);
+    var day = store.decks[id] && store.decks[id].day.day === S.dayNum(now) ? store.decks[id].day : { newDone: 0, revDone: 0, extraNew: 0 };
+    var q = S.buildQueue(cardsOf(id, false), now, day, cfg(day));
+    var dueNow = q.counts.due + q.counts.learn;
+    var h = K.health(t, dueNow, now), m = K.mood(h);
+    var c = creatureOf(meta);
+    return { c: c, health: h, mood: m, line: K.moodLine(c.name, m, dueNow, t ? Math.floor((now - t) / 86400000) : 0), dueNow: dueNow };
+  }
+  function recordAnswer(rating, cleared) {
+    var today = S.dayNum(Date.now());
+    var r = K.answer(store.streak, today, cleared);
+    store.streak = r.streak;
+    combo = rating === 'again' ? 0 : combo + 1;
+    var c = creatureOf(deck().meta), msg = [];
+    if (r.credited) {
+      var st = K.status(store.streak, today);
+      msg.push('🔥 ' + (st.current === 1 ? 'Streak started' : st.current + '-day streak') + (K.isMilestone(st.current) ? ' · milestone!' : ''));
+    }
+    if (combo === 10 || combo === 25) msg.push(c.emoji + ' ' + c.name + ': ' + combo + ' in a row!');
+    if (msg.length) toast(msg.join(' · '));
+  }
+  function renderStreak() {
+    var el = $('streakLine'); if (!el) return;
+    var st = K.status(store.streak, S.dayNum(Date.now()));
+    var fire = '<span class="fire' + (st.state === 'done' || st.state === 'risk' ? '' : ' off') + '">🔥</span>';
+    var main, sub;
+    if (st.state === 'none') { main = 'No streak yet'; sub = 'Answer ' + st.left + ' cards today to start one.'; }
+    else if (st.state === 'lost') { main = 'Streak lost'; sub = 'Best ' + st.best + '. Answer ' + st.left + ' cards to start again.'; }
+    else if (st.state === 'risk') { main = st.current + '-day streak · at risk'; sub = st.left + ' more cards today keep it alive. Best ' + st.best + '.'; }
+    else { main = st.current + '-day streak'; sub = 'Done for today. Best ' + st.best + '.'; }
+    el.innerHTML = fire + '<div><b>' + main + '</b><small>' + sub + '</small></div>';
+    var risk = st.state === 'risk' && new Date().getHours() >= 18;
+    document.title = (risk ? '🔥 ' : '') + (deck() ? deck().meta.name + ' · ' : '') + 'Flashcards';
+  }
+  function renderPet(cleared) {
+    var now = Date.now(), cs = creatureState(deck().meta, now), pet = $('pet');
+    $('petEmoji').textContent = cs.c.emoji;
+    pet.className = 'pet ' + cs.mood;
+    var st = K.status(store.streak, S.dayNum(now));
+    var line = cleared ? cs.c.name + ' is full and happy.' : cs.line;
+    if (cleared && st.state === 'done' && K.isMilestone(st.current)) line += ' ' + st.current + ' days in a row!';
+    $('petLine').textContent = line;
+    var today = S.dayNum(now);
+    if (cleared && celebratedDay !== today) {
+      celebratedDay = today;
+      var burst = $('burst'), dots = '';
+      for (var i = 0; i < 12; i++) { var a = i / 12 * Math.PI * 2, r = 44 + (i % 3) * 10; dots += '<i style="--dx:' + Math.round(Math.cos(a) * r) + 'px;--dy:' + Math.round(Math.sin(a) * r) + 'px;animation-delay:' + (i * 25) + 'ms"></i>'; }
+      burst.innerHTML = dots;
+      pet.classList.add('celebrate', st.state === 'done' && K.isMilestone(st.current) ? 'big' : 'happy');
+      setTimeout(function () { pet.classList.remove('celebrate'); }, 1200);
+    }
+  }
+
   /* ---------- render ---------- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
   function fmtEta(ms) {
@@ -815,6 +912,7 @@
     if (d.revDone) did.push(d.revDone + (d.revDone === 1 ? ' review' : ' reviews'));
     var nothingToDo = !c.new && !c.due && !c.learn;
     $('doneTitle').textContent = did.length ? 'Done for today' : (nothingToDo ? 'Nothing due' : 'Nothing due right now');
+    renderPet(nothingToDo && did.length > 0);
     $('doneText').textContent = did.length ? 'Today: ' + did.join(', ') + '.' : (nothingToDo ? 'Come back tomorrow, raise new cards per day in Settings, or switch deck.' : '');
     $('doneEta').textContent = queueInfo.nextLearnDue ? 'Next learning card in ' + fmtEta(queueInfo.nextLearnDue - Date.now()) : '';
     var unseen = activeCards().filter(function (x) { return !x.state; }).length;
@@ -981,12 +1079,15 @@
       var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg(day));
       var st = S.stats(cardsOf(meta.id, false), now);
       var on = meta.id === store.deck;
-      html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '">' +
+      var cs = creatureState(meta, now);
+      html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '"><div class="d-row"><span class="d-pet ' + cs.mood + '">' + cs.c.emoji + '</span><div>' +
         '<div class="d-name">' + esc(meta.name) + (on ? ' <span class="d-now">current</span>' : '') + '</div>' +
-        '<div class="d-sub">' + d.data.notes.length + ' phrases · ' + esc(meta.langName) + ' · ' + st.mature + ' mature</div>' +
-        '<div class="d-counts"><b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></button>';
+        '<div class="d-mood">' + esc(cs.line) + '</div>' +
+        '<div class="d-sub">' + d.data.notes.length + ' phrases · ' + st.mature + ' mature</div>' +
+        '<div class="d-counts"><b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></div></div></button>';
     });
     $('deckList').innerHTML = html;
+    renderStreak();
     renderSyncLine();
   }
   function fillSettings() {
