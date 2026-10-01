@@ -11,8 +11,9 @@
 //   anki:state:<uid>      { v:2, updated, settings, decks, streak, deck }
 // uid = 'u' + sha256(lowercased email)[0..16], so keys never carry the address.
 //
-// Env: SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (storage), GMAIL_USER +
-// GMAIL_APP_PASSWORD or RESEND_API_KEY (the code email, via _lib/email.js),
+// Env: SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (storage), RESEND_API_KEY or
+// GMAIL_USER + GMAIL_APP_PASSWORD (the code email, via _lib/email.js), optional
+// ANKI_FROM (sender, default "Flashcards <flashcards@samfinegold.me>"),
 // optional ANKI_ALLOWED_EMAILS: comma-separated list; when set, only those
 // addresses can sign in (others get the same neutral reply).
 //
@@ -85,7 +86,7 @@ module.exports = async (req, res) => {
       if (body.op === 'request') {
         const email = normEmail(body.email);
         if (!validEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
-        if (!transport() && !process.env.ANKI_ALLOW_MEMORY) return res.status(503).json({ error: 'Sign-in email is not configured on the server (GMAIL_USER and GMAIL_APP_PASSWORD).' });
+        if (!transport() && !process.env.ANKI_ALLOW_MEMORY) return res.status(503).json({ error: 'Sign-in email is not configured on the server (RESEND_API_KEY, or GMAIL_USER and GMAIL_APP_PASSWORD).' });
         const neutral = { ok: true, message: 'If that address can sign in, a code is on its way.' };
         if (!allowed(email)) return res.status(200).json(neutral);
         const uid = uidOf(email);
@@ -94,12 +95,22 @@ module.exports = async (req, res) => {
         const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
         await setJSON(kCode(uid), { hash: sha(code + ':' + uid), exp: now() + CODE_TTL, tries: 0, sentAt: now() });
         if (process.env.ANKI_ALLOW_MEMORY && process.env.ANKI_ECHO_CODE) return res.status(200).json({ ok: true, code });
-        await sendEmail({
-          to: email,
-          subject: code + ' is your Flashcards code',
-          text: 'Your sign-in code is ' + code + '. It works for 10 minutes.\n\nIf you did not ask for it, ignore this email.',
-          html: '<p style="font:16px Helvetica,Arial,sans-serif">Your Flashcards sign-in code is</p><p style="font:700 32px Helvetica,Arial,sans-serif;letter-spacing:.2em">' + code + '</p><p style="font:14px Helvetica,Arial,sans-serif;color:#666">It works for 10 minutes. If you did not ask for it, ignore this email.</p>',
-        });
+        try {
+          await sendEmail({
+            to: email,
+            from: process.env.ANKI_FROM || 'Flashcards <flashcards@samfinegold.me>',
+            subject: code + ' is your Flashcards code',
+            text: 'Your sign-in code is ' + code + '. It works for 10 minutes.\n\nIf you did not ask for it, ignore this email.',
+            html: '<p style="font:16px Helvetica,Arial,sans-serif">Your Flashcards sign-in code is</p><p style="font:700 32px Helvetica,Arial,sans-serif;letter-spacing:.2em">' + code + '</p><p style="font:14px Helvetica,Arial,sans-serif;color:#666">It works for 10 minutes. If you did not ask for it, ignore this email.</p>',
+          });
+        } catch (err) {
+          console.error('anki: code email failed', err && err.code, err && err.message, err && err.detail);
+          await setJSON(kCode(uid), { hash: '', exp: 0, tries: CODE_TRIES, sentAt: 0 });   // no cooldown on a failed send
+          const msg = err && err.code === 'EAUTH' ? 'The server\'s email password was rejected. Sam needs to fix GMAIL_APP_PASSWORD or set RESEND_API_KEY in Vercel.'
+            : err && err.code === 'RESEND' && err.status >= 400 && err.status < 500 ? 'Email is not set up on the server yet: ' + err.message
+            : 'The sign-in email could not be sent right now. Try again in a minute.';
+          return res.status(502).json({ error: msg });
+        }
         return res.status(200).json(neutral);
       }
 

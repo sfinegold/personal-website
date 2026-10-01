@@ -3,8 +3,8 @@
 const assert = require('node:assert/strict');
 process.env.ANKI_ALLOW_MEMORY = '1';
 delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY; delete process.env.SUPABASE_KEY; delete process.env.ANKI_ECHO_CODE;
-const sent = [];
-require.cache[require.resolve('./_lib/email')] = { id: require.resolve('./_lib/email'), filename: require.resolve('./_lib/email'), loaded: true, exports: { sendEmail: async (m) => { sent.push(m); return { id: 'x' }; }, transport: () => 'fake' } };
+const sent = []; let mailFail = '';
+require.cache[require.resolve('./_lib/email')] = { id: require.resolve('./_lib/email'), filename: require.resolve('./_lib/email'), loaded: true, exports: { sendEmail: async (m) => { if (mailFail) { const e = new Error('Gmail rejected the login.'); e.code = mailFail; throw e; } sent.push(m); return { id: 'x' }; }, transport: () => 'fake' } };
 const drafts = [];
 require.cache[require.resolve('./_lib/draft')] = { id: require.resolve('./_lib/draft'), filename: require.resolve('./_lib/draft'), loaded: true, exports: {
   draftCard: async (a) => { drafts.push(a); if (!String(a.input || '').trim()) { const e = new Error('Say what the card should teach.'); e.status = 400; throw e; } return { term: 'Πόσο κάνει;', tr: 'póso káni?', en: 'How much is it?', memo: 'póso = how much', parts: [{ t: 'Πόσο', tr: 'póso', m: 'how much' }], tags: ['shopping'] }; },
@@ -76,6 +76,17 @@ const codeFrom = (m) => m.subject.match(/^(\d{6})/)[1];
     assert.equal((await call({ query: { op: 'me' }, token })).json.user.updated !== null, true);
     assert.equal((await call({ method: 'POST', body: { op: 'signout' }, token })).status, 200);
     assert.equal((await call({ query: { op: 'me' }, token })).status, 401);
+  });
+  await test('request: a failed send answers 502 in one line and leaves no cooldown behind', async () => {
+    mailFail = 'EAUTH';
+    const r = await call({ method: 'POST', body: { op: 'request', email: 'new@example.com' } });
+    assert.equal(r.status, 502); assert.match(r.json.error, /email password was rejected/);
+    mailFail = 'ESMTP';
+    const r2 = await call({ method: 'POST', body: { op: 'request', email: 'new@example.com' } });
+    assert.equal(r2.status, 502, 'not blocked by the cooldown'); assert.match(r2.json.error, /Try again in a minute/);
+    mailFail = '';
+    const r3 = await call({ method: 'POST', body: { op: 'request', email: 'new@example.com' } });
+    assert.equal(r3.status, 200); assert.equal(sent[sent.length - 1].from, 'Flashcards <flashcards@samfinegold.me>');
   });
   await test('allowlist: addresses outside ANKI_ALLOWED_EMAILS get the neutral reply and no email', async () => {
     process.env.ANKI_ALLOWED_EMAILS = 'sam@example.com, caroline@example.com';

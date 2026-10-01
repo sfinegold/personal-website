@@ -36,10 +36,11 @@ vercel.json     rewrites + function timeouts (no cron — the local job sends)
 |---|---|---|
 | `ANTHROPIC_API_KEY` | **optional** | LLM *fallback* extractor — only runs on sites where deterministic parsing (JSON-LD/iCal/RSS) finds nothing. Unset ⇒ deterministic-only. |
 | `LINEUP_USE_LLM` | optional | set to `0` to force-disable the LLM fallback even if a key exists |
-| `GMAIL_USER` | yes | Gmail address mail is sent from, e.g. `sjfinegold@gmail.com` |
-| `GMAIL_APP_PASSWORD` | yes | Google **App Password** (16 chars) — requires 2FA on the account |
-| `LINEUP_FROM_NAME` | optional | display name on the email, default `Lineup` |
-| `RESEND_API_KEY` / `LINEUP_FROM` | optional | only if you later switch back to Resend (domain-verified) instead of Gmail |
+| `RESEND_API_KEY` | one of | Resend API key; used whenever set (domain `samfinegold.me` must be verified in Resend). Also sends the Flashcards sign-in codes. |
+| `LINEUP_FROM` | optional | Resend sender, default `Lineup <lineup@samfinegold.me>` |
+| `GMAIL_USER` | one of | Gmail fallback when `RESEND_API_KEY` is unset: address mail is sent from, e.g. `sjfinegold@gmail.com` |
+| `GMAIL_APP_PASSWORD` | with Gmail | Google **App Password** (16 chars, spaces fine) — requires 2FA on the account |
+| `LINEUP_FROM_NAME` | optional | display name on Gmail-sent email, default `Lineup` |
 | `MILTON_EMAIL` / `SAM_EMAIL` | optional | recipient overrides (defaults are set in `profiles.js`) |
 | `SUPABASE_URL` | yes | your Supabase project URL, e.g. `https://abcd.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | yes | service role key (server-side; bypasses RLS) |
@@ -64,10 +65,10 @@ It arrives **from your Gmail address** (fine for a personal digest; Milton sees 
 Volume limits are generous (consumer Gmail ~500 recipients/day; Workspace ~2,000) —
 this app sends a handful per week, so you're nowhere near them.
 
-Switching to `samfinegold.me` branding later: set up Resend (or SES) with a verified
-domain and set `RESEND_API_KEY` + `LINEUP_FROM`; the code auto-prefers Gmail when its
-vars are present, so unset those to fall back to Resend. Transport logic lives in
-`api/_lib/email.js`.
+Resend (`samfinegold.me` branding): verify the domain in Resend (DKIM, SPF and the bounce
+MX records at the domain's DNS), create a sending key, set `RESEND_API_KEY` (+ `LINEUP_FROM`
+if you want a different sender). Resend is preferred whenever its key is set; Gmail is the
+fallback. Transport logic lives in `api/_lib/email.js`.
 
 ## Storage (Supabase)
 
