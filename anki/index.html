@@ -195,8 +195,29 @@
   .tile b{color:var(--text)}
 
   /* ---- browse ---- */
-  .filter{display:flex;gap:.5rem;margin-bottom:.6rem}
+  .filter{display:flex;gap:.5rem;margin-bottom:.7rem}
   .filter input{flex:1}
+  .scope{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:#FFFFFF;
+    border:1px solid var(--line);border-radius:8px;padding:0 .7rem;min-height:40px;white-space:nowrap}
+  .scope.all{background:var(--text);color:#FFFFFF;border-color:var(--text)}
+  .themes{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem}
+  .theme{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:10px;padding:.65rem .85rem;text-align:left;width:100%}
+  .theme .t1{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+  .theme .t-name{font-weight:600;text-transform:capitalize}
+  .theme .t-n{font-family:var(--mono);font-size:.68rem;color:var(--dim)}
+  .bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(11,15,20,.1);margin-top:.45rem}
+  .bar i{display:block;height:100%}
+  .bar .b-mature{background:var(--text)} .bar .b-review{background:rgba(11,15,20,.55)} .bar .b-learn{background:rgba(11,15,20,.3)}
+  .legend{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:-.2rem 0 .8rem}
+  .crumb{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .crumb button{background:none;border:0;color:var(--text);font:inherit;padding:.4rem .2rem;min-height:32px}
+  .note .snip{font-size:.8rem;color:var(--faint);margin-top:.2rem;font-style:italic}
+  .note .deckname{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:.15rem}
+  .grp{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:.7rem .9rem .3rem;background:rgba(255,255,255,.4)}
+  .acts{display:flex;gap:.4rem;margin-top:.6rem;flex-wrap:wrap}
+  .acts .btn{padding:.5rem .7rem;min-height:36px;font-size:.64rem;flex:none}
+  .acts .btn.on{background:var(--text);color:#FFFFFF}
+  .st.boost{color:#FFFFFF;background:var(--text);border-color:var(--text)}
   .chips{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem}
   .chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:.3rem .65rem;font-family:var(--mono);
     font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);min-height:30px}
@@ -247,7 +268,7 @@
   </header>
   <nav class="tabs" aria-label="Views">
     <button class="tab" data-go="study">Study</button>
-    <button class="tab" data-go="browse">Browse</button>
+    <button class="tab" data-go="browse">Phrases</button>
     <button class="tab" data-go="stats">Stats</button>
     <button class="tab" data-go="settings">Settings</button>
   </nav>
@@ -301,7 +322,7 @@
     <h2 class="ttl">Decks</h2>
     <div class="decklist" id="deckList"></div>
     <div class="menu">
-      <button class="btn" data-go="browse">Browse <span>phrases and their state</span></button>
+      <button class="btn" data-go="browse">Phrases <span>search, themes, progress</span></button>
       <button class="btn" data-go="stats">Stats <span>deck and today</span></button>
       <button class="btn" data-go="settings">Settings <span>limits, direction, export</span></button>
     </div>
@@ -309,9 +330,19 @@
   </section>
 
   <section class="view" id="view-browse">
-    <div class="filter"><input type="search" id="q" placeholder="Search" autocomplete="off"></div>
-    <div class="chips" id="chips"></div>
-    <div class="list" id="list"></div>
+    <div class="filter">
+      <input type="search" id="q" placeholder="Search phrases, meanings, parts…" autocomplete="off" autocapitalize="off">
+      <button class="scope" id="scopeBtn" title="Search this deck or all decks">This deck</button>
+    </div>
+    <div id="browseHome">
+      <div class="chips" id="stateChips"></div>
+      <h2 class="ttl">Themes</h2>
+      <div class="themes" id="themes"></div>
+    </div>
+    <div id="browseResults">
+      <div class="crumb" id="crumb"></div>
+      <div class="list" id="list"></div>
+    </div>
     <div class="retired" id="retired"></div>
   </section>
 
@@ -345,7 +376,7 @@
     </div>
     <h2 class="ttl">Keys</h2>
     <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
-      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase<br>u — undo &nbsp; h — home &nbsp; b s , — browse stats settings &nbsp; esc — back
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase<br>u — undo &nbsp; h — home &nbsp; b s , — phrases stats settings &nbsp; / — search &nbsp; esc — back
     </div>
   </section>
 </div>
@@ -367,7 +398,7 @@
   if (!S || !INDEX.length) { $('fMain').textContent = 'Could not load the decks.'; return; }
 
   /* ---------- storage (v2: progress per deck) ---------- */
-  function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null }; }
+  function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null, boost: [] }; }
   function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {} }; }
   function normalise(o) {
     if (!o || typeof o !== 'object') return null;
@@ -385,6 +416,7 @@
       nb.day = Object.assign(nb.day, b.day || {});
       nb.undo = Array.isArray(b.undo) ? b.undo : [];
       nb.stamp = b.stamp || null;
+      nb.boost = Array.isArray(b.boost) ? b.boost : [];
       s.decks[id] = nb;
     });
     return s;
@@ -414,8 +446,9 @@
     var d = deckOf(id), bucket = P(id), out = [];
     var dirs = filterDirs ? store.settings.dirs : 'both';
     d.data.notes.forEach(function (n, i) {
-      // Notes flagged priority:true are introduced before the rest, otherwise file order.
-      var base = (n.priority ? 0 : 1000000) + i * 2;
+      // "Study next" (per device) comes first, then notes flagged priority in the deck file, then file order.
+      var boosted = bucket.boost && bucket.boost.indexOf(n.id) >= 0;
+      var base = (boosted ? -1000000 : 0) + (n.priority ? 0 : 1000000) + i * 2;
       if (dirs !== 'rev') out.push({ id: n.id + ':fwd', noteId: n.id, dir: 'fwd', order: base, note: n, state: bucket.cards[n.id + ':fwd'] || null });
       if (dirs !== 'fwd') out.push({ id: n.id + ':rev', noteId: n.id, dir: 'rev', order: base + 1, note: n, state: bucket.cards[n.id + ':rev'] || null });
     });
@@ -446,7 +479,8 @@
 
   /* ---------- session state ---------- */
   var view = 'study', current = null, revealed = false, lastNoteId = null, queueInfo = null, cardsIdx = {};
-  var browseTag = '', browseQ = '';
+  var browseTag = '', browseQ = '', browseState = '', browseScope = 'deck';
+  function norm(str) { return String(str || '').normalize('NFD').replace(/[\u0300-\u036f\u200c]/g, '').toLowerCase(); }
 
   function rollDay(now) {
     var b = P(), t = S.dayNum(now);
@@ -472,7 +506,7 @@
   function switchDeck(id) {
     if (!deckOf(id) || id === store.deck) { view = 'study'; render(); return; }
     store.deck = id; save();
-    current = null; lastNoteId = null; revealed = false; browseTag = ''; browseQ = ''; $('q').value = '';
+    current = null; lastNoteId = null; revealed = false; browseTag = ''; browseQ = ''; browseState = ''; $('q').value = '';
     pickVoice();
     view = 'study'; render();
     toast(deckOf(id).meta.name);
@@ -510,24 +544,27 @@
 
   /* ---------- speech (device voice for the deck's language) ---------- */
   var synth = window.speechSynthesis || null, voice = null, spokenKey = '';
-  function pickVoice() {
-    if (!synth || !deck()) return;
-    var lang = deck().meta.lang.toLowerCase();
+  function voiceFor(lang) {
+    if (!synth) return null;
+    lang = String(lang || '').toLowerCase();
     var re = new RegExp('^' + lang.replace(/[-_]/g, '[-_]') + '([-_]|$)', 'i');
     var vs = synth.getVoices().filter(function (v) { return re.test(v.lang); });
-    if (!vs.length) { voice = null; return; }
-    voice = vs.filter(function (v) { return /melina|google|neural|premium|enhanced|natural|siri/i.test(v.name); })[0] || vs[0];
+    if (!vs.length) return null;
+    return vs.filter(function (v) { return /melina|google|neural|premium|enhanced|natural|siri/i.test(v.name); })[0] || vs[0];
   }
+  function pickVoice() { voice = deck() ? voiceFor(deck().meta.lang) : null; }
   if (synth) { if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', pickVoice); else synth.onvoiceschanged = pickVoice; }
   else document.body.classList.add('nospeech');
-  function speak(text, quiet) {
+  function speak(text, quiet, meta) {
+    meta = meta || deck().meta;
     if (!synth) { if (!quiet) toast('No speech on this device'); return false; }
     if (!voice) pickVoice();
-    if (!voice) { if (!quiet) toast('No ' + deck().meta.langName + ' voice on this device'); return false; }
+    var v = meta === deck().meta ? voice : voiceFor(meta.lang);
+    if (!v) { if (!quiet) toast('No ' + meta.langName + ' voice on this device'); return false; }
     try {
       synth.cancel();
       var u = new SpeechSynthesisUtterance(String(text).replace(/;/g, ''));
-      u.voice = voice; u.lang = voice.lang; u.rate = 0.9;
+      u.voice = v; u.lang = v.lang; u.rate = 0.9;
       var btn = $('sayBtn');
       u.onstart = function () { btn.classList.add('playing'); };
       u.onend = u.onerror = function () { btn.classList.remove('playing'); };
@@ -634,35 +671,122 @@
     if (st.type === 'review') return { cls: st.leech ? 'leech' : 'review', txt: S.fmtDays(st.ivl) + (st.leech ? ' leech' : '') };
     return { cls: st.type, txt: st.type === 'relearn' ? 'relearn' : 'learn' };
   }
-  function renderBrowse() {
-    var d = deck(), notes = d.data.notes, cards = P().cards, code = d.meta.code, tl = d.meta.translit;
-    var tags = {};
-    notes.forEach(function (n) { n.tags.forEach(function (t) { tags[t] = (tags[t] || 0) + 1; }); });
-    $('chips').innerHTML = Object.keys(tags).map(function (t) {
-      return '<button class="chip' + (browseTag === t ? ' on' : '') + '" data-tag="' + esc(t) + '">' + esc(t) + ' ' + tags[t] + '</button>';
-    }).join('');
-    var q = browseQ.trim().toLowerCase();
-    var dirs = store.settings.dirs;
-    var html = '';
-    notes.forEach(function (n) {
-      if (browseTag && n.tags.indexOf(browseTag) < 0) return;
-      if (q && (n.term + ' ' + (n.tr || '') + ' ' + n.en + ' ' + (n.note || '')).toLowerCase().indexOf(q) < 0) return;
-      var f = stLabel(cards[n.id + ':fwd']), r = stLabel(cards[n.id + ':rev']);
-      var head = tl && n.tr ? '<span class="tr">' + esc(n.tr) + '</span><span class="el" dir="auto">' + esc(n.term) + '</span>' : '<span class="tr el">' + esc(n.term) + '</span>';
-      var exLine = n.ex ? [n.ex.tr, n.ex.term, n.ex.en].filter(Boolean).map(esc).join(' · ') : '';
-      html += '<div class="note" data-id="' + esc(n.id) + '"><div class="l1"><div>' + head + '</div>' +
-        '<div class="state"><span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">→EN ' + esc(f.txt) + '</span>' +
-        '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">→' + esc(code) + ' ' + esc(r.txt) + '</span></div></div>' +
-        '<div class="en">' + esc(n.en) + '</div>' +
-        '<div class="more">' + (n.note ? '<div>' + esc(n.note) + '</div>' : '') +
-        (n.memo ? '<div style="margin-top:.3rem;font-style:italic">' + esc(n.memo) + '</div>' : '') +
-        (n.parts ? '<div class="parts" style="margin-top:.4rem;display:block">' + partsHtml(n) + '</div>' : '') +
-        (exLine ? '<div style="margin-top:.3rem">' + exLine + '</div>' : '') +
-        '<div style="margin-top:.3rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">' + esc(n.tags.join(' · ')) + '</div></div></div>';
+  /* ---- Phrases: search across decks, themes with progress, state lists, per-card actions ---- */
+  function cardState(st) {
+    if (!st) return 'new';
+    if (st.leech) return 'leech';
+    if (st.type === 'learn' || st.type === 'relearn') return 'learn';
+    if (st.ivl >= 21) return 'mature';
+    return 'review';
+  }
+  function noteStates(deckId, n) {
+    var cards = P(deckId).cards, dirs = store.settings.dirs, out = [];
+    if (dirs !== 'rev') out.push(cardState(cards[n.id + ':fwd']));
+    if (dirs !== 'fwd') out.push(cardState(cards[n.id + ':rev']));
+    return out;
+  }
+  function noteDue(deckId, n, now) {
+    var cards = P(deckId).cards, today = S.dayNum(now);
+    return ['fwd', 'rev'].some(function (d) {
+      var st = cards[n.id + ':' + d]; if (!st) return false;
+      if (st.type === 'review') return S.dayNum(st.due) <= today;
+      return st.due <= now;
     });
-    $('list').innerHTML = html || '<div class="empty">No matches.</div>';
+  }
+  function matchNote(n, q) {
+    if (!q) return null;
+    var fields = [['term', n.term], ['tr', n.tr], ['en', n.en], ['note', n.note], ['memo', n.memo], ['tags', (n.tags || []).join(' ')]];
+    (n.parts || []).forEach(function (p) { fields.push(['part', [p.tr, p.t, p.m].filter(Boolean).join(' · ')]); });
+    if (n.ex) fields.push(['example', [n.ex.tr, n.ex.term, n.ex.en].filter(Boolean).join(' · ')]);
+    for (var i = 0; i < fields.length; i++) if (fields[i][1] && norm(fields[i][1]).indexOf(q) >= 0) return fields[i];
+    return null;
+  }
+  function renderBrowse() {
+    var now = Date.now(), q = norm(browseQ.trim());
+    var showHome = !q && !browseTag && !browseState;
+    $('browseHome').style.display = showHome ? '' : 'none';
+    $('browseResults').style.display = showHome ? 'none' : '';
+    $('scopeBtn').textContent = browseScope === 'all' ? 'All decks' : 'This deck';
+    $('scopeBtn').classList.toggle('all', browseScope === 'all');
+    if (showHome) renderBrowseHome(now); else renderBrowseList(now, q);
     var rc = retiredCount();
-    $('retired').textContent = notes.length + ' phrases' + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+    $('retired').textContent = deck().data.notes.length + ' phrases in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+  }
+  function renderBrowseHome(now) {
+    var d = deck(), notes = d.data.notes;
+    var counts = { all: notes.length, new: 0, learn: 0, due: 0, mature: 0, leech: 0 };
+    var tags = {};
+    notes.forEach(function (n) {
+      var sts = noteStates(d.meta.id, n);
+      if (sts.indexOf('new') >= 0) counts.new++;
+      if (sts.indexOf('learn') >= 0) counts.learn++;
+      if (sts.indexOf('mature') >= 0) counts.mature++;
+      if (sts.indexOf('leech') >= 0) counts.leech++;
+      if (noteDue(d.meta.id, n, now)) counts.due++;
+      n.tags.forEach(function (t) {
+        var g = tags[t] || (tags[t] = { n: 0, mature: 0, review: 0, learn: 0, cards: 0 });
+        g.n++;
+        sts.forEach(function (st) { g.cards++; if (st === 'mature') g.mature++; else if (st === 'review' || st === 'leech') g.review++; else if (st === 'learn') g.learn++; });
+      });
+    });
+    $('stateChips').innerHTML = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['due', 'Due now'], ['mature', 'Mature'], ['leech', 'Leeches']].map(function (c) {
+      return '<button class="chip" data-state="' + c[0] + '">' + c[1] + ' ' + counts[c[0]] + '</button>';
+    }).join('');
+    $('themes').innerHTML = Object.keys(tags).map(function (t) {
+      var g = tags[t], pc = function (x) { return g.cards ? Math.round(x / g.cards * 100) : 0; };
+      return '<button class="theme" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' phrases · ' + pc(g.mature + g.review) + '% learned</span></div>' +
+        '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
+    }).join('') + '<div class="legend">bar: mature · review · learning · (empty = new)</div>';
+  }
+  function renderBrowseList(now, q) {
+    var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [deck()];
+    var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : browseTag ? browseTag : ({ all: 'All phrases', new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
+    $('crumb').innerHTML = '<button id="crumbBack">‹ Themes</button><span></span>';
+    var html = '', total = 0;
+    decksToSearch.forEach(function (d) {
+      var rows = '';
+      d.data.notes.forEach(function (n) {
+        var hit = null;
+        if (q) { hit = matchNote(n, q); if (!hit) return; }
+        else if (browseTag) { if (n.tags.indexOf(browseTag) < 0) return; }
+        else if (browseState && browseState !== 'all') {
+          var sts = noteStates(d.meta.id, n);
+          if (browseState === 'due') { if (!noteDue(d.meta.id, n, now)) return; }
+          else if (sts.indexOf(browseState) < 0) return;
+        }
+        total++;
+        rows += noteRow(d, n, hit);
+      });
+      if (rows) html += (decksToSearch.length > 1 ? '<div class="grp">' + esc(d.meta.name) + '</div>' : '') + rows;
+    });
+    $('list').innerHTML = html || '<div class="empty">' + (q ? 'No phrase matches that.' : 'Nothing here yet.') + '</div>';
+    $('crumb').querySelector('span').textContent = label + ' · ' + total;
+  }
+  function stLabel(st) {
+    if (!st) return { cls: 'new', txt: 'new' };
+    if (st.type === 'review') return { cls: st.leech ? 'leech' : 'review', txt: S.fmtDays(st.ivl) + (st.leech ? ' leech' : '') };
+    return { cls: st.type, txt: st.type === 'relearn' ? 'relearn' : 'learn' };
+  }
+  function noteRow(d, n, hit) {
+    var cards = P(d.meta.id).cards, code = d.meta.code, tl = d.meta.translit, dirs = store.settings.dirs;
+    var f = stLabel(cards[n.id + ':fwd']), r = stLabel(cards[n.id + ':rev']);
+    var boosted = P(d.meta.id).boost.indexOf(n.id) >= 0;
+    var head = tl && n.tr ? '<span class="tr">' + esc(n.tr) + '</span><span class="el" dir="auto">' + esc(n.term) + '</span>' : '<span class="tr el" dir="auto">' + esc(n.term) + '</span>';
+    var snip = hit && ['memo', 'part', 'example', 'note', 'tags'].indexOf(hit[0]) >= 0 ? '<div class="snip">' + esc(hit[0]) + ': ' + esc(hit[1].length > 110 ? hit[1].slice(0, 110) + '…' : hit[1]) + '</div>' : '';
+    var exLine = n.ex ? [n.ex.tr, n.ex.term, n.ex.en].filter(Boolean).map(esc).join(' · ') : '';
+    return '<div class="note" data-deck="' + esc(d.meta.id) + '" data-id="' + esc(n.id) + '">' +
+      '<div class="l1"><div>' + head + '</div>' +
+      '<div class="state">' + (boosted ? '<span class="st boost">next</span>' : '') +
+      '<span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">→EN ' + esc(f.txt) + '</span>' +
+      '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">→' + esc(code) + ' ' + esc(r.txt) + '</span></div></div>' +
+      '<div class="en">' + esc(n.en) + '</div>' + snip +
+      '<div class="more">' + (n.note ? '<div>' + esc(n.note) + '</div>' : '') +
+      (n.memo ? '<div style="margin-top:.3rem;font-style:italic">' + esc(n.memo) + '</div>' : '') +
+      (n.parts ? '<div class="parts" style="margin-top:.4rem;display:block">' + partsHtml(n) + '</div>' : '') +
+      (exLine ? '<div style="margin-top:.4rem">' + exLine + '</div>' : '') +
+      '<div style="margin-top:.3rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">' + esc(n.tags.join(' · ')) + '</div>' +
+      '<div class="acts"><button class="btn" data-act="say">Play</button><button class="btn' + (boosted ? ' on' : '') + '" data-act="boost">' + (boosted ? 'Next ✓' : 'Study next') + '</button><button class="btn" data-act="reset">Reset</button></div>' +
+      '</div></div>';
   }
   function tile(cls, v, label) { return '<div class="tile ' + cls + '"><b>' + v + '</b><span>' + label + '</span></div>'; }
   function renderStats() {
@@ -739,15 +863,45 @@
     var b = e.target.closest('.deck[data-deck]'); if (b) switchDeck(b.dataset.deck);
   });
 
-  $('q').addEventListener('input', function () { browseQ = this.value; renderBrowse(); });
-  $('chips').addEventListener('click', function (e) {
+  $('q').addEventListener('input', function () { browseQ = this.value; browseTag = ''; browseState = ''; renderBrowse(); });
+  $('scopeBtn').addEventListener('click', function () { browseScope = browseScope === 'all' ? 'deck' : 'all'; renderBrowse(); });
+  $('stateChips').addEventListener('click', function (e) {
     var b = e.target.closest('.chip'); if (!b) return;
-    browseTag = browseTag === b.dataset.tag ? '' : b.dataset.tag; renderBrowse();
+    browseState = b.dataset.state; browseTag = ''; renderBrowse(); window.scrollTo(0, 0);
+  });
+  $('themes').addEventListener('click', function (e) {
+    var b = e.target.closest('.theme'); if (!b) return;
+    browseTag = b.dataset.tag; browseState = ''; renderBrowse(); window.scrollTo(0, 0);
+  });
+  $('crumb').addEventListener('click', function (e) {
+    if (!e.target.closest('#crumbBack')) return;
+    browseQ = ''; $('q').value = ''; browseTag = ''; browseState = ''; renderBrowse();
   });
   $('list').addEventListener('click', function (e) {
+    var row = e.target.closest('.note'); if (!row) return;
+    var d = deckOf(row.dataset.deck), n = d && d.notesById[row.dataset.id]; if (!n) return;
+    var act = e.target.closest('[data-act]');
+    if (act) {
+      e.stopPropagation();
+      if (act.dataset.act === 'say') { speak(n.term, false, d.meta); return; }
+      if (act.dataset.act === 'boost') {
+        var b = P(d.meta.id), i = b.boost.indexOf(n.id);
+        if (i >= 0) b.boost.splice(i, 1); else b.boost.push(n.id);
+        save(); if (d.meta.id === store.deck) current = null;
+        toast(i >= 0 ? 'Removed from next' : 'Will come up next' + (d.meta.id === store.deck ? '' : ' in ' + d.meta.name));
+        renderBrowse();
+        var again = $('list').querySelector('.note[data-id="' + n.id + '"][data-deck="' + d.meta.id + '"]'); if (again) again.classList.add('open');
+        return;
+      }
+      if (act.dataset.act === 'reset') {
+        if (!confirm('Reset "' + (n.tr || n.term) + '" to new in both directions?')) return;
+        var bk = P(d.meta.id); delete bk.cards[n.id + ':fwd']; delete bk.cards[n.id + ':rev'];
+        save(); if (d.meta.id === store.deck) current = null; toast('Card reset'); renderBrowse(); return;
+      }
+    }
     var el = e.target.closest('.el');
-    if (el && synth) { var n = deck().notesById[el.closest('.note').dataset.id]; if (n) speak(n.term, false); return; }
-    var row = e.target.closest('.note'); if (row) row.classList.toggle('open');
+    if (el && synth && !row.classList.contains('open')) speak(n.term, false, d.meta);
+    row.classList.toggle('open');
   });
 
   function settingChanged() {
@@ -796,6 +950,7 @@
     var k = e.key;
     if (k === 'Escape') { setView('study'); return; }
     if (k === 'b') { setView('browse'); return; }
+    if (k === '/') { e.preventDefault(); setView('browse'); $('q').focus(); return; }
     if (k === 's') { setView('stats'); return; }
     if (k === 'd' || k === 'h') { setView('decks'); return; }
     if (k === ',') { setView('settings'); return; }
