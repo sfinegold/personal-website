@@ -423,14 +423,21 @@
   </section>
 
   <section class="view" id="view-settings">
-    <h2 class="ttl">Profile &amp; sync</h2>
+    <h2 class="ttl">Account &amp; sync</h2>
     <div class="panel" id="syncPanel">
-      <p class="pnote" id="syncNote">Keep your progress on every device and give each person their own profile. Enter the family passphrase to connect.</p>
-      <div class="row" id="rowPass"><label for="sPass">Passphrase</label><input type="password" id="sPass" autocomplete="current-password" placeholder="passphrase"></div>
-      <div class="actions" id="syncActions"><button class="btn" id="connectBtn">Connect</button></div>
-      <div id="profileList"></div>
-      <div class="row" id="rowNewProfile" style="display:none"><label for="sNewProfile">New profile<small>A name, e.g. Caroline.</small></label><input type="text" id="sNewProfile" placeholder="name" maxlength="24"></div>
-      <div class="actions" id="newProfileActions" style="display:none"><button class="btn" id="newProfileBtn">Create profile</button><button class="btn ghost" id="syncOutBtn">Sign out</button></div>
+      <p class="pnote" id="syncNote">Sign in with your email to keep your progress on every device. Each person has their own account.</p>
+      <div id="signedOut">
+        <div class="row"><label for="sEmail">Email</label><input type="email" id="sEmail" autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
+        <div class="actions"><button class="btn" id="codeBtn">Send code</button></div>
+        <div id="codeStep" style="display:none">
+          <div class="row"><label for="sCode">Code<small>Six digits from the email. Good for 10 minutes.</small></label><input type="text" id="sCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"></div>
+          <div class="actions"><button class="btn primary" id="verifyBtn">Sign in</button></div>
+        </div>
+      </div>
+      <div id="signedIn" style="display:none">
+        <div class="row"><label>Signed in as<small id="sWho"></small></label><button class="btn ghost" id="syncOutBtn">Sign out</button></div>
+        <div class="row"><label for="sName">Display name<small>Shown on the home screen.</small></label><input type="text" id="sName" maxlength="24"></div>
+      </div>
     </div>
     <h2 class="ttl">Study</h2>
     <div class="panel">
@@ -479,7 +486,7 @@
 
   /* ---------- storage (v2: progress per deck) ---------- */
   function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null, boost: [] }; }
-  function freshSync() { return { pass: '', profileId: '', profileName: '', lastSync: 0, lastError: '', dirty: false }; }
+  function freshSync() { return { token: '', uid: '', email: '', name: '', lastEmail: '', lastSync: 0, lastError: '', dirty: false }; }
   function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {}, sync: freshSync(), updated: null }; }
   function normalise(o) {
     if (!o || typeof o !== 'object') return null;
@@ -631,7 +638,7 @@
   var M = window.AnkiMerge;
   var API = '/api/anki';
   var pushTimer = null, pushing = false, syncState = 'idle';   // idle | saving | synced | offline | off
-  function hasProfile() { return !!(store.sync && store.sync.profileId && store.sync.pass); }
+  function hasProfile() { return !!(store.sync && store.sync.token && store.sync.uid); }
   function hasLocalProgress() { return Object.keys(store.decks).some(function (id) { return Object.keys(store.decks[id].cards || {}).length > 0; }); }
   function docOut() {
     var decks = {};
@@ -652,7 +659,7 @@
   }
   function api(op, params, body, keepalive) {
     var url = API + '?op=' + encodeURIComponent(op) + Object.keys(params || {}).map(function (k) { return '&' + k + '=' + encodeURIComponent(params[k]); }).join('');
-    var opts = { method: body ? 'POST' : 'GET', headers: { 'x-anki-pass': store.sync.pass || '' }, keepalive: !!keepalive };
+    var opts = { method: body ? 'POST' : 'GET', headers: { 'x-anki-token': store.sync.token || '' }, keepalive: !!keepalive };
     if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(Object.assign({ op: op }, body)); }
     return fetch(url, opts).then(function (r) {
       return r.text().then(function (t) {
@@ -670,8 +677,8 @@
   function renderSyncLine() {
     var el = $('syncStatus'); if (!el) return;
     el.classList.remove('err');
-    if (!hasProfile()) { el.textContent = 'Not synced · set up a profile in Settings'; return; }
-    var name = store.sync.profileName || 'profile';
+    if (!hasProfile()) { el.textContent = 'Not signed in · sync your progress in Settings'; return; }
+    var name = store.sync.name || store.sync.email || 'account';
     if (syncState === 'saving') el.textContent = name + ' · saving…';
     else if (syncState === 'offline') { el.textContent = name + ' · offline, will sync' + (store.sync.lastError ? ' (' + store.sync.lastError + ')' : ''); el.classList.add('err'); }
     else el.textContent = name + ' · synced ' + (store.sync.lastSync ? fmtAgo(Date.now() - store.sync.lastSync) : '');
@@ -685,59 +692,60 @@
   function pushState(keepalive) {
     if (!hasProfile() || pushing) return Promise.resolve();
     pushing = true; setSync('saving');
-    return api('save', { }, { profile: store.sync.profileId, state: docOut() }, keepalive).then(function (doc) {
+    return api('save', { }, { state: docOut() }, keepalive).then(function (doc) {
       adopt(doc); store.sync.dirty = false; store.sync.lastSync = Date.now(); save(); setSync('synced', '');
     }).catch(function (e) {
-      setSync('offline', e.status === 401 ? 'wrong passphrase' : e.status === 503 ? 'server not configured' : 'no connection');
+      if (e.status === 401) signedOutByServer(); else setSync('offline', e.status === 503 ? 'server not configured' : 'no connection');
     }).then(function () { pushing = false; });
   }
   function pullState() {
     if (!hasProfile()) return Promise.resolve();
-    return api('state', { profile: store.sync.profileId }).then(function (doc) {
+    return api('state', {}).then(function (doc) {
       var before = docOut(); adopt(doc); save();
       var changed = M.differs(docOut(), doc) || store.sync.dirty;
       store.sync.lastSync = Date.now(); setSync('synced', '');
       current = null; render();
       if (changed) return pushState(false);
     }).catch(function (e) {
-      setSync('offline', e.status === 401 ? 'wrong passphrase' : e.status === 503 ? 'server not configured' : 'no connection');
+      if (e.status === 401) signedOutByServer(); else setSync('offline', e.status === 503 ? 'server not configured' : 'no connection');
       render();
     });
   }
-  function useProfile(p) {
-    if (store.sync.profileId === p.id) return;
-    var switching = hasProfile();
-    var start = switching ? pushState(false) : Promise.resolve();
-    var mergeLocal = !switching && hasLocalProgress() ? confirm('Merge this device\'s progress into "' + p.name + '"?\n\nOK merges it in. Cancel replaces it with the profile\'s progress.') : false;
-    start.then(function () {
-      if (switching || !mergeLocal) { store.decks = {}; store.streak = null; }
-      store.sync.profileId = p.id; store.sync.profileName = p.name; store.sync.dirty = mergeLocal; save();
-      return pullState();
-    }).then(function () { toast('Using profile ' + p.name); fillSettings(); return refreshProfiles(); });
+  function signedOutByServer() {
+    store.sync = Object.assign(freshSync(), { lastError: 'signed out', lastEmail: store.sync.email }); save(); setSync('idle'); toast('Signed out. Sign in again in Settings.');
   }
-  function refreshProfiles() {
-    if (!store.sync.pass || view !== 'settings') return Promise.resolve();
-    return api('profiles').then(function (j) { renderProfiles(j.profiles || []); }).catch(function () {});
+  function requestCode() {
+    var email = $('sEmail').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { toast('Enter a valid email'); return; }
+    $('syncNote').textContent = 'Sending…';
+    api('request', {}, { email: email }).then(function (j) {
+      $('syncNote').textContent = j.message || 'Code sent. Check your email.';
+      $('codeStep').style.display = ''; $('sCode').focus();
+    }).catch(function (e) { $('syncNote').textContent = e.message; });
   }
-  function renderProfiles(list) {
-    var el = $('profileList');
-    el.innerHTML = '<div class="plist">' + (list.length ? list.map(function (p) {
-      var on = p.id === store.sync.profileId;
-      return '<div class="prow' + (on ? ' on' : '') + '"><span><span class="pname">' + esc(p.name) + '</span><span class="pmeta">' + (p.updated ? 'studied ' + fmtAgo(Date.now() - Date.parse(p.updated)) : 'new') + '</span></span>' +
-        '<button class="btn" data-profile="' + esc(p.id) + '" data-name="' + esc(p.name) + '"' + (on ? ' disabled' : '') + '>' + (on ? 'In use' : 'Use') + '</button></div>';
-    }).join('') : '<div class="empty">No profiles yet. Create one below.</div>') + '</div>';
-    $('rowNewProfile').style.display = ''; $('newProfileActions').style.display = '';
+  function verifyCode() {
+    var email = $('sEmail').value.trim(), code = $('sCode').value.replace(/\D/g, '');
+    if (code.length !== 6) { toast('Enter the 6-digit code'); return; }
+    $('syncNote').textContent = 'Checking…';
+    api('verify', {}, { email: email, code: code }).then(function (j) {
+      // Offer to merge only when this device's progress is not another person's.
+      var sameOwner = !store.sync.lastEmail || store.sync.lastEmail === j.user.email;
+      var mergeLocal = hasLocalProgress() && sameOwner ? confirm('Merge this device\'s progress into your account?\n\nOK merges it in. Cancel replaces it with what the account already has.') : false;
+      if (!mergeLocal) { store.decks = {}; store.streak = null; }
+      store.sync = Object.assign(freshSync(), { token: j.token, uid: j.user.uid, email: j.user.email, name: j.user.name, dirty: mergeLocal });
+      save(); $('sCode').value = ''; fillSettings();
+      return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); });
+    }).catch(function (e) { $('syncNote').textContent = e.message; });
   }
-  function connect() {
-    store.sync.pass = $('sPass').value.trim(); save();
-    $('syncNote').textContent = 'Connecting…';
-    return api('profiles').then(function (j) {
-      $('syncNote').textContent = 'Connected. Pick your profile, or create one.';
-      renderProfiles(j.profiles || []);
-    }).catch(function (e) {
-      $('profileList').innerHTML = '';
-      $('syncNote').textContent = e.status === 503 ? 'Sync is not set up on the server yet: ' + e.message : e.status === 401 ? 'That passphrase is not right.' : 'Could not reach the server: ' + e.message;
-    });
+  function signOut() {
+    if (!confirm('Sign out on this device? Progress stays here and on the account.')) return;
+    var tok = store.sync.token, who = store.sync.email;
+    store.sync = Object.assign(freshSync(), { lastEmail: who }); save(); setSync('idle'); fillSettings(); toast('Signed out');
+    if (tok) fetch(API + '?op=signout', { method: 'POST', headers: { 'x-anki-token': tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'signout' }) }).catch(function () {});
+  }
+  function renameAccount() {
+    var name = $('sName').value.trim(); if (!name || name === store.sync.name) return;
+    api('rename', {}, { name: name }).then(function (j) { store.sync.name = j.user.name; save(); toast('Name saved'); renderSyncLine(); }).catch(function (e) { toast(e.message); });
   }
 
   /* ---------- speech (device voice for the deck's language) ---------- */
@@ -1098,13 +1106,15 @@
     renderSyncLine();
   }
   function fillSettings() {
-    $('sPass').value = store.sync.pass || '';
-    if (hasProfile()) {
-      $('syncNote').textContent = 'Syncing as ' + store.sync.profileName + '. Connect again to switch profile or add one.';
-      $('rowNewProfile').style.display = ''; $('newProfileActions').style.display = '';
+    var on = hasProfile();
+    $('signedIn').style.display = on ? '' : 'none'; $('signedOut').style.display = on ? 'none' : '';
+    if (on) {
+      $('syncNote').textContent = 'Your progress syncs to this account on every device you sign in on.';
+      $('sWho').textContent = store.sync.email; $('sName').value = store.sync.name || '';
     } else {
-      $('rowNewProfile').style.display = 'none'; $('newProfileActions').style.display = 'none';
-      $('profileList').innerHTML = '';
+      $('syncNote').textContent = 'Sign in with your email to keep your progress on every device. Each person has their own account.';
+      $('codeStep').style.display = 'none';
+      if (store.sync.lastError === 'signed out') $('syncNote').textContent = 'You were signed out. Sign in again to keep syncing.';
     }
     $('sNew').value = store.settings.newPerDay; $('sRev').value = store.settings.revPerDay;
     $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
@@ -1147,21 +1157,12 @@
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
   $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
   $('syncStatus').addEventListener('click', function () { setView('settings'); });
-  $('connectBtn').addEventListener('click', connect);
-  $('sPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') connect(); });
-  $('profileList').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-profile]'); if (!b) return;
-    useProfile({ id: b.dataset.profile, name: b.dataset.name });
-  });
-  $('newProfileBtn').addEventListener('click', function () {
-    var name = $('sNewProfile').value.trim(); if (!name) { toast('Give the profile a name'); return; }
-    api('create', {}, { name: name }).then(function (j) { $('sNewProfile').value = ''; useProfile(j.profile); })
-      .catch(function (e) { toast('Could not create: ' + e.message); });
-  });
-  $('syncOutBtn').addEventListener('click', function () {
-    if (!confirm('Stop syncing on this device? Progress stays here.')) return;
-    store.sync = freshSync(); save(); setSync('idle'); fillSettings(); toast('Sync off');
-  });
+  $('codeBtn').addEventListener('click', requestCode);
+  $('sEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') requestCode(); });
+  $('verifyBtn').addEventListener('click', verifyCode);
+  $('sCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(); });
+  $('syncOutBtn').addEventListener('click', signOut);
+  $('sName').addEventListener('change', renameAccount);
   document.addEventListener('visibilitychange', function () { if (document.hidden && store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   window.addEventListener('pagehide', function () { if (store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
