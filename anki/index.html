@@ -70,18 +70,23 @@
   .streak b{font-size:1.05rem}
   .streak small{display:block;color:var(--dim);font-size:.8rem;margin-top:.1rem}
   .deck .d-row{display:flex;align-items:center;gap:.7rem}
-  .deck .d-pet{font-size:2rem;line-height:1;flex:none;display:inline-block}
+  .deck .d-pet{font-size:2rem;line-height:1;flex:none;display:inline-block;width:64px;height:64px}
+  .pet-art{width:100%;height:100%;display:block}
+  .lid,.flat,.sad,.zz,.noprop{display:none}
+  .hungry .smile{display:none} .hungry .flat{display:block}
+  .sick .smile{display:none} .sick .sad{display:block} .sick .eye{display:none} .sick .lid{display:block} .sick .prop{display:none} .sick .noprop{display:block}
+  .asleep .eye{display:none} .asleep .lid{display:block} .asleep .zz{display:block} .asleep .smile{display:none} .asleep .flat{display:block}
   .deck .d-pet.hungry{animation:wobble 2.4s ease-in-out infinite}
-  .deck .d-pet.sick{filter:grayscale(.7);opacity:.7;transform:rotate(-12deg)}
+  .deck .d-pet.sick{filter:grayscale(.6);opacity:.8;transform:rotate(-8deg)}
   .deck .d-pet.asleep{opacity:.5}
   .deck .d-pet.happy{animation:bob 3s ease-in-out infinite}
   .deck .d-mood{font-size:.8rem;color:var(--dim);margin-top:.2rem}
-  .pet{position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center;margin:0 auto .4rem}
-  .pet-emoji{font-size:4.2rem;line-height:1;display:inline-block}
+  .pet{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;margin:0 auto .4rem}
+  .pet-emoji{font-size:4.2rem;line-height:1;display:inline-block;width:100%;height:100%}
   .pet.happy .pet-emoji{animation:hop .9s cubic-bezier(.3,1.4,.5,1) 2}
   .pet.big .pet-emoji{animation:hop .9s cubic-bezier(.3,1.4,.5,1) 4}
   .pet.hungry .pet-emoji{animation:wobble 2.4s ease-in-out infinite}
-  .pet.sick .pet-emoji{filter:grayscale(.7);opacity:.75;transform:rotate(-12deg)}
+  .pet.sick .pet-emoji{filter:grayscale(.6);opacity:.8;transform:rotate(-8deg)}
   .pet.asleep .pet-emoji{opacity:.55}
   .pet-line{font-size:.92rem;color:var(--dim);margin-bottom:.9rem}
   .burst{position:absolute;inset:0;pointer-events:none}
@@ -457,6 +462,7 @@
 <script src="/anki/scheduler.js"></script>
 <script src="/anki/merge.js"></script>
 <script src="/anki/streak.js"></script>
+<script src="/anki/creatures.js"></script>
 <script src="/anki/decks/index.js"></script>
 <script>
 (function () {
@@ -774,6 +780,7 @@
   var K = window.AnkiStreak;
   var combo = 0, celebratedDay = 0;
   function creatureOf(meta) { return meta.creature || { emoji: '🐣', name: 'Pip', kind: 'chick' }; }
+  function creatureArt(c) { var art = window.CREATURE_ART || {}; return art[c.kind] || esc(c.emoji); }
   function lastStudied(deckId) {
     var cards = P(deckId).cards, t = 0;
     Object.keys(cards).forEach(function (k) { if (cards[k].last > t) t = cards[k].last; });
@@ -816,7 +823,7 @@
   }
   function renderPet(cleared) {
     var now = Date.now(), cs = creatureState(deck().meta, now), pet = $('pet');
-    $('petEmoji').textContent = cs.c.emoji;
+    $('petEmoji').innerHTML = creatureArt(cs.c);
     pet.className = 'pet ' + cs.mood;
     var st = K.status(store.streak, S.dayNum(now));
     var line = cleared ? cs.c.name + ' is full and happy.' : cs.line;
@@ -1080,7 +1087,7 @@
       var st = S.stats(cardsOf(meta.id, false), now);
       var on = meta.id === store.deck;
       var cs = creatureState(meta, now);
-      html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '"><div class="d-row"><span class="d-pet ' + cs.mood + '">' + cs.c.emoji + '</span><div>' +
+      html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '"><div class="d-row"><span class="d-pet ' + cs.mood + '">' + creatureArt(cs.c) + '</span><div>' +
         '<div class="d-name">' + esc(meta.name) + (on ? ' <span class="d-now">current</span>' : '') + '</div>' +
         '<div class="d-mood">' + esc(cs.line) + '</div>' +
         '<div class="d-sub">' + d.data.notes.length + ' phrases · ' + st.mature + ' mature</div>' +
