@@ -32,9 +32,14 @@
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
   }
-  html{font-size:16px}
+  /* The body, not the window, scrolls. A fixed body means iOS cannot leave the page
+     scrolled under the status bar after the keyboard closes; every view scrolls inside it.
+     html needs its own overflow, or the body's overflow is handed to the viewport instead. */
+  html{font-size:16px;height:100%;overflow:hidden}
   body{background:var(--bg);color:var(--text);font-family:var(--sans);
-    -webkit-font-smoothing:antialiased;letter-spacing:.01em;min-height:100vh;
+    -webkit-font-smoothing:antialiased;letter-spacing:.01em;
+    position:fixed;inset:0;width:100%;height:100%;overflow-x:hidden;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
     -webkit-tap-highlight-color:transparent}
   body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.6;
     background:linear-gradient(var(--grid) 1px,transparent 1px),
@@ -48,9 +53,11 @@
 
   .app{width:100%;max-width:640px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;
     padding:calc(.5rem + env(safe-area-inset-top)) 1rem calc(.6rem + env(safe-area-inset-bottom));
-    min-height:100vh;min-height:100svh}
-  /* Study and Done are locked to one screen: header, card, grades, nothing to scroll past. */
-  .app[data-view=study],.app[data-view=done]{height:100vh;height:100svh;overflow:hidden}
+    min-height:100%}
+  /* Study and Done fill the screen (header, card, grades) when it is tall enough, and
+     keep a floor on short screens (landscape, small phones) so the body scrolls instead
+     of squashing the card. */
+  .app[data-view=study],.app[data-view=done]{height:100%;min-height:460px}
 
   /* ---- top bar ---- */
   .top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex:none;min-height:44px}
@@ -146,8 +153,9 @@
   .track{height:3px;background:rgba(11,15,20,.18);border-radius:2px;overflow:hidden;margin:.4rem 0 1rem;flex:none}
   .fill{height:100%;width:0;background:#FFFFFF;transition:width .3s}
 
-  .view{display:none;flex:1;flex-direction:column;min-height:0}
-  #view-study,#view-done{padding-top:.75rem}
+  .view{display:none;flex:1;flex-direction:column}
+  /* Only the one-screen views may shrink below their content; the rest grow and the body scrolls. */
+  #view-study,#view-done{padding-top:.75rem;min-height:0}
   .app[data-view=study] #view-study,.app[data-view=done] #view-done,.app[data-view=browse] #view-browse,.app[data-view=decks] #view-decks,
   .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings,.app[data-view=add] #view-add,.app[data-view=newdeck] #view-newdeck,
   .app[data-view=manage] #view-manage,.app[data-view=welcome] #view-welcome{display:flex}
@@ -273,7 +281,7 @@
   .mastery b{color:var(--text);font-variant-numeric:tabular-nums}
   .st.done{background:var(--text);color:#FFFFFF;border-color:var(--text)}
   .st.user{border-style:dashed}
-  .welcome{max-width:420px;margin:6vh auto 0;width:100%;padding-top:env(safe-area-inset-top)}
+  .welcome{max-width:420px;margin:6vh auto 0;width:100%}
   .welcome .brain{font-size:2.6rem;line-height:1;margin-bottom:.6rem;text-align:center}
   .welcome h1,.welcome p{text-align:center}
   .welcome h1{font-size:1.5rem;font-weight:700;margin-bottom:.4rem}
@@ -1407,13 +1415,14 @@
     render();
     resetScroll();
   }
-  // iOS keeps the offset the keyboard caused after a field loses focus, which pushes the next
-  // view under the status bar. Reset now, again once the keyboard animation is done, and
-  // whenever the visual viewport settles while no field is focused.
+  // The body is the scroll container (the window is fixed), so a new view starts at the top.
+  // iOS can still nudge the visual viewport while the keyboard is up; reset again once the
+  // keyboard animation is done, and whenever the viewport settles while no field is focused.
   function resetScroll() {
-    window.scrollTo(0, 0);
-    setTimeout(function () { window.scrollTo(0, 0); }, 60);
-    setTimeout(function () { window.scrollTo(0, 0); }, 400);
+    var top = function () { document.body.scrollTop = 0; window.scrollTo(0, 0); };
+    top();
+    setTimeout(top, 60);
+    setTimeout(top, 400);
   }
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', function () {
