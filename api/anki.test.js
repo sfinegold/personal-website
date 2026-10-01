@@ -29,14 +29,16 @@ const codeFrom = (m) => m.subject.match(/^(\d{6})/)[1];
   await test('request: validates the address, emails a 6-digit code, cools down', async () => {
     assert.equal((await call({ method: 'POST', body: { op: 'request', email: 'nope' } })).status, 400);
     const r = await call({ method: 'POST', body: { op: 'request', email: ' Sam@Example.com ' } });
-    assert.equal(r.status, 200); assert.equal(sent.length, 1); assert.equal(sent[0].to, 'sam@example.com'); assert.match(sent[0].subject, /^\d{6} is your/);
+    assert.equal(r.status, 200); assert.equal(r.json.isNew, true); assert.equal(sent.length, 1); assert.equal(sent[0].to, 'sam@example.com'); assert.match(sent[0].subject, /^\d{6} is your/);
     assert.equal((await call({ method: 'POST', body: { op: 'request', email: 'sam@example.com' } })).status, 429);
   });
   await test('verify: wrong code counts a try, right code signs in and creates the account once', async () => {
     const bad = await call({ method: 'POST', body: { op: 'verify', email: 'sam@example.com', code: '000000' } });
     assert.equal(bad.status, 401);
-    const good = await call({ method: 'POST', body: { op: 'verify', email: 'sam@example.com', code: codeFrom(sent[0]) } });
-    assert.equal(good.status, 200); assert.match(good.json.token, /^[a-f0-9]{48}$/); assert.equal(good.json.user.email, 'sam@example.com'); assert.equal(good.json.user.name, 'sam');
+    const noName = await call({ method: 'POST', body: { op: 'verify', email: 'sam@example.com', code: codeFrom(sent[0]) } });
+    assert.equal(noName.status, 400); assert.equal(noName.json.needName, true);
+    const good = await call({ method: 'POST', body: { op: 'verify', email: 'sam@example.com', code: codeFrom(sent[0]), first: ' Sam ', last: 'Finegold' } });
+    assert.equal(good.status, 200, 'the code survives the name check: ' + JSON.stringify(good.json)); assert.match(good.json.token, /^[a-f0-9]{48}$/); assert.equal(good.json.user.email, 'sam@example.com'); assert.equal(good.json.user.name, 'Sam Finegold'); assert.equal(good.json.user.first, 'Sam');
     token = good.json.token;
     const reuse = await call({ method: 'POST', body: { op: 'verify', email: 'sam@example.com', code: codeFrom(sent[0]) } });
     assert.equal(reuse.status, 401, 'codes are single use');
@@ -44,7 +46,7 @@ const codeFrom = (m) => m.subject.match(/^(\d{6})/)[1];
   await test('session: me and state need the token; state is empty at first', async () => {
     assert.equal((await call({ query: { op: 'me' } })).status, 401);
     assert.equal((await call({ query: { op: 'me' }, token: 'deadbeef' })).status, 401);
-    const me = await call({ query: { op: 'me' }, token }); assert.equal(me.status, 200); assert.equal(me.json.user.name, 'sam');
+    const me = await call({ query: { op: 'me' }, token }); assert.equal(me.status, 200); assert.equal(me.json.user.name, 'Sam Finegold');
     const st = await call({ query: { op: 'state' }, token }); assert.deepEqual(st.json.decks, {});
   });
   await test('draft: needs a session, returns the drafted card, counts against the daily quota', async () => {

@@ -17,8 +17,8 @@
 // optional ANKI_ALLOWED_EMAILS: comma-separated list; when set, only those
 // addresses can sign in (others get the same neutral reply).
 //
-//   POST { op:'request', email }        -> { ok:true }        code sent (or neutral)
-//   POST { op:'verify', email, code }   -> { token, user }
+//   POST { op:'request', email }        -> { ok:true, isNew }  code sent (or neutral); isNew = no account yet
+//   POST { op:'verify', email, code, first?, last? } -> { token, user }   a new account needs first and last name
 //   GET  ?op=me                         -> { user }
 //   GET  ?op=state                      -> the document (empty one if none)
 //   POST { op:'save', state }           -> the merged document
@@ -71,7 +71,7 @@ async function session(req) {
   s.token = token;
   return s;
 }
-const publicUser = (u) => ({ uid: u.uid, email: u.email, name: u.name, updated: u.updated || null });
+const publicUser = (u) => ({ uid: u.uid, email: u.email, name: u.name, first: u.first || '', last: u.last || '', updated: u.updated || null });
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -87,9 +87,10 @@ module.exports = async (req, res) => {
         const email = normEmail(body.email);
         if (!validEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
         if (!transport() && !process.env.ANKI_ALLOW_MEMORY) return res.status(503).json({ error: 'Sign-in email is not configured on the server (RESEND_API_KEY, or GMAIL_USER and GMAIL_APP_PASSWORD).' });
-        const neutral = { ok: true, message: 'If that address can sign in, a code is on its way.' };
+        const neutral = { ok: true, message: 'If that address can sign in, a code is on its way.', isNew: true };
         if (!allowed(email)) return res.status(200).json(neutral);
         const uid = uidOf(email);
+        neutral.isNew = !(await getJSON(kUser(uid), null));
         const pending = await getJSON(kCode(uid), null);
         if (pending && now() - pending.sentAt < CODE_COOLDOWN) return res.status(429).json({ error: 'A code was just sent. Wait a minute and try again.' });
         const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
@@ -123,10 +124,13 @@ module.exports = async (req, res) => {
         if (pending.tries >= CODE_TRIES) return res.status(401).json({ error: 'Too many tries. Request a new code.' });
         const ok = crypto.timingSafeEqual(Buffer.from(pending.hash), Buffer.from(sha(code + ':' + uid)));
         if (!ok) { pending.tries += 1; await setJSON(kCode(uid), pending); return res.status(401).json({ error: 'That code is not right.' }); }
-        await setJSON(kCode(uid), { hash: '', exp: 0, tries: CODE_TRIES, sentAt: pending.sentAt });   // single use
         let user = await getJSON(kUser(uid), null);
+        const first = cleanName(body.first), last = cleanName(body.last);
+        // A new account needs a name. The code stays valid, so the person can add the name and try again.
+        if (!user && (!first || !last)) return res.status(400).json({ error: 'Enter your first and last name to create your account.', needName: true });
+        await setJSON(kCode(uid), { hash: '', exp: 0, tries: CODE_TRIES, sentAt: pending.sentAt });   // single use
         if (!user) {
-          user = { uid, email, name: cleanName(email.split('@')[0]) || 'Me', created: new Date().toISOString(), updated: null };
+          user = { uid, email, first, last, name: cleanName(first + ' ' + last), created: new Date().toISOString(), updated: null };
           await setJSON(kUser(uid), user);
           await setJSON(kState(uid), emptyDoc());
         }

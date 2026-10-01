@@ -514,6 +514,11 @@
         <div class="actions"><button class="btn primary" id="wSend">Send code</button></div>
         <div id="wStep" style="display:none">
           <div class="field"><label for="wCode">Code from the email</label><input type="text" id="wCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"></div>
+          <div id="wNames" style="display:none">
+            <p class="pnote" style="margin:.2rem 0 .4rem">New account: tell us who you are.</p>
+            <div class="field"><label for="wFirst">First name</label><input type="text" id="wFirst" autocomplete="given-name" maxlength="24"></div>
+            <div class="field"><label for="wLast">Last name</label><input type="text" id="wLast" autocomplete="family-name" maxlength="24"></div>
+          </div>
           <div class="actions"><button class="btn primary" id="wVerify">Sign in</button></div>
         </div>
         <p class="pnote" id="wNote" style="margin:.6rem 0 0"></p>
@@ -539,6 +544,10 @@
         <div class="actions"><button class="btn" id="codeBtn">Send code</button></div>
         <div id="codeStep" style="display:none">
           <div class="row"><label for="sCode">Code<small>Six digits from the email. Good for 10 minutes.</small></label><input type="text" id="sCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"></div>
+          <div id="sNames" style="display:none">
+            <div class="row"><label for="sFirst">First name<small>New account.</small></label><input type="text" id="sFirst" autocomplete="given-name" maxlength="24"></div>
+            <div class="row"><label for="sLast">Last name</label><input type="text" id="sLast" autocomplete="family-name" maxlength="24"></div>
+          </div>
           <div class="actions"><button class="btn primary" id="verifyBtn">Sign in</button></div>
         </div>
       </div>
@@ -892,8 +901,8 @@
   function signedOutByServer() {
     store.sync = Object.assign(freshSync(), { lastError: 'signed out', lastEmail: store.sync.email }); save(); setSync('idle'); toast('Signed out. Sign in again in Settings.');
   }
-  var SF = { email: 'sEmail', code: 'sCode', note: 'syncNote', step: 'codeStep' };     // the Settings panel
-  var WF = { email: 'wEmail', code: 'wCode', note: 'wNote', step: 'wStep' };          // the welcome screen
+  var SF = { email: 'sEmail', code: 'sCode', note: 'syncNote', step: 'codeStep', names: 'sNames', first: 'sFirst', last: 'sLast' };   // the Settings panel
+  var WF = { email: 'wEmail', code: 'wCode', note: 'wNote', step: 'wStep', names: 'wNames', first: 'wFirst', last: 'wLast' };        // the welcome screen
   function requestCode(f) {
     f = f || SF;
     var email = $(f.email).value.trim();
@@ -901,6 +910,7 @@
     $(f.note).textContent = 'Sending…';
     api('request', {}, { email: email }).then(function (j) {
       $(f.note).textContent = j.message || 'Code sent. Check your email.';
+      $(f.names).style.display = j.isNew ? '' : 'none';
       $(f.step).style.display = ''; $(f.code).focus();
     }).catch(function (e) { $(f.note).textContent = e.message; });
   }
@@ -908,8 +918,10 @@
     f = f || SF;
     var email = $(f.email).value.trim(), code = $(f.code).value.replace(/\D/g, '');
     if (code.length !== 6) { toast('Enter the 6-digit code'); return; }
+    var isNew = $(f.names).style.display !== 'none', first = $(f.first).value.trim(), last = $(f.last).value.trim();
+    if (isNew && (!first || !last)) { toast('Enter your first and last name'); $(first ? f.last : f.first).focus(); return; }
     $(f.note).textContent = 'Checking…';
-    api('verify', {}, { email: email, code: code }).then(function (j) {
+    api('verify', {}, { email: email, code: code, first: first, last: last }).then(function (j) {
       // Offer to merge only when this device's progress is not another person's.
       var sameOwner = !store.sync.lastEmail || store.sync.lastEmail === j.user.email;
       var mergeLocal = hasLocalProgress() && sameOwner ? confirm('Merge this device\'s progress into your account?\n\nOK merges it in. Cancel replaces it with what the account already has.') : false;
@@ -918,7 +930,7 @@
       save(); $(f.code).value = ''; fillSettings();
       if (f === WF) view = 'decks';
       return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); });
-    }).catch(function (e) { $(f.note).textContent = e.message; });
+    }).catch(function (e) { $(f.note).textContent = e.message; if (e.status === 400 && /first and last/.test(e.message)) { $(f.names).style.display = ''; $(f.first).focus(); } });
   }
   // First visit on a device: ask for a sign-in once. Skipping holds for a week.
   function needWelcome() { return !hasProfile() && !store.sync.lastEmail && !(store.sync.skipAt && Date.now() - store.sync.skipAt < 7 * 86400000); }
@@ -1526,6 +1538,8 @@
   $('wEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') requestCode(WF); });
   $('wVerify').addEventListener('click', function () { verifyCode(WF); });
   $('wCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(WF); });
+  $('wLast').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(WF); });
+  $('sLast').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(SF); });
   $('wSkip').addEventListener('click', function () { store.sync.skipAt = Date.now(); save(); setView('study'); });
 
   var toastT;
