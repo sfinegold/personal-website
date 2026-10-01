@@ -155,6 +155,7 @@
     flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem}
   .done h2{font-weight:300;font-size:1.6rem;letter-spacing:.02em}
   .done p{color:var(--dim);font-size:.92rem;line-height:1.5}
+  .done .more{margin-top:1.4rem;width:auto;padding-left:1.4rem;padding-right:1.4rem}
   .done .eta{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin-top:.4rem}
 
   /* ---- generic panels ---- */
@@ -286,6 +287,7 @@
       <h2 id="doneTitle">Done for today</h2>
       <p id="doneText"></p>
       <div class="eta" id="doneEta"></div>
+      <button class="btn primary more" id="moreBtn" hidden>Keep going</button>
     </div>
     <div class="foot">
       <button class="mini" id="undoBtn2" disabled>Undo</button>
@@ -418,7 +420,8 @@
   }
   function save() { try { localStorage.setItem(keyFor(account), JSON.stringify(store)); } catch (e) {} push(); }
   var store = load();
-  function cfg() { return { newPerDay: +store.settings.newPerDay || 0, revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 }; }
+  // day: today's counters; "Keep going" adds day.extraNew on top of the daily limit, for that day only.
+  function cfg(day) { return { newPerDay: (+store.settings.newPerDay || 0) + ((day && day.extraNew) || 0), revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 }; }
 
   /* ---------- decks ---------- */
   var decks = {};          // id -> { meta, data, notesById }
@@ -475,7 +478,7 @@
     var cards = activeCards();
     cardsIdx = {};
     cards.forEach(function (c) { cardsIdx[c.id] = c; });
-    queueInfo = S.buildQueue(cards, now, P().day, cfg());
+    queueInfo = S.buildQueue(cards, now, P().day, cfg(P().day));
   }
   function pickNext() {
     rebuild();
@@ -632,6 +635,19 @@
     $('doneText').textContent = did.length ? 'Today: ' + did.join(', ') + '.' : (nothingToDo ? 'Come back tomorrow, raise new cards per day in Settings, or switch deck.' : '');
     $('doneEta').textContent = queueInfo.nextLearnDue ? 'Next learning card in ' + fmtEta(queueInfo.nextLearnDue - Date.now()) : '';
     $('doneDeck').textContent = data.notes.length + ' phrases · v' + data.version;
+    // New cards still unseen, held back only by the daily limit: offer another batch.
+    var unseen = activeCards().filter(function (x) { return !x.state || x.state.type === 'new'; }).length;
+    var batch = Math.min(unseen, +store.settings.newPerDay || 20);
+    $('moreBtn').hidden = !(unseen && !c.new && !c.learn && !c.due && !queueInfo.queue.length);
+    $('moreBtn').textContent = 'Keep going · ' + batch + ' more';
+  }
+  function keepGoing() {
+    var b = P();
+    b.day.extraNew = (b.day.extraNew || 0) + (+store.settings.newPerDay || 20);
+    save();
+    current = null;
+    pickNext();
+    render();
   }
   function stLabel(st) {
     if (!st) return { cls: 'new', txt: 'new' };
@@ -685,7 +701,7 @@
       if (!d) { html += '<div class="deck off"><div class="d-name">' + esc(meta.name) + '</div><div class="d-sub">Could not load ' + esc(meta.file) + '</div></div>'; return; }
       var b = P(meta.id);
       var t = S.dayNum(now), day = b.day.day === t ? b.day : { newDone: 0, revDone: 0 };
-      var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg());
+      var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg(day));
       var st = S.stats(cardsOf(meta.id, false), now);
       var on = meta.id === store.deck;
       html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '">' +
@@ -729,6 +745,7 @@
   document.querySelectorAll('.grade').forEach(function (b) { b.addEventListener('click', function () { rate(b.dataset.r); }); });
   $('undoBtn').addEventListener('click', undo);
   $('undoBtn2').addEventListener('click', undo);
+  $('moreBtn').addEventListener('click', keepGoing);
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
   $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
   document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
