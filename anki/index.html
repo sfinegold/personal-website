@@ -278,6 +278,7 @@
       <h2 id="doneTitle">Done for today</h2>
       <p id="doneText"></p>
       <div class="eta" id="doneEta"></div>
+      <button class="btn primary more" id="moreBtn" style="display:none;width:auto;margin-top:1rem">+20 new cards</button>
     </div>
     <div class="foot">
       <button class="mini" id="undoBtn2" disabled>Undo</button>
@@ -355,7 +356,7 @@
   if (!S || !INDEX.length) { $('fMain').textContent = 'Could not load the decks.'; return; }
 
   /* ---------- storage (v2: progress per deck) ---------- */
-  function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0 }, undo: [], stamp: null }; }
+  function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null }; }
   function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {} }; }
   function normalise(o) {
     if (!o || typeof o !== 'object') return null;
@@ -383,7 +384,11 @@
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
   var store = load();
-  function cfg() { return { newPerDay: +store.settings.newPerDay || 0, revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 }; }
+  // Today's new-card allowance is the setting plus whatever "+20" presses added today.
+  function cfg(day) {
+    day = day || P().day;
+    return { newPerDay: (+store.settings.newPerDay || 0) + (+day.extraNew || 0), revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 };
+  }
 
   /* ---------- decks ---------- */
   var decks = {};          // id -> { meta, data, notesById }
@@ -432,7 +437,7 @@
 
   function rollDay(now) {
     var b = P(), t = S.dayNum(now);
-    if (b.day.day !== t) { b.day = { day: t, newDone: 0, revDone: 0 }; save(); }
+    if (b.day.day !== t) { b.day = { day: t, newDone: 0, revDone: 0, extraNew: 0 }; save(); }
   }
   function rebuild() {
     var now = Date.now();
@@ -596,6 +601,11 @@
     $('doneTitle').textContent = did.length ? 'Done for today' : (nothingToDo ? 'Nothing due' : 'Nothing due right now');
     $('doneText').textContent = did.length ? 'Today: ' + did.join(', ') + '.' : (nothingToDo ? 'Come back tomorrow, raise new cards per day in Settings, or switch deck.' : '');
     $('doneEta').textContent = queueInfo.nextLearnDue ? 'Next learning card in ' + fmtEta(queueInfo.nextLearnDue - Date.now()) : '';
+    var unseen = activeCards().filter(function (x) { return !x.state; }).length;
+    var more = $('moreBtn');
+    more.style.display = unseen > 0 ? '' : 'none';
+    more.textContent = '+' + Math.min(20, unseen) + ' new card' + (Math.min(20, unseen) === 1 ? '' : 's');
+    if (unseen > 0) $('doneText').textContent += (did.length ? ' ' : '') + unseen + ' unseen card' + (unseen === 1 ? '' : 's') + ' left in the deck.';
     $('doneDeck').textContent = data.notes.length + ' phrases · v' + data.version;
   }
   function stLabel(st) {
@@ -649,8 +659,8 @@
       var d = deckOf(meta.id);
       if (!d) { html += '<div class="deck off"><div class="d-name">' + esc(meta.name) + '</div><div class="d-sub">Could not load ' + esc(meta.file) + '</div></div>'; return; }
       var b = P(meta.id);
-      var t = S.dayNum(now), day = b.day.day === t ? b.day : { newDone: 0, revDone: 0 };
-      var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg());
+      var t = S.dayNum(now), day = b.day.day === t ? b.day : { newDone: 0, revDone: 0, extraNew: 0 };
+      var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg(day));
       var st = S.stats(cardsOf(meta.id, false), now);
       var on = meta.id === store.deck;
       html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '">' +
@@ -694,6 +704,11 @@
   document.querySelectorAll('.grade').forEach(function (b) { b.addEventListener('click', function () { rate(b.dataset.r); }); });
   $('undoBtn').addEventListener('click', undo);
   $('undoBtn2').addEventListener('click', undo);
+  $('moreBtn').addEventListener('click', function () {
+    var b = P(); b.day.extraNew = (+b.day.extraNew || 0) + 20; save();
+    current = null; lastNoteId = null; view = 'study'; render();
+    toast('+20 new cards today');
+  });
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
   $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
   document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
