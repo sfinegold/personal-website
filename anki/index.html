@@ -120,7 +120,14 @@
   .d-counts{font-family:var(--mono);font-size:.74rem;color:var(--dim);margin-top:.4rem}
   .d-counts b{color:inherit;font-weight:600}
   .deck.off{opacity:.6}
-  .counts{display:flex;gap:.55rem;font-family:var(--mono);font-size:.88rem;font-variant-numeric:tabular-nums;margin-left:auto}
+  .counts{display:flex;gap:.55rem;font-family:var(--mono);font-size:.88rem;font-variant-numeric:tabular-nums}
+  .mute{margin-left:auto;margin-right:.6rem;width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--text);
+    display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+  .mute svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mute .ic-off{display:none} .mute.off .ic-on{display:none} .mute.off .ic-off{display:block}
+  .mute.off{color:var(--dim)}
+  .mute:hover{background:rgba(255,255,255,.6)}
+  body.nospeech .mute{display:none}
   .counts b{font-weight:600}
   .counts b+b::before{content:'·';color:var(--faint);margin-right:.55rem;font-weight:400}
   .c-new{color:var(--new)} .c-learn{color:var(--learn)} .c-due{color:var(--due)}
@@ -203,10 +210,15 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem}
   .grade .g-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
   .grade .g-ivl{font-family:var(--mono);font-size:.78rem;color:var(--dim);font-variant-numeric:tabular-nums}
-  .grade.again .g-label{color:var(--again)} .grade.hard .g-label{color:var(--hard)}
-  .grade.good .g-label{color:var(--good)} .grade.easy .g-label{color:var(--easy)}
-  .grade:hover{background:rgba(11,15,20,.08);border-color:rgba(11,15,20,.35);transform:translateY(-1px)}
-  .grade:active{background:var(--text);border-color:var(--text);transform:none}
+  .grade.again{background:#FBE9E7;border-color:#F3CFCB} .grade.hard{background:#FCF1DC;border-color:#F0DDB5}
+  .grade.good{background:#E6F3EB;border-color:#C6E2D0} .grade.easy{background:#E5F0F9;border-color:#C3DAEE}
+  .grade.again .g-label{color:#B3261E} .grade.hard .g-label{color:#9A6A12}
+  .grade.good .g-label{color:#2E6B4F} .grade.easy .g-label{color:#1D5C8A}
+  .grade.again:hover{background:#F6D9D5} .grade.hard:hover{background:#F8E4BD} .grade.good:hover{background:#D3EADB} .grade.easy:hover{background:#D1E4F4}
+  .grade.again:active{background:#B3261E;border-color:#B3261E} .grade.hard:active{background:#9A6A12;border-color:#9A6A12}
+  .grade.good:active{background:#2E6B4F;border-color:#2E6B4F} .grade.easy:active{background:#1D5C8A;border-color:#1D5C8A}
+  .grade:hover{transform:translateY(-1px)}
+  .grade:active{transform:none}
   .grade:active .g-label,.grade:active .g-ivl{color:#FFFFFF}
   .foot{flex:none;display:flex;align-items:center;justify-content:space-between;margin-top:.15rem}
   .mini{background:none;border:0;color:var(--faint);font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
@@ -310,7 +322,8 @@
 
   @media (hover:none){
     .btn:hover{background:#FFFFFF;border-color:var(--text)} .btn.danger:hover{background:#FFFFFF}
-    .grade:hover{background:#FFFFFF;border-color:rgba(255,255,255,.9);transform:none}
+    .grade:hover{transform:none}
+    .grade.again:hover{background:#FBE9E7} .grade.hard:hover{background:#FCF1DC} .grade.good:hover{background:#E6F3EB} .grade.easy:hover{background:#E5F0F9}
     .deck:hover,.theme:hover{border-color:rgba(255,255,255,.9);transform:none;background:#FFFFFF}
     .say:hover{background:transparent;color:var(--faint)} .chip:hover{border-color:var(--line);background:rgba(255,255,255,.55)}
   }
@@ -330,6 +343,7 @@
 <div class="app" id="app" data-view="study">
   <header class="top">
     <button class="home" id="homeBtn" aria-label="Home" title="Home (h)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></button>
+    <button class="mute" id="muteBtn" aria-label="Mute auto-play" title="Mute auto-play (m)"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic-on"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18 5.5a8.5 8.5 0 0 1 0 13"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" class="ic-off"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
     <div class="counts" title="new · learning · due" aria-label="Counts">
       <b class="c-new" id="cNew">0</b><b class="c-learn" id="cLearn">0</b><b class="c-due" id="cDue">0</b>
     </div>
@@ -445,6 +459,8 @@
       <div class="row"><label for="sRev">Reviews per day<small>Anki default is 200.</small></label><input type="number" id="sRev" min="0" max="9999"></div>
       <div class="row" id="rowTr"><label for="sTr">Transliteration first<small>Off shows the original script as the main line.</small></label><input type="checkbox" id="sTr"></div>
       <div class="row"><label for="sSay">Auto-play<small id="sSayNote"></small></label><input type="checkbox" id="sSay"></div>
+      <div class="row"><label for="sVoice">Voice<small id="sVoiceNote"></small></label><select id="sVoice"></select></div>
+      <div class="actions"><button class="btn" id="voiceTestBtn">Test voice</button></div>
       <div class="row"><label for="sDir">Direction<small>Filters what you study. Progress is kept for both.</small></label>
         <select id="sDir"><option value="both">Both</option><option value="fwd">→ English</option><option value="rev">English →</option></select></div>
     </div>
@@ -460,7 +476,7 @@
     </div>
     <h2 class="ttl">Keys</h2>
     <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
-      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase<br>u — undo &nbsp; h — home &nbsp; b s , — phrases stats settings &nbsp; / — search &nbsp; esc — back
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase &nbsp; m — mute auto-play<br>u — undo &nbsp; h — home &nbsp; b s , — phrases stats settings &nbsp; / — search &nbsp; esc — back
     </div>
   </section>
 </div>
@@ -750,13 +766,20 @@
 
   /* ---------- speech (device voice for the deck's language) ---------- */
   var synth = window.speechSynthesis || null, voice = null, spokenKey = '';
-  function voiceFor(lang) {
-    if (!synth) return null;
+  // Voices whose language matches the deck's language, and nothing else: a Greek
+  // card is never read by an English voice.
+  function voicesFor(lang) {
+    if (!synth) return [];
     lang = String(lang || '').toLowerCase();
     var re = new RegExp('^' + lang.replace(/[-_]/g, '[-_]') + '([-_]|$)', 'i');
-    var vs = synth.getVoices().filter(function (v) { return re.test(v.lang); });
+    return synth.getVoices().filter(function (v) { return re.test(v.lang); });
+  }
+  function voiceFor(lang) {
+    var vs = voicesFor(lang);
     if (!vs.length) return null;
-    return vs.filter(function (v) { return /melina|google|neural|premium|enhanced|natural|siri/i.test(v.name); })[0] || vs[0];
+    var chosen = (store.settings.voices || {})[lang];
+    var pick = chosen ? vs.filter(function (v) { return v.voiceURI === chosen || v.name === chosen; })[0] : null;
+    return pick || vs.filter(function (v) { return /melina|google|neural|premium|enhanced|natural|siri|kyoko|o-ren|hattori/i.test(v.name); })[0] || vs[0];
   }
   function pickVoice() { voice = deck() ? voiceFor(deck().meta.lang) : null; }
   if (synth) { if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', pickVoice); else synth.onvoiceschanged = pickVoice; }
@@ -766,11 +789,11 @@
     if (!synth) { if (!quiet) toast('No speech on this device'); return false; }
     if (!voice) pickVoice();
     var v = meta === deck().meta ? voice : voiceFor(meta.lang);
-    if (!v) { if (!quiet) toast('No ' + meta.langName + ' voice on this device'); return false; }
+    if (!v) { if (!quiet) toast('No ' + meta.langName + ' voice on this device. See Settings › Voice.'); return false; }
     try {
       synth.cancel();
       var u = new SpeechSynthesisUtterance(String(text).replace(/;/g, ''));
-      u.voice = v; u.lang = v.lang; u.rate = 0.9;
+      u.voice = v; u.lang = meta.locale || v.lang; u.rate = 0.9;
       var btn = $('sayBtn');
       u.onstart = function () { btn.classList.add('playing'); };
       u.onend = u.onerror = function () { btn.classList.remove('playing'); };
@@ -892,6 +915,8 @@
     $('fill').style.width = (total ? Math.round(done / total * 100) : 100) + '%';
     var canUndo = b.undo.length > 0;
     $('undoBtn').disabled = !canUndo; $('undoBtn2').disabled = !canUndo;
+    $('muteBtn').classList.toggle('off', !store.settings.autoSay);
+    $('muteBtn').setAttribute('aria-label', store.settings.autoSay ? 'Mute auto-play' : 'Unmute auto-play');
   }
   function renderCard() {
     var c = cardsIdx[current], n = c.note, gk = sides(n);
@@ -1120,11 +1145,31 @@
     $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
     $('sSay').checked = !!store.settings.autoSay;
     $('rowTr').style.display = deck().meta.translit ? '' : 'none';
+    fillVoices();
     var ln = deck().meta.langName, opts = $('sDir').options;
     opts[1].textContent = ln + ' → English'; opts[2].textContent = 'English → ' + ln;
     $('sSayNote').textContent = 'Speaks the ' + deck().meta.langName + ' side when it appears, using this device\'s ' + deck().meta.langName + ' voice.';
   }
 
+  function installHelp(langName) {
+    var ua = navigator.userAgent, where;
+    if (/Macintosh/.test(ua)) where = 'System Settings › Accessibility › Spoken Content › System Voice › Manage Voices, then download a ' + langName + ' voice. Restart the browser.';
+    else if (/Windows/.test(ua)) where = 'Settings › Time & Language › Speech › Add voices, add ' + langName + '. Restart the browser.';
+    else if (/iPhone|iPad/.test(ua)) where = 'Settings › Accessibility › Spoken Content › Voices › ' + langName + '.';
+    else if (/Android/.test(ua)) where = 'Settings › General management › Text-to-speech › Google TTS › Install voice data › ' + langName + '.';
+    else where = 'install a ' + langName + ' system voice, then restart the browser.';
+    return 'No ' + langName + ' voice is installed, so cards stay silent rather than use another language. To add one: ' + where;
+  }
+  function fillVoices() {
+    var meta = deck().meta, sel = $('sVoice'), vs = voicesFor(meta.lang);
+    var chosen = (store.settings.voices || {})[meta.lang] || '';
+    sel.innerHTML = vs.length ? vs.map(function (v) {
+      return '<option value="' + esc(v.voiceURI) + '"' + (v.voiceURI === chosen || v.name === chosen ? ' selected' : '') + '>' + esc(v.name) + ' (' + esc(v.lang) + ')' + (v.localService === false ? ' · online' : '') + '</option>';
+    }).join('') : '<option value="">None installed</option>';
+    sel.disabled = !vs.length;
+    $('sVoiceNote').textContent = vs.length ? vs.length + ' ' + meta.langName + ' voice' + (vs.length === 1 ? '' : 's') + ' on this device. Only ' + meta.langName + ' voices are ever used.' : installHelp(meta.langName);
+  }
+  if (synth && typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', function () { if (view === 'settings') fillVoices(); });
   function setView(v) {
     view = v;
     if (v === 'settings') fillSettings();
@@ -1162,6 +1207,19 @@
   $('verifyBtn').addEventListener('click', verifyCode);
   $('sCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(); });
   $('syncOutBtn').addEventListener('click', signOut);
+  function toggleMute() {
+    store.settings.autoSay = !store.settings.autoSay; save(); markDirty();
+    if (!store.settings.autoSay && synth) { try { synth.cancel(); } catch (e) {} }
+    renderTop(); toast(store.settings.autoSay ? 'Auto-play on' : 'Muted. Tap the speaker on a card to hear it.');
+  }
+  $('muteBtn').addEventListener('click', toggleMute);
+  $('sVoice').addEventListener('change', function () {
+    store.settings.voices = store.settings.voices || {};
+    store.settings.voices[deck().meta.lang] = this.value; save(); markDirty(); pickVoice(); toast('Voice saved');
+  });
+  $('voiceTestBtn').addEventListener('click', function () {
+    var n = deck().data.notes[0]; speak(n.term, false, deck().meta);
+  });
   $('sName').addEventListener('change', renameAccount);
   document.addEventListener('visibilitychange', function () { if (document.hidden && store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   window.addEventListener('pagehide', function () { if (store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
@@ -1261,6 +1319,7 @@
     if (k === 'd' || k === 'h') { setView('decks'); return; }
     if (k === ',') { setView('settings'); return; }
     if (k === 'u') { undo(); return; }
+    if (k === 'm') { toggleMute(); return; }
     if (view !== 'study') return;
     if (k === 'p') { sayCurrent(false); return; }
     if (k === ' ' || k === 'Enter') { e.preventDefault(); if (!current) return; if (!revealed) reveal(); else rate('good'); return; }

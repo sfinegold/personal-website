@@ -14,6 +14,7 @@
  *        file      the file name in this folder
  *        name      shown in the deck list and the top bar
  *        lang      BCP-47 language tag used to pick a speech voice (e.g. 'el', 'es', 'ja')
+ *        locale    full tag for speech (e.g. 'el-GR'); the voice must match `lang`
  *        langName  the language, for labels ("Greek")
  *        code      short code for direction labels ("EL → EN")
  *        translit  true if notes carry a `tr` transliteration line (Greek, Japanese,
@@ -42,10 +43,10 @@
  *   en    English
  */
 window.DECK_INDEX = [
-  { id: 'greek', file: 'greek.js', name: 'Conversational Greek', lang: 'el', langName: 'Greek', code: 'EL', translit: true,
+  { id: 'greek', file: 'greek.js', name: 'Conversational Greek', lang: 'el', locale: 'el-GR', langName: 'Greek', code: 'EL', translit: true,
     creature: { emoji: '🦉', name: 'Sophia', kind: 'owl' } },
-  { id: 'japanese', file: 'japanese.js', name: 'Conversational Japanese', lang: 'ja', langName: 'Japanese', code: 'JA', translit: true,
+  { id: 'japanese', file: 'japanese.js', name: 'Conversational Japanese', lang: 'ja', locale: 'ja-JP', langName: 'Japanese', code: 'JA', translit: true,
     creature: { emoji: '🦊', name: 'Kitsu', kind: 'fox' } },
-  { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', langName: 'Farsi', code: 'FA', translit: true,
+  { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', locale: 'fa-IR', langName: 'Farsi', code: 'FA', translit: true,
     creature: { emoji: '🐈', name: 'Pari', kind: 'cat' } },
 ];
