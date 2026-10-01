@@ -204,6 +204,20 @@
   .retired{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:.8rem .2rem}
   .empty{padding:1rem;color:var(--faint);font-size:.9rem}
 
+  /* Profile: a round button like Home, and a sheet to sign in with an emailed code. */
+  .me{width:38px;height:38px;border-radius:50%;background:#FFFFFF;color:var(--text);border:0;flex:none;cursor:pointer;
+    display:grid;place-items:center;font:600 .95rem var(--sans);text-transform:uppercase}
+  .me svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .me.on{background:var(--text);color:#FFFFFF}
+  .sheet{margin:auto;border:0;border-radius:18px;padding:1.4rem;width:min(360px,calc(100vw - 2rem));background:#FFFFFF;color:var(--text);
+    box-shadow:0 20px 60px rgba(11,15,20,.3)}
+  .sheet::backdrop{background:rgba(11,15,20,.35)}
+  .sheet h3{font-size:1.15rem;margin-bottom:.3rem}
+  .sheet p{color:var(--dim);font-size:.88rem;line-height:1.45;margin-bottom:1rem}
+  .sheet input{width:100%;font:16px var(--sans);padding:.7rem .8rem;border:1px solid var(--line);border-radius:10px;margin-bottom:.7rem;background:#FFFFFF;color:var(--text)}
+  .sheet input.code{font:600 1.5rem var(--mono);letter-spacing:.4em;text-align:center}
+  .sheet .err{color:#B3261E;font-size:.85rem;margin:-.3rem 0 .7rem;min-height:1em}
+  .sheet .links{display:flex;justify-content:space-between;margin-top:.8rem}
   .toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
     background:var(--text);color:#FFFFFF;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;padding:.6rem .9rem;
     border-radius:8px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:5;max-width:90vw;text-align:center}
@@ -228,6 +242,7 @@
     <div class="counts" title="new · learning · due" aria-label="Counts">
       <b class="c-new" id="cNew">0</b><b class="c-learn" id="cLearn">0</b><b class="c-due" id="cDue">0</b>
     </div>
+    <button class="me" id="meBtn" aria-label="Sign in to keep your progress" title="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
   </header>
   <nav class="tabs" aria-label="Views">
     <button class="tab" data-go="study">Study</button>
@@ -330,6 +345,17 @@
     </div>
   </section>
 </div>
+<dialog class="sheet" id="meSheet" aria-labelledby="meTitle">
+  <form id="meForm" method="dialog" novalidate>
+    <h3 id="meTitle">Your flashcards</h3>
+    <p id="meText">Sign in with your email to keep your own progress, on any device. We'll email you a 6-digit code.</p>
+    <input type="email" id="meEmail" placeholder="you@example.com" autocomplete="email" inputmode="email" required>
+    <input type="text" id="meCode" class="code" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" maxlength="6" hidden>
+    <div class="err" id="meErr" role="alert"></div>
+    <button class="btn primary" id="meGo" type="submit">Email me a code</button>
+    <div class="links"><button class="mini" id="meBack" type="button" hidden>Use a different email</button><button class="mini" id="meClose" type="button">Close</button></div>
+  </form>
+</dialog>
 <div class="toast" id="toast"></div>
 
 <script src="/anki/scheduler.js"></script>
@@ -370,11 +396,27 @@
     });
     return s;
   }
+  /* ---------- profile: signed in, progress lives on the server too ---------- */
+  // Each account keeps its own copy on the device (so two people on one browser
+  // never mix), and every change is sent to the server a moment later.
+  var account = null;
+  try { account = localStorage.getItem('anki_account') || null; } catch (e) {}
+  function keyFor(email) { return email ? 'anki_v2:' + email : KEY; }
   function load() {
-    try { var raw = localStorage.getItem(KEY); if (raw) { var s = normalise(JSON.parse(raw)); if (s) return s; } } catch (e) {}
+    try { var raw = localStorage.getItem(keyFor(account)); if (raw) { var s = normalise(JSON.parse(raw)); if (s) return s; } } catch (e) {}
     return fresh();
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+  var pushTimer = null;
+  function push() {
+    if (!account) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      fetch('/api/anki', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', keepalive: true,
+        body: JSON.stringify({ action: 'save', progress: store }) })
+        .then(function (r) { if (r.status === 401) signedOut(); }).catch(function () {});
+    }, 1200);
+  }
+  function save() { try { localStorage.setItem(keyFor(account), JSON.stringify(store)); } catch (e) {} push(); }
   var store = load();
   function cfg() { return { newPerDay: +store.settings.newPerDay || 0, revPerDay: +store.settings.revPerDay || 0, learnAhead: +store.settings.learnAhead || 20 }; }
 
@@ -746,6 +788,8 @@
 
   document.addEventListener('keydown', function (e) {
     var t = e.target;
+    var open = document.getElementById('meSheet');
+    if (open && open.open) return; // the profile sheet has the keyboard while it is up
     if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) { if (e.key === 'Escape') { t.blur(); setView('study'); } return; }
     if (e.metaKey || e.ctrlKey) { if (e.key === 'z') { e.preventDefault(); undo(); } return; }
     var k = e.key;
@@ -790,6 +834,89 @@
     save();
     pickVoice();
     render();
+    whoAmI();
+  });
+
+  /* ---------- profile sheet ---------- */
+  var sheet = $('meSheet'), meStep = 'email';
+  function paintMe() {
+    var btn = $('meBtn');
+    btn.classList.toggle('on', Boolean(account));
+    btn.setAttribute('aria-label', account ? 'Signed in as ' + account : 'Sign in to keep your progress');
+    if (account) btn.textContent = account.charAt(0);
+    else btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  }
+  function useStore(s) { store = s; current = null; lastNoteId = null; pickVoice(); render(); }
+  function adopt(email, serverProgress) {
+    // A first sign-in on this device brings the progress already made here.
+    var here = store, theirs = serverProgress ? normalise(serverProgress) : null;
+    account = email;
+    try { localStorage.setItem('anki_account', email); } catch (e) {}
+    paintMe();
+    useStore(theirs || here);
+    save();
+  }
+  function signedOut() {
+    try { localStorage.removeItem(keyFor(account)); localStorage.removeItem('anki_account'); } catch (e) {}
+    account = null; paintMe(); useStore(load());
+  }
+  function whoAmI() {
+    paintMe();
+    fetch('/api/anki?progress=1', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (body) {
+      if (body.email) {
+        if (body.email !== account) { adopt(body.email, body.progress); return; }
+        // Same person: the server copy wins when it is newer (studied on another device).
+        if (body.progress) { var s = normalise(body.progress); if (s) { useStore(s); try { localStorage.setItem(keyFor(account), JSON.stringify(store)); } catch (e) {} } }
+      } else if (account) signedOut();
+    }).catch(function () { /* offline: keep studying on the device copy */ });
+  }
+  function setStep(step, text) {
+    meStep = step;
+    var signedIn = step === 'account';
+    $('meEmail').hidden = step !== 'email';
+    $('meCode').hidden = step !== 'code';
+    $('meBack').hidden = step !== 'code';
+    $('meErr').textContent = '';
+    $('meTitle').textContent = signedIn ? 'Signed in' : 'Your flashcards';
+    $('meText').textContent = text || (signedIn ? account + '. Your progress is saved to your account and follows you to any device.' : 'Sign in with your email to keep your own progress, on any device. We\'ll email you a 6-digit code.');
+    $('meGo').textContent = step === 'email' ? 'Email me a code' : step === 'code' ? 'Sign in' : 'Sign out';
+    $('meGo').classList.toggle('danger', signedIn);
+  }
+  $('meBtn').addEventListener('click', function () {
+    setStep(account ? 'account' : 'email');
+    sheet.showModal();
+    setTimeout(function () { (account ? $('meGo') : $('meEmail')).focus(); }, 30);
+  });
+  $('meClose').addEventListener('click', function () { sheet.close(); });
+  $('meBack').addEventListener('click', function () { setStep('email'); $('meEmail').focus(); });
+  $('meCode').addEventListener('input', function (e) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6); if (e.target.value.length === 6) $('meForm').requestSubmit(); });
+  $('meForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var go = $('meGo'), email = $('meEmail').value.trim().toLowerCase();
+    function call(body) {
+      go.disabled = true;
+      return fetch('/api/anki', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(body) })
+        .then(function (r) { return r.json().then(function (b) { b.okay = r.ok; return b; }); })
+        .catch(function () { return { error: 'No connection. Try again.' }; })
+        .then(function (b) { go.disabled = false; return b; });
+    }
+    if (meStep === 'email') {
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $('meErr').textContent = 'Enter your email address.'; return; }
+      call({ action: 'send', email: email }).then(function (b) {
+        if (b.error) { $('meErr').textContent = b.error; return; }
+        setStep('code', 'We emailed a 6-digit code to ' + email + '. It works for 10 minutes.');
+        $('meCode').value = ''; $('meCode').focus();
+      });
+    } else if (meStep === 'code') {
+      call({ action: 'verify', email: email, code: $('meCode').value }).then(function (b) {
+        if (!b.okay) { $('meErr').textContent = b.error || 'That code is not right.'; return; }
+        adopt(b.email, b.progress);
+        sheet.close();
+        toast(b.progress ? 'Welcome back' : 'Signed in · your progress is saved');
+      });
+    } else {
+      call({ action: 'logout' }).then(function () { signedOut(); sheet.close(); toast('Signed out'); });
+    }
   });
 })();
 </script>
