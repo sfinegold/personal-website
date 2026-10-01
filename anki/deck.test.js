@@ -53,6 +53,20 @@ function validateDeck(deck, meta) {
     check(Array.isArray(n.tags) && n.tags.length > 0 && n.tags.every(str), w + ': tags must be a non-empty array of strings');
     if (n.note !== undefined) check(str(n.note), w + ': note must be a non-empty string if present');
     if (n.priority !== undefined) check(n.priority === true, w + ': priority must be true if present (omit it otherwise)');
+    if (n.memo !== undefined) { check(str(n.memo), w + ': memo must be a non-empty string'); check((n.memo || '').length <= 220, w + ': memo over 220 chars'); }
+    if (n.parts !== undefined) {
+      check(Array.isArray(n.parts) && n.parts.length >= 1, w + ': parts must be a non-empty array');
+      (Array.isArray(n.parts) ? n.parts : []).forEach((pt, j) => {
+        const wp = w + ' parts[' + j + ']';
+        check(pt && str(pt.t) && str(pt.m), wp + ': needs t and m');
+        if (!pt) return;
+        const punct = /^[\s\p{P}]*$/u.test(pt.t || '');
+        const script = SCRIPTS[meta.lang];
+        if (script && !punct) check(script.re.test(pt.t), wp + ': t should be in ' + script.name + ' script');
+        if (meta.translit && !punct) check(str(pt.tr), wp + ': tr missing');
+        if (pt.tr !== undefined) check(!NON_LATIN.test(pt.tr), wp + ': tr should be Latin only');
+      });
+    }
     if (n.ex !== undefined) {
       check(n.ex && str(n.ex.term) && str(n.ex.en), w + ': ex needs term and en');
       if (meta.translit) check(n.ex && str(n.ex.tr), w + ': ex needs tr');
@@ -71,6 +85,8 @@ index.forEach(d => {
   const deck = global.window.DECKS[d.id];
   const tags = {};
   deck.notes.forEach(n => n.tags.forEach(t => { tags[t] = (tags[t] || 0) + 1; }));
-  console.log(d.id + ' ok: ' + deck.notes.length + ' notes, version ' + deck.version + ', updated ' + deck.updated);
+  const withMemo = deck.notes.filter(n => n.memo).length, withParts = deck.notes.filter(n => n.parts).length;
+  console.log(d.id + ' ok: ' + deck.notes.length + ' notes, version ' + deck.version + ', updated ' + deck.updated +
+    ' · memo ' + withMemo + '/' + deck.notes.length + ' · parts ' + withParts + '/' + deck.notes.length);
   console.log('  tags: ' + Object.entries(tags).map(([k, v]) => k + ' ' + v).join(', '));
 });

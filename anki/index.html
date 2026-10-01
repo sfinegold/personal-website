@@ -116,6 +116,16 @@
   @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
   .hint{font-size:.95rem;color:var(--dim);font-style:italic;margin-top:1rem;line-height:1.45}
   .hint:empty{display:none}
+  .lbl{display:block;font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:.25rem;font-style:normal}
+  .memo{font-size:.95rem;color:var(--dim);font-style:italic;margin-top:1rem;line-height:1.45}
+  .memo:empty{display:none}
+  .parts{margin-top:1rem;text-align:left;display:inline-block;max-width:100%}
+  .parts:empty{display:none}
+  .part{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .6rem;font-size:.92rem;line-height:1.45;padding:.12rem 0;border-top:1px solid var(--line)}
+  .part:first-of-type{border-top:0}
+  .part b{font-weight:600;min-width:5.5rem}
+  .part .pt{color:var(--faint);font-size:.86rem}
+  .part .pm{color:var(--dim)}
   .ex{margin-top:.9rem;font-size:.95rem;line-height:1.5;color:var(--dim);cursor:pointer;border-radius:8px;padding:.3rem .5rem;margin-left:-.5rem;margin-right:-.5rem}
   .ex:hover{background:var(--card-2)}
   .ex:empty{display:none}
@@ -253,6 +263,8 @@
         <div class="back" id="back">
           <div class="main" id="bMain" dir="auto"></div><div class="sub" id="bSub" dir="auto"></div>
           <div class="hint" id="hint"></div>
+          <div class="memo" id="memo"></div>
+          <div class="parts" id="parts"></div>
           <div class="ex" id="ex"></div>
         </div>
       </div>
@@ -543,6 +555,12 @@
     if (!tl) return [n.term, ''];
     return store.settings.trFirst ? [n.tr, n.term] : [n.term, n.tr];
   }
+  function partsHtml(n) {
+    if (!n.parts || !n.parts.length) return '';
+    return '<span class="lbl">Parts</span>' + n.parts.map(function (p) {
+      return '<div class="part"><b>' + esc(p.tr || p.t) + '</b>' + (p.tr ? '<span class="pt" dir="auto">' + esc(p.t) + '</span>' : '') + '<span class="pm">' + esc(p.m) + '</span></div>';
+    }).join('');
+  }
   function dirLabel(dir) { var c = deck().meta.code; return dir === 'fwd' ? c + ' → EN' : 'EN → ' + c; }
 
   function render() {
@@ -575,6 +593,8 @@
     if (c.dir === 'fwd') { $('fMain').textContent = gk[0]; $('fSub').textContent = gk[1]; $('bMain').textContent = n.en; $('bSub').textContent = ''; }
     else { $('fMain').textContent = n.en; $('fSub').textContent = ''; $('bMain').textContent = gk[0]; $('bSub').textContent = gk[1]; }
     $('hint').textContent = n.note || '';
+    $('memo').innerHTML = n.memo ? '<span class="lbl">Remember</span>' + esc(n.memo) : '';
+    $('parts').innerHTML = partsHtml(n);
     var ex = n.ex;
     $('ex').innerHTML = ex ? ((ex.tr && deck().meta.translit) ? '<div class="ex-tr">' + esc(ex.tr) + '</div><div class="ex-el" dir="auto">' + esc(ex.term) + '</div>' : '<div class="ex-tr">' + esc(ex.term) + '</div>') +
       '<div class="ex-en">' + esc(ex.en) + '</div>' : '';
@@ -635,6 +655,8 @@
         '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">→' + esc(code) + ' ' + esc(r.txt) + '</span></div></div>' +
         '<div class="en">' + esc(n.en) + '</div>' +
         '<div class="more">' + (n.note ? '<div>' + esc(n.note) + '</div>' : '') +
+        (n.memo ? '<div style="margin-top:.3rem;font-style:italic">' + esc(n.memo) + '</div>' : '') +
+        (n.parts ? '<div class="parts" style="margin-top:.4rem;display:block">' + partsHtml(n) + '</div>' : '') +
         (exLine ? '<div style="margin-top:.3rem">' + exLine + '</div>' : '') +
         '<div style="margin-top:.3rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">' + esc(n.tags.join(' · ')) + '</div></div></div>';
     });

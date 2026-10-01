@@ -25,6 +25,14 @@
  *   priority: true  puts the note's cards at the front of the new-card queue, ahead of
  *             unseen notes without the flag. Use it when Sam asks for a set "next".
  *             Remove the flag later (or leave it; it only affects unseen cards).
+ *   memo      one or two sentences (under 160 chars) on how to remember the phrase. Lean on,
+ *             in this order: an English word that shares the root or was borrowed; a pattern
+ *             already in the deck (verb endings, particles, markers); a sound-alike picture.
+ *   parts     the phrase in order, one item per meaning-bearing piece, including endings,
+ *             particles and link words: [{t:'Καλη-', tr:'kali', m:'good'}, {t:'-μέρα', tr:'méra', m:'day'}]
+ *             t = piece in the language's script, tr = its transliteration (translit decks only),
+ *             m = meaning or function. A hyphen marks a bound piece. Every note should carry
+ *             both fields; the validator prints coverage per deck.
  *   term  the phrase in the target language's own script
  *   tr    transliteration (only when translit is true)
  *   en    English
