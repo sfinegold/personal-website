@@ -28,4 +28,6 @@
  */
 window.DECK_INDEX = [
   { id: 'greek', file: 'greek.js', name: 'Conversational Greek', lang: 'el', langName: 'Greek', code: 'EL', translit: true },
+  { id: 'japanese', file: 'japanese.js', name: 'Conversational Japanese', lang: 'ja', langName: 'Japanese', code: 'JA', translit: true },
+  { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', langName: 'Farsi', code: 'FA', translit: true },
 ];

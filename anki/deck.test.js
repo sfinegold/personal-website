@@ -6,6 +6,12 @@ global.window = {};
 require('./decks/index.js');
 const index = global.window.DECK_INDEX;
 
+const SCRIPTS = {
+  el: { name: 'Greek', re: /[\u0370-\u03FF\u1F00-\u1FFF]/ },
+  ja: { name: 'Japanese', re: /[\u3040-\u30FF\u4E00-\u9FFF]/ },
+  fa: { name: 'Persian', re: /[\u0600-\u06FF]/ },
+};
+const NON_LATIN = /[\u0370-\u03FF\u1F00-\u1FFF\u0600-\u06FF\u3040-\u30FF\u4E00-\u9FFF;\u061F]/;
 const errors = [];
 const check = (cond, msg) => { if (!cond) errors.push(msg); };
 const str = (v) => typeof v === 'string' && v.trim().length > 0;
@@ -51,8 +57,11 @@ function validateDeck(deck, meta) {
       if (meta.translit) check(n.ex && str(n.ex.tr), w + ': ex needs tr');
     }
     if (n.el !== undefined) check(false, w + ': field "el" is obsolete, use "term"');
-    if (meta.lang === 'el' && str(n.term)) check(/[Ͱ-Ͽἀ-῿]/.test(n.term), w + ': term should contain Greek script');
-    if (str(n.tr)) check(!/[Ͱ-Ͽἀ-῿;]/.test(n.tr), w + ': tr should be Latin only, with ? not ;');
+    const script = SCRIPTS[meta.lang];
+    if (script && str(n.term)) check(script.re.test(n.term), w + ': term should contain ' + script.name + ' script');
+    if (script && n.ex && str(n.ex.term)) check(script.re.test(n.ex.term), w + ': ex.term should contain ' + script.name + ' script');
+    if (str(n.tr)) check(!NON_LATIN.test(n.tr), w + ': tr should be Latin only, with ? not ; or ؟');
+    if (n.ex && str(n.ex.tr)) check(!NON_LATIN.test(n.ex.tr), w + ': ex.tr should be Latin only');
   });
 }
 

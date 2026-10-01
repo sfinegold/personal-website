@@ -250,9 +250,9 @@
       <div class="leech">leech</div>
       <button class="say" id="sayBtn" aria-label="Play pronunciation" title="Play (p)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18 5.5a8.5 8.5 0 0 1 0 13"/></svg></button>
       <div class="inner">
-        <div class="front"><div class="main" id="fMain"></div><div class="sub" id="fSub"></div></div>
+        <div class="front"><div class="main" id="fMain" dir="auto"></div><div class="sub" id="fSub" dir="auto"></div></div>
         <div class="back" id="back">
-          <div class="main" id="bMain"></div><div class="sub" id="bSub"></div>
+          <div class="main" id="bMain" dir="auto"></div><div class="sub" id="bSub" dir="auto"></div>
           <div class="hint" id="hint"></div>
           <div class="ex" id="ex"></div>
         </div>
@@ -575,7 +575,7 @@
     else { $('fMain').textContent = n.en; $('fSub').textContent = ''; $('bMain').textContent = gk[0]; $('bSub').textContent = gk[1]; }
     $('hint').textContent = n.note || '';
     var ex = n.ex;
-    $('ex').innerHTML = ex ? ((ex.tr && deck().meta.translit) ? '<div class="ex-tr">' + esc(ex.tr) + '</div><div class="ex-el">' + esc(ex.term) + '</div>' : '<div class="ex-tr">' + esc(ex.term) + '</div>') +
+    $('ex').innerHTML = ex ? ((ex.tr && deck().meta.translit) ? '<div class="ex-tr">' + esc(ex.tr) + '</div><div class="ex-el" dir="auto">' + esc(ex.term) + '</div>' : '<div class="ex-tr">' + esc(ex.term) + '</div>') +
       '<div class="ex-en">' + esc(ex.en) + '</div>' : '';
     card.dataset.dir = c.dir;
     card.classList.toggle('revealed', revealed);
@@ -627,7 +627,7 @@
       if (browseTag && n.tags.indexOf(browseTag) < 0) return;
       if (q && (n.term + ' ' + (n.tr || '') + ' ' + n.en + ' ' + (n.note || '')).toLowerCase().indexOf(q) < 0) return;
       var f = stLabel(cards[n.id + ':fwd']), r = stLabel(cards[n.id + ':rev']);
-      var head = tl && n.tr ? '<span class="tr">' + esc(n.tr) + '</span><span class="el">' + esc(n.term) + '</span>' : '<span class="tr el">' + esc(n.term) + '</span>';
+      var head = tl && n.tr ? '<span class="tr">' + esc(n.tr) + '</span><span class="el" dir="auto">' + esc(n.term) + '</span>' : '<span class="tr el">' + esc(n.term) + '</span>';
       var exLine = n.ex ? [n.ex.tr, n.ex.term, n.ex.en].filter(Boolean).map(esc).join(' · ') : '';
       html += '<div class="note" data-id="' + esc(n.id) + '"><div class="l1"><div>' + head + '</div>' +
         '<div class="state"><span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">→EN ' + esc(f.txt) + '</span>' +
