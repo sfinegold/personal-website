@@ -20,6 +20,10 @@
  *        translit  true if notes carry a `tr` transliteration line (Greek, Japanese,
  *                  Russian...), false for Latin-script languages (then `tr` is omitted
  *                  and `term` is the main line)
+ *        speech    false for decks that should never be read aloud (facts, maths).
+ *        dirs      'both' (default) or 'fwd' when the reverse card makes no sense.
+ *        labels    { fwd, rev, front, back } for non-language decks, shown instead of
+ *                  language codes ("Problem → Answer"). term = prompt, en = answer.
  *        creature  { emoji, name, kind }: the deck's companion. Its health follows how
  *                  recently the deck was studied and how many cards are due. Pick an
  *                  animal tied to the language's culture (owl for Greek, fox for
@@ -49,4 +53,14 @@ window.DECK_INDEX = [
     creature: { emoji: '🦊', name: 'Kitsu', kind: 'fox' } },
   { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', locale: 'fa-IR', langName: 'Farsi', code: 'FA', translit: true,
     creature: { emoji: '🐈', name: 'Pari', kind: 'cat' } },
+  // Fact decks: term is the prompt, en is the answer. No transliteration, no speech.
+  { id: 'mental-math', file: 'mental-math.js', name: 'Mental Multiplication', lang: 'en', locale: 'en-US', langName: 'Maths', code: 'Q', translit: false,
+    speech: false, dirs: 'fwd', labels: { fwd: 'Problem → Answer', rev: 'Answer → Problem', front: 'Problem', back: 'Answer' },
+    creature: { emoji: '➕', name: 'Plus', kind: 'plus' } },
+  { id: 'greek-myth', file: 'greek-myth.js', name: 'Greek Gods & Myths', lang: 'en', locale: 'en-US', langName: 'Mythology', code: 'Q', translit: false,
+    speech: false, dirs: 'both', labels: { fwd: 'Name → Who', rev: 'Who → Name', front: 'Name', back: 'Who or what' },
+    creature: { emoji: '⚡', name: 'Zeus', kind: 'zeus' } },
+  { id: 'us-presidents', file: 'us-presidents.js', name: 'US Presidents', lang: 'en', locale: 'en-US', langName: 'History', code: 'Q', translit: false,
+    speech: false, dirs: 'both', labels: { fwd: 'President → Facts', rev: 'Facts → President', front: 'President', back: 'Facts' },
+    creature: { emoji: '🦅', name: 'Abe', kind: 'eagle' } },
 ];

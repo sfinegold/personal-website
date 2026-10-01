@@ -157,7 +157,7 @@
   .say:active{color:#FFFFFF;background:var(--text)}
   .say svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .say.playing{color:var(--text)}
-  .card[data-dir=rev]:not(.revealed) .say,body.nospeech .say{display:none}
+  .card[data-dir=rev]:not(.revealed) .say,body.nospeech .say,.card.nospeech .say{display:none}
   .leech{position:absolute;top:.7rem;right:3.2rem;display:none;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
     text-transform:uppercase;color:#FFFFFF;background:#B3261E;border:1px solid #B3261E;border-radius:4px;padding:.15rem .4rem}
   .card.is-leech .leech{display:block}
@@ -544,6 +544,7 @@
   var decks = {};          // id -> { meta, data, notesById }
   function deckOf(id) { return decks[id]; }
   function deck() { return decks[store.deck]; }
+  function unit(m) { return m && m.labels ? 'cards' : 'phrases'; }
   function P(id) {          // progress bucket for a deck
     id = id || store.deck;
     if (!store.decks[id]) store.decks[id] = freshBucket();
@@ -552,6 +553,7 @@
   function cardsOf(id, filterDirs) {
     var d = deckOf(id), bucket = P(id), out = [];
     var dirs = filterDirs ? store.settings.dirs : 'both';
+    if (d.meta.dirs === 'fwd') dirs = 'fwd';
     d.data.notes.forEach(function (n, i) {
       // "Study next" (per device) comes first, then notes flagged priority in the deck file, then file order.
       var boosted = bucket.boost && bucket.boost.indexOf(n.id) >= 0;
@@ -802,7 +804,7 @@
     } catch (e) { return false; }
   }
   function sayCurrent(quiet) {
-    var c = current && cardsIdx[current]; if (!c) return;
+    var c = current && cardsIdx[current]; if (!c || deck().meta.speech === false) return;
     if (c.dir === 'rev' && !revealed) return;   // never read out the answer early
     speak(c.note.term, quiet);
   }
@@ -891,7 +893,12 @@
       return '<div class="part"><b>' + esc(p.tr || p.t) + '</b>' + (p.tr ? '<span class="pt" dir="auto">' + esc(p.t) + '</span>' : '') + '<span class="pm">' + esc(p.m) + '</span></div>';
     }).join('');
   }
-  function dirLabel(dir) { var c = deck().meta.code; return dir === 'fwd' ? c + ' → EN' : 'EN → ' + c; }
+  function dirLabel(dir) {
+    var m = deck().meta;
+    if (m.labels) return dir === 'fwd' ? m.labels.fwd : m.labels.rev;
+    return dir === 'fwd' ? m.code + ' → EN' : 'EN → ' + m.code;
+  }
+  function chipLabels(m) { return m.labels ? ['→ ' + m.labels.back, '→ ' + m.labels.front] : ['→EN', '→' + m.code]; }
 
   function render() {
     if (view === 'study') {
@@ -916,6 +923,7 @@
     var canUndo = b.undo.length > 0;
     $('undoBtn').disabled = !canUndo; $('undoBtn2').disabled = !canUndo;
     $('muteBtn').classList.toggle('off', !store.settings.autoSay);
+    $('muteBtn').style.display = deck() && deck().meta.speech === false ? 'none' : '';
     $('muteBtn').setAttribute('aria-label', store.settings.autoSay ? 'Mute auto-play' : 'Unmute auto-play');
   }
   function renderCard() {
@@ -931,6 +939,7 @@
     $('ex').innerHTML = ex ? ((ex.tr && deck().meta.translit) ? '<div class="ex-tr">' + esc(ex.tr) + '</div><div class="ex-el" dir="auto">' + esc(ex.term) + '</div>' : '<div class="ex-tr">' + esc(ex.term) + '</div>') +
       '<div class="ex-en">' + esc(ex.en) + '</div>' : '';
     card.dataset.dir = c.dir;
+    card.classList.toggle('nospeech', deck().meta.speech === false);
     card.classList.toggle('revealed', revealed);
     card.classList.toggle('is-leech', !!(c.state && c.state.leech));
     card.setAttribute('aria-label', revealed ? 'Flashcard, revealed.' : 'Flashcard. Tap to reveal.');
@@ -960,7 +969,7 @@
     more.style.display = unseen > 0 ? '' : 'none';
     more.textContent = '+' + Math.min(20, unseen) + ' new card' + (Math.min(20, unseen) === 1 ? '' : 's');
     if (unseen > 0) $('doneText').textContent += (did.length ? ' ' : '') + unseen + ' unseen card' + (unseen === 1 ? '' : 's') + ' left in the deck.';
-    $('doneDeck').textContent = data.notes.length + ' phrases · v' + data.version;
+    $('doneDeck').textContent = data.notes.length + ' ' + unit(deck().meta) + ' · v' + data.version;
   }
   function stLabel(st) {
     if (!st) return { cls: 'new', txt: 'new' };
@@ -1006,7 +1015,7 @@
     $('scopeBtn').classList.toggle('all', browseScope === 'all');
     if (showHome) renderBrowseHome(now); else renderBrowseList(now, q);
     var rc = retiredCount();
-    $('retired').textContent = deck().data.notes.length + ' phrases in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+    $('retired').textContent = deck().data.notes.length + ' ' + unit(deck().meta) + ' in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
   }
   function deckOverview(d, now) {
     var notes = d.data.notes, id = d.meta.id;
@@ -1038,17 +1047,17 @@
       }).join('');
       var themes = Object.keys(o.tags).map(function (t) {
         var g = o.tags[t], pc = function (x) { return g.cards ? Math.round(x / g.cards * 100) : 0; };
-        return '<button class="theme" data-deck="' + esc(id) + '" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' phrases · ' + pc(g.mature + g.review) + '% learned</span></div>' +
+        return '<button class="theme" data-deck="' + esc(id) + '" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' ' + unit(d.meta) + ' · ' + pc(g.mature + g.review) + '% learned</span></div>' +
           '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
       }).join('');
-      return '<details class="dsec" data-deck="' + esc(id) + '"' + (id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' phrases · ' + c.due + ' due</span></summary>' +
+      return '<details class="dsec" data-deck="' + esc(id) + '"' + (id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' ' + unit(d.meta) + ' · ' + c.due + ' due</span></summary>' +
         '<div class="body"><div class="chips statechips">' + chips + '</div><div class="themes">' + themes + '</div></div></details>';
     }).join('') + '<div class="legend">bar: mature · review · learning · (empty = new)</div>';
   }
   function renderBrowseList(now, q) {
     var listDeck = (!q && browseDeck && deckOf(browseDeck)) || deck();
     var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [q ? deck() : listDeck];
-    var what = browseTag ? browseTag : ({ all: 'All phrases', new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
+    var what = browseTag ? browseTag : ({ all: 'All ' + unit(listDeck.meta), new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
     var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : (listDeck.meta.id === store.deck ? what : listDeck.meta.name + ' › ' + what);
     $('crumb').innerHTML = '<button id="crumbBack">‹ Decks</button><span></span>';
     var html = '', total = 0;
@@ -1086,8 +1095,8 @@
     return '<div class="note" data-deck="' + esc(d.meta.id) + '" data-id="' + esc(n.id) + '">' +
       '<div class="l1"><div>' + head + '</div>' +
       '<div class="state">' + (boosted ? '<span class="st boost">next</span>' : '') +
-      '<span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">→EN ' + esc(f.txt) + '</span>' +
-      '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">→' + esc(code) + ' ' + esc(r.txt) + '</span></div></div>' +
+      '<span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">' + esc(chipLabels(d.meta)[0]) + ' ' + esc(f.txt) + '</span>' +
+      (d.meta.dirs === 'fwd' ? '' : '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">' + esc(chipLabels(d.meta)[1]) + ' ' + esc(r.txt) + '</span>') + '</div></div>' +
       '<div class="en">' + esc(n.en) + '</div>' + snip +
       '<div class="more">' + (n.note ? '<div>' + esc(n.note) + '</div>' : '') +
       (n.memo ? '<div style="margin-top:.3rem;font-style:italic">' + esc(n.memo) + '</div>' : '') +
@@ -1106,7 +1115,7 @@
     var c = queueInfo.counts;
     $('tilesToday').innerHTML = tile('t-new', b.day.newDone, 'new done') + tile('t-due', b.day.revDone, 'reviews done') + tile('', c.new + c.due + c.learn, 'remaining');
     var dirs = store.settings.dirs, code = d.meta.code;
-    $('statsNote').textContent = d.meta.name + ' · ' + (dirs === 'both' ? 'both directions' : dirs === 'fwd' ? code + ' → EN only' : 'EN → ' + code + ' only') +
+    $('statsNote').textContent = d.meta.name + ' · ' + (d.meta.dirs === 'fwd' ? 'one direction' : dirs === 'both' ? 'both directions' : dirs === 'fwd' ? dirLabel('fwd') + ' only' : dirLabel('rev') + ' only') +
       ' · mature = interval of 21 days or more · deck v' + d.data.version + ' (' + d.data.updated + ')';
   }
   function renderDecks() {
@@ -1123,7 +1132,7 @@
       html += '<button class="deck' + (on ? ' on' : '') + '" data-deck="' + esc(meta.id) + '"><div class="d-row"><span class="d-pet ' + cs.mood + '">' + creatureArt(cs.c) + '</span><div>' +
         '<div class="d-name">' + esc(meta.name) + (on ? ' <span class="d-now">current</span>' : '') + '</div>' +
         '<div class="d-mood">' + esc(cs.line) + '</div>' +
-        '<div class="d-sub">' + d.data.notes.length + ' phrases · ' + st.mature + ' mature</div>' +
+        '<div class="d-sub">' + d.data.notes.length + ' ' + unit(meta) + ' · ' + st.mature + ' mature</div>' +
         '<div class="d-counts"><b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></div></div></button>';
     });
     $('deckList').innerHTML = html;
@@ -1145,9 +1154,14 @@
     $('sTr').checked = !!store.settings.trFirst; $('sDir').value = store.settings.dirs;
     $('sSay').checked = !!store.settings.autoSay;
     $('rowTr').style.display = deck().meta.translit ? '' : 'none';
-    fillVoices();
-    var ln = deck().meta.langName, opts = $('sDir').options;
-    opts[1].textContent = ln + ' → English'; opts[2].textContent = 'English → ' + ln;
+    var m = deck().meta, quiet = m.speech === false;
+    $('sSay').closest('.row').style.display = quiet ? 'none' : '';
+    $('sVoice').closest('.row').style.display = quiet ? 'none' : '';
+    $('voiceTestBtn').closest('.actions').style.display = quiet ? 'none' : '';
+    $('sDir').closest('.row').style.display = m.dirs === 'fwd' ? 'none' : '';
+    if (!quiet) fillVoices();
+    var ln = deck().meta.langName, opts = $('sDir').options, lb = deck().meta.labels;
+    opts[1].textContent = lb ? lb.fwd : ln + ' → English'; opts[2].textContent = lb ? lb.rev : 'English → ' + ln;
     $('sSayNote').textContent = 'Speaks the ' + deck().meta.langName + ' side when it appears, using this device\'s ' + deck().meta.langName + ' voice.';
   }
 
@@ -1348,7 +1362,7 @@
       var seen = b.stamp;
       if (seen && (seen.version !== cur.version || seen.updated !== cur.updated) && meta.id === store.deck) {
         var diff = cur.notes - (seen.notes || 0);
-        setTimeout(function () { toast(meta.name + ' updated' + (diff > 0 ? ' · +' + diff + ' phrases' : '') + ' · v' + cur.version); }, 400);
+        setTimeout(function () { toast(meta.name + ' updated' + (diff > 0 ? ' · +' + diff + ' ' + unit(meta) : '') + ' · v' + cur.version); }, 400);
       }
       b.stamp = cur;
     });
