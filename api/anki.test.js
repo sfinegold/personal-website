@@ -5,6 +5,11 @@ process.env.ANKI_ALLOW_MEMORY = '1';
 delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY; delete process.env.SUPABASE_KEY; delete process.env.ANKI_ECHO_CODE;
 const sent = [];
 require.cache[require.resolve('./_lib/email')] = { id: require.resolve('./_lib/email'), filename: require.resolve('./_lib/email'), loaded: true, exports: { sendEmail: async (m) => { sent.push(m); return { id: 'x' }; }, transport: () => 'fake' } };
+const drafts = [];
+require.cache[require.resolve('./_lib/draft')] = { id: require.resolve('./_lib/draft'), filename: require.resolve('./_lib/draft'), loaded: true, exports: {
+  draftCard: async (a) => { drafts.push(a); if (!String(a.input || '').trim()) { const e = new Error('Say what the card should teach.'); e.status = 400; throw e; } return { term: 'Πόσο κάνει;', tr: 'póso káni?', en: 'How much is it?', memo: 'póso = how much', parts: [{ t: 'Πόσο', tr: 'póso', m: 'how much' }], tags: ['shopping'] }; },
+  draftDeck: async (a) => { drafts.push(a); return { meta: { name: 'Italian Basics', langName: 'Italian', lang: 'it', locale: 'it-IT', code: 'IT', translit: false, speech: true, dirs: 'both', creature: { emoji: '🍝', name: 'Gino', kind: 'emoji' } }, notes: [{ term: 'Ciao', en: 'Hi / bye', memo: 'c', parts: [{ t: 'Ciao', m: 'hi' }], tags: ['greetings'] }] }; },
+} };
 const handler = require('./anki.js');
 let passed = 0, failed = 0;
 async function test(name, fn) { try { await fn(); passed++; console.log('  ok  ' + name); } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + (e.message || e)); } }
@@ -41,6 +46,26 @@ const codeFrom = (m) => m.subject.match(/^(\d{6})/)[1];
     assert.equal((await call({ query: { op: 'me' }, token: 'deadbeef' })).status, 401);
     const me = await call({ query: { op: 'me' }, token }); assert.equal(me.status, 200); assert.equal(me.json.user.name, 'sam');
     const st = await call({ query: { op: 'state' }, token }); assert.deepEqual(st.json.decks, {});
+  });
+  await test('draft: needs a session, returns the drafted card, counts against the daily quota', async () => {
+    assert.equal((await call({ method: 'POST', body: { op: 'draft', text: 'how much is it' } })).status, 401);
+    const r = await call({ method: 'POST', token, body: { op: 'draft', deck: { name: 'Conversational Greek', lang: 'el', translit: true }, text: 'how much is it', examples: [], tags: ['food'] } });
+    assert.equal(r.status, 200); assert.equal(r.json.note.tr, 'póso káni?'); assert.equal(r.json.left, 79);
+    assert.equal(drafts[drafts.length - 1].meta.lang, 'el');
+    const bad = await call({ method: 'POST', token, body: { op: 'draft', deck: {}, text: '   ' } });
+    assert.equal(bad.status, 400);
+    const d = await call({ method: 'POST', token, body: { op: 'draftDeck', text: 'Italian for a trip' } });
+    assert.equal(d.status, 200); assert.equal(d.json.meta.name, 'Italian Basics'); assert.equal(d.json.notes.length, 1);
+    for (let i = 0; i < 80; i++) await call({ method: 'POST', token, body: { op: 'draft', deck: {}, text: 'x' } });
+    const over = await call({ method: 'POST', token, body: { op: 'draft', deck: {}, text: 'x' } });
+    assert.equal(over.status, 429);
+  });
+  await test('save: the library rides along in the state document and merges', async () => {
+    const lib = { decks: {}, notes: { greek: { u1: { t: 5, note: { term: 'x', en: 'y', tags: ['added'] } } } }, hidden: { greek: { 'gr-1': { t: 2, on: true } } }, shelf: {} };
+    const r = await call({ method: 'POST', token, body: { op: 'save', state: Object.assign(doc({}, '2026-10-02T00:00:00Z'), { library: lib }) } });
+    assert.equal(r.status, 200); assert.equal(r.json.library.notes.greek.u1.note.term, 'x');
+    const r2 = await call({ method: 'POST', token, body: { op: 'save', state: Object.assign(doc({}, '2026-10-02T00:01:00Z'), { library: { decks: {}, notes: {}, hidden: { greek: { 'gr-1': { t: 9, on: false } } }, shelf: { farsi: { t: 1, on: false } } } }) } });
+    assert.equal(r2.json.library.hidden.greek['gr-1'].on, false); assert.equal(r2.json.library.notes.greek.u1.note.term, 'x'); assert.equal(r2.json.library.shelf.farsi.on, false);
   });
   await test('save merges across devices; rename works; signout kills the token', async () => {
     const phone = await call({ method: 'POST', body: { op: 'save', state: doc({ 'a:fwd': card(10, 1), 'b:fwd': card(10, 1) }, '2026-10-01T10:00:00Z') }, token });

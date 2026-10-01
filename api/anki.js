@@ -23,12 +23,16 @@
 //   POST { op:'save', state }           -> the merged document
 //   POST { op:'rename', name }          -> { user }
 //   POST { op:'signout' }               -> { ok:true }
+//   POST { op:'draft', deck:{meta}, text, examples, tags } -> { note }      Claude drafts one card
+//   POST { op:'draftDeck', text }       -> { meta, notes }                 Claude drafts a new deck
 // Saves merge with what is stored (anki/merge.js): per card the later answer wins.
+// Drafting needs ANTHROPIC_API_KEY and a signed-in account; DRAFTS_PER_DAY caps each account.
 
 const crypto = require('crypto');
 const { getJSON, setJSON, dbEnabled } = require('./_lib/store');
 const { sendEmail, transport } = require('./_lib/email');
 const { mergeState } = require('../anki/merge');
+const draft = require('./_lib/draft');
 
 const MAX_BODY = 1500000;
 const MAX_NAME = 24;
@@ -36,6 +40,7 @@ const CODE_TTL = 10 * 60 * 1000;
 const CODE_COOLDOWN = 45 * 1000;
 const CODE_TRIES = 5;
 const SESSION_TTL = 365 * 86400000;
+const DRAFTS_PER_DAY = 80;
 
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 const normEmail = (e) => String(e || '').trim().toLowerCase();
@@ -48,6 +53,7 @@ const kCode = (uid) => 'anki:code:' + uid;
 const kSession = (t) => 'anki:session:' + t;
 const kUser = (uid) => 'anki:user:' + uid;
 const kState = (uid) => 'anki:state:' + uid;
+const kQuota = (uid) => 'anki:quota:' + uid + ':' + new Date().toISOString().slice(0, 10);
 
 function allowed(email) {
   const list = (process.env.ANKI_ALLOWED_EMAILS || '').split(',').map(normEmail).filter(Boolean);
@@ -139,6 +145,21 @@ module.exports = async (req, res) => {
         if (!user) return res.status(404).json({ error: 'No such account.' });
         user.name = name; await setJSON(kUser(s.uid), user);
         return res.status(200).json({ user: publicUser(user) });
+      }
+      if (body.op === 'draft' || body.op === 'draftDeck') {
+        const used = (await getJSON(kQuota(s.uid), null)) || { n: 0 };
+        if (used.n >= DRAFTS_PER_DAY) return res.status(429).json({ error: 'Daily drafting limit reached (' + DRAFTS_PER_DAY + '). Try again tomorrow.' });
+        await setJSON(kQuota(s.uid), { n: used.n + 1 });
+        try {
+          if (body.op === 'draft') {
+            const note = await draft.draftCard({ meta: body.deck && typeof body.deck === 'object' ? body.deck : {}, input: body.text, examples: body.examples, tags: body.tags });
+            return res.status(200).json({ note, left: DRAFTS_PER_DAY - used.n - 1 });
+          }
+          const d = await draft.draftDeck({ input: body.text });
+          return res.status(200).json({ meta: d.meta, notes: d.notes, left: DRAFTS_PER_DAY - used.n - 1 });
+        } catch (e) {
+          return res.status(e.status || 500).json({ error: e.message });
+        }
       }
       if (body.op === 'signout') {
         await setJSON(kSession(s.token), { uid: '', email: '', created: '1970-01-01T00:00:00Z' });

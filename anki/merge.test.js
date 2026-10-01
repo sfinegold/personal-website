@@ -20,6 +20,20 @@ test('boost: union, order kept', () => { assert.deepEqual(M.mergeBoost(['x', 'y'
 test('streak: later lastDay wins, best is the max', () => {
   assert.deepEqual(M.mergeStreak({ current: 3, best: 3, lastDay: 10 }, { current: 1, best: 9, lastDay: 11 }), { current: 1, best: 9, lastDay: 11 });
 });
+test('library: per entry the later t wins; deleted and hidden tombstones carry across', () => {
+  const a = { decks: { 'u-it': { t: 10, meta: { name: 'Italian' } } }, notes: { greek: { x1: { t: 5, note: { id: 'x1', term: 'a' } } } }, hidden: { greek: { 'gr-1': { t: 3, on: true } } }, shelf: { farsi: { t: 1, on: false } } };
+  const b = { decks: { 'u-it': { t: 20, meta: { name: 'Italian' }, deleted: true }, 'u-de': { t: 2, meta: { name: 'German' } } }, notes: { greek: { x1: { t: 4, note: { id: 'x1', term: 'b' } }, x2: { t: 6, note: { id: 'x2', term: 'c' } } } }, hidden: { greek: { 'gr-1': { t: 9, on: false } } }, shelf: { farsi: { t: 1, on: true } } };
+  const out = M.mergeLibrary(a, b);
+  assert.equal(out.decks['u-it'].deleted, true);
+  assert.equal(out.decks['u-de'].meta.name, 'German');
+  assert.equal(out.notes.greek.x1.note.term, 'a');
+  assert.equal(out.notes.greek.x2.note.term, 'c');
+  assert.equal(out.hidden.greek['gr-1'].on, false);
+  assert.equal(out.shelf.farsi.on, false, 'ties keep the stored side');
+  assert.equal(M.mergeLibrary(null, null), null);
+  assert.ok(M.mergeState({ v: 2, decks: {} }, { v: 2, decks: {}, library: b }).library.decks['u-de']);
+  assert.ok(M.differs({ v: 2, decks: {} }, { v: 2, decks: {}, library: b }), 'a library change counts as a change');
+});
 test('state: per-deck buckets merge, settings from the later document, undo stays local', () => {
   const local = { v: 2, updated: '2026-10-01T10:00:00Z', settings: { newPerDay: 5 }, decks: { greek: { cards: { 'a:fwd': card(10, { ivl: 1 }) }, day: { day: 1, newDone: 1, revDone: 0, extraNew: 0 }, undo: [{ id: 'a:fwd' }], stamp: { version: 3, updated: '2026-10-01' }, boost: ['a'] } } };
   const server = { v: 2, updated: '2026-10-01T11:00:00Z', settings: { newPerDay: 20 }, decks: { greek: { cards: { 'a:fwd': card(20, { ivl: 4 }), 'b:rev': card(2) }, day: { day: 1, newDone: 0, revDone: 7, extraNew: 0 }, undo: [{ id: 'zzz' }], stamp: { version: 4, updated: '2026-10-01' }, boost: ['b'] }, farsi: { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null, boost: [] } } };

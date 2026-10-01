@@ -62,6 +62,34 @@
     return Object.assign({}, w, { best: Math.max(a.best || 0, b.best || 0, w.current || 0) });
   }
 
+  // The library is what the person added, hid or created: maps of entries that each
+  // carry a timestamp t. Per entry, the later t wins (a ties). Sections: decks
+  // (custom decks: {t, meta, deleted}), notes (deck -> id -> {t, note}), hidden
+  // (deck -> id -> {t, on}), shelf (deck -> {t, on}).
+  function mergeStamped(a, b) {
+    a = isObj(a) ? a : {}; b = isObj(b) ? b : {};
+    var out = {}, ids = Object.keys(a).concat(Object.keys(b).filter(function (k) { return !(k in a); }));
+    ids.forEach(function (id) {
+      var x = a[id], y = b[id];
+      if (!isObj(x)) { out[id] = y; return; }
+      if (!isObj(y)) { out[id] = x; return; }
+      out[id] = (y.t || 0) > (x.t || 0) ? y : x;
+    });
+    return out;
+  }
+  function mergeNested(a, b) {
+    a = isObj(a) ? a : {}; b = isObj(b) ? b : {};
+    var out = {}, ids = Object.keys(a).concat(Object.keys(b).filter(function (k) { return !(k in a); }));
+    ids.forEach(function (id) { out[id] = mergeStamped(a[id], b[id]); });
+    return out;
+  }
+  function mergeLibrary(a, b) {
+    a = isObj(a) ? a : null; b = isObj(b) ? b : null;
+    if (!a && !b) return null;
+    a = a || {}; b = b || {};
+    return { decks: mergeStamped(a.decks, b.decks), notes: mergeNested(a.notes, b.notes), hidden: mergeNested(a.hidden, b.hidden), shelf: mergeStamped(a.shelf, b.shelf) };
+  }
+
   // a = local / stored, b = incoming. Returns a new document; neither input is modified.
   function mergeState(a, b) {
     a = isObj(a) ? a : {}; b = isObj(b) ? b : {};
@@ -73,6 +101,8 @@
     if (settings) out.settings = settings;
     var streak = mergeStreak(a.streak, b.streak);
     if (streak) out.streak = streak;
+    var library = mergeLibrary(a.library, b.library);
+    if (library) out.library = library;
     if (a.deck || b.deck) out.deck = newer.deck || a.deck || b.deck;
     out.updated = ts(a) >= ts(b) ? (a.updated || null) : (b.updated || null);
     return out;
@@ -81,10 +111,10 @@
   // True when merging b into a would change a (so the page knows whether to push).
   function differs(a, b) { return JSON.stringify(stripUndo(a)) !== JSON.stringify(stripUndo(b)); }
   function stripUndo(doc) {
-    var d = { v: 2, decks: {}, settings: doc.settings || null, streak: doc.streak || null };
+    var d = { v: 2, decks: {}, settings: doc.settings || null, streak: doc.streak || null, library: doc.library || null };
     Object.keys(doc.decks || {}).forEach(function (id) { var b = doc.decks[id]; d.decks[id] = { cards: b.cards, day: b.day, stamp: b.stamp, boost: b.boost }; });
     return d;
   }
 
-  return { mergeState: mergeState, mergeCards: mergeCards, mergeDay: mergeDay, mergeBoost: mergeBoost, mergeStreak: mergeStreak, differs: differs };
+  return { mergeState: mergeState, mergeCards: mergeCards, mergeDay: mergeDay, mergeBoost: mergeBoost, mergeStreak: mergeStreak, mergeLibrary: mergeLibrary, differs: differs };
 }));

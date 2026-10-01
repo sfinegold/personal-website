@@ -141,7 +141,9 @@
   .view{display:none;flex:1;flex-direction:column;min-height:0}
   #view-study,#view-done{padding-top:.75rem}
   .app[data-view=study] #view-study,.app[data-view=done] #view-done,.app[data-view=browse] #view-browse,.app[data-view=decks] #view-decks,
-  .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings{display:flex}
+  .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings,.app[data-view=add] #view-add,.app[data-view=newdeck] #view-newdeck,
+  .app[data-view=manage] #view-manage,.app[data-view=welcome] #view-welcome{display:flex}
+  .app[data-view=welcome] .top,.app[data-view=welcome] .tabs,.app[data-view=welcome] .track{display:none}
 
   /* ---- study ---- */
   .card{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:2.6rem 1.25rem 2.4rem;
@@ -244,6 +246,30 @@
   input[type=number],input[type=text],input[type=search],select{background:var(--bg-2);color:var(--text);border:1px solid var(--line);
     border-radius:7px;padding:.5rem .6rem;font-family:inherit;font-size:16px;min-width:0;min-height:40px}
   input[type=number]{width:5.5rem;text-align:right;font-family:var(--mono)}
+  textarea{background:var(--bg-2);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:.55rem .6rem;font-family:inherit;font-size:16px;width:100%;min-height:5.2rem;resize:vertical;line-height:1.45}
+  .field{padding:.45rem 0}
+  .field > label{display:block;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:.3rem}
+  .field input[type=text],.field select,.field textarea{width:100%}
+  .field textarea.short{min-height:3.2rem}
+  .pick{display:flex;align-items:flex-start;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.9rem;line-height:1.4}
+  .pick:first-child{border-top:0}
+  .pick input{margin-top:.2rem;flex:none}
+  .pick small{display:block;color:var(--dim);font-size:.78rem}
+  .mastery{display:flex;align-items:center;gap:.6rem;margin:.1rem 0 .7rem;font-size:.82rem;color:var(--dim)}
+  .mastery .bar{flex:1;height:6px;border-radius:3px;background:rgba(11,15,20,.08);overflow:hidden}
+  .mastery .bar i{display:block;height:100%;background:var(--text)}
+  .mastery b{color:var(--text);font-variant-numeric:tabular-nums}
+  .st.done{background:var(--text);color:#FFFFFF;border-color:var(--text)}
+  .st.user{border-style:dashed}
+  .welcome{max-width:420px;margin:8vh auto 0;width:100%}
+  .welcome .brain{font-size:2.6rem;line-height:1;margin-bottom:.6rem}
+  .welcome h1{font-size:1.5rem;font-weight:700;margin-bottom:.4rem}
+  .welcome p{font-size:.92rem;color:var(--dim);line-height:1.55;margin-bottom:1rem}
+  .welcome .skip{margin-top:.8rem;text-align:center}
+  .welcome .skip button{background:none;border:0;color:var(--dim);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem;cursor:pointer}
+  .spin{display:inline-block;width:.8em;height:.8em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-.1em;margin-right:.4em}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .addbtn{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:var(--text);color:#FFFFFF;border:1px solid var(--text);border-radius:7px;padding:0 .7rem;min-height:40px;cursor:pointer}
   input[type=checkbox]{width:1.2rem;height:1.2rem;accent-color:var(--text)}
   .actions{display:flex;gap:.5rem;flex-wrap:wrap}
   .actions .btn{flex:1;text-align:center}
@@ -408,7 +434,10 @@
     <div class="decklist" id="deckList"></div>
     <button class="syncline" id="syncStatus"></button>
     <div class="menu">
-      <button class="btn" data-go="browse">Phrases <span>search, themes, progress</span></button>
+      <button class="btn" data-go="add">Add a card <span>drafted by Claude, or your own</span></button>
+      <button class="btn" data-go="newdeck">New deck <span>describe it, Claude drafts it</span></button>
+      <button class="btn" data-go="manage">Manage decks <span>choose from the master list</span></button>
+      <button class="btn" data-go="browse">Phrases <span>search, mastered, themes</span></button>
       <button class="btn" data-go="stats">Stats <span>deck and today</span></button>
       <button class="btn" data-go="settings">Settings <span>limits, direction, export</span></button>
     </div>
@@ -419,6 +448,7 @@
     <div class="filter">
       <input type="search" id="q" placeholder="Search phrases, meanings, parts…" autocomplete="off" autocapitalize="off">
       <button class="scope" id="scopeBtn" title="Search this deck or all decks">This deck</button>
+      <button class="addbtn" id="addBtn" title="Add a card (a)">+ Add</button>
     </div>
     <div id="browseHome"></div>
     <div id="browseResults">
@@ -426,6 +456,69 @@
       <div class="list" id="list"></div>
     </div>
     <div class="retired" id="retired"></div>
+  </section>
+
+  <section class="view" id="view-add">
+    <h2 class="ttl">Add a card</h2>
+    <div class="panel">
+      <div class="field"><label for="addDeck">Deck</label><select id="addDeck"></select></div>
+      <div class="field"><label for="addText">What should it teach?</label><textarea id="addText" class="short" placeholder="e.g. “How much does this cost?”, or paste a phrase in the language and get it explained"></textarea></div>
+      <p class="pnote" id="addNote">Claude drafts the card in this deck's format: phrase, meaning, how to remember it, and the parts. You check it before it is added.</p>
+      <div class="actions"><button class="btn primary" id="draftBtn">Draft with Claude</button><button class="btn" id="manualBtn">Write it myself</button></div>
+    </div>
+    <div class="panel" id="draftForm" style="display:none">
+      <div class="field"><label for="fTerm" id="fTermLabel">Phrase</label><input type="text" id="fTerm" autocapitalize="off"></div>
+      <div class="field" id="fTrRow"><label for="fTr">Transliteration</label><input type="text" id="fTr" autocapitalize="off"></div>
+      <div class="field"><label for="fEn" id="fEnLabel">Meaning</label><input type="text" id="fEn"></div>
+      <div class="field"><label for="fMemo">How to remember it</label><textarea id="fMemo" class="short"></textarea></div>
+      <div class="field"><label for="fParts">Parts, one per line: piece — meaning</label><textarea id="fParts"></textarea></div>
+      <div class="field"><label for="fEx">Example: sentence — meaning</label><input type="text" id="fEx" autocapitalize="off"></div>
+      <div class="field"><label for="fTags">Tags, comma separated</label><input type="text" id="fTags" autocapitalize="off"></div>
+      <div class="field"><label for="fNote">Usage note</label><input type="text" id="fNote"></div>
+      <div class="actions"><button class="btn primary" id="saveCardBtn">Add card</button><button class="btn" id="redraftBtn">Redraft</button><button class="btn ghost" id="cancelCardBtn">Cancel</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-newdeck">
+    <h2 class="ttl">New deck</h2>
+    <div class="panel">
+      <div class="field"><label for="ndText">Describe the deck</label><textarea id="ndText" class="short" placeholder="e.g. “Italian for a trip to Rome”, “Chemistry element symbols”, “Spanish past-tense verbs”"></textarea></div>
+      <p class="pnote" id="ndNote">Claude designs the deck: name, mascot, direction, and 12 to 20 starter cards with memos. You review it before it is created, and can add more cards later.</p>
+      <div class="actions"><button class="btn primary" id="ndDraftBtn">Draft deck with Claude</button></div>
+    </div>
+    <div class="panel" id="ndReview" style="display:none">
+      <div class="field"><label for="ndName">Deck name</label><input type="text" id="ndName" maxlength="40"></div>
+      <div class="row"><label>Mascot<small id="ndKind"></small></label><span style="display:flex;gap:.4rem"><input type="text" id="ndEmoji" maxlength="4" style="width:3.2rem;text-align:center" aria-label="Mascot emoji"><input type="text" id="ndPet" maxlength="16" style="width:7rem" aria-label="Mascot name"></span></div>
+      <div class="field"><label>Starter cards · untick any you don't want</label><div id="ndList"></div></div>
+      <div class="actions"><button class="btn primary" id="ndCreateBtn">Create deck</button><button class="btn" id="ndRedraftBtn">Redraft</button><button class="btn ghost" id="ndCancelBtn">Cancel</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-manage">
+    <h2 class="ttl">Manage decks</h2>
+    <div class="panel">
+      <p class="pnote">Sam keeps the master list of decks. Untick the ones you don't want on your home screen; their progress is kept. Decks you created can be deleted.</p>
+      <div id="manageList"></div>
+    </div>
+    <div class="actions"><button class="btn" data-go="newdeck">New deck</button><button class="btn ghost" data-go="decks">Done</button></div>
+  </section>
+
+  <section class="view" id="view-welcome">
+    <div class="welcome">
+      <div class="brain">🧠</div>
+      <h1>Flashcards</h1>
+      <p>Sign in with your email so your progress, your own cards and your decks follow you to every device. You get a code by email, no password.</p>
+      <div class="panel">
+        <div class="field"><label for="wEmail">Email</label><input type="email" id="wEmail" autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
+        <div class="actions"><button class="btn primary" id="wSend">Send code</button></div>
+        <div id="wStep" style="display:none">
+          <div class="field"><label for="wCode">Code from the email</label><input type="text" id="wCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"></div>
+          <div class="actions"><button class="btn primary" id="wVerify">Sign in</button></div>
+        </div>
+        <p class="pnote" id="wNote" style="margin:.6rem 0 0"></p>
+      </div>
+      <div class="skip"><button id="wSkip">Continue without signing in</button></div>
+    </div>
   </section>
 
   <section class="view" id="view-stats">
@@ -476,7 +569,7 @@
     </div>
     <h2 class="ttl">Keys</h2>
     <div class="panel" style="font-family:var(--mono);font-size:.74rem;color:var(--dim);line-height:1.9">
-      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase &nbsp; m — mute auto-play<br>u — undo &nbsp; h — home &nbsp; b s , — phrases stats settings &nbsp; / — search &nbsp; esc — back
+      space / enter — reveal, then Good<br>1 2 3 4 — Again Hard Good Easy<br>p — play the phrase &nbsp; m — mute auto-play<br>u — undo &nbsp; h — home &nbsp; a — add a card &nbsp; b s , — phrases stats settings &nbsp; / — search &nbsp; esc — back
     </div>
   </section>
 </div>
@@ -491,19 +584,23 @@
 (function () {
   'use strict';
   var S = window.AnkiSched;
-  var INDEX = window.DECK_INDEX || [];
+  var MASTER = window.DECK_INDEX || [];   // Sam's master list of decks (anki/decks/index.js)
+  var INDEX = MASTER.slice();             // what this person sees: master decks they keep, plus their own
   var KEY = 'sam_anki_v1';
   var UNDO_MAX = 20;
   var DEF_SETTINGS = { newPerDay: 20, revPerDay: 200, trFirst: true, dirs: 'both', learnAhead: 20, autoSay: true };
   var $ = function (id) { return document.getElementById(id); };
   var app = $('app');
 
-  if (!S || !INDEX.length) { $('fMain').textContent = 'Could not load the decks.'; return; }
+  if (!S || !MASTER.length) { $('fMain').textContent = 'Could not load the decks.'; return; }
 
   /* ---------- storage (v2: progress per deck) ---------- */
   function freshBucket() { return { cards: {}, day: { day: 0, newDone: 0, revDone: 0, extraNew: 0 }, undo: [], stamp: null, boost: [] }; }
-  function freshSync() { return { token: '', uid: '', email: '', name: '', lastEmail: '', lastSync: 0, lastError: '', dirty: false }; }
-  function fresh() { return { v: 2, deck: INDEX[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {}, sync: freshSync(), updated: null }; }
+  function freshSync() { return { token: '', uid: '', email: '', name: '', lastEmail: '', lastSync: 0, lastError: '', dirty: false, skipAt: 0 }; }
+  // The library is what this person changed: their own decks, cards they added, cards they hid, master decks they keep off the shelf.
+  function freshLib() { return { decks: {}, notes: {}, hidden: {}, shelf: {} }; }
+  function libNorm(l) { var o = freshLib(); if (l && typeof l === 'object') Object.keys(o).forEach(function (k) { if (l[k] && typeof l[k] === 'object' && !Array.isArray(l[k])) o[k] = l[k]; }); return o; }
+  function fresh() { return { v: 2, deck: MASTER[0].id, settings: Object.assign({}, DEF_SETTINGS), decks: {}, sync: freshSync(), library: freshLib(), updated: null }; }
   function normalise(o) {
     if (!o || typeof o !== 'object') return null;
     if (o.v === 1 && typeof o.cards === 'object') {
@@ -513,8 +610,9 @@
     if (o.v !== 2 || typeof o.decks !== 'object') return null;
     var s = fresh();
     s.settings = Object.assign(s.settings, o.settings || {});
-    s.deck = (o.deck && INDEX.some(function (d) { return d.id === o.deck; })) ? o.deck : INDEX[0].id;
+    s.deck = typeof o.deck === 'string' && o.deck ? o.deck : MASTER[0].id;   // checked against the loaded decks at boot
     s.sync = Object.assign(freshSync(), o.sync || {});
+    s.library = libNorm(o.library);
     s.updated = o.updated || null;
     if (o.streak) s.streak = o.streak;
     Object.keys(o.decks || {}).forEach(function (id) {
@@ -557,7 +655,7 @@
     d.data.notes.forEach(function (n, i) {
       // "Study next" (per device) comes first, then notes flagged priority in the deck file, then file order.
       var boosted = bucket.boost && bucket.boost.indexOf(n.id) >= 0;
-      var base = (boosted ? -1000000 : 0) + (n.priority ? 0 : 1000000) + i * 2;
+      var base = (boosted ? -4000000 : 0) + (n.priority ? 0 : 1000000) + i * 2;
       if (dirs !== 'rev') out.push({ id: n.id + ':fwd', noteId: n.id, dir: 'fwd', order: base, note: n, state: bucket.cards[n.id + ':fwd'] || null });
       if (dirs !== 'fwd') out.push({ id: n.id + ':rev', noteId: n.id, dir: 'rev', order: base + 1, note: n, state: bucket.cards[n.id + ':rev'] || null });
     });
@@ -565,26 +663,85 @@
   }
   function activeCards() { return cardsOf(store.deck, true); }
   function retiredCount() {
-    var n = 0, byId = deck().notesById;
-    Object.keys(P().cards).forEach(function (id) { if (!byId[id.split(':')[0]]) n++; });
+    var n = 0, byId = deck().notesById, hidden = (store.library.hidden[store.deck] || {});
+    Object.keys(P().cards).forEach(function (id) { var nid = id.split(':')[0]; if (!byId[nid] && !(hidden[nid] && hidden[nid].on)) n++; });
     return n;
   }
   function loadDeckFiles(done) {
-    var left = INDEX.length;
-    INDEX.forEach(function (meta) {
+    var left = MASTER.length;
+    MASTER.forEach(function (meta) {
       var s = document.createElement('script');
       s.src = '/anki/decks/' + meta.file;
       s.onload = s.onerror = function () {
         var data = window.DECKS && window.DECKS[meta.id];
         if (data && Array.isArray(data.notes)) {
           var byId = {}; data.notes.forEach(function (n) { byId[n.id] = n; });
-          decks[meta.id] = { meta: meta, data: data, notesById: byId };
+          decks[meta.id] = { meta: meta, data: data, notesById: byId, base: data.notes.slice() };
         }
         if (--left === 0) done();
       };
       document.head.appendChild(s);
     });
   }
+
+  // Apply the library: build custom decks, drop hidden notes, append added notes, then rebuild INDEX.
+  function applyLibrary() {
+    var lib = store.library = libNorm(store.library);
+    Object.keys(lib.decks).forEach(function (id) {
+      var e = lib.decks[id];
+      if (!e || e.deleted || !e.meta) { if (decks[id] && decks[id].custom) delete decks[id]; return; }
+      var meta = Object.assign({ file: '' }, e.meta, { id: id, custom: true });
+      if (!meta.creature) meta.creature = { emoji: '🐣', name: 'Pip', kind: 'emoji' };
+      if (!decks[id] || !decks[id].custom) decks[id] = { custom: true, base: [], data: { version: 1, updated: '', notes: [] }, notesById: {} };
+      decks[id].meta = meta; decks[id].data.updated = new Date(e.t || 0).toISOString().slice(0, 10);
+    });
+    Object.keys(decks).forEach(function (id) {
+      var d = decks[id], hidden = lib.hidden[id] || {}, added = lib.notes[id] || {};
+      var hid = function (nid) { return !!(hidden[nid] && hidden[nid].on); };
+      var notes = d.base.filter(function (n) { return !hid(n.id); }), gone = d.base.filter(function (n) { return hid(n.id); });
+      Object.keys(added).sort(function (a, b) { return (added[a].t || 0) - (added[b].t || 0); }).forEach(function (nid) {
+        var e = added[nid]; if (!e || !e.note) return;
+        var n = Object.assign({}, e.note, { id: nid, user: true, tags: Array.isArray(e.note.tags) && e.note.tags.length ? e.note.tags : ['added'] });
+        (hid(nid) ? gone : notes).push(n);
+      });
+      d.data.notes = notes; d.hiddenNotes = gone;
+      var byId = {}; notes.forEach(function (n) { byId[n.id] = n; }); d.notesById = byId;
+    });
+    rebuildIndex();
+  }
+  function rebuildIndex() {
+    var lib = store.library;
+    INDEX = MASTER.filter(function (m) { var e = lib.shelf[m.id]; return !(e && e.on === false); })
+      .concat(Object.keys(lib.decks).filter(function (id) { return decks[id] && decks[id].custom; }).map(function (id) { return decks[id].meta; }));
+    if (!deckOf(store.deck) || !INDEX.some(function (m) { return m.id === store.deck; })) {
+      var f = INDEX.filter(function (m) { return deckOf(m.id); })[0]; if (f) store.deck = f.id;
+    }
+  }
+  function libTouch() { save(); applyLibrary(); markDirty(); }
+  function newId(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function addNote(deckId, note) {
+    var lib = store.library, id = newId('u');
+    lib.notes[deckId] = lib.notes[deckId] || {}; lib.notes[deckId][id] = { t: Date.now(), note: note };
+    libTouch(); return id;
+  }
+  function hideNote(deckId, noteId, on) {
+    var lib = store.library; lib.hidden[deckId] = lib.hidden[deckId] || {}; lib.hidden[deckId][noteId] = { t: Date.now(), on: !!on };
+    if (on) { var b = P(deckId); b.boost = b.boost.filter(function (x) { return x !== noteId; }); }
+    libTouch();
+  }
+  function createDeck(meta, notes) {
+    var lib = store.library, id = 'u-' + String(meta.name || 'deck').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) + '-' + Math.random().toString(36).slice(2, 6);
+    lib.decks[id] = { t: Date.now(), meta: meta };
+    lib.notes[id] = {};
+    notes.forEach(function (n, i) { lib.notes[id][newId('u')] = { t: Date.now() + i, note: n }; });
+    libTouch(); return id;
+  }
+  function deleteDeck(id) {
+    var e = store.library.decks[id]; if (!e) return;
+    store.library.decks[id] = { t: Date.now(), meta: e.meta, deleted: true };
+    libTouch();
+  }
+  function setShelf(id, on) { store.library.shelf[id] = { t: Date.now(), on: !!on }; libTouch(); }
 
   /* ---------- session state ---------- */
   var view = 'study', current = null, revealed = false, lastNoteId = null, queueInfo = null, cardsIdx = {};
@@ -661,7 +818,7 @@
   function docOut() {
     var decks = {};
     Object.keys(store.decks).forEach(function (id) { var b = store.decks[id]; decks[id] = { cards: b.cards, day: b.day, stamp: b.stamp, boost: b.boost, undo: [] }; });
-    return { v: 2, updated: new Date().toISOString(), settings: store.settings, decks: decks, deck: store.deck, streak: store.streak || null };
+    return { v: 2, updated: new Date().toISOString(), settings: store.settings, decks: decks, deck: store.deck, streak: store.streak || null, library: store.library || null };
   }
   function adopt(doc) {
     var merged = M.mergeState(store, doc);   // keeps this device's undo, takes the later card states
@@ -672,6 +829,8 @@
     });
     if (merged.settings) store.settings = Object.assign({}, DEF_SETTINGS, merged.settings);
     if (merged.streak) store.streak = merged.streak;
+    if (merged.library) store.library = libNorm(merged.library);
+    applyLibrary();
     store.updated = doc.updated || store.updated;
     combo = 0;
   }
@@ -732,29 +891,36 @@
   function signedOutByServer() {
     store.sync = Object.assign(freshSync(), { lastError: 'signed out', lastEmail: store.sync.email }); save(); setSync('idle'); toast('Signed out. Sign in again in Settings.');
   }
-  function requestCode() {
-    var email = $('sEmail').value.trim();
+  var SF = { email: 'sEmail', code: 'sCode', note: 'syncNote', step: 'codeStep' };     // the Settings panel
+  var WF = { email: 'wEmail', code: 'wCode', note: 'wNote', step: 'wStep' };          // the welcome screen
+  function requestCode(f) {
+    f = f || SF;
+    var email = $(f.email).value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { toast('Enter a valid email'); return; }
-    $('syncNote').textContent = 'Sending…';
+    $(f.note).textContent = 'Sending…';
     api('request', {}, { email: email }).then(function (j) {
-      $('syncNote').textContent = j.message || 'Code sent. Check your email.';
-      $('codeStep').style.display = ''; $('sCode').focus();
-    }).catch(function (e) { $('syncNote').textContent = e.message; });
+      $(f.note).textContent = j.message || 'Code sent. Check your email.';
+      $(f.step).style.display = ''; $(f.code).focus();
+    }).catch(function (e) { $(f.note).textContent = e.message; });
   }
-  function verifyCode() {
-    var email = $('sEmail').value.trim(), code = $('sCode').value.replace(/\D/g, '');
+  function verifyCode(f) {
+    f = f || SF;
+    var email = $(f.email).value.trim(), code = $(f.code).value.replace(/\D/g, '');
     if (code.length !== 6) { toast('Enter the 6-digit code'); return; }
-    $('syncNote').textContent = 'Checking…';
+    $(f.note).textContent = 'Checking…';
     api('verify', {}, { email: email, code: code }).then(function (j) {
       // Offer to merge only when this device's progress is not another person's.
       var sameOwner = !store.sync.lastEmail || store.sync.lastEmail === j.user.email;
       var mergeLocal = hasLocalProgress() && sameOwner ? confirm('Merge this device\'s progress into your account?\n\nOK merges it in. Cancel replaces it with what the account already has.') : false;
       if (!mergeLocal) { store.decks = {}; store.streak = null; }
       store.sync = Object.assign(freshSync(), { token: j.token, uid: j.user.uid, email: j.user.email, name: j.user.name, dirty: mergeLocal });
-      save(); $('sCode').value = ''; fillSettings();
+      save(); $(f.code).value = ''; fillSettings();
+      if (f === WF) view = 'decks';
       return pullState().then(function () { toast('Signed in as ' + j.user.name); fillSettings(); });
-    }).catch(function (e) { $('syncNote').textContent = e.message; });
+    }).catch(function (e) { $(f.note).textContent = e.message; });
   }
+  // First visit on a device: ask for a sign-in once. Skipping holds for a week.
+  function needWelcome() { return !hasProfile() && !store.sync.lastEmail && !(store.sync.skipAt && Date.now() - store.sync.skipAt < 7 * 86400000); }
   function signOut() {
     if (!confirm('Sign out on this device? Progress stays here and on the account.')) return;
     var tok = store.sync.token, who = store.sync.email;
@@ -781,7 +947,9 @@
     if (!vs.length) return null;
     var chosen = (store.settings.voices || {})[lang];
     var pick = chosen ? vs.filter(function (v) { return v.voiceURI === chosen || v.name === chosen; })[0] : null;
-    return pick || vs.filter(function (v) { return /melina|google|neural|premium|enhanced|natural|siri|kyoko|o-ren|hattori/i.test(v.name); })[0] || vs[0];
+    // Rank by quality: enhanced/premium/neural voices first, then online (Google) voices, then the compact system defaults.
+    var score = function (v) { var n = v.name || '', sc = 0; if (/premium|enhanced|neural|natural|siri|wavenet|studio/i.test(n)) sc += 4; if (/google|microsoft/i.test(n)) sc += 2; if (/melina|kyoko|o-ren|hattori|dariush/i.test(n)) sc += 1; if (/compact|eloquence|novelty|whisper|zarvox|trinoids|cellos|bells|bubbles|organ|bad news|good news|jester|boing|bahh|fred|junior|kathy|ralph|albert|wobble/i.test(n)) sc -= 3; return sc; };
+    return pick || vs.slice().sort(function (a, b) { return score(b) - score(a); })[0];
   }
   function pickVoice() { voice = deck() ? voiceFor(deck().meta.lang) : null; }
   if (synth) { if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', pickVoice); else synth.onvoiceschanged = pickVoice; }
@@ -910,6 +1078,9 @@
     else if (view === 'browse') renderBrowse();
     else if (view === 'stats') renderStats();
     else if (view === 'decks') renderDecks();
+    else if (view === 'add') renderAdd();
+    else if (view === 'newdeck') renderNewDeck();
+    else if (view === 'manage') renderManage();
     app.dataset.view = view === 'study' ? (current ? 'study' : 'done') : view;
     document.title = (deck() ? deck().meta.name + ' · ' : '') + 'Flashcards';
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.go === view); });
@@ -1017,16 +1188,19 @@
     var rc = retiredCount();
     $('retired').textContent = deck().data.notes.length + ' ' + unit(deck().meta) + ' in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
   }
+  // Mastered = every direction being studied has an interval of 21 days or more (Anki's "mature").
+  function mastered(deckId, n) { var sts = noteStates(deckId, n); return sts.length > 0 && sts.every(function (st) { return st === 'mature'; }); }
   function deckOverview(d, now) {
     var notes = d.data.notes, id = d.meta.id;
-    var counts = { all: notes.length, new: 0, learn: 0, due: 0, mature: 0, leech: 0 };
+    var counts = { all: notes.length, new: 0, learn: 0, due: 0, mastered: 0, leech: 0, added: 0, hidden: (d.hiddenNotes || []).length };
     var tags = {};
     notes.forEach(function (n) {
       var sts = noteStates(id, n);
       if (sts.indexOf('new') >= 0) counts.new++;
       if (sts.indexOf('learn') >= 0) counts.learn++;
-      if (sts.indexOf('mature') >= 0) counts.mature++;
+      if (mastered(id, n)) counts.mastered++;
       if (sts.indexOf('leech') >= 0) counts.leech++;
+      if (n.user) counts.added++;
       if (noteDue(id, n, now)) counts.due++;
       n.tags.forEach(function (t) {
         var g = tags[t] || (tags[t] = { n: 0, mature: 0, review: 0, learn: 0, cards: 0 });
@@ -1042,38 +1216,46 @@
       var o = deckOverview(d, now), id = d.meta.id, c = o.counts;
       var learned = 0, cards = 0;
       Object.keys(o.tags).forEach(function (t) { learned += o.tags[t].mature + o.tags[t].review; cards += o.tags[t].cards; });
-      var chips = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['due', 'Due now'], ['mature', 'Mature'], ['leech', 'Leeches']].map(function (x) {
-        return '<button class="chip" data-deck="' + esc(id) + '" data-state="' + x[0] + '">' + x[1] + ' ' + c[x[0]] + '</button>';
+      var chips = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['due', 'Due now'], ['mastered', 'Mastered'], ['leech', 'Leeches'], ['added', 'Added'], ['hidden', 'Hidden']].filter(function (x) {
+        return (x[0] !== 'added' && x[0] !== 'hidden') || c[x[0]] > 0;
+      }).map(function (x) {
+        return '<button class="chip' + (x[0] === 'mastered' ? ' mastered' : '') + '" data-deck="' + esc(id) + '" data-state="' + x[0] + '">' + x[1] + ' ' + c[x[0]] + '</button>';
       }).join('');
+      var mpc = c.all ? Math.round(c.mastered / c.all * 100) : 0;
+      var mastery = '<div class="mastery"><span>✓ <b>' + c.mastered + '</b> of ' + c.all + ' mastered</span><div class="bar"><i style="width:' + mpc + '%"></i></div><b>' + mpc + '%</b></div>';
       var themes = Object.keys(o.tags).map(function (t) {
         var g = o.tags[t], pc = function (x) { return g.cards ? Math.round(x / g.cards * 100) : 0; };
         return '<button class="theme" data-deck="' + esc(id) + '" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' ' + unit(d.meta) + ' · ' + pc(g.mature + g.review) + '% learned</span></div>' +
           '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
       }).join('');
       return '<details class="dsec" data-deck="' + esc(id) + '"' + (id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' ' + unit(d.meta) + ' · ' + c.due + ' due</span></summary>' +
-        '<div class="body"><div class="chips statechips">' + chips + '</div><div class="themes">' + themes + '</div></div></details>';
+        '<div class="body">' + mastery + '<div class="chips statechips">' + chips + '</div><div class="themes">' + themes + '</div></div></details>';
     }).join('') + '<div class="legend">bar: mature · review · learning · (empty = new)</div>';
   }
   function renderBrowseList(now, q) {
     var listDeck = (!q && browseDeck && deckOf(browseDeck)) || deck();
     var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [q ? deck() : listDeck];
-    var what = browseTag ? browseTag : ({ all: 'All ' + unit(listDeck.meta), new: 'New', learn: 'Learning', due: 'Due now', mature: 'Mature', leech: 'Leeches' })[browseState];
+    var what = browseTag ? browseTag : ({ all: 'All ' + unit(listDeck.meta), new: 'New', learn: 'Learning', due: 'Due now', mastered: 'Mastered', leech: 'Leeches', added: 'Added by you', hidden: 'Hidden' })[browseState];
     var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : (listDeck.meta.id === store.deck ? what : listDeck.meta.name + ' › ' + what);
     $('crumb').innerHTML = '<button id="crumbBack">‹ Decks</button><span></span>';
     var html = '', total = 0;
     decksToSearch.forEach(function (d) {
-      var rows = '';
-      d.data.notes.forEach(function (n) {
+      var rows = '', hiddenList = !q && browseState === 'hidden';
+      var src = hiddenList ? (d.hiddenNotes || []) : d.data.notes;
+      if (!q && (browseState === 'added' || hiddenList)) src = src.slice().reverse();   // newest first
+      src.forEach(function (n) {
         var hit = null;
         if (q) { hit = matchNote(n, q); if (!hit) return; }
         else if (browseTag) { if (n.tags.indexOf(browseTag) < 0) return; }
-        else if (browseState && browseState !== 'all') {
+        else if (browseState && browseState !== 'all' && browseState !== 'hidden') {
           var sts = noteStates(d.meta.id, n);
           if (browseState === 'due') { if (!noteDue(d.meta.id, n, now)) return; }
+          else if (browseState === 'mastered') { if (!mastered(d.meta.id, n)) return; }
+          else if (browseState === 'added') { if (!n.user) return; }
           else if (sts.indexOf(browseState) < 0) return;
         }
         total++;
-        rows += noteRow(d, n, hit);
+        rows += noteRow(d, n, hit, hiddenList);
       });
       if (rows) html += (decksToSearch.length > 1 ? '<div class="grp">' + esc(d.meta.name) + '</div>' : '') + rows;
     });
@@ -1085,8 +1267,9 @@
     if (st.type === 'review') return { cls: st.leech ? 'leech' : 'review', txt: S.fmtDays(st.ivl) + (st.leech ? ' leech' : '') };
     return { cls: st.type, txt: st.type === 'relearn' ? 'relearn' : 'learn' };
   }
-  function noteRow(d, n, hit) {
+  function noteRow(d, n, hit, hiddenRow) {
     var cards = P(d.meta.id).cards, code = d.meta.code, tl = d.meta.translit, dirs = store.settings.dirs;
+    var done = !hiddenRow && mastered(d.meta.id, n);
     var f = stLabel(cards[n.id + ':fwd']), r = stLabel(cards[n.id + ':rev']);
     var boosted = P(d.meta.id).boost.indexOf(n.id) >= 0;
     var head = tl && n.tr ? '<span class="tr">' + esc(n.tr) + '</span><span class="el" dir="auto">' + esc(n.term) + '</span>' : '<span class="tr el" dir="auto">' + esc(n.term) + '</span>';
@@ -1094,7 +1277,7 @@
     var exLine = n.ex ? [n.ex.tr, n.ex.term, n.ex.en].filter(Boolean).map(esc).join(' · ') : '';
     return '<div class="note" data-deck="' + esc(d.meta.id) + '" data-id="' + esc(n.id) + '">' +
       '<div class="l1"><div>' + head + '</div>' +
-      '<div class="state">' + (boosted ? '<span class="st boost">next</span>' : '') +
+      '<div class="state">' + (done ? '<span class="st done">✓ mastered</span>' : '') + (n.user ? '<span class="st user">yours</span>' : '') + (boosted ? '<span class="st boost">next</span>' : '') +
       '<span class="st ' + f.cls + (dirs === 'rev' ? ' off' : '') + '">' + esc(chipLabels(d.meta)[0]) + ' ' + esc(f.txt) + '</span>' +
       (d.meta.dirs === 'fwd' ? '' : '<span class="st ' + r.cls + (dirs === 'fwd' ? ' off' : '') + '">' + esc(chipLabels(d.meta)[1]) + ' ' + esc(r.txt) + '</span>') + '</div></div>' +
       '<div class="en">' + esc(n.en) + '</div>' + snip +
@@ -1103,7 +1286,8 @@
       (n.parts ? '<div class="parts" style="margin-top:.4rem;display:block">' + partsHtml(n) + '</div>' : '') +
       (exLine ? '<div style="margin-top:.4rem">' + exLine + '</div>' : '') +
       '<div style="margin-top:.3rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">' + esc(n.tags.join(' · ')) + '</div>' +
-      '<div class="acts"><button class="btn" data-act="say">Play</button><button class="btn' + (boosted ? ' on' : '') + '" data-act="boost">' + (boosted ? 'Next ✓' : 'Study next') + '</button><button class="btn" data-act="reset">Reset</button></div>' +
+      (hiddenRow ? '<div class="acts"><button class="btn" data-act="restore">Restore</button></div>' :
+      '<div class="acts"><button class="btn" data-act="say">Play</button><button class="btn' + (boosted ? ' on' : '') + '" data-act="boost">' + (boosted ? 'Next ✓' : 'Study next') + '</button><button class="btn" data-act="reset">Reset</button><button class="btn danger" data-act="delete">' + (n.user ? 'Delete' : 'Hide') + '</button></div>') +
       '</div></div>';
   }
   function tile(cls, v, label) { return '<div class="tile ' + cls + '"><b>' + v + '</b><span>' + label + '</span></div>'; }
@@ -1191,6 +1375,158 @@
     if (v === 'browse' || v === 'decks') window.scrollTo(0, 0);
   }
 
+  /* ---------- add a card (Claude drafts it, the person checks it) ---------- */
+  var draftDeckId = '', drafting = false;
+  function renderAdd() {
+    var sel = $('addDeck');
+    sel.innerHTML = INDEX.filter(function (m) { return deckOf(m.id); }).map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>'; }).join('');
+    sel.value = draftDeckId && deckOf(draftDeckId) ? draftDeckId : store.deck;
+    draftDeckId = sel.value;
+    fitForm();
+    $('draftBtn').disabled = drafting;
+    if (!hasProfile()) $('addNote').textContent = 'Sign in (Settings) and Claude drafts the card for you. Without an account you can still write cards yourself; they stay on this device.';
+  }
+  function fitForm() {
+    var m = deckOf($('addDeck').value).meta, fact = !!m.labels;
+    $('fTrRow').style.display = m.translit ? '' : 'none';
+    $('fTermLabel').textContent = fact ? m.labels.front : m.langName + ' phrase';
+    $('fEnLabel').textContent = fact ? m.labels.back : 'English meaning';
+    $('fEx').closest('.field').style.display = fact ? 'none' : '';
+  }
+  function draftMeta(m) { return { name: m.name, langName: m.langName, lang: m.lang, translit: !!m.translit, labels: m.labels || null }; }
+  function startDraft() {
+    var text = $('addText').value.trim(), d = deckOf($('addDeck').value);
+    if (!text) { toast('Say what the card should teach'); $('addText').focus(); return; }
+    if (!hasProfile()) { $('addNote').textContent = 'Sign in (Settings) to draft with Claude, or write the card yourself.'; return; }
+    drafting = true; $('draftBtn').disabled = true; $('addNote').innerHTML = '<span class="spin"></span>Drafting…';
+    var tags = {}; d.data.notes.forEach(function (n) { (n.tags || []).forEach(function (t) { tags[t] = 1; }); });
+    var examples = d.data.notes.filter(function (n) { return n.memo && n.parts && !n.user; }).slice(0, 3).map(function (n) { var c = Object.assign({}, n); delete c.id; delete c.priority; return c; });
+    api('draft', {}, { deck: draftMeta(d.meta), text: text, examples: examples, tags: Object.keys(tags).slice(0, 40) }).then(function (j) {
+      fillForm(j.note);
+      $('addNote').textContent = 'Check the draft, change anything, then add it.' + (j.left < 10 ? ' ' + j.left + ' drafts left today.' : '');
+    }).catch(function (e) { $('addNote').textContent = e.message; if (e.status === 401) signedOutByServer(); })
+      .then(function () { drafting = false; $('draftBtn').disabled = false; });
+  }
+  function joinBits(arr) { return arr.filter(function (x) { return x; }).join(' — '); }
+  function splitBits(line) { return line.split(/\s+[—–|]\s+|\s+-\s+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  function fillForm(n) {
+    n = n || {};
+    $('fTerm').value = n.term || ''; $('fTr').value = n.tr || ''; $('fEn').value = n.en || ''; $('fMemo').value = n.memo || '';
+    $('fParts').value = (n.parts || []).map(function (p) { return joinBits([p.t, p.tr, p.m]); }).join('\n');
+    $('fEx').value = n.ex ? joinBits([n.ex.term, n.ex.tr, n.ex.en]) : '';
+    $('fTags').value = (n.tags || []).join(', '); $('fNote').value = n.note || '';
+    $('draftForm').style.display = ''; fitForm();
+    $('draftForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function readForm() {
+    var m = deckOf($('addDeck').value).meta, tl = !!m.translit;
+    var v = function (id) { return $(id).value.trim(); };
+    var term = v('fTerm'), en = v('fEn'); if (!term || !en) return null;
+    var n = { term: term, en: en };
+    if (tl && v('fTr')) n.tr = v('fTr');
+    if (v('fMemo')) n.memo = v('fMemo');
+    if (v('fNote')) n.note = v('fNote');
+    var parts = v('fParts').split('\n').map(splitBits).filter(function (b) { return b.length >= 2; }).map(function (b) {
+      return b.length >= 3 ? { t: b[0], tr: b[1], m: b.slice(2).join(' — ') } : { t: b[0], m: b[1] };
+    });
+    if (parts.length) n.parts = parts;
+    var ex = splitBits(v('fEx'));
+    if (ex.length >= 2) n.ex = ex.length >= 3 ? { term: ex[0], tr: ex[1], en: ex.slice(2).join(' — ') } : { term: ex[0], en: ex[1] };
+    var tags = v('fTags').split(',').map(function (t) { return t.trim().toLowerCase().replace(/[^a-z0-9\u00c0-\uffff]+/g, '-').replace(/^-|-$/g, ''); }).filter(Boolean).slice(0, 4);
+    n.tags = tags.length ? tags : ['added'];
+    return n;
+  }
+  function saveCard() {
+    var n = readForm(); if (!n) { toast('Needs a phrase and a meaning'); return; }
+    var deckId = $('addDeck').value, id = addNote(deckId, n);
+    P(deckId).boost.push(id); save(); markDirty();
+    $('addText').value = ''; $('draftForm').style.display = 'none'; current = null;
+    browseDeck = deckId; browseState = 'added'; browseTag = ''; browseQ = ''; $('q').value = '';
+    setView('browse'); toast('Added to ' + deckOf(deckId).meta.name + ' · comes up next');
+  }
+  $('addDeck').addEventListener('change', function () { draftDeckId = this.value; fitForm(); });
+  $('draftBtn').addEventListener('click', startDraft);
+  $('redraftBtn').addEventListener('click', startDraft);
+  $('manualBtn').addEventListener('click', function () { fillForm({ term: $('addText').value.trim() }); $('fTerm').focus(); });
+  $('saveCardBtn').addEventListener('click', saveCard);
+  $('cancelCardBtn').addEventListener('click', function () { $('draftForm').style.display = 'none'; setView('browse'); });
+  $('addBtn').addEventListener('click', function () { setView('add'); });
+
+  /* ---------- a new deck from a description ---------- */
+  var ndDraft = null, ndBusy = false;
+  var ND_NOTE = 'Claude designs the deck: name, mascot, direction, and 12 to 20 starter cards with memos. You review it before it is created, and can add more cards later.';
+  function renderNewDeck() {
+    $('ndDraftBtn').disabled = ndBusy;
+    if (!hasProfile()) $('ndNote').textContent = 'Sign in (Settings) to draft a deck with Claude.';
+  }
+  function startDeckDraft() {
+    var text = $('ndText').value.trim();
+    if (!text) { toast('Describe the deck first'); $('ndText').focus(); return; }
+    if (!hasProfile()) { $('ndNote').textContent = 'Sign in (Settings) to draft a deck with Claude.'; return; }
+    ndBusy = true; $('ndDraftBtn').disabled = true; $('ndNote').innerHTML = '<span class="spin"></span>Designing the deck and writing the starter cards… about a minute.';
+    api('draftDeck', {}, { text: text }).then(function (j) {
+      ndDraft = j; showDeckDraft(); $('ndNote').textContent = 'Review it, then create it.' + (j.left < 10 ? ' ' + j.left + ' drafts left today.' : '');
+    }).catch(function (e) { $('ndNote').textContent = e.message; if (e.status === 401) signedOutByServer(); })
+      .then(function () { ndBusy = false; $('ndDraftBtn').disabled = false; });
+  }
+  function showDeckDraft() {
+    var m = ndDraft.meta;
+    $('ndName').value = m.name; $('ndEmoji').value = m.creature.emoji; $('ndPet').value = m.creature.name;
+    $('ndKind').textContent = (m.labels ? 'Fact deck · ' + m.labels.fwd : m.langName + ' phrases' + (m.translit ? ' with transliteration' : '')) + (m.dirs === 'fwd' ? ' · one direction' : ' · both directions');
+    $('ndList').innerHTML = ndDraft.notes.map(function (n, i) {
+      return '<label class="pick"><input type="checkbox" checked data-i="' + i + '"><span>' + esc(n.tr || n.term) + (n.tr ? ' <span style="color:var(--dim)">' + esc(n.term) + '</span>' : '') + '<small>' + esc(n.en) + '</small></span></label>';
+    }).join('');
+    $('ndReview').style.display = '';
+    $('ndReview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function createFromDraft() {
+    if (!ndDraft) return;
+    var m = Object.assign({}, ndDraft.meta);
+    m.name = $('ndName').value.trim() || m.name;
+    m.creature = { emoji: $('ndEmoji').value.trim() || '🐣', name: $('ndPet').value.trim() || 'Pip', kind: 'emoji' };
+    var keep = []; $('ndList').querySelectorAll('input[data-i]').forEach(function (c) { if (c.checked) keep.push(ndDraft.notes[+c.dataset.i]); });
+    if (!keep.length) { toast('Keep at least one card'); return; }
+    var id = createDeck(m, keep);
+    ndDraft = null; $('ndReview').style.display = 'none'; $('ndText').value = ''; $('ndNote').textContent = ND_NOTE;
+    switchDeck(id); toast(m.name + ' created · ' + keep.length + ' cards');
+  }
+  $('ndDraftBtn').addEventListener('click', startDeckDraft);
+  $('ndRedraftBtn').addEventListener('click', startDeckDraft);
+  $('ndCreateBtn').addEventListener('click', createFromDraft);
+  $('ndCancelBtn').addEventListener('click', function () { ndDraft = null; $('ndReview').style.display = 'none'; setView('decks'); });
+
+  /* ---------- manage decks: the master list, personalised ---------- */
+  function renderManage() {
+    var lib = store.library, html = '';
+    MASTER.forEach(function (m) {
+      var off = lib.shelf[m.id] && lib.shelf[m.id].on === false, d = deckOf(m.id);
+      html += '<label class="pick"><input type="checkbox" data-shelf="' + esc(m.id) + '"' + (off ? '' : ' checked') + '><span>' + esc(m.name) + '<small>' + esc(m.langName) + (d ? ' · ' + d.data.notes.length + ' ' + unit(m) : '') + '</small></span></label>';
+    });
+    Object.keys(lib.decks).forEach(function (id) {
+      var e = lib.decks[id], d = deckOf(id); if (!e || e.deleted || !d) return;
+      html += '<div class="pick"><span style="flex:1">' + esc(d.meta.creature.emoji) + ' ' + esc(d.meta.name) + '<small>Your deck · ' + d.data.notes.length + ' ' + unit(d.meta) + '</small></span><button class="btn danger" data-del="' + esc(id) + '">Delete</button></div>';
+    });
+    $('manageList').innerHTML = html;
+  }
+  $('manageList').addEventListener('change', function (e) {
+    var c = e.target.closest('input[data-shelf]'); if (!c) return;
+    if (!c.checked && INDEX.length <= 1) { c.checked = true; toast('Keep at least one deck'); return; }
+    setShelf(c.dataset.shelf, c.checked); current = null; renderManage();
+  });
+  $('manageList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-del]'); if (!b) return;
+    var d = deckOf(b.dataset.del); if (!d) return;
+    if (!confirm('Delete ' + d.meta.name + ' and its ' + d.data.notes.length + ' cards? This cannot be undone.')) return;
+    deleteDeck(b.dataset.del); current = null; renderManage(); toast('Deck deleted');
+  });
+
+  /* ---------- welcome: a sign-in prompt on the first visit ---------- */
+  $('wSend').addEventListener('click', function () { requestCode(WF); });
+  $('wEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') requestCode(WF); });
+  $('wVerify').addEventListener('click', function () { verifyCode(WF); });
+  $('wCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(WF); });
+  $('wSkip').addEventListener('click', function () { store.sync.skipAt = Date.now(); save(); setView('study'); });
+
   var toastT;
   function toast(msg) {
     var t = $('toast'); t.textContent = msg; t.classList.add('on');
@@ -1216,9 +1552,9 @@
   document.querySelectorAll('.tab').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.go); }); });
   $('homeBtn').addEventListener('click', function () { setView(view === 'decks' ? 'study' : 'decks'); });
   $('syncStatus').addEventListener('click', function () { setView('settings'); });
-  $('codeBtn').addEventListener('click', requestCode);
+  $('codeBtn').addEventListener('click', function () { requestCode(SF); });
   $('sEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') requestCode(); });
-  $('verifyBtn').addEventListener('click', verifyCode);
+  $('verifyBtn').addEventListener('click', function () { verifyCode(SF); });
   $('sCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') verifyCode(); });
   $('syncOutBtn').addEventListener('click', signOut);
   function toggleMute() {
@@ -1237,7 +1573,7 @@
   $('sName').addEventListener('change', renameAccount);
   document.addEventListener('visibilitychange', function () { if (document.hidden && store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   window.addEventListener('pagehide', function () { if (store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
-  document.querySelectorAll('.menu [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
+  document.querySelectorAll('.menu [data-go], .actions [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
   $('deckList').addEventListener('click', function (e) {
     var b = e.target.closest('.deck[data-deck]'); if (b) switchDeck(b.dataset.deck);
   });
@@ -1257,7 +1593,16 @@
   });
   $('list').addEventListener('click', function (e) {
     var row = e.target.closest('.note'); if (!row) return;
-    var d = deckOf(row.dataset.deck), n = d && d.notesById[row.dataset.id]; if (!n) return;
+    var d = deckOf(row.dataset.deck), n = d && (d.notesById[row.dataset.id] || (d.hiddenNotes || []).filter(function (x) { return x.id === row.dataset.id; })[0]); if (!n) return;
+    var act0 = e.target.closest('[data-act]');
+    if (act0 && act0.dataset.act === 'delete') {
+      e.stopPropagation();
+      if (!confirm(n.user ? 'Delete your card "' + n.term + '"?' : 'Hide "' + n.term + '" from ' + d.meta.name + '? Progress is kept. Find it again under Hidden.')) return;
+      hideNote(d.meta.id, n.id, true); current = null; renderBrowse(); toast(n.user ? 'Deleted' : 'Hidden'); return;
+    }
+    if (act0 && act0.dataset.act === 'restore') {
+      e.stopPropagation(); hideNote(d.meta.id, n.id, false); current = null; renderBrowse(); toast('Restored'); return;
+    }
     var act = e.target.closest('[data-act]');
     if (act) {
       e.stopPropagation();
@@ -1328,6 +1673,7 @@
     var k = e.key;
     if (k === 'Escape') { setView('study'); return; }
     if (k === 'b') { setView('browse'); return; }
+    if (k === 'a') { setView('add'); return; }
     if (k === '/') { e.preventDefault(); setView('browse'); $('q').focus(); return; }
     if (k === 's') { setView('stats'); return; }
     if (k === 'd' || k === 'h') { setView('decks'); return; }
@@ -1349,6 +1695,7 @@
 
   /* ---------- boot ---------- */
   loadDeckFiles(function () {
+    applyLibrary();
     if (!deckOf(store.deck)) {
       var first = INDEX.filter(function (m) { return deckOf(m.id); })[0];
       if (!first) { $('fMain').textContent = 'Could not load any deck.'; return; }
@@ -1356,9 +1703,9 @@
     }
     // Deck stamps: notice when a deck file changed since this browser last saw it.
     INDEX.forEach(function (meta) {
-      var d = deckOf(meta.id); if (!d) return;
+      var d = deckOf(meta.id); if (!d || meta.custom) return;
       var b = P(meta.id);
-      var cur = { version: d.data.version, updated: d.data.updated, notes: d.data.notes.length };
+      var cur = { version: d.data.version, updated: d.data.updated, notes: d.base.length };
       var seen = b.stamp;
       if (seen && (seen.version !== cur.version || seen.updated !== cur.updated) && meta.id === store.deck) {
         var diff = cur.notes - (seen.notes || 0);
@@ -1370,6 +1717,7 @@
     pickVoice();
     render();
     if (hasProfile()) pullState();
+    else if (needWelcome()) setView('welcome');
   });
 })();
 </script>
