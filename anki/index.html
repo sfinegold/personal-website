@@ -115,6 +115,17 @@
   .prow.on{border-color:var(--text)}
   .menu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
   .menu .btn span{color:var(--dim);font-size:.7rem}
+  .menu.homenav{margin-top:0}
+  /* Home: "Decks" is the first button and folds the deck list open under it. */
+  .navdecks summary{list-style:none;cursor:pointer;justify-content:flex-start;gap:.5rem}
+  .navdecks summary::-webkit-details-marker{display:none}
+  .navdecks summary span{margin-left:auto;text-align:right}
+  .navdecks summary::after{content:'▸';color:var(--dim);flex:none}
+  .navdecks[open] summary::after{content:'▾'}
+  .navdecks[open] summary.btn{background:var(--text);color:#FFFFFF}
+  .navdecks[open] summary.btn span,.navdecks[open] summary::after{color:rgba(255,255,255,.7)}
+  .navdecks .decklist{margin:.5rem 0 .2rem}
+  .navdecks .empty{padding:.5rem .2rem .4rem}
   .app[data-view=decks] #view-decks{display:flex}
   .deck{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:12px;padding:.9rem 1rem;text-align:left;width:100%}
   .deck.on{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
@@ -305,9 +316,13 @@
   /* ---- browse ---- */
   .filter{display:flex;gap:.5rem;margin-bottom:.7rem}
   .filter input{flex:1}
-  .scope{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:#FFFFFF;
-    border:1px solid var(--line);border-radius:8px;padding:0 .7rem;min-height:40px;white-space:nowrap}
-  .scope.all{background:var(--text);color:#FFFFFF;border-color:var(--text)}
+  .scope{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:#FFFFFF;color:var(--text);
+    border:1px solid var(--line);border-radius:8px;padding:0 1.5rem 0 .7rem;min-height:40px;white-space:nowrap;max-width:9.5rem;
+    text-overflow:ellipsis;-webkit-appearance:none;appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%230B0F14' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right .5rem center;background-size:12px}
+  .scope.all{background-color:var(--text);color:#FFFFFF;border-color:var(--text);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%23FFFFFF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
   .themes{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem}
   .dsec{background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.9);border-radius:12px;margin-bottom:.6rem;overflow:hidden}
   .dsec summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;padding:.8rem .9rem}
@@ -454,10 +469,12 @@
 
   <section class="view" id="view-decks">
     <div class="streak" id="streakLine"></div>
-    <h2 class="ttl">Decks</h2>
-    <div class="decklist" id="deckList"></div>
-    <button class="syncline" id="syncStatus"></button>
-    <div class="menu">
+    <div class="menu homenav">
+      <details class="navdecks" id="navDecks">
+        <summary class="btn">Decks <span id="decksSub"></span></summary>
+        <div class="decklist" id="deckList"></div>
+        <p class="empty">Tap a deck to study it. Each deck keeps its own progress and daily counts.</p>
+      </details>
       <button class="btn" data-go="add">Add a card <span>drafted by Claude, or your own</span></button>
       <button class="btn" data-go="newdeck">New deck <span>describe it, Claude drafts it</span></button>
       <button class="btn" data-go="manage">Manage decks <span>choose from the master list</span></button>
@@ -465,13 +482,13 @@
       <button class="btn" data-go="stats">Stats <span>deck and today</span></button>
       <button class="btn" data-go="settings">Settings <span>limits, direction, export</span></button>
     </div>
-    <p class="empty">Tap a deck to study it. Each deck keeps its own progress and daily counts.</p>
+    <button class="syncline" id="syncStatus"></button>
   </section>
 
   <section class="view" id="view-browse">
     <div class="filter">
       <input type="search" id="q" placeholder="Search phrases, meanings, parts…" autocomplete="off" autocapitalize="off">
-      <button class="scope" id="scopeBtn" title="Search this deck or all decks">This deck</button>
+      <select class="scope" id="scopeSel" aria-label="Deck to search" title="Search one deck or all decks"></select>
       <button class="addbtn" id="addBtn" title="Add a card (a)">+ Add</button>
     </div>
     <div id="browseHome"></div>
@@ -778,7 +795,8 @@
 
   /* ---------- session state ---------- */
   var view = 'study', current = null, revealed = false, lastNoteId = null, queueInfo = null, cardsIdx = {};
-  var browseTag = '', browseQ = '', browseState = '', browseScope = 'deck', browseDeck = '';
+  var browseTag = '', browseQ = '', browseState = '', browseScope = 'all', browseDeck = '';   // browseScope: 'all' or a deck id
+  function scopeDeck() { return browseScope !== 'all' && deckOf(browseScope) || null; }
   function norm(str) { return String(str || '').normalize('NFD').replace(/[\u0300-\u036f\u200c]/g, '').toLowerCase(); }
 
   function rollDay(now) {
@@ -1222,11 +1240,26 @@
     var showHome = !q && !browseTag && !browseState;
     $('browseHome').style.display = showHome ? '' : 'none';
     $('browseResults').style.display = showHome ? 'none' : '';
-    $('scopeBtn').textContent = browseScope === 'all' ? 'All decks' : 'This deck';
-    $('scopeBtn').classList.toggle('all', browseScope === 'all');
+    fillScope();
     if (showHome) renderBrowseHome(now); else renderBrowseList(now, q);
-    var rc = retiredCount();
-    $('retired').textContent = deck().data.notes.length + ' ' + unit(deck().meta) + ' in ' + deck().meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+    var sd = scopeDeck();
+    if (sd) {
+      var rc = sd.meta.id === store.deck ? retiredCount() : 0;
+      $('retired').textContent = sd.data.notes.length + ' ' + unit(sd.meta) + ' in ' + sd.meta.name + (rc ? ' · ' + rc + ' retired card' + (rc === 1 ? '' : 's') + ' (progress kept)' : '');
+    } else {
+      var all = loadedDecks(), n = 0, units = {};
+      all.forEach(function (d) { n += d.data.notes.length; units[unit(d.meta)] = 1; });
+      $('retired').textContent = n + ' ' + Object.keys(units).join(' and ') + ' in ' + all.length + ' deck' + (all.length === 1 ? '' : 's');
+    }
+  }
+  function loadedDecks() { return INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean); }
+  // The deck dropdown: All decks first, then every loaded deck. A deck that is gone falls back to all.
+  function fillScope() {
+    var sel = $('scopeSel');
+    if (browseScope !== 'all' && !deckOf(browseScope)) browseScope = 'all';
+    sel.innerHTML = '<option value="all">All decks</option>' + loadedDecks().map(function (d) { return '<option value="' + esc(d.meta.id) + '">' + esc(d.meta.name) + '</option>'; }).join('');
+    sel.value = browseScope;
+    sel.classList.toggle('all', browseScope === 'all');
   }
   // Mastered = every direction being studied has an interval of 21 days or more (Anki's "mature").
   function mastered(deckId, n) { var sts = noteStates(deckId, n); return sts.length > 0 && sts.every(function (st) { return st === 'mature'; }); }
@@ -1251,7 +1284,8 @@
     return { counts: counts, tags: tags };
   }
   function renderBrowseHome(now) {
-    var order = [deck()].concat(INDEX.map(function (m) { return deckOf(m.id); }).filter(function (d) { return d && d.meta.id !== store.deck; }));
+    var sd = scopeDeck();
+    var order = sd ? [sd] : [deck()].concat(loadedDecks().filter(function (d) { return d.meta.id !== store.deck; }));
     $('browseHome').innerHTML = order.map(function (d) {
       var o = deckOverview(d, now), id = d.meta.id, c = o.counts;
       var learned = 0, cards = 0;
@@ -1268,15 +1302,16 @@
         return '<button class="theme" data-deck="' + esc(id) + '" data-tag="' + esc(t) + '"><div class="t1"><span class="t-name">' + esc(t) + '</span><span class="t-n">' + g.n + ' ' + unit(d.meta) + ' · ' + pc(g.mature + g.review) + '% learned</span></div>' +
           '<div class="bar"><i class="b-mature" style="width:' + pc(g.mature) + '%"></i><i class="b-review" style="width:' + pc(g.review) + '%"></i><i class="b-learn" style="width:' + pc(g.learn) + '%"></i></div></button>';
       }).join('');
-      return '<details class="dsec" data-deck="' + esc(id) + '"' + (id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' ' + unit(d.meta) + ' · ' + c.due + ' due</span></summary>' +
+      return '<details class="dsec" data-deck="' + esc(id) + '"' + (sd || id === store.deck ? ' open' : '') + '><summary><span class="d-name">' + esc(d.meta.name) + '</span><span class="d-sub">' + c.all + ' ' + unit(d.meta) + ' · ' + c.due + ' due</span></summary>' +
         '<div class="body">' + mastery + '<div class="chips statechips">' + chips + '</div><div class="themes">' + themes + '</div></div></details>';
     }).join('') + '<div class="legend">bar: mature · review · learning · (empty = new)</div>';
   }
   function renderBrowseList(now, q) {
-    var listDeck = (!q && browseDeck && deckOf(browseDeck)) || deck();
-    var decksToSearch = (q && browseScope === 'all') ? INDEX.map(function (m) { return deckOf(m.id); }).filter(Boolean) : [q ? deck() : listDeck];
+    var sd = scopeDeck();
+    var listDeck = (!q && browseDeck && deckOf(browseDeck)) || sd || deck();
+    var decksToSearch = q ? (sd ? [sd] : loadedDecks()) : [listDeck];
     var what = browseTag ? browseTag : ({ all: 'All ' + unit(listDeck.meta), new: 'New', learn: 'Learning', due: 'Due now', mastered: 'Mastered', leech: 'Leeches', added: 'Added by you', hidden: 'Hidden' })[browseState];
-    var label = q ? ('"' + browseQ.trim() + '"' + (browseScope === 'all' ? ' in all decks' : '')) : (listDeck.meta.id === store.deck ? what : listDeck.meta.name + ' › ' + what);
+    var label = q ? ('"' + browseQ.trim() + '" in ' + (sd ? sd.meta.name : 'all decks')) : (listDeck.meta.id === store.deck ? what : listDeck.meta.name + ' › ' + what);
     $('crumb').innerHTML = '<button id="crumbBack">‹ Decks</button><span></span>';
     var html = '', total = 0;
     decksToSearch.forEach(function (d) {
@@ -1360,6 +1395,7 @@
         '<div class="d-counts"><b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></div></div></button>';
     });
     $('deckList').innerHTML = html;
+    $('decksSub').textContent = INDEX.length + ' deck' + (INDEX.length === 1 ? '' : 's');
     renderStreak();
     renderSyncLine();
   }
@@ -1639,14 +1675,23 @@
   });
 
   $('q').addEventListener('input', function () { browseQ = this.value; browseTag = ''; browseState = ''; renderBrowse(); });
-  $('scopeBtn').addEventListener('click', function () { browseScope = browseScope === 'all' ? 'deck' : 'all'; renderBrowse(); });
+  $('scopeSel').addEventListener('change', function () { browseScope = this.value; browseDeck = ''; renderBrowse(); });
   $('browseHome').addEventListener('click', function (e) {
     var chip = e.target.closest('.chip[data-state]'), theme = e.target.closest('.theme[data-tag]');
     if (chip) { browseDeck = chip.dataset.deck; browseState = chip.dataset.state; browseTag = ''; }
     else if (theme) { browseDeck = theme.dataset.deck; browseTag = theme.dataset.tag; browseState = ''; }
     else return;
-    renderBrowse(); window.scrollTo(0, 0);
+    renderBrowse(); resetScroll();
   });
+  // Home: the deck list folds under the Decks button; this device remembers whether it was left open.
+  var UI_KEY = 'anki:ui';
+  function uiPref(k, v) {
+    var ui = {}; try { ui = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}; } catch (e) {}
+    if (arguments.length < 2) return ui[k];
+    ui[k] = v; try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) {}
+  }
+  $('navDecks').open = !!uiPref('decksOpen');
+  $('navDecks').addEventListener('toggle', function () { uiPref('decksOpen', this.open); });
   $('crumb').addEventListener('click', function (e) {
     if (!e.target.closest('#crumbBack')) return;
     browseQ = ''; $('q').value = ''; browseTag = ''; browseState = ''; browseDeck = ''; renderBrowse();
