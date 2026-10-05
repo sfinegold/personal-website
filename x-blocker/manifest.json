@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "X Pause",
+  "version": "1.0.0",
+  "description": "Blocks x.com for 10 seconds every time you open it.",
+  "content_scripts": [
+    {
+      "matches": ["*://x.com/*", "*://*.x.com/*", "*://twitter.com/*", "*://*.twitter.com/*"],
+      "js": ["block.js"],
+      "css": ["block.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}
