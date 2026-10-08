@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#121214">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
+<title>Nate playlist</title>
+<meta name="description" content="Tech house candidates for Nate's set: open each track, rate it yes, maybe or no, and leave a note. Ratings stay on this device.">
+<meta name="robots" content="noindex">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#121214; --bg-2:#1b1b1f; --card:#1f1f24; --line:rgba(255,255,255,.1);
+    --text:#f2f2f0; --dim:rgba(242,242,240,.62); --faint:rgba(242,242,240,.4);
+    --yes:#2fbf71; --maybe:#e0a52b; --no:#e4524a; --accent:#8b7cf6;
+    --sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  html{color-scheme:dark}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    padding:0 0 calc(2rem + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent}
+  header{position:sticky;top:0;z-index:5;background:rgba(18,18,20,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);padding:calc(.6rem + env(safe-area-inset-top)) 1rem .6rem}
+  h1{font-size:1.05rem;font-weight:700;letter-spacing:.01em;display:flex;align-items:baseline;gap:.6rem}
+  h1 small{font-weight:400;color:var(--dim);font-size:.8rem}
+  .tools{display:flex;gap:.45rem;margin-top:.55rem;align-items:center;flex-wrap:wrap}
+  input[type=search]{flex:1 1 140px;min-width:0;background:var(--bg-2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:.5rem .7rem;font-size:16px;outline:none}
+  .chips{display:flex;gap:.35rem;overflow-x:auto;scrollbar-width:none;margin-top:.5rem;padding-bottom:2px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--bg-2);color:var(--dim);border-radius:999px;
+    padding:.32rem .7rem;font-size:.8rem;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .chip .n{opacity:.7;margin-left:.3rem;font-variant-numeric:tabular-nums}
+  main{padding:.6rem .75rem}
+  .row{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .8rem;margin-bottom:.55rem;
+    display:grid;grid-template-columns:1fr auto;gap:.45rem .6rem;align-items:start}
+  .row.r-yes{border-color:rgba(47,191,113,.45)} .row.r-maybe{border-color:rgba(224,165,43,.45)} .row.r-no{opacity:.55}
+  .num{font-family:var(--mono);font-size:.7rem;color:var(--faint);margin-right:.35rem}
+  .title{font-size:.95rem;font-weight:600;line-height:1.3;word-break:break-word}
+  .meta{font-size:.76rem;color:var(--dim);margin-top:.2rem;line-height:1.45}
+  .meta b{color:var(--text);font-weight:600}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 .35rem;font-size:.7rem;margin-right:.3rem;color:var(--dim);font-family:var(--mono)}
+  .tag.cam{color:var(--accent);border-color:rgba(139,124,246,.5)}
+  .tag.set{color:#f2f2f0;background:rgba(139,124,246,.25);border-color:transparent}
+  .tag.dl{color:var(--yes);border-color:rgba(47,191,113,.4)}
+  .tag.vote{color:var(--maybe);border-color:rgba(224,165,43,.4)}
+  .note-src{font-size:.74rem;color:var(--faint);margin-top:.15rem;font-style:italic}
+  a.open{grid-column:2;grid-row:1;display:inline-flex;align-items:center;gap:.3rem;background:var(--accent);color:#fff;text-decoration:none;
+    border-radius:10px;padding:.55rem .8rem;font-size:.85rem;font-weight:600;white-space:nowrap}
+  a.open.sc{background:#ff5500}
+  .rate{grid-column:1 / -1;display:flex;gap:.4rem;margin-top:.15rem}
+  .rate button{flex:1;border:1px solid var(--line);background:var(--bg-2);color:var(--dim);border-radius:10px;padding:.55rem 0;
+    font-size:.85rem;font-weight:600;cursor:pointer;min-height:42px}
+  .rate button.yes.on{background:var(--yes);color:#0b1f14;border-color:var(--yes)}
+  .rate button.maybe.on{background:var(--maybe);color:#231a04;border-color:var(--maybe)}
+  .rate button.no.on{background:var(--no);color:#fff;border-color:var(--no)}
+  textarea{grid-column:1 / -1;width:100%;background:var(--bg-2);border:1px solid var(--line);color:var(--text);border-radius:10px;
+    padding:.5rem .65rem;font-size:16px;font-family:var(--sans);resize:none;min-height:40px;line-height:1.35;outline:none}
+  textarea:focus{border-color:rgba(139,124,246,.6)}
+  textarea::placeholder{color:var(--faint)}
+  .foot{padding:1rem .75rem;color:var(--faint);font-size:.75rem;line-height:1.5}
+  .foot button{background:var(--bg-2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-size:.85rem;margin:.2rem .3rem .2rem 0;cursor:pointer}
+  .empty{color:var(--faint);text-align:center;padding:2rem 0;font-size:.9rem}
+  .toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);
+    padding:.5rem .9rem;border-radius:999px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  @media (min-width:720px){
+    main{max-width:860px;margin:0 auto}
+    .row{grid-template-columns:1fr auto;}
+    .rate{grid-column:1;max-width:320px}
+    textarea{grid-column:1 / -1}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Nate playlist <small id="count"></small></h1>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search artist, title, remixer, key…" autocomplete="off">
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+<main id="list"></main>
+<div class="foot">
+  <div>Ratings and notes are saved in this browser only. Export to send them back.</div>
+  <div style="margin-top:.5rem">
+    <button id="copy">Copy ratings as text</button>
+    <button id="share">Share ratings</button>
+    <button id="clear">Clear ratings</button>
+  </div>
+  <div style="margin-top:.6rem">Groups: <b>Set</b> = in the draft setlist order · <b>TH</b> = tagged Tech House on soundeo · <b>House+</b> = house, bass house, deep house, UK garage · <b>Cover?</b> = title-match cover or bootleg, not verified · <b>Off-BPM</b> = outside 120–130. DL = downloadable on your soundeo plan; vote = needs votes first.</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="tracks.js?v=1"></script>
+<script>
+(function(){
+  const KEY='nate-playlist-v1';
+  let state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){state={};}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+  const tracks=(window.TRACKS||[]).map((t,i)=>Object.assign({i:i+1},t));
+  const GROUPS={A:'TH',B:'House+',C:'Cover?',D:'Off-BPM'};
+  let filter='all', q='';
+  const chipsEl=document.getElementById('chips'), listEl=document.getElementById('list'), countEl=document.getElementById('count');
+  const CHIPS=[['all','All'],['unrated','Unrated'],['yes','Yes'],['maybe','Maybe'],['no','No'],['set','Setlist'],['A','Tech House'],['B','House+'],['C','Covers'],['dl','Downloadable']];
+  function rating(t){return (state[t.id]||{}).r||'';}
+  function note(t){return (state[t.id]||{}).n||'';}
+  function matches(t){
+    const r=rating(t);
+    if(filter==='unrated'&&r)return false;
+    if(['yes','maybe','no'].includes(filter)&&r!==filter)return false;
+    if(filter==='set'&&!t.set)return false;
+    if(['A','B','C'].includes(filter)&&t.grp!==filter)return false;
+    if(filter==='dl'&&t.dl!==true)return false;
+    if(q){const s=(t.t+' '+t.artist+' '+t.g+' '+t.key+' '+t.cam+' '+(t.note||'')).toLowerCase();if(!s.includes(q))return false;}
+    return true;
+  }
+  function counts(){
+    const c={all:tracks.length,unrated:0,yes:0,maybe:0,no:0,set:0,A:0,B:0,C:0,dl:0};
+    tracks.forEach(t=>{const r=rating(t);if(!r)c.unrated++;else c[r]++;if(t.set)c.set++;if(c[t.grp]!==undefined)c[t.grp]++;if(t.dl===true)c.dl++;});
+    return c;
+  }
+  function renderChips(){
+    const c=counts();
+    chipsEl.innerHTML=CHIPS.map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${k}">${l}<span class="n">${c[k]}</span></button>`).join('');
+    countEl.textContent=`${c.yes} yes · ${c.maybe} maybe · ${c.no} no · ${c.unrated} left`;
+  }
+  function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+  function rowHtml(t){
+    const r=rating(t);
+    const tags=[
+      t.set?`<span class="tag set">Set #${t.set}</span>`:'',
+      `<span class="tag">${esc(GROUPS[t.grp]||t.grp)}</span>`,
+      t.bpm?`<span class="tag">${t.bpm} BPM</span>`:'<span class="tag">BPM ?</span>',
+      t.cam?`<span class="tag cam">${esc(t.cam)} ${esc(t.key)}</span>`:'',
+      t.len?`<span class="tag">${esc(t.len)}</span>`:'',
+      t.dl===true?'<span class="tag dl">DL</span>':(t.dl===false?'<span class="tag vote">vote</span>':'')
+    ].join('');
+    return `<div class="row r-${r||'none'}" data-id="${t.id}">
+      <div>
+        <div class="title"><span class="num">${t.i}</span>${esc(t.t)}</div>
+        <div class="meta">${t.artist?`<b>${esc(t.artist)}</b> · `:''}${esc(t.g)}</div>
+        <div class="meta">${tags}</div>
+        ${t.note?`<div class="note-src">${esc(t.note)}</div>`:''}
+      </div>
+      <a class="open${t.src==='soundcloud'?' sc':''}" href="${esc(t.u)}" target="_blank" rel="noopener">▶ ${t.src==='soundcloud'?'SoundCloud':'soundeo'}</a>
+      <div class="rate">
+        <button class="yes${r==='yes'?' on':''}" data-r="yes">Yes</button>
+        <button class="maybe${r==='maybe'?' on':''}" data-r="maybe">Maybe</button>
+        <button class="no${r==='no'?' on':''}" data-r="no">No</button>
+      </div>
+      <textarea rows="1" placeholder="Notes…">${esc(note(t))}</textarea>
+    </div>`;
+  }
+  function render(){
+    renderChips();
+    const vis=tracks.filter(matches);
+    listEl.innerHTML=vis.length?vis.map(rowHtml).join(''):'<div class="empty">Nothing here.</div>';
+    listEl.querySelectorAll('textarea').forEach(autosize);
+  }
+  function autosize(ta){ta.style.height='auto';ta.style.height=Math.max(40,ta.scrollHeight)+'px';}
+  chipsEl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.f;render();window.scrollTo({top:0});});
+  document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
+  listEl.addEventListener('click',e=>{
+    const b=e.target.closest('.rate button');if(!b)return;
+    const row=b.closest('.row'),id=row.dataset.id;
+    const cur=(state[id]||{}).r||'';const next=cur===b.dataset.r?'':b.dataset.r;
+    state[id]=Object.assign({},state[id]||{},{r:next,at:Date.now()});save();
+    row.className='row r-'+(next||'none');
+    row.querySelectorAll('.rate button').forEach(x=>x.classList.toggle('on',x.dataset.r===next));
+    renderChips();
+  });
+  listEl.addEventListener('input',e=>{
+    const ta=e.target.closest('textarea');if(!ta)return;autosize(ta);
+    const id=ta.closest('.row').dataset.id;
+    state[id]=Object.assign({},state[id]||{},{n:ta.value,at:Date.now()});save();
+  });
+  function exportText(){
+    const lines=[];
+    ['yes','maybe','no'].forEach(r=>{
+      const rows=tracks.filter(t=>rating(t)===r);if(!rows.length)return;
+      lines.push(r.toUpperCase()+' ('+rows.length+')');
+      rows.forEach(t=>lines.push(`- ${t.t}${t.bpm?' · '+t.bpm+' BPM':''}${t.cam?' · '+t.cam:''}${note(t)?' — '+note(t).replace(/\s+/g,' '):''}\n  ${t.u}`));
+      lines.push('');
+    });
+    return lines.join('\n')||'No ratings yet.';
+  }
+  function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+  document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(exportText());toast('Copied');}catch(e){prompt('Copy:',exportText());}});
+  document.getElementById('share').addEventListener('click',async()=>{const text=exportText();if(navigator.share){try{await navigator.share({title:'Nate playlist ratings',text});}catch(e){}}else{try{await navigator.clipboard.writeText(text);toast('Copied');}catch(e){prompt('Copy:',text);}}});
+  document.getElementById('clear').addEventListener('click',()=>{if(confirm('Clear all ratings and notes on this device?')){state={};save();render();}});
+  render();
+})();
+</script>
+</body>
+</html>
