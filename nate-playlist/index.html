@@ -67,7 +67,31 @@
   .toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);
     padding:.5rem .9rem;border-radius:999px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
+  body{padding-bottom:calc(7.5rem + env(safe-area-inset-bottom))}
+  .row.playing{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .act{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;align-items:flex-end;gap:.35rem}
+  button.play{width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:1.05rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  button.play.on{background:var(--text);color:var(--bg)}
+  a.open{grid-column:auto;grid-row:auto;background:transparent;color:var(--dim);padding:.15rem .3rem;font-size:.72rem;font-weight:500;border:1px solid var(--line)}
+  a.open.sc{background:transparent;color:#ff7a33}
+  #player{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(27,27,31,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);padding:.55rem .8rem calc(.6rem + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .25s}
+  #player.show{transform:none}
+  #player .bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:.45rem}
+  #player .bar i{display:block;height:100%;width:0;background:var(--accent)}
+  #player .now{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #player .sub{font-size:.72rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.1rem}
+  #player .ctl{display:flex;align-items:center;gap:.4rem;margin-top:.45rem}
+  #player .ctl button{border:1px solid var(--line);background:var(--bg-2);color:var(--text);border-radius:10px;min-height:40px;padding:0 .7rem;font-size:.95rem;cursor:pointer}
+  #player .ctl .pp{width:48px;font-size:1.1rem}
+  #player .ctl .r{flex:1;font-size:.82rem;font-weight:700}
+  #player .ctl .r.yes.on{background:var(--yes);color:#0b1f14;border-color:var(--yes)}
+  #player .ctl .r.maybe.on{background:var(--maybe);color:#231a04;border-color:var(--maybe)}
+  #player .ctl .r.no.on{background:var(--no);color:#fff;border-color:var(--no)}
+  #player .auto{font-size:.72rem;color:var(--dim);display:flex;align-items:center;gap:.3rem;margin-left:auto}
+  #player .auto input{accent-color:var(--accent)}
   @media (min-width:720px){
+    #player > div{max-width:860px;margin:0 auto}
     main{max-width:860px;margin:0 auto}
     .row{grid-template-columns:1fr auto;}
     .rate{grid-column:1;max-width:320px}
@@ -93,8 +117,25 @@
   </div>
   <div style="margin-top:.6rem">Groups: <b>Set</b> = in the draft setlist order · <b>TH</b> = tagged Tech House on soundeo · <b>House+</b> = house, bass house, deep house, UK garage · <b>Cover?</b> = title-match cover or bootleg, not verified · <b>Off-BPM</b> = outside 120–130. DL = downloadable on your soundeo plan; vote = needs votes first.</div>
 </div>
+<div id="player"><div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="now" id="pnow">—</div>
+  <div class="sub" id="psub"></div>
+  <div class="ctl">
+    <button id="prev" aria-label="Previous">⏮</button>
+    <button id="pp" class="pp" aria-label="Play or pause">▶</button>
+    <button id="next" aria-label="Next">⏭</button>
+    <button class="r yes" data-r="yes">Yes</button>
+    <button class="r maybe" data-r="maybe">Maybe</button>
+    <button class="r no" data-r="no">No</button>
+  </div>
+  <div class="ctl" style="margin-top:.35rem;justify-content:space-between">
+    <span class="sub" id="pstat" style="margin:0">Tap ▶ on a track. Rating from here moves to the next one.</span>
+    <label class="auto"><input type="checkbox" id="auto" checked> auto-next</label>
+  </div>
+</div></div>
 <div class="toast" id="toast"></div>
-<script src="tracks.js?v=1"></script>
+<script src="tracks.js?v=2"></script>
 <script>
 (function(){
   const KEY='nate-playlist-v1';
@@ -146,7 +187,10 @@
         <div class="meta">${tags}</div>
         ${t.note?`<div class="note-src">${esc(t.note)}</div>`:''}
       </div>
-      <a class="open${t.src==='soundcloud'?' sc':''}" href="${esc(t.u)}" target="_blank" rel="noopener">▶ ${t.src==='soundcloud'?'SoundCloud':'soundeo'}</a>
+      <div class="act">
+        <button class="play" data-play="${t.id}" aria-label="Play preview">▶</button>
+        <a class="open${t.src==='soundcloud'?' sc':''}" href="${esc(t.u)}" target="_blank" rel="noopener">${t.src==='soundcloud'?'SoundCloud ↗':'soundeo ↗'}</a>
+      </div>
       <div class="rate">
         <button class="yes${r==='yes'?' on':''}" data-r="yes">Yes</button>
         <button class="maybe${r==='maybe'?' on':''}" data-r="maybe">Maybe</button>
@@ -160,7 +204,66 @@
     const vis=tracks.filter(matches);
     listEl.innerHTML=vis.length?vis.map(rowHtml).join(''):'<div class="empty">Nothing here.</div>';
     listEl.querySelectorAll('textarea').forEach(autosize);
+    markPlaying();
   }
+  // ---- inline preview player ----
+  const audio=new Audio(); audio.preload='none';
+  const byId={}; tracks.forEach(t=>byId[t.id]=t);
+  let cur=null, queue=[];
+  const P={el:document.getElementById('player'),now:document.getElementById('pnow'),sub:document.getElementById('psub'),stat:document.getElementById('pstat'),
+    prog:document.getElementById('prog'),pp:document.getElementById('pp'),auto:document.getElementById('auto')};
+  function previewSrc(t){
+    if(t.src==='soundcloud')return null;
+    return '/api/nate-preview?u='+encodeURIComponent(t.u.replace('https://soundeo.com',''));
+  }
+  function markPlaying(){
+    listEl.querySelectorAll('.row').forEach(r=>{const on=cur&&r.dataset.id===cur.id;r.classList.toggle('playing',!!on);const b=r.querySelector('.play');if(b){b.classList.toggle('on',!!on);b.textContent=on&&!audio.paused?'❚❚':'▶';}});
+    P.el.querySelectorAll('.r').forEach(b=>b.classList.toggle('on',!!cur&&rating(cur)===b.dataset.r));
+    P.pp.textContent=audio.paused?'▶':'❚❚';
+  }
+  function playTrack(t,fromList){
+    if(!t)return;
+    if(fromList)queue=tracks.filter(matches).map(x=>x.id);
+    if(!queue.length)queue=tracks.map(x=>x.id);
+    const src=previewSrc(t);
+    cur=t; P.el.classList.add('show');
+    P.now.textContent=t.i+'. '+t.t; P.sub.textContent=[t.artist,t.g,t.bpm?t.bpm+' BPM':'',t.cam].filter(Boolean).join(' · ');
+    P.prog.style.width='0';
+    if(!src){P.stat.textContent='No inline preview for SoundCloud tracks, use the link.';markPlaying();return;}
+    P.stat.textContent='Loading preview…';
+    audio.src=src; audio.play().then(()=>{P.stat.textContent='2-minute preview';}).catch(e=>{P.stat.textContent='Tap ▶ to play (browser blocked autoplay).';markPlaying();});
+    markPlaying();
+    const row=listEl.querySelector('.row[data-id="'+t.id+'"]'); if(row)row.scrollIntoView({block:'center',behavior:'smooth'});
+    if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:t.t,artist:t.artist||'',album:'Nate playlist'});}
+  }
+  function step(d){
+    if(!cur)return;
+    let i=queue.indexOf(cur.id); if(i<0){queue=tracks.filter(matches).map(x=>x.id);i=queue.indexOf(cur.id);}
+    const n=queue[i+d]; if(n)playTrack(byId[n]); else {P.stat.textContent=d>0?'End of list.':'Start of list.';}
+  }
+  audio.addEventListener('timeupdate',()=>{if(audio.duration)P.prog.style.width=(audio.currentTime/audio.duration*100)+'%';});
+  audio.addEventListener('play',markPlaying); audio.addEventListener('pause',markPlaying);
+  audio.addEventListener('ended',()=>{if(P.auto.checked)step(1);else markPlaying();});
+  audio.addEventListener('error',()=>{P.stat.textContent='No preview for this one.';if(P.auto.checked)setTimeout(()=>step(1),900);});
+  listEl.addEventListener('click',e=>{
+    const b=e.target.closest('button.play');if(!b)return;
+    const t=byId[b.dataset.play];
+    if(cur&&cur.id===t.id){if(audio.paused)audio.play().catch(()=>{});else audio.pause();return;}
+    playTrack(t,true);
+  });
+  P.pp.addEventListener('click',()=>{if(!cur){const first=tracks.filter(matches)[0];if(first)playTrack(first,true);return;}if(audio.paused)audio.play().catch(()=>{});else audio.pause();});
+  document.getElementById('next').addEventListener('click',()=>step(1));
+  document.getElementById('prev').addEventListener('click',()=>step(-1));
+  P.el.querySelectorAll('.r').forEach(b=>b.addEventListener('click',()=>{
+    if(!cur)return;
+    const next=rating(cur)===b.dataset.r?'':b.dataset.r;
+    state[cur.id]=Object.assign({},state[cur.id]||{},{r:next,at:Date.now()});save();
+    const row=listEl.querySelector('.row[data-id="'+cur.id+'"]');
+    if(row){row.className='row r-'+(next||'none')+(row.classList.contains('playing')?' playing':'');row.querySelectorAll('.rate button').forEach(x=>x.classList.toggle('on',x.dataset.r===next));}
+    renderChips(); markPlaying();
+    if(next&&P.auto.checked)step(1);
+  }));
+  if('mediaSession' in navigator){try{navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1));navigator.mediaSession.setActionHandler('play',()=>audio.play());navigator.mediaSession.setActionHandler('pause',()=>audio.pause());}catch(e){}}
   function autosize(ta){ta.style.height='auto';ta.style.height=Math.max(40,ta.scrollHeight)+'px';}
   chipsEl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.f;render();window.scrollTo({top:0});});
   document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render();});
