@@ -1081,7 +1081,9 @@
     var dueNow = q.counts.due + q.counts.learn;
     var h = K.health(t, dueNow, now), m = K.mood(h);
     var c = creatureOf(meta);
-    return { c: c, health: h, mood: m, line: K.moodLine(c.name, m, dueNow, t ? Math.floor((now - t) / 86400000) : 0), dueNow: dueNow };
+    var days = t ? Math.floor((now - t) / 86400000) : 0;
+    var line = c.lines && c.lines[m] ? String(c.lines[m]).replace('{due}', dueNow).replace('{days}', days).replace('{name}', c.name) : K.moodLine(c.name, m, dueNow, days);
+    return { c: c, health: h, mood: m, line: line, dueNow: dueNow };
   }
   function recordAnswer(rating, cleared) {
     var today = S.dayNum(Date.now());

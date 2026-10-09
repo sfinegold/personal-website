@@ -24,7 +24,7 @@
  *        dirs      'both' (default) or 'fwd' when the reverse card makes no sense.
  *        labels    { fwd, rev, front, back } for non-language decks, shown instead of
  *                  language codes ("Problem → Answer"). term = prompt, en = answer.
- *        creature  { emoji, name, kind }: the deck's companion. Its health follows how
+ *        creature  { emoji, name, kind, lines? }: the deck's companion. Its health follows how
  *                  recently the deck was studied and how many cards are due. Pick an
  *                  animal tied to the language's culture (owl for Greek, fox for
  *                  Japanese, Persian cat for Farsi). Without one the deck gets 🐣.
@@ -53,6 +53,11 @@ window.DECK_INDEX = [
     creature: { emoji: '🦊', name: 'Kitsu', kind: 'fox' } },
   { id: 'farsi', file: 'farsi.js', name: 'Conversational Farsi', lang: 'fa', locale: 'fa-IR', langName: 'Farsi', code: 'FA', translit: true,
     creature: { emoji: '🐈', name: 'Pari', kind: 'cat' } },
+  { id: 'italian', file: 'italian.js', name: 'Conversational Italian', lang: 'it', locale: 'it-IT', langName: 'Italian', code: 'IT', translit: false,
+    creature: { emoji: '🍝', name: 'Fusillo', kind: 'fusilli',
+      // Optional per-mood lines; {due} and {days} are filled in. Without them the generic line is used.
+      lines: { happy: 'Fusillo: "Perfetto. Don\'t let it go to your head."', fine: 'Fusillo: "Not bad. Not Nonna\'s, but not bad."',
+               hungry: 'Fusillo: "Overcooked and ignored. {due} due. Andiamo."', sick: 'Fusillo: "Mamma mia. {days} days. I\'m mush."', asleep: 'Fusillo: "Wake me when you\'re serious about Italian."' } } },
   // Fact decks: term is the prompt, en is the answer. No transliteration, no speech.
   { id: 'mental-math', file: 'mental-math.js', name: 'Mental Multiplication', lang: 'en', locale: 'en-US', langName: 'Maths', code: 'Q', translit: false,
     speech: false, dirs: 'fwd', labels: { fwd: 'Problem → Answer', rev: 'Answer → Problem', front: 'Problem', back: 'Answer' },

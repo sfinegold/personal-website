@@ -108,5 +108,30 @@ window.CREATURE_ART = {
     '<g class="prop"><rect x="44" y="6" width="32" height="18" fill="#0B0F14"/><rect x="38" y="22" width="44" height="5" fill="#0B0F14"/><rect x="44" y="16" width="32" height="5" fill="#C0392B"/><path d="M46 10 h28" stroke="#1D5C8A" stroke-width="3"/></g>' +
     '<path d="M50 110 v6 M56 110 v6 M64 110 v6 M70 110 v6" stroke="#E8A33D" stroke-width="3" stroke-linecap="round"/>' +
     '<text class="zz" x="90" y="30" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="16" fill="#0B0F14">z<tspan font-size="11" dy="-8">z</tspan></text>' +
-    '</svg>'
+    '</svg>',
+
+  // Fusillo: a corkscrew of pasta with attitude. One eyebrow up, a smirk, sunglasses pushed
+  // up on the head (the prop), one hand on the hip. Golden with darker ridges.
+  fusilli: '<svg class="pet-art" viewBox="0 0 120 120" aria-hidden="true">' +
+    '<ellipse cx="60" cy="113" rx="30" ry="5" fill="rgba(11,15,20,.12)"/>' +
+    '<path d="M48 18 q34 10 0 26 q-34 16 0 32 q34 16 0 34" fill="none" stroke="#0B0F14" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="M48 18 q34 10 0 26 q-34 16 0 32 q34 16 0 34" fill="none" stroke="#E8C547" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="M48 18 q34 10 0 26 q-34 16 0 32 q34 16 0 34" fill="none" stroke="#F6DE8A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9"/>' +
+    '<path d="M44 46 q22-4 36 6 M40 74 q20 10 40 0" fill="none" stroke="#C99A2E" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<ellipse cx="60" cy="62" rx="20" ry="15" fill="#F2D469" stroke="#0B0F14" stroke-width="3"/>' +
+    '<g class="eye"><circle cx="52" cy="60" r="3.2" fill="#0B0F14"/><circle cx="68" cy="60" r="3.2" fill="#0B0F14"/>' +
+    '<path d="M62 56 q6-5 12-1" fill="none" stroke="#0B0F14" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<path d="M46 56 h10" fill="none" stroke="#0B0F14" stroke-width="2.6" stroke-linecap="round"/></g>' +
+    '<g class="lid" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"><path d="M47 60 q5 3 10 0"/><path d="M63 60 q5 3 10 0"/></g>' +
+    '<path class="smile" d="M51 68 q7 6 16-1" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<path class="flat" d="M53 69 h14" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<path class="sad" d="M52 71 q8-6 16 0" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<g class="prop"><path d="M40 36 h40" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<rect x="41" y="30" width="16" height="11" rx="4" fill="#0B0F14"/><rect x="63" y="30" width="16" height="11" rx="4" fill="#0B0F14"/>' +
+    '<path d="M44 33 q5-2 9 0" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity=".7"/></g>' +
+    '<path d="M38 62 q-14 4-10 18 q2 6 10 4" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M82 60 q14 8 8 20" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M50 108 l-5 7 M70 108 l5 7" fill="none" stroke="#0B0F14" stroke-width="3" stroke-linecap="round"/>' +
+    '<text class="zz" x="90" y="34" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="16" fill="#0B0F14">z<tspan font-size="11" dy="-8">z</tspan></text>' +
+    '</svg>',
 };
