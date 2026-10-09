@@ -88,6 +88,13 @@
   .deck .d-pet.asleep{opacity:.5}
   .deck .d-pet.happy{animation:bob 3s ease-in-out infinite}
   .deck .d-mood{font-size:.8rem;color:var(--dim);margin-top:.2rem}
+  .dm-head{background:#FFFFFF;border:1px solid rgba(255,255,255,.9);border-radius:12px;padding:1rem;margin-bottom:.9rem;display:flex;align-items:center;gap:.9rem}
+  .dm-head .d-pet{font-size:2.6rem;line-height:1;flex:none;display:inline-block;width:84px;height:84px}
+  .dm-head h2{font-size:1.25rem;font-weight:700;margin:0 0 .15rem}
+  .dm-head .d-mood{font-size:.86rem;color:var(--dim)}
+  .dm-head .d-counts{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;color:var(--dim);margin-top:.35rem}
+  .dm-head .d-counts b{color:var(--text);font-weight:600}
+  .menu .btn.primary span{color:rgba(255,255,255,.7)}
   .pet{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;margin:0 auto .4rem}
   .pet-emoji{font-size:4.2rem;line-height:1;display:inline-block;width:100%;height:100%}
   .pet.happy .pet-emoji{animation:hop .9s cubic-bezier(.3,1.4,.5,1) 2}
@@ -169,7 +176,7 @@
   #view-study,#view-done{padding-top:.75rem;min-height:0}
   .app[data-view=study] #view-study,.app[data-view=done] #view-done,.app[data-view=browse] #view-browse,.app[data-view=decks] #view-decks,
   .app[data-view=stats] #view-stats,.app[data-view=settings] #view-settings,.app[data-view=add] #view-add,.app[data-view=newdeck] #view-newdeck,
-  .app[data-view=manage] #view-manage,.app[data-view=welcome] #view-welcome{display:flex}
+  .app[data-view=manage] #view-manage,.app[data-view=welcome] #view-welcome,.app[data-view=deck] #view-deck{display:flex}
   .app[data-view=welcome] .top,.app[data-view=welcome] .tabs,.app[data-view=welcome] .track{display:none}
 
   /* ---- study ---- */
@@ -542,6 +549,19 @@
       <div class="row"><label>Mascot<small id="ndKind"></small></label><span style="display:flex;gap:.4rem"><input type="text" id="ndEmoji" maxlength="4" style="width:3.2rem;text-align:center" aria-label="Mascot emoji"><input type="text" id="ndPet" maxlength="16" style="width:7rem" aria-label="Mascot name"></span></div>
       <div class="field"><label>Starter cards · untick any you don't want</label><div id="ndList"></div></div>
       <div class="actions"><button class="btn primary" id="ndCreateBtn">Create deck</button><button class="btn" id="ndRedraftBtn">Redraft</button><button class="btn ghost" id="ndCancelBtn">Cancel</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-deck">
+    <div class="dm-head" id="dmHead"></div>
+    <div class="menu">
+      <button class="btn primary" id="dmPractice" data-dact="practice">Practice <span id="dmDue"></span></button>
+      <button class="btn" data-dact="add">Add a card <span>to this deck</span></button>
+      <button class="btn" data-dact="phrases">Phrases <span>search, mastered, themes</span></button>
+      <button class="btn" data-dact="stats">Stats <span>deck, today, this session</span></button>
+      <button class="btn" data-dact="reset">Reset progress <span>every card back to new</span></button>
+      <button class="btn" id="dmHide" data-dact="hide">Hide from home <span>keeps its progress</span></button>
+      <button class="btn danger" id="dmDelete" data-dact="delete">Delete deck <span>your own deck, cannot be undone</span></button>
     </div>
   </section>
 
@@ -1170,6 +1190,7 @@
     else if (view === 'add') renderAdd();
     else if (view === 'newdeck') renderNewDeck();
     else if (view === 'manage') renderManage();
+    else if (view === 'deck') renderDeckMenu();
     app.dataset.view = view === 'study' ? (current ? 'study' : 'done') : view;
     document.title = (deck() ? deck().meta.name + ' · ' : '') + 'Flashcards';
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.go === view); });
@@ -1727,8 +1748,41 @@
   document.addEventListener('visibilitychange', function () { if (document.hidden && store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   window.addEventListener('pagehide', function () { if (store.sync.dirty) { clearTimeout(pushTimer); pushState(true); } });
   document.querySelectorAll('.menu [data-go], .actions [data-go]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.go); }); });
+  /* ---------- deck menu: tap a deck, choose what to do with it ---------- */
+  var menuDeck = '';
+  function openDeckMenu(id) { if (!deckOf(id)) return; menuDeck = id; setView('deck'); }
+  function renderDeckMenu() {
+    var d = deckOf(menuDeck); if (!d) { setView('decks'); return; }
+    var now = Date.now(), meta = d.meta, b = P(meta.id), cs = creatureState(meta, now);
+    var t = S.dayNum(now), day = b.day.day === t ? b.day : { newDone: 0, revDone: 0, extraNew: 0 };
+    var q = S.buildQueue(cardsOf(meta.id, false), now, day, cfg(day)), st = S.stats(cardsOf(meta.id, false), now);
+    $('dmHead').innerHTML = '<span class="d-pet ' + cs.mood + '">' + creatureArt(cs.c) + '</span><div><h2>' + esc(meta.name) + '</h2><div class="d-mood">' + esc(cs.line) + '</div>' +
+      '<div class="d-counts">' + d.data.notes.length + ' ' + unit(meta) + ' · <b>' + st.mature + '</b> mature · <b>' + q.counts.new + '</b> new · <b>' + q.counts.learn + '</b> learning · <b>' + q.counts.due + '</b> due</div></div>';
+    var todo = q.counts.new + q.counts.learn + q.counts.due;
+    $('dmDue').textContent = todo ? todo + ' card' + (todo === 1 ? '' : 's') + ' waiting' : 'nothing due, +20 new on the done screen';
+    $('dmHide').style.display = meta.custom ? 'none' : '';
+    $('dmDelete').style.display = meta.custom ? '' : 'none';
+    document.title = meta.name + ' · Flashcards';
+  }
+  function resetDeck(id) {
+    var d = deckOf(id); if (!d) return;
+    if (!confirm('Reset progress for ' + d.meta.name + '? Every card in this deck goes back to new. Other decks are untouched.')) return false;
+    if (!confirm('Really? This cannot be undone.')) return false;
+    store.decks[id] = freshBucket(); save(); markDirty(); current = null; lastNoteId = null; toast('Progress reset'); return true;
+  }
   $('deckList').addEventListener('click', function (e) {
-    var b = e.target.closest('.deck[data-deck]'); if (b) switchDeck(b.dataset.deck);
+    var b = e.target.closest('.deck[data-deck]'); if (b) openDeckMenu(b.dataset.deck);
+  });
+  document.querySelector('#view-deck .menu').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-dact]'); if (!b) return;
+    var id = menuDeck, act = b.dataset.dact, d = deckOf(id); if (!d) return;
+    if (act === 'practice') { switchDeck(id); return; }
+    if (act === 'add') { draftDeckId = id; setView('add'); return; }
+    if (act === 'phrases') { if (id !== store.deck) { store.deck = id; save(); pickVoice(); current = null; } browseScope = id; browseTag = ''; browseState = ''; browseQ = ''; $('q').value = ''; setView('browse'); return; }
+    if (act === 'stats') { if (id !== store.deck) { store.deck = id; save(); pickVoice(); current = null; } setView('stats'); return; }
+    if (act === 'reset') { if (resetDeck(id)) render(); return; }
+    if (act === 'hide') { if (INDEX.length <= 1) { toast('Keep at least one deck'); return; } setShelf(id, false); current = null; setView('decks'); toast(d.meta.name + ' hidden · Manage decks brings it back'); return; }
+    if (act === 'delete') { if (!confirm('Delete ' + d.meta.name + ' and its ' + d.data.notes.length + ' cards? This cannot be undone.')) return; deleteDeck(id); current = null; setView('decks'); toast('Deck deleted'); }
   });
 
   $('q').addEventListener('input', function () { browseQ = this.value; browseTag = ''; browseState = ''; renderBrowse(); });
@@ -1828,12 +1882,7 @@
     };
     rd.readAsText(f);
   });
-  $('resetBtn').addEventListener('click', function () {
-    var name = deck().meta.name;
-    if (!confirm('Reset progress for ' + name + '? Every card in this deck goes back to new. Other decks are untouched.')) return;
-    if (!confirm('Really? This cannot be undone.')) return;
-    store.decks[store.deck] = freshBucket(); save(); markDirty(); current = null; lastNoteId = null; setView('study'); toast('Progress reset');
-  });
+  $('resetBtn').addEventListener('click', function () { if (resetDeck(store.deck)) setView('study'); });
 
   document.addEventListener('keydown', function (e) {
     var t = e.target;
