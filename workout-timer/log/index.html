@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
+  <meta name="theme-color" content="#101410">
   <title>Workout Log</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +13,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #fff;
-      color: #061224;
+      background: #101410;
+      color: #f1f4e9;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -38,7 +39,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #00288B;
+      color: #d6fa52;
     }
     .back-link {
       font-family: 'Oswald', sans-serif;
@@ -46,17 +47,17 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #3C638E;
+      color: #a5b09e;
       text-decoration: none;
-      border: 1px solid #c8cfe0;
+      border: 1px solid #343e31;
       padding: 6px 12px;
       border-radius: 6px;
       transition: all 0.15s;
     }
-    .back-link:hover { background: #f4f6fa; border-color: #3C638E; color: #00288B; }
+    .back-link:hover { background: #191f19; border-color: #a5b09e; color: #d6fa52; }
     .header-stripe {
       height: 3px;
-      background: linear-gradient(90deg, #00288B 0%, #00288B 50%, #FDD201 50%, #FDD201 100%);
+      background: linear-gradient(90deg, #d6fa52 0%, #d6fa52 50%, #151b0b 50%, #151b0b 100%);
       border-radius: 2px;
       margin-bottom: 1.5rem;
     }
@@ -69,7 +70,7 @@
       margin-bottom: 2rem;
     }
     .stat-card {
-      background: #f4f6fa;
+      background: #191f19;
       border-radius: 8px;
       padding: 16px;
       text-align: center;
@@ -78,7 +79,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 2rem;
       font-weight: 700;
-      color: #00288B;
+      color: #d6fa52;
       line-height: 1;
     }
     .stat-label {
@@ -86,7 +87,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #3C638E;
+      color: #a5b09e;
       margin-top: 4px;
     }
 
@@ -97,7 +98,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #3C638E;
+      color: #a5b09e;
       margin-bottom: 12px;
     }
     .calendar {
@@ -110,7 +111,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 0.65rem;
       text-transform: uppercase;
-      color: #7a8ba8;
+      color: #a5b09e;
       text-align: center;
       padding: 4px 0;
       letter-spacing: 1px;
@@ -122,14 +123,14 @@
       align-items: center;
       justify-content: center;
       font-size: 0.75rem;
-      color: #7a8ba8;
-      background: #f9fafb;
+      color: #a5b09e;
+      background: var(--surface);
     }
     .cal-day.empty { background: transparent; }
-    .cal-day.today { border: 2px solid #00288B; color: #00288B; font-weight: 700; }
-    .cal-day.has-workout { background: #00288B; color: #FDD201; font-weight: 600; }
-    .cal-day.has-workout.partial { background: #3C638E; color: #fff; }
-    .cal-day.future { background: transparent; color: #c8cfe0; }
+    .cal-day.today { border: 2px solid #d6fa52; color: #d6fa52; font-weight: 700; }
+    .cal-day.has-workout { background: #d6fa52; color: #151b0b; font-weight: 600; }
+    .cal-day.has-workout.partial { background: #a5b09e; color: #101410; }
+    .cal-day.future { background: transparent; color: #343e31; }
 
     .month-nav {
       display: flex;
@@ -141,14 +142,14 @@
       font-family: 'Oswald', sans-serif;
       font-size: 1rem;
       font-weight: 600;
-      color: #061224;
+      color: #f1f4e9;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .month-btn {
       background: none;
-      border: 1px solid #c8cfe0;
-      color: #3C638E;
+      border: 1px solid #343e31;
+      color: #a5b09e;
       padding: 4px 10px;
       border-radius: 4px;
       font-family: 'Oswald', sans-serif;
@@ -156,17 +157,17 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .month-btn:hover { border-color: #3C638E; color: #00288B; }
+    .month-btn:hover { border-color: #a5b09e; color: #d6fa52; }
 
     /* Log entries */
     .log-entry {
-      border: 1px solid #e8ecf2;
+      border: 1px solid #343e31;
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 10px;
       transition: all 0.15s;
     }
-    .log-entry:hover { border-color: #c8cfe0; }
+    .log-entry:hover { border-color: #343e31; }
     .log-header {
       display: flex;
       justify-content: space-between;
@@ -177,7 +178,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 0.95rem;
       font-weight: 600;
-      color: #00288B;
+      color: #d6fa52;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -189,11 +190,11 @@
       padding: 3px 8px;
       border-radius: 4px;
     }
-    .log-status.complete { background: #00288B; color: #FDD201; }
-    .log-status.partial { background: #f4f6fa; color: #3C638E; }
+    .log-status.complete { background: #d6fa52; color: #151b0b; }
+    .log-status.partial { background: #191f19; color: #a5b09e; }
     .log-duration {
       font-size: 0.85rem;
-      color: #3C638E;
+      color: #a5b09e;
       margin-bottom: 8px;
     }
     .log-exercises {
@@ -203,8 +204,8 @@
     }
     .log-exercise-tag {
       font-size: 0.7rem;
-      background: #f4f6fa;
-      color: #3C638E;
+      background: #191f19;
+      color: #a5b09e;
       padding: 3px 8px;
       border-radius: 4px;
       font-weight: 600;
@@ -213,14 +214,14 @@
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: #7a8ba8;
+      color: #a5b09e;
     }
     .empty-state p {
       margin-bottom: 1rem;
       font-size: 0.95rem;
     }
     .empty-state a {
-      color: #00288B;
+      color: #d6fa52;
       text-decoration: none;
       font-weight: 600;
     }
@@ -228,7 +229,7 @@
     .delete-btn {
       background: none;
       border: none;
-      color: #c8cfe0;
+      color: #343e31;
       font-size: 0.75rem;
       cursor: pointer;
       padding: 2px 6px;
@@ -236,7 +237,12 @@
       margin-left: 8px;
     }
     .delete-btn:hover { color: #e55; }
+    h1, .stat-number { color: var(--text); }
+    .header-stripe { background: var(--accent); height: 2px; }
+    .stat-card { border: 1px solid var(--line); }
+    .back-link { border-radius: 999px; }
   </style>
+  <link rel="stylesheet" href="/workout-timer/theme.css">
 </head>
 <body>
   <div class="app">

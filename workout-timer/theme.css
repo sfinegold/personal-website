@@ -1,0 +1,9 @@
+/* Shared workout palette. */
+:root { color-scheme: dark; --bg: #101410; --surface: #191f19; --surface-raised: #222a21; --line: #343e31; --text: #f1f4e9; --muted: #a5b09e; --accent: #d6fa52; --ink: #151b0b; --rest: #b7d1fd; --danger: #ff9d8c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; display: flex; justify-content: center; padding: 28px 20px calc(120px + env(safe-area-inset-bottom)); background-image: radial-gradient(ellipse at 50% 0, #26312155, transparent 55%); }
+button, input, a { -webkit-tap-highlight-color: transparent; }
+button:disabled { opacity: .35; cursor: default; transform: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+::selection { background: var(--accent); color: var(--ink); }
+@media (max-width: 480px) { body { padding: 20px 14px calc(120px + env(safe-area-inset-bottom)); } }
