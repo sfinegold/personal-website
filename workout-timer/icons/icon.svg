@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Workout Timer</title>
+  <rect width="512" height="512" fill="#101410"/>
+  <g fill="none" stroke="#d6fa52" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M224 80h64M256 80v52M366 168l22-22" stroke-width="28"/>
+    <circle cx="256" cy="286" r="152" stroke-width="28"/>
+    <path d="M256 206v80l58 34" stroke-width="28"/>
+  </g>
+  <circle cx="256" cy="286" r="19" fill="#d6fa52"/>
+</svg>

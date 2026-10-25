@@ -1,0 +1,24 @@
+{
+  "id": "/workout-timer/",
+  "name": "Workout Timer",
+  "short_name": "Workout",
+  "start_url": "/workout-timer/",
+  "scope": "/workout-timer/",
+  "display": "standalone",
+  "background_color": "#101410",
+  "theme_color": "#101410",
+  "icons": [
+    {
+      "src": "/workout-timer/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/workout-timer/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
