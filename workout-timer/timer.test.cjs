@@ -7,6 +7,7 @@ const path = require('node:path');
 function timer() {
   const elements = new Map();
   const blobs = new Map();
+  const storage = new Map();
   const audio = {
     paused: true, currentTime: 0, ended: false,
     pause() { this.paused = true; },
@@ -31,7 +32,10 @@ function timer() {
       querySelectorAll: () => [], addEventListener() {}
     },
     navigator: { mediaSession: { setActionHandler() {} } },
-    localStorage: { getItem: () => null },
+    localStorage: {
+      getItem: key => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, String(value))
+    },
     window: {},
     // Rendering audio must not depend on ANY JavaScript timer.
     setTimeout() { throw new Error('Audio cue depends on a JavaScript timer'); },
@@ -126,4 +130,41 @@ test('set adjustment clamps each exercise independently to at least one', () => 
   assert.equal(run('exercises[1].sets'), 1);
   assert.equal(run("boundedNumber('', 1, 99, 4)"), 4);
   assert.equal(run('boundedNumber(Infinity, 1, 99, 4)'), 4);
+});
+
+test('full-body workout is available alongside saved workouts with three timed rounds', () => {
+  const { run, element } = timer();
+  run(`localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify([
+    { name: 'My saved workout', exercises: [{ name: 'Custom', work: 30, rest: 10, sets: 2 }] }
+  ])); renderSavedWorkoutList();`);
+  assert.match(element('saved-workout-list').innerHTML, /Full-body kettlebell circuit/);
+  assert.match(element('saved-workout-list').innerHTML, /My saved workout/);
+  run('loadWorkout(BUILT_IN_WORKOUTS[0], false); buildQueue();');
+  const phases = JSON.parse(run('JSON.stringify(queue)'));
+  const names = ['Rows', 'Cleans', 'Swings', 'Goblet squats', 'Bicep curls',
+    'Tricep extensions', 'Pullovers', 'Alternating halos', 'Pushups'];
+  assert.equal(run('restMode'), 'round');
+  assert.equal(phases.filter(p => p.type === 'work').length, 27);
+  assert.equal(phases.reduce((total, p) => total + p.duration, 0), 660);
+  for (let round = 1; round <= 3; round++) {
+    const roundPhases = phases.filter(p => p.set === round);
+    assert.deepEqual(roundPhases.slice(0, 9).map(p => p.name), names);
+    assert.ok(roundPhases.slice(0, 9).every(p => p.type === 'work' && p.duration === 20));
+    assert.equal(roundPhases.length, round === 3 ? 9 : 10);
+    if (round < 3) assert.equal(roundPhases[9].duration, 60);
+  }
+  assert.equal(run('getSavedWorkouts().length'), 1);
+  assert.equal(run('getDefaultWorkoutName()'), '');
+});
+
+test('saved workout rest settings restore while older workouts retain current settings', () => {
+  const { run, element } = timer();
+  run(`loadWorkout({ name: 'Saved circuit', restMode: 'round', roundRest: 45,
+    exercises: [{ name: 'Squats', work: 20, rest: 0, sets: 3 }] }, false);`);
+  assert.equal(run('restMode'), 'round');
+  assert.equal(Number(element('round-rest').value), 45);
+  run(`loadWorkout({ name: 'Older workout',
+    exercises: [{ name: 'Press', work: 30, rest: 15, sets: 4 }] }, false);`);
+  assert.equal(run('restMode'), 'round');
+  assert.equal(Number(element('round-rest').value), 45);
 });

@@ -79,6 +79,7 @@
     .saved-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border-bottom: 1px solid var(--line); font-size: .83rem; cursor: pointer; }
     .saved-item:last-child { border-bottom: 0; }
     .saved-item:hover { background: var(--surface-raised); }
+    .workout-option { width: 100%; text-align: left; color: var(--text); background: transparent; border: 0; border-bottom: 1px solid var(--line); font-family: inherit; }
     .saved-item-info { display: block; color: var(--muted); font-size: .7rem; margin-top: 4px; }
     .saved-item-actions { display: flex; align-items: center; gap: 6px; }
     .saved-default-btn { border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: transparent; cursor: pointer; font-size: .65rem; padding: 5px 8px; }
@@ -163,7 +164,7 @@
       <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
       <div class="saved-section">
         <button class="saved-toggle" onclick="toggleSavedWorkoutList()">
-          <span id="saved-workout-arrow">&#9654;</span> Saved Workouts
+          <span id="saved-workout-arrow">&#9654;</span> Workouts
         </button>
         <div class="saved-actions">
           <button class="saved-action-btn" onclick="saveCurrentWorkoutSet()">Save Current Workout</button>
@@ -787,6 +788,14 @@
     // ========== SAVED WORKOUTS (localStorage) ==========
     const SAVED_WORKOUTS_KEY = 'sam_saved_workouts';
     const DEFAULT_WORKOUT_KEY = 'sam_default_workout';
+    const BUILT_IN_WORKOUTS = [{
+      name: 'Full-body kettlebell circuit',
+      restMode: 'round',
+      roundRest: 60,
+      exercises: ['Rows', 'Cleans', 'Swings', 'Goblet squats', 'Bicep curls',
+        'Tricep extensions', 'Pullovers', 'Alternating halos', 'Pushups']
+        .map(name => ({ name, work: 20, rest: 0, sets: 3 }))
+    }];
 
     function getSavedWorkouts() {
       try { return JSON.parse(localStorage.getItem(SAVED_WORKOUTS_KEY)) || []; }
@@ -822,6 +831,8 @@
       const workout = {
         name: name.trim(),
         exercises: workoutExercises,
+        restMode,
+        roundRest: getRoundRest(),
         updatedAt: new Date().toISOString()
       };
 
@@ -843,7 +854,16 @@
         sets: ex.sets
       }));
       renderExercises();
+      if (['exercise', 'round', 'none'].includes(workout.restMode)) {
+        document.getElementById('round-rest').value = boundedNumber(workout.roundRest, 0, 1800, 30);
+        saveRoundRest();
+        setRestMode(workout.restMode);
+      }
       if (showLoadedToast) showToast(`Loaded "${workout.name}"`);
+    }
+
+    function loadWorkoutOption(idx) {
+      loadWorkout(BUILT_IN_WORKOUTS[idx]);
     }
 
     function loadSavedWorkout(idx) {
@@ -883,11 +903,15 @@
       const saved = getSavedWorkouts();
       const list = document.getElementById('saved-workout-list');
       const defaultWorkoutName = getDefaultWorkoutName();
-      if (saved.length === 0) {
-        list.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:0.8rem;">No saved workouts yet. Save the current exercise list to reuse it later.</div>';
-        return;
-      }
-      list.innerHTML = saved.map((workout, i) => {
+      const builtIns = BUILT_IN_WORKOUTS.map((workout, i) => `
+        <button class="saved-item workout-option" onclick="loadWorkoutOption(${i})">
+          <span>${escapeHtml(workout.name)}
+            <span class="saved-item-info">9 exercises · 20s each · 3 rounds · 60s between rounds</span>
+          </span>
+          <span aria-hidden="true">↗</span>
+        </button>
+      `).join('');
+      list.innerHTML = builtIns + saved.map((workout, i) => {
         const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.sets, 0);
         return `
           <div class="saved-item" onclick="loadSavedWorkout(${i})">
