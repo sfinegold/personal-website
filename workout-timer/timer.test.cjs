@@ -187,3 +187,42 @@ test('quick insertion places exercises and timed rests at the requested position
     loadWorkout({name: 'Rest circuit', exercises: snapshot}, false); buildQueue();`);
   assert.equal(run('queue.filter(p => p.type === "rest").length'), 3);
 });
+
+test('recent pills show completed unique routines newest first and keep rest settings', () => {
+  const { run, element } = timer();
+  run(`const entry = (date, name, completed = true) => ({ date, name, completed,
+    exercises: [{name, work: 20, rest: 0, sets: 3}], restMode: 'round', roundRest: 60 });
+    localStorage.setItem(DB_KEY, JSON.stringify([
+      entry('2026-11-10', 'Rows'), entry('2026-11-12', 'Cleans'),
+      entry('2026-11-15', 'Rows'), entry('2026-11-16', 'Stopped', false)
+    ])); renderRecentWorkouts();`);
+  assert.equal(element('recent-workouts').hidden, false);
+  assert.deepEqual(JSON.parse(run('JSON.stringify(getRecentWorkouts().map(e => e.name))')), ['Rows', 'Cleans']);
+  assert.match(element('recent-pills').innerHTML, /Load recent workout: Rows/);
+  run('loadWorkout(getRecentWorkouts()[0], false); buildQueue();');
+  assert.equal(run('exercises[0].name'), 'Rows');
+  assert.equal(run('restMode'), 'round');
+  assert.equal(run('getRoundRest()'), 60);
+  run('localStorage.setItem(DB_KEY, "[]"); renderRecentWorkouts();');
+  assert.equal(element('recent-workouts').hidden, true);
+});
+
+test('update appears after editing and replaces the loaded saved workout in place', () => {
+  const { run, element } = timer();
+  run(`showToast = () => {};
+    loadWorkout(BUILT_IN_WORKOUTS[0], false);
+    localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify([
+      {name: 'Other routine', exercises: [{name: 'Press', work: 30, rest: 10, sets: 2}]}
+    ]));`);
+  assert.equal(element('workout-update').hidden, true);
+  run('exercises[0].work = 40; updateTotalTime();');
+  assert.equal(element('workout-update').hidden, false);
+  run('updateLoadedWorkout()');
+  assert.equal(element('workout-update').hidden, true);
+  assert.equal(run('getSavedWorkouts().length'), 2);
+  run('exercises[0].work = 50; updateTotalTime(); updateLoadedWorkout(); loadWorkoutOption(0);');
+  assert.equal(run('getSavedWorkouts().length'), 2);
+  assert.equal(run('exercises[0].work'), 50);
+  assert.equal(run('getSavedWorkouts()[0].name'), 'Other routine');
+  assert.equal(run('restMode'), 'round');
+});

@@ -31,6 +31,14 @@
     .all-sets { display: flex; align-items: center; gap: 6px; }
     .quick-btn { min-height: 36px; padding: 7px 10px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: .73rem; font-weight: 600; cursor: pointer; }
     .quick-btn:hover { border-color: var(--accent); }
+    .workout-update { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; font-size: .75rem; color: var(--muted); }
+    .workout-update[hidden] { display: none; }
+    .recent-workouts { margin: 0 0 14px; }
+    .recent-workouts[hidden] { display: none; }
+    .recent-label { color: var(--muted); font-size: .65rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .recent-pills { display: flex; gap: 7px; overflow-x: auto; padding: 2px 2px 6px; }
+    .recent-pill { flex: none; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 38px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--accent); font: 600 .75rem 'DM Sans', sans-serif; cursor: pointer; }
+    .recent-pill:hover { border-color: var(--accent); background: var(--surface-raised); }
     .exercise-row { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px 10px; margin-bottom: 8px; }
     .exercise-top { display: grid; grid-template-columns: 22px minmax(0, 1fr) 32px 32px; align-items: center; gap: 4px; margin-bottom: 4px; }
     .exercise-top input { min-width: 0; width: 100%; color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 6px; font: 600 .95rem 'DM Sans', sans-serif; padding: 6px 3px; }
@@ -42,15 +50,11 @@
     .remove-btn:hover { color: var(--danger); }
     .exercise-row.drag-over { border-color: var(--accent); }
     .exercise-row.dragging { opacity: .4; }
-    .insert-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
-    .insert-menu { position: relative; min-width: 0; }
-    .insert-menu summary { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 .72rem 'DM Sans', sans-serif; cursor: pointer; list-style: none; }
-    .insert-menu summary::-webkit-details-marker { display: none; }
-    .insert-menu summary::after { content: '⌄'; }
-    .insert-menu[open] summary, .insert-menu summary:hover { background: var(--surface-raised); border-color: var(--accent); }
-    .insert-menu-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 40; padding: 4px; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px #000b; }
-    .insert-menu-options button { display: block; width: 100%; min-height: 40px; padding: 8px 10px; text-align: left; background: transparent; color: var(--text); border: 0; border-radius: 5px; font: 600 .75rem 'DM Sans', sans-serif; cursor: pointer; }
-    .insert-menu-options button:hover { background: var(--line); color: var(--accent); }
+    .insert-actions { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 5px; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+    .insert-label { color: var(--muted); font: 600 clamp(.6rem, 1.9vw, .72rem) 'DM Sans', sans-serif; }
+    .insert-label.rest-label { margin-left: 5px; }
+    .insert-actions button { min-width: 0; min-height: 36px; padding: 5px 3px; background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 clamp(.6rem, 1.9vw, .72rem) 'DM Sans', sans-serif; cursor: pointer; }
+    .insert-actions button:hover { background: var(--surface-raised); border-color: var(--accent); }
     .rest-entry { border-left: 3px solid var(--rest); }
     .rest-entry .exercise-fields { grid-template-columns: 1fr 1.35fr; }
     .rest-entry .exercise-rest-field { display: none; }
@@ -165,12 +169,20 @@
     <div id="tab-workout">
     <!-- Setup -->
     <div class="setup-view" id="setup">
+      <div class="recent-workouts" id="recent-workouts" hidden>
+        <div class="recent-label">Recently completed</div>
+        <div class="recent-pills" id="recent-pills" role="group" aria-label="Recently completed workouts"></div>
+      </div>
       <div class="setup-toolbar">
         <a href="/workout-timer/log/" class="log-link" id="log-link">Log</a>
         <div class="all-sets" role="group" aria-label="Adjust sets for all exercises">
           <button class="quick-btn" id="decrease-all" onclick="adjustAllSets(-1)">−1 set from all</button>
           <button class="quick-btn" id="increase-all" onclick="adjustAllSets(1)" aria-label="Add one set to all exercises">+1 to all</button>
         </div>
+      </div>
+      <div class="workout-update" id="workout-update" hidden>
+        <span id="workout-update-name"></span>
+        <button class="quick-btn" onclick="updateLoadedWorkout()">Update workout</button>
       </div>
       <div id="exercise-list"></div>
       <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
@@ -300,10 +312,14 @@
         id: Date.now(),
         date: new Date().toISOString(),
         exercises: data.exercises,
+        name: getWorkoutTitle(data.exercises),
+        restMode,
+        roundRest: getRoundRest(),
         totalDuration: data.totalDuration,
         completed: data.completed
       });
       localStorage.setItem(DB_KEY, JSON.stringify(log));
+      renderRecentWorkouts();
     }
 
     function showToast(msg) {
@@ -375,6 +391,8 @@
 
     // ========== TIMER STATE ==========
     let exercises = [];
+    let loadedWorkoutName = 'Tennis workout';
+    let loadedWorkoutSignature = '';
     let nextExerciseId = 1;
     let paused = false;
     let currentSeconds = 0;
@@ -682,7 +700,7 @@
         <div class="exercise-row ${e.kind === 'rest' ? 'rest-entry' : ''}" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
           <div class="exercise-top">
             <button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder" aria-label="Reorder exercise ${i + 1}">&#8942;</button>
-            <input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value">
+            <input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value; updateTotalTime()">
             <button class="save-btn" onclick="saveExercise(${i})" title="Save for later" aria-label="Save exercise ${i + 1}">&#9734;</button>
             <button class="remove-btn" onclick="removeExercise(${e.id})" aria-label="Remove exercise ${i + 1}">&times;</button>
           </div>
@@ -696,20 +714,12 @@
             </div></div>
           </div>
           <div class="insert-actions" role="group" aria-label="Insert near exercise ${i + 1}">
-            <details class="insert-menu" name="insert-menu">
-              <summary aria-label="Add exercise near exercise ${i + 1}">+ Exercise</summary>
-              <div class="insert-menu-options">
-                <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}">↑ Above</button>
-                <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}">↓ Below</button>
-              </div>
-            </details>
-            <details class="insert-menu" name="insert-menu">
-              <summary aria-label="Add rest near exercise ${i + 1}">+ Rest</summary>
-              <div class="insert-menu-options">
-                <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}">↑ Above</button>
-                <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}">↓ Below</button>
-              </div>
-            </details>
+            <span class="insert-label">Exercise:</span>
+            <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}">Add above</button>
+            <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}">Add below</button>
+            <span class="insert-label rest-label">Rest:</span>
+            <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}">Add above</button>
+            <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}">Add below</button>
           </div>
         </div>
       `).join('');
@@ -717,17 +727,13 @@
     }
 
     // Shift+Arrow to navigate between number inputs in the grid
-    document.addEventListener('click', event => {
-      document.querySelectorAll('.insert-menu[open]').forEach(menu => {
-        if (!menu.contains(event.target)) menu.open = false;
-      });
+    document.addEventListener('input', event => {
+      if (loadedWorkoutSignature && event.target.matches('.exercise-row input, #round-rest')) {
+        document.getElementById('workout-update').hidden = false;
+      }
     });
-    document.addEventListener('keydown', event => {
-      if (event.key !== 'Escape') return;
-      document.querySelectorAll('.insert-menu[open]').forEach(menu => {
-        menu.open = false;
-        menu.querySelector('summary').focus();
-      });
+    document.addEventListener('focusout', event => {
+      if (event.target.matches('.exercise-row input')) updateTotalTime();
     });
     document.addEventListener('keydown', (e) => {
       if (!e.shiftKey || !e.target.matches('.exercise-row input[type="number"]')) return;
@@ -778,6 +784,7 @@
       document.getElementById('decrease-all').disabled = !exercises.some(ex => ex.sets > 1);
       document.getElementById('increase-all').disabled = !exercises.some(ex => ex.sets < 99);
       document.getElementById('start-btn').disabled = exercises.length === 0;
+      renderWorkoutUpdate();
     }
 
     // ========== SAVED EXERCISES (localStorage) ==========
@@ -862,6 +869,72 @@
       catch { return []; }
     }
 
+    function workoutSignature(items) {
+      return JSON.stringify(items.map(ex => [ex.name, ex.work, ex.rest, ex.sets, ex.kind || 'exercise']));
+    }
+
+    function currentWorkoutSignature() {
+      return workoutSignature(getCurrentWorkoutSnapshot()) + JSON.stringify([restMode, getRoundRest()]);
+    }
+
+    function renderWorkoutUpdate() {
+      const changed = loadedWorkoutSignature && currentWorkoutSignature() !== loadedWorkoutSignature;
+      document.getElementById('workout-update').hidden = !changed || !exercises.length;
+      document.getElementById('workout-update-name').textContent = loadedWorkoutName;
+    }
+
+    function updateLoadedWorkout() {
+      const workout = { name: loadedWorkoutName, exercises: getCurrentWorkoutSnapshot(),
+        restMode, roundRest: getRoundRest(), updatedAt: new Date().toISOString() };
+      if (!workout.exercises.length) return;
+      const saved = getSavedWorkouts();
+      const index = saved.findIndex(w => w.name.toLowerCase() === workout.name.toLowerCase());
+      if (index < 0) saved.push(workout);
+      else saved[index] = workout;
+      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      loadedWorkoutSignature = currentWorkoutSignature();
+      renderWorkoutUpdate();
+      renderSavedWorkoutList();
+      showToast(`Updated "${workout.name}"`);
+    }
+
+    function getWorkoutTitle(items) {
+      const match = [...BUILT_IN_WORKOUTS, ...getSavedWorkouts()].find(workout =>
+        workoutSignature(workout.exercises) === workoutSignature(items));
+      if (match) return match.name;
+      const work = items.filter(ex => ex.kind !== 'rest');
+      if (!work.length) return 'Rest routine';
+      return (work[0].name || 'Workout') + (work.length > 1 ? ` +${work.length - 1}` : '');
+    }
+
+    function getRecentWorkouts() {
+      const seen = new Set();
+      return getWorkoutLog()
+        .filter(entry => entry.completed && Array.isArray(entry.exercises) && entry.exercises.length)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .filter(entry => {
+          const key = workoutSignature(entry.exercises) + JSON.stringify([entry.restMode, entry.roundRest]);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }).slice(0, 5);
+    }
+
+    function renderRecentWorkouts() {
+      const recent = getRecentWorkouts();
+      document.getElementById('recent-workouts').hidden = !recent.length;
+      document.getElementById('recent-pills').innerHTML = recent.map((entry, i) => {
+        const name = entry.name || getWorkoutTitle(entry.exercises);
+        const date = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `<button class="recent-pill" onclick="loadRecentWorkout(${i})" title="${escapeHtml(name)} · ${escapeHtml(date)}" aria-label="Load recent workout: ${escapeHtml(name)}">${escapeHtml(name)} <span aria-hidden="true">↗</span></button>`;
+      }).join('');
+    }
+
+    function loadRecentWorkout(idx) {
+      const entry = getRecentWorkouts()[idx];
+      if (entry) loadWorkout({ ...entry, name: entry.name || getWorkoutTitle(entry.exercises) });
+    }
+
     function getDefaultWorkoutName() {
       return localStorage.getItem(DEFAULT_WORKOUT_KEY) || '';
     }
@@ -901,6 +974,9 @@
       else saved.push(workout);
 
       localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      loadedWorkoutName = workout.name;
+      loadedWorkoutSignature = currentWorkoutSignature();
+      renderWorkoutUpdate();
       showToast(`Saved workout "${workout.name}"`);
       renderSavedWorkoutList();
     }
@@ -921,11 +997,15 @@
         saveRoundRest();
         setRestMode(workout.restMode);
       }
+      loadedWorkoutName = workout.name;
+      loadedWorkoutSignature = currentWorkoutSignature();
+      renderWorkoutUpdate();
       if (showLoadedToast) showToast(`Loaded "${workout.name}"`);
     }
 
     function loadWorkoutOption(idx) {
-      loadWorkout(BUILT_IN_WORKOUTS[idx]);
+      const original = BUILT_IN_WORKOUTS[idx];
+      loadWorkout(getSavedWorkouts().find(w => w.name === original.name) || original);
     }
 
     function loadSavedWorkout(idx) {
@@ -965,7 +1045,7 @@
       const saved = getSavedWorkouts();
       const list = document.getElementById('saved-workout-list');
       const defaultWorkoutName = getDefaultWorkoutName();
-      const builtIns = BUILT_IN_WORKOUTS.map((workout, i) => `
+      const builtIns = BUILT_IN_WORKOUTS.map((workout, i) => saved.some(w => w.name === workout.name) ? '' : `
         <button class="saved-item workout-option" onclick="loadWorkoutOption(${i})">
           <span>${escapeHtml(workout.name)}
             <span class="saved-item-info">9 exercises · 20s each · 3 rounds · 60s between rounds</span>
@@ -1221,6 +1301,9 @@
 
     if (!loadDefaultWorkout()) loadBuiltInWorkout();
     initRestMode();
+    loadedWorkoutSignature = currentWorkoutSignature();
+    renderWorkoutUpdate();
+    renderRecentWorkouts();
     document.getElementById('log-link').href = logHref();
   </script>
 </body>
