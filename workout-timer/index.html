@@ -43,8 +43,14 @@
     .exercise-row.drag-over { border-color: var(--accent); }
     .exercise-row.dragging { opacity: .4; }
     .insert-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
-    .insert-actions button { min-height: 36px; background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 .72rem 'DM Sans', sans-serif; cursor: pointer; }
-    .insert-actions button:hover { background: var(--surface-raised); border-color: var(--accent); }
+    .insert-menu { position: relative; min-width: 0; }
+    .insert-menu summary { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 .72rem 'DM Sans', sans-serif; cursor: pointer; list-style: none; }
+    .insert-menu summary::-webkit-details-marker { display: none; }
+    .insert-menu summary::after { content: '⌄'; }
+    .insert-menu[open] summary, .insert-menu summary:hover { background: var(--surface-raised); border-color: var(--accent); }
+    .insert-menu-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 40; padding: 4px; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px #000b; }
+    .insert-menu-options button { display: block; width: 100%; min-height: 40px; padding: 8px 10px; text-align: left; background: transparent; color: var(--text); border: 0; border-radius: 5px; font: 600 .75rem 'DM Sans', sans-serif; cursor: pointer; }
+    .insert-menu-options button:hover { background: var(--line); color: var(--accent); }
     .rest-entry { border-left: 3px solid var(--rest); }
     .rest-entry .exercise-fields { grid-template-columns: 1fr 1.35fr; }
     .rest-entry .exercise-rest-field { display: none; }
@@ -690,10 +696,20 @@
             </div></div>
           </div>
           <div class="insert-actions" role="group" aria-label="Insert near exercise ${i + 1}">
-            <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}">↑ Add exercise</button>
-            <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}">↓ Add exercise</button>
-            <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}">↑ Add rest</button>
-            <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}">↓ Add rest</button>
+            <details class="insert-menu" name="insert-menu">
+              <summary aria-label="Add exercise near exercise ${i + 1}">+ Exercise</summary>
+              <div class="insert-menu-options">
+                <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}">↑ Above</button>
+                <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}">↓ Below</button>
+              </div>
+            </details>
+            <details class="insert-menu" name="insert-menu">
+              <summary aria-label="Add rest near exercise ${i + 1}">+ Rest</summary>
+              <div class="insert-menu-options">
+                <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}">↑ Above</button>
+                <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}">↓ Below</button>
+              </div>
+            </details>
           </div>
         </div>
       `).join('');
@@ -701,6 +717,18 @@
     }
 
     // Shift+Arrow to navigate between number inputs in the grid
+    document.addEventListener('click', event => {
+      document.querySelectorAll('.insert-menu[open]').forEach(menu => {
+        if (!menu.contains(event.target)) menu.open = false;
+      });
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.insert-menu[open]').forEach(menu => {
+        menu.open = false;
+        menu.querySelector('summary').focus();
+      });
+    });
     document.addEventListener('keydown', (e) => {
       if (!e.shiftKey || !e.target.matches('.exercise-row input[type="number"]')) return;
       const row = e.target.closest('.exercise-row');
