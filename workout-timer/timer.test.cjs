@@ -121,6 +121,33 @@ test('restart exercise from rest seeks to preceding work; stop releases its trac
   assert.equal(run('timeline.length'), 0);
 });
 
+test('next exercise skips rests, follows the media position, and preserves pause', () => {
+  const { run, audio, element } = timer();
+  run("restMode = 'exercise'; buildQueue(); prepareWorkoutAudio(); workoutActive = true;");
+  audio.currentTime = 7;
+  audio.paused = false;
+  run('skipToNextExercise()');
+  assert.equal(audio.currentTime, 13);
+  assert.equal(element('current-name').textContent, 'Second');
+  assert.equal(element('countdown').textContent, 6);
+  assert.equal(audio.paused, false);
+  // A backgrounded display may still have a stale queueIndex. Use media time.
+  audio.currentTime = 11;
+  audio.paused = true;
+  run('queueIndex = 4; skipToNextExercise()');
+  assert.equal(audio.currentTime, 13);
+  assert.equal(audio.paused, true);
+  run('skipToNextExercise()');
+  assert.equal(audio.currentTime, 23);
+  assert.equal(element('set-info').textContent, 'Round 2 of 2');
+  assert.equal(element('next-exercise-btn').disabled, true);
+  run('skipToNextExercise()');
+  assert.equal(audio.currentTime, 23);
+  audio.currentTime = 28;
+  run('syncAudioDisplay()');
+  assert.equal(element('exercise-nav').style.display, 'none');
+});
+
 test('set adjustment clamps each exercise independently to at least one', () => {
   const { run } = timer();
   run('adjustAllSets(-1)');
