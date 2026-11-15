@@ -50,7 +50,7 @@ function timer() {
   run(`exercises = [
     { id: 1, name: 'First', work: 5, rest: 3, sets: 2 },
     { id: 2, name: 'Second', work: 6, rest: 4, sets: 1 }
-  ];`);
+  ]; nextExerciseId = 3;`);
   return { run, audio, blobs, element };
 }
 
@@ -167,4 +167,23 @@ test('saved workout rest settings restore while older workouts retain current se
     exercises: [{ name: 'Press', work: 30, rest: 15, sets: 4 }] }, false);`);
   assert.equal(run('restMode'), 'round');
   assert.equal(Number(element('round-rest').value), 45);
+});
+
+test('quick insertion places exercises and timed rests at the requested position', () => {
+  const { run } = timer();
+  run(`insertEntry(0, 'above'); insertEntry(2, 'below', 'rest');`);
+  assert.deepEqual(JSON.parse(run('JSON.stringify(exercises.map(e => e.name))')),
+    ['', 'First', 'Second', 'Rest']);
+  assert.equal(run('new Set(exercises.map(e => e.id)).size'), 4);
+  assert.equal(run('exercises[0].work'), 5);
+  assert.equal(run('exercises[0].sets'), 2);
+  assert.equal(run('exercises[3].sets'), 1);
+  run(`insertEntry(1, 'below', 'rest'); restMode = 'none'; buildQueue();`);
+  const phases = JSON.parse(run('JSON.stringify(queue)'));
+  assert.equal(phases[2].type, 'rest');
+  assert.equal(phases[2].duration, 30);
+  assert.equal(phases.filter(p => p.type === 'rest').length, 3);
+  run(`const snapshot = getCurrentWorkoutSnapshot();
+    loadWorkout({name: 'Rest circuit', exercises: snapshot}, false); buildQueue();`);
+  assert.equal(run('queue.filter(p => p.type === "rest").length'), 3);
 });

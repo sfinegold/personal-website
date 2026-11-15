@@ -9,7 +9,7 @@
   <link rel="manifest" href="/workout-timer/manifest.webmanifest">
   <meta name="apple-mobile-web-app-title" content="Workout">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#101410">
+  <meta name="theme-color" content="#000000">
   <meta name="description" content="Your circuit, your pace. A workout timer with background audio cues and quick set controls.">
   <title>Workout Timer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,6 +42,12 @@
     .remove-btn:hover { color: var(--danger); }
     .exercise-row.drag-over { border-color: var(--accent); }
     .exercise-row.dragging { opacity: .4; }
+    .insert-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+    .insert-actions button { min-height: 36px; background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 .72rem 'DM Sans', sans-serif; cursor: pointer; }
+    .insert-actions button:hover { background: var(--surface-raised); border-color: var(--accent); }
+    .rest-entry { border-left: 3px solid var(--rest); }
+    .rest-entry .exercise-fields { grid-template-columns: 1fr 1.35fr; }
+    .rest-entry .exercise-rest-field { display: none; }
     .exercise-fields { display: grid; grid-template-columns: 1fr 1fr 1.35fr; gap: 8px; }
     .field-label { display: block; color: var(--muted); font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
     .value-field, .stepper { display: flex; align-items: center; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 8px; height: 36px; overflow: hidden; }
@@ -55,7 +61,7 @@
     .btn:hover { transform: translateY(-1px); }
     .btn-add { background: transparent; border-style: dashed; color: var(--muted); width: 100%; margin: 4px 0 18px; }
     .btn-add:hover { color: var(--accent); border-color: var(--accent); }
-    .start-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; border-top: 1px solid var(--line); background: rgba(16, 20, 16, .94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    .start-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; border-top: 1px solid var(--line); background: rgba(0, 0, 0, .94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
     .start-dock-inner { display: flex; align-items: center; gap: 16px; max-width: 580px; margin: auto; }
     .total-time { flex: none; min-width: 80px; color: var(--muted); font-size: .63rem; text-transform: uppercase; letter-spacing: 1px; }
     .total-time strong { display: block; margin-top: 3px; color: var(--text); font-family: 'Oswald', sans-serif; font-size: 1.65rem; font-weight: 500; line-height: 1.2; font-variant-numeric: tabular-nums; }
@@ -89,7 +95,7 @@
     .rest-mode-label { color: var(--muted); font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
     .rest-seg { display: flex; gap: 6px; }
     .seg-btn { flex: 1; padding: 9px 5px; font: 500 .73rem 'DM Sans', sans-serif; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); cursor: pointer; }
-    .seg-btn.active { background: rgba(214, 250, 82, .1); color: var(--accent); border-color: var(--accent); }
+    .seg-btn.active { background: rgba(82, 167, 255, .12); color: var(--accent); border-color: var(--accent); }
     .rest-hint, .audio-note { font-size: .72rem; color: var(--muted); margin-top: 10px; line-height: 1.6; }
     .audio-note { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
     .audio-note::before { content: ''; flex: none; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
@@ -115,7 +121,7 @@
     .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 90; overflow: hidden; }
     .confetti { position: absolute; top: -20px; border-radius: 2px; animation: confettiFall linear forwards; }
     @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
-    .completion-overlay { position: fixed; inset: 0; background: #101410f5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 80; opacity: 0; transition: opacity .3s; }
+    .completion-overlay { position: fixed; inset: 0; background: #000000f5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 80; opacity: 0; transition: opacity .3s; }
     .completion-overlay.show { opacity: 1; }
     .completion-check { color: var(--accent); font-size: 5rem; }
     .completion-text { font: 600 2rem 'Oswald', sans-serif; text-transform: uppercase; margin-top: 16px; }
@@ -579,15 +585,35 @@
       renderExercises();
     }
 
-    function addExercise(name = '', work = 30, rest = 15, sets = 4) {
+    function addExercise(name = '', work = 30, rest = 15, sets = 4, kind = 'exercise') {
       const id = nextExerciseId++;
-      exercises.push({ id, name, work, rest, sets });
+      exercises.push({ id, name, work, rest, sets, kind });
       renderExercises();
     }
 
     function removeExercise(id) {
       exercises = exercises.filter(e => e.id !== id);
       renderExercises();
+    }
+
+    function insertEntry(index, position, kind = 'exercise') {
+      syncExercisesFromRows();
+      const anchor = exercises[index];
+      if (!anchor) return;
+      const insertAt = index + (position === 'below' ? 1 : 0);
+      const isRest = kind === 'rest';
+      const id = nextExerciseId++;
+      exercises.splice(insertAt, 0, {
+        id, name: isRest ? 'Rest' : '', kind,
+        work: isRest ? 30 : anchor.work,
+        rest: isRest ? 0 : anchor.rest,
+        sets: anchor.sets
+      });
+      renderExercises();
+      const row = document.querySelectorAll('.exercise-row')[insertAt];
+      const input = row?.querySelectorAll('input')[isRest ? 1 : 0];
+      input?.focus();
+      input?.select();
     }
 
     let draggedExerciseIndex = null;
@@ -647,7 +673,7 @@
     function renderExercises() {
       const list = document.getElementById('exercise-list');
       list.innerHTML = exercises.map((e, i) => `
-        <div class="exercise-row" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
+        <div class="exercise-row ${e.kind === 'rest' ? 'rest-entry' : ''}" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
           <div class="exercise-top">
             <button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder" aria-label="Reorder exercise ${i + 1}">&#8942;</button>
             <input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value">
@@ -655,13 +681,19 @@
             <button class="remove-btn" onclick="removeExercise(${e.id})" aria-label="Remove exercise ${i + 1}">&times;</button>
           </div>
           <div class="exercise-fields">
-            <label><span class="field-label">Work</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} work seconds" value="${e.work}" min="5" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
-            <label><span class="field-label">Rest</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
+            <label><span class="field-label">${e.kind === 'rest' ? 'Rest duration' : 'Work'}</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} ${e.kind === 'rest' ? 'rest duration' : 'work'} seconds" value="${e.work}" min="5" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
+            <label class="exercise-rest-field"><span class="field-label">Rest</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
             <div><label class="field-label" for="sets-${e.id}">Sets</label><div class="stepper">
               <button onclick="adjustSets(${i}, -1)" aria-label="Decrease sets for exercise ${i + 1}">−</button>
               <input class="sets-input" id="sets-${e.id}" type="number" aria-label="Exercise ${i + 1} sets" value="${e.sets}" min="1" max="99" inputmode="numeric" onchange="updateTotalTime()">
               <button onclick="adjustSets(${i}, 1)" aria-label="Increase sets for exercise ${i + 1}">+</button>
             </div></div>
+          </div>
+          <div class="insert-actions" role="group" aria-label="Insert near exercise ${i + 1}">
+            <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}">↑ Add exercise</button>
+            <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}">↓ Add exercise</button>
+            <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}">↑ Add rest</button>
+            <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}">↓ Add rest</button>
           </div>
         </div>
       `).join('');
@@ -704,7 +736,7 @@
         const active = exercises.filter(ex => round <= ex.sets);
         active.forEach((ex, i) => {
           totalSec += ex.work;
-          if (restMode === 'exercise') {
+          if (restMode === 'exercise' && ex.kind !== 'rest') {
             const isLastExInLastRound = round === maxSets && i === active.length - 1;
             if (ex.rest > 0 && !isLastExInLastRound) totalSec += ex.rest;
           }
@@ -740,7 +772,7 @@
         showToast(`"${name}" already saved`);
         return;
       }
-      saved.push({ name, work, rest, sets });
+      saved.push({ name, work, rest, sets, kind: exercises[idx].kind });
       localStorage.setItem(SAVED_EX_KEY, JSON.stringify(saved));
       showToast(`Saved "${name}"`);
       renderSavedList();
@@ -756,7 +788,7 @@
     function loadSavedExercise(idx) {
       const saved = getSavedExercises();
       const ex = saved[idx];
-      addExercise(ex.name, ex.work, ex.rest, ex.sets);
+      addExercise(ex.name, ex.work, ex.rest, ex.sets, ex.kind);
     }
 
     function toggleSavedList() {
@@ -810,6 +842,7 @@
       syncExercisesFromRows();
       return exercises.map(e => ({
         name: e.name || 'Exercise',
+        kind: e.kind,
         work: e.work,
         rest: e.rest,
         sets: e.sets
@@ -849,6 +882,7 @@
       exercises = workout.exercises.map(ex => ({
         id: nextExerciseId++,
         name: ex.name,
+        kind: ex.kind,
         work: ex.work,
         rest: ex.rest,
         sets: ex.sets
@@ -947,8 +981,8 @@
         const active = exercises.filter(ex => round <= ex.sets);
         active.forEach((ex, i) => {
           const name = ex.name || 'Exercise';
-          queue.push({ name, type: 'work', duration: ex.work, set: round, totalSets: maxSets });
-          if (restMode === 'exercise') {
+          queue.push({ name, type: ex.kind === 'rest' ? 'rest' : 'work', duration: ex.work, set: round, totalSets: maxSets });
+          if (restMode === 'exercise' && ex.kind !== 'rest') {
             const isLastExInLastRound = round === maxSets && i === active.length - 1;
             if (ex.rest > 0 && !isLastExInLastRound) {
               queue.push({ name, type: 'rest', duration: ex.rest, set: round, totalSets: maxSets });
@@ -1081,7 +1115,7 @@
       // Log as incomplete
       const elapsed = Math.round((new Date() - workoutStartTime) / 1000);
       logWorkout({
-        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets })),
+        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets, kind: e.kind })),
         totalDuration: elapsed,
         completed: false
       });
@@ -1094,7 +1128,7 @@
       const container = document.createElement('div');
       container.className = 'confetti-container';
       document.body.appendChild(container);
-      const colors = ['#d6fa52', '#b7d1fd', '#f2f4ed', '#88ab78'];
+      const colors = ['#52a7ff', '#b5d8ff', '#f2f4ed', '#247bdb'];
       for (let i = 0; i < 60; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti';
@@ -1131,7 +1165,7 @@
 
       // Log completed workout
       logWorkout({
-        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets })),
+        exercises: exercises.map(e => ({ name: e.name, work: e.work, rest: e.rest, sets: e.sets, kind: e.kind })),
         totalDuration: elapsed,
         completed: true
       });
