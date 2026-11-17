@@ -63,7 +63,7 @@ test('sign-in attempts are rate limited', async () => {
   assert.equal((await call({ op: 'login', email: 'a@example.com', password: 'wrong' })).status, 429);
 });
 test('device import, offline retry, account switching and cross-device deletion stay isolated', async () => {
-  const { call, login: loginServer } = backend(); let cookie = '', offline = false;
+  const { call, login: loginServer } = backend(); let cookie = '', offline = false, holdRequest = null;
   const priorSession = await loginServer('a@example.com');
   await call({op:'sync',mutations:{'setting:sam_rest_mode':'exercise'}}, priorSession);
   const raw = new Map([['sam_rest_mode','round'],['sam_workout_log', JSON.stringify([{ id: 1, name: 'Existing', completed: true }])], ['sam_saved_workouts', JSON.stringify([{name:'Device routine',exercises:[]}])]]);
@@ -77,6 +77,7 @@ test('device import, offline retry, account switching and cross-device deletion 
     window: { addEventListener(){}, dispatchEvent(){} },
     async fetch(url, options) {
       if (offline) throw new Error('Offline');
+      if (holdRequest) { const wait = holdRequest; holdRequest = null; await wait; }
       const result = await call(options.body ? JSON.parse(options.body) : undefined, cookie);
       if (result.headers['Set-Cookie']) cookie=result.headers['Set-Cookie'].split(';')[0];
       return {ok:result.status===200,status:result.status,json:async()=>result.data};
@@ -108,4 +109,14 @@ test('device import, offline retry, account switching and cross-device deletion 
   // Signing out restores the untouched original guest data, never another account's cache.
   await el('account-signout').onclick();
   assert.equal(JSON.parse(store.getItem('sam_workout_log'))[0].id,1);
+  let release;
+  holdRequest = new Promise(resolve => { release = resolve; });
+  const inFlight = el('account-sync').onclick();
+  const loggingOut = el('account-signout').onclick();
+  assert.equal(el('account-signout').disabled, true);
+  release(); await inFlight; await loggingOut;
+  assert.equal(el('account-signin').hidden, false);
+  assert.equal(el('account-signout').disabled, false);
+  assert.equal((await call(null, cookie)).status, 401);
+
 });

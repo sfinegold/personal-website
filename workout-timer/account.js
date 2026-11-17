@@ -6,7 +6,7 @@
   const settings = ['sam_default_workout', 'sam_rest_mode', 'sam_round_rest'];
   let user = parse(localStorage.getItem(PROFILE), null);
   let cache = user ? parse(localStorage.getItem(cacheKey(user.uid)), { records: {}, pending: {} }) : { records: {}, pending: {} };
-  let timeout, syncing = false, syncAgain = false;
+  let timeout, syncPromise = null, syncAgain = false;
   function parse(value, fallback) { try { return JSON.parse(value) ?? fallback; } catch { return fallback; } }
   const accepted = key => Object.hasOwn(collections, key) || settings.includes(key) || key.startsWith('sam_rehab_');
   function toRecords(key, value) {
@@ -60,10 +60,13 @@
     return data;
   }
   function scheduleSync() { clearTimeout(timeout); timeout = setTimeout(() => sync().catch(() => {}), 700); }
-  async function sync() {
-    if (!user) return;
-    if (syncing) { syncAgain = true; return; }
-    syncing = true;
+  function sync() {
+    if (!user) return Promise.resolve();
+    if (syncPromise) { syncAgain = true; return syncPromise; }
+    syncPromise = performSync().finally(() => { syncPromise = null; });
+    return syncPromise;
+  }
+  async function performSync() {
     const uid = user.uid;
     const mutations = { ...cache.pending };
     status('Syncing…');
@@ -80,7 +83,6 @@
       if (error.status === 401) document.getElementById('account-signin').hidden = false;
       throw error;
     } finally {
-      syncing = false;
       if (syncAgain) { syncAgain = false; scheduleSync(); }
     }
   }
@@ -117,13 +119,16 @@
     document.getElementById('account-close').onclick = () => dialog.close();
     document.getElementById('account-sync').onclick = () => sync().catch(() => {});
     document.getElementById('account-signout').onclick = async () => {
+      const button = document.getElementById('account-signout');
       try {
         if (window.WorkoutSessionActive?.()) { status('Stop your workout before signing out.'); return; }
-        if (syncing) { status('Finishing sync. Try signing out again in a moment.'); return; }
+        button.disabled = true; button.textContent = 'Logging out…';
         await sync();
+        if (Object.keys(cache.pending).length) await sync();
         if (Object.keys(cache.pending).length) { status('Sync your changes before signing out.'); return; }
         await api({ op: 'logout' }); user = null; cache = { records: {}, pending: {} }; localStorage.removeItem(PROFILE); renderAccount(); status('Saved on this device'); changed(true);
       } catch { status('Could not sign out. Connect and try again.'); }
+      finally { button.disabled = false; button.textContent = 'Log out'; }
     };
     document.getElementById('account-form').onsubmit = async event => {
       event.preventDefault();
