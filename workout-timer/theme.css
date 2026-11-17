@@ -1,5 +1,5 @@
 /* Shared workout palette. */
-:root { color-scheme: dark; --bg: #000000; --surface: #0d1119; --surface-raised: #151d2a; --line: #29374c; --text: #edf4ff; --muted: #9eacc1; --accent: #52a7ff; --ink: #001326; --rest: #b5d8ff; --danger: #ff9d8c; }
+:root { color-scheme: light; --bg: #ffffff; --surface: #f7f9fd; --surface-raised: #edf3ff; --line: #d8e2f1; --text: #15243b; --muted: #566782; --accent: #0057ff; --ink: #ffffff; --rest: #335bc7; --danger: #c42b40; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; display: flex; justify-content: center; padding: 28px 20px calc(120px + env(safe-area-inset-bottom));  }
 button, input, a { -webkit-tap-highlight-color: transparent; }
@@ -7,3 +7,23 @@ button:disabled { opacity: .35; cursor: default; transform: none; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 ::selection { background: var(--accent); color: var(--ink); }
 @media (max-width: 480px) { body { padding: 20px 14px calc(120px + env(safe-area-inset-bottom)); } }
+
+/* Shared account controls. */
+.account-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+.account-info { min-width: 0; display: grid; gap: 4px; }
+.account-info strong { font-size: .8rem; overflow-wrap: anywhere; }
+.account-info span { color: var(--muted); font-size: .7rem; }
+.account-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.account-bar button, .account-dialog button { color: var(--accent); background: white; border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font: 600 .8rem 'DM Sans', sans-serif; cursor: pointer; }
+.account-bar button[hidden] { display: none; }
+.account-dialog { margin: auto; width: min(420px, calc(100% - 28px)); color: var(--text); background: white; border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 20px 80px #15243b30; }
+.account-dialog::backdrop { background: #15243b60; }
+.account-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.account-heading h2 { font-size: 1.2rem; }
+.account-dialog p { color: var(--muted); font-size: .85rem; line-height: 1.5; margin: 12px 0; }
+.account-dialog label { display: block; margin: 16px 0; font-size: .85rem; font-weight: 600; }
+.account-dialog input:not([type=checkbox]) { display: block; width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 8px; margin-top: 7px; }
+.account-dialog .account-import { display: flex; gap: 10px; align-items: start; font-weight: 400; line-height: 1.5; }
+.account-import input { margin-top: 4px; accent-color: var(--accent); }
+#account-error { color: var(--danger); }
+#account-submit { width: 100%; background: var(--accent); color: white; border-color: var(--accent); }

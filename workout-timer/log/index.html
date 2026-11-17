@@ -9,7 +9,7 @@
   <link rel="manifest" href="/workout-timer/manifest.webmanifest">
   <meta name="apple-mobile-web-app-title" content="Workout">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#ffffff">
   <title>Workout Log</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,8 +18,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #000000;
-      color: #edf4ff;
+      background: #ffffff;
+      color: #15243b;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -44,7 +44,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #52a7ff;
+      color: #0057ff;
     }
     .back-link {
       font-family: 'Oswald', sans-serif;
@@ -52,17 +52,17 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #9eacc1;
+      color: #566782;
       text-decoration: none;
-      border: 1px solid #29374c;
+      border: 1px solid #d8e2f1;
       padding: 6px 12px;
       border-radius: 6px;
       transition: all 0.15s;
     }
-    .back-link:hover { background: #0d1119; border-color: #9eacc1; color: #52a7ff; }
+    .back-link:hover { background: #f7f9fd; border-color: #566782; color: #0057ff; }
     .header-stripe {
       height: 3px;
-      background: linear-gradient(90deg, #52a7ff 0%, #52a7ff 50%, #001326 50%, #001326 100%);
+      background: linear-gradient(90deg, #0057ff 0%, #0057ff 50%, #ffffff 50%, #ffffff 100%);
       border-radius: 2px;
       margin-bottom: 1.5rem;
     }
@@ -75,7 +75,7 @@
       margin-bottom: 2rem;
     }
     .stat-card {
-      background: #0d1119;
+      background: #f7f9fd;
       border-radius: 8px;
       padding: 16px;
       text-align: center;
@@ -84,7 +84,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 2rem;
       font-weight: 700;
-      color: #52a7ff;
+      color: #0057ff;
       line-height: 1;
     }
     .stat-label {
@@ -92,7 +92,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #9eacc1;
+      color: #566782;
       margin-top: 4px;
     }
 
@@ -103,7 +103,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #9eacc1;
+      color: #566782;
       margin-bottom: 12px;
     }
     .calendar {
@@ -116,7 +116,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 0.65rem;
       text-transform: uppercase;
-      color: #9eacc1;
+      color: #566782;
       text-align: center;
       padding: 4px 0;
       letter-spacing: 1px;
@@ -128,14 +128,14 @@
       align-items: center;
       justify-content: center;
       font-size: 0.75rem;
-      color: #9eacc1;
+      color: #566782;
       background: var(--surface);
     }
     .cal-day.empty { background: transparent; }
-    .cal-day.today { border: 2px solid #52a7ff; color: #52a7ff; font-weight: 700; }
-    .cal-day.has-workout { background: #52a7ff; color: #001326; font-weight: 600; }
-    .cal-day.has-workout.partial { background: #9eacc1; color: #000000; }
-    .cal-day.future { background: transparent; color: #29374c; }
+    .cal-day.today { border: 2px solid #0057ff; color: #0057ff; font-weight: 700; }
+    .cal-day.has-workout { background: #0057ff; color: #ffffff; font-weight: 600; }
+    .cal-day.has-workout.partial { background: #566782; color: #ffffff; }
+    .cal-day.future { background: transparent; color: #d8e2f1; }
 
     .month-nav {
       display: flex;
@@ -147,14 +147,14 @@
       font-family: 'Oswald', sans-serif;
       font-size: 1rem;
       font-weight: 600;
-      color: #edf4ff;
+      color: #15243b;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .month-btn {
       background: none;
-      border: 1px solid #29374c;
-      color: #9eacc1;
+      border: 1px solid #d8e2f1;
+      color: #566782;
       padding: 4px 10px;
       border-radius: 4px;
       font-family: 'Oswald', sans-serif;
@@ -162,17 +162,17 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .month-btn:hover { border-color: #9eacc1; color: #52a7ff; }
+    .month-btn:hover { border-color: #566782; color: #0057ff; }
 
     /* Log entries */
     .log-entry {
-      border: 1px solid #29374c;
+      border: 1px solid #d8e2f1;
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 10px;
       transition: all 0.15s;
     }
-    .log-entry:hover { border-color: #29374c; }
+    .log-entry:hover { border-color: #d8e2f1; }
     .log-header {
       display: flex;
       justify-content: space-between;
@@ -183,7 +183,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 0.95rem;
       font-weight: 600;
-      color: #52a7ff;
+      color: #0057ff;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -195,11 +195,11 @@
       padding: 3px 8px;
       border-radius: 4px;
     }
-    .log-status.complete { background: #52a7ff; color: #001326; }
-    .log-status.partial { background: #0d1119; color: #9eacc1; }
+    .log-status.complete { background: #0057ff; color: #ffffff; }
+    .log-status.partial { background: #f7f9fd; color: #566782; }
     .log-duration {
       font-size: 0.85rem;
-      color: #9eacc1;
+      color: #566782;
       margin-bottom: 8px;
     }
     .log-exercises {
@@ -209,8 +209,8 @@
     }
     .log-exercise-tag {
       font-size: 0.7rem;
-      background: #0d1119;
-      color: #9eacc1;
+      background: #f7f9fd;
+      color: #566782;
       padding: 3px 8px;
       border-radius: 4px;
       font-weight: 600;
@@ -219,14 +219,14 @@
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: #9eacc1;
+      color: #566782;
     }
     .empty-state p {
       margin-bottom: 1rem;
       font-size: 0.95rem;
     }
     .empty-state a {
-      color: #52a7ff;
+      color: #0057ff;
       text-decoration: none;
       font-weight: 600;
     }
@@ -234,7 +234,7 @@
     .delete-btn {
       background: none;
       border: none;
-      color: #29374c;
+      color: #d8e2f1;
       font-size: 0.75rem;
       cursor: pointer;
       padding: 2px 6px;
@@ -288,7 +288,9 @@
     <div id="log-list"></div>
   </div>
 
+  <script src="/workout-timer/account.js"></script>
   <script>
+    const WorkoutStore = window.WorkoutStore || localStorage;
     const DB_KEY = 'sam_workout_log';
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -298,14 +300,14 @@
 
     function getLog() {
       try {
-        return JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        return JSON.parse(WorkoutStore.getItem(DB_KEY)) || [];
       } catch { return []; }
     }
 
     function deleteEntry(id) {
       let log = getLog();
       log = log.filter(e => e.id !== id);
-      localStorage.setItem(DB_KEY, JSON.stringify(log));
+      WorkoutStore.setItem(DB_KEY, JSON.stringify(log));
       render();
     }
 
@@ -498,6 +500,7 @@
       document.getElementById('timer-link').href = timerHref();
     }
 
+    window.addEventListener('workout-data-changed', render);
     render();
   </script>
 </body>

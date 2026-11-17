@@ -9,7 +9,7 @@
   <link rel="manifest" href="/workout-timer/manifest.webmanifest">
   <meta name="apple-mobile-web-app-title" content="Workout">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Your circuit, your pace. A workout timer with background audio cues and quick set controls.">
   <title>Workout Timer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,10 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/workout-timer/theme.css">
   <style>
+    .workout-picker { margin-bottom: 20px; }
+    .workout-picker label { display: block; color: var(--muted); font-size: .75rem; margin-bottom: 7px; }
+    .workout-picker select { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--accent); font: 600 .95rem 'DM Sans', sans-serif; }
+    .btn-start, .btn-pause, .btn-go { background: white; color: var(--accent); }
     .app { max-width: 580px; width: 100%; }
     .tabbar { display: flex; gap: 6px; padding: 4px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
     .tab { flex: 1; padding: 9px 8px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font: 600 .8rem 'DM Sans', sans-serif; cursor: pointer; }
@@ -71,7 +75,7 @@
     .btn:hover { transform: translateY(-1px); }
     .btn-add { background: transparent; border-style: dashed; color: var(--muted); width: 100%; margin: 4px 0 18px; }
     .btn-add:hover { color: var(--accent); border-color: var(--accent); }
-    .start-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; border-top: 1px solid var(--line); background: rgba(0, 0, 0, .94); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    .start-dock { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; border-top: 1px solid var(--line); background: rgba(255, 255, 255, .96); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
     .start-dock-inner { display: flex; align-items: center; gap: 16px; max-width: 580px; margin: auto; }
     .total-time { flex: none; min-width: 80px; color: var(--muted); font-size: .63rem; text-transform: uppercase; letter-spacing: 1px; }
     .total-time strong { display: block; margin-top: 3px; color: var(--text); font-family: 'Oswald', sans-serif; font-size: 1.65rem; font-weight: 500; line-height: 1.2; font-variant-numeric: tabular-nums; }
@@ -134,7 +138,7 @@
     .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 90; overflow: hidden; }
     .confetti { position: absolute; top: -20px; border-radius: 2px; animation: confettiFall linear forwards; }
     @keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
-    .completion-overlay { position: fixed; inset: 0; background: #000000f5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 80; opacity: 0; transition: opacity .3s; }
+    .completion-overlay { position: fixed; inset: 0; background: #fffffff5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 80; opacity: 0; transition: opacity .3s; }
     .completion-overlay.show { opacity: 1; }
     .completion-check { color: var(--accent); font-size: 5rem; }
     .completion-text { font: 600 2rem 'Oswald', sans-serif; text-transform: uppercase; margin-top: 16px; }
@@ -159,14 +163,20 @@
     .dose { color: var(--accent); font-size: .68rem; white-space: nowrap; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 5px 7px; }
     .rehab-foot { color: var(--muted); font-size: .7rem; line-height: 1.6; text-align: center; }
     @media (max-width: 380px) { .exercise-row { padding: 8px 10px; } .exercise-fields { gap: 8px; } .stepper button { width: 32px; } .quick-btn { padding: 7px; font-size: .67rem; } .dose { white-space: normal; max-width: 75px; } }
+    .btn-start, .btn-pause, .btn-go { background: white; color: var(--accent); }
+    .quick-btn, .log-link, .saved-action-btn, .saved-toggle, .saved-default-btn, .btn-restart, .btn-restart-round { color: var(--accent); }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="tabbar">
-      <button class="tab active" id="tab-btn-workout" onclick="switchTab('workout')">Workout</button>
-      <button class="tab" id="tab-btn-rehab" onclick="switchTab('rehab')">Shoulder Rehab</button>
+    <div class="workout-picker">
+      <label for="workout-picker">Workout</label>
+      <select id="workout-picker" onchange="selectWorkout(this.value)">
+        <option value="tennis">Tennis workout</option>
+        <option value="full-body">Full-body kettlebell circuit</option>
+        <option value="rehab">Shoulder Rehab</option>
+      </select>
     </div>
 
     <div id="tab-workout">
@@ -302,13 +312,15 @@
   <div class="toast" id="toast">Workout logged ✓</div>
 
   <audio id="workout-audio" preload="auto" playsinline></audio>
+  <script src="/workout-timer/account.js"></script>
   <script>
+    const WorkoutStore = window.WorkoutStore || localStorage;
     // ========== WORKOUT LOG DATABASE (localStorage) ==========
     const DB_KEY = 'sam_workout_log';
 
     function getWorkoutLog() {
       try {
-        return JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        return JSON.parse(WorkoutStore.getItem(DB_KEY)) || [];
       } catch { return []; }
     }
 
@@ -324,7 +336,7 @@
         totalDuration: data.totalDuration,
         completed: data.completed
       });
-      localStorage.setItem(DB_KEY, JSON.stringify(log));
+      WorkoutStore.setItem(DB_KEY, JSON.stringify(log));
       renderRecentWorkouts();
     }
 
@@ -350,8 +362,7 @@
       const isWorkout = name === 'workout';
       document.getElementById('tab-workout').style.display = isWorkout ? '' : 'none';
       document.getElementById('tab-rehab').style.display = isWorkout ? 'none' : '';
-      document.getElementById('tab-btn-workout').classList.toggle('active', isWorkout);
-      document.getElementById('tab-btn-rehab').classList.toggle('active', !isWorkout);
+      if (!isWorkout) document.getElementById('workout-picker').value = 'rehab';
     }
 
     // ========== SHOULDER REHAB CHECK-OFF (resets daily) ==========
@@ -361,9 +372,9 @@
       return 'sam_rehab_' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
     }
     function getRehabDone() {
-      try { return new Set(JSON.parse(localStorage.getItem(rehabKey())) || []); } catch { return new Set(); }
+      try { return new Set(JSON.parse(WorkoutStore.getItem(rehabKey())) || []); } catch { return new Set(); }
     }
-    function saveRehabDone(set) { localStorage.setItem(rehabKey(), JSON.stringify([...set])); }
+    function saveRehabDone(set) { WorkoutStore.setItem(rehabKey(), JSON.stringify([...set])); }
     function toggleRehab(el) {
       const id = el.dataset.id;
       const done = getRehabDone();
@@ -382,14 +393,14 @@
       document.getElementById('rehab-bar-fill').style.width = pct + '%';
     }
     function resetRehab() {
-      localStorage.removeItem(rehabKey());
+      WorkoutStore.removeItem(rehabKey());
       document.querySelectorAll('#tab-rehab .rehab-ex.done').forEach(e => e.classList.remove('done'));
       updateRehabProgress();
     }
     function initRehab() {
       const done = getRehabDone();
       document.querySelectorAll('#tab-rehab .rehab-ex').forEach(el => {
-        if (done.has(el.dataset.id)) el.classList.add('done');
+        el.classList.toggle('done', done.has(el.dataset.id));
       });
       updateRehabProgress();
     }
@@ -427,14 +438,14 @@
       const el = document.getElementById('round-rest');
       if (el) {
         el.value = getRoundRest();
-        localStorage.setItem(ROUND_REST_KEY, el.value);
+        WorkoutStore.setItem(ROUND_REST_KEY, el.value);
       }
       updateTotalTime();
     }
 
-    function setRestMode(mode) {
+    function setRestMode(mode, persist = true) {
       restMode = mode;
-      localStorage.setItem(REST_MODE_KEY, mode);
+      if (persist) WorkoutStore.setItem(REST_MODE_KEY, mode);
       document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
       document.getElementById('round-rest-row').style.display = mode === 'round' ? 'flex' : 'none';
       const hint = document.getElementById('rest-hint');
@@ -450,12 +461,13 @@
     }
 
     function initRestMode() {
-      const savedRR = localStorage.getItem(ROUND_REST_KEY);
+      const savedRR = WorkoutStore.getItem(ROUND_REST_KEY);
       const rrEl = document.getElementById('round-rest');
-      if (savedRR && rrEl) rrEl.value = savedRR;
-      setRestMode(localStorage.getItem(REST_MODE_KEY) || 'exercise');
+      if (rrEl) rrEl.value = savedRR ?? 30;
+      setRestMode(WorkoutStore.getItem(REST_MODE_KEY) || 'exercise', false);
     }
     let workoutActive = false;
+    window.WorkoutSessionActive = () => workoutActive;
 
     async function requestWakeLock() {
       if (!('wakeLock' in navigator) || wakeLock) return;
@@ -797,7 +809,7 @@
     const SAVED_EX_KEY = 'sam_saved_exercises';
 
     function getSavedExercises() {
-      try { return JSON.parse(localStorage.getItem(SAVED_EX_KEY)) || []; }
+      try { return JSON.parse(WorkoutStore.getItem(SAVED_EX_KEY)) || []; }
       catch { return []; }
     }
 
@@ -814,7 +826,7 @@
         return;
       }
       saved.push({ name, work, rest, sets, kind: exercises[idx].kind });
-      localStorage.setItem(SAVED_EX_KEY, JSON.stringify(saved));
+      WorkoutStore.setItem(SAVED_EX_KEY, JSON.stringify(saved));
       showToast(`Saved "${name}"`);
       renderSavedList();
     }
@@ -822,7 +834,7 @@
     function deleteSavedExercise(idx) {
       const saved = getSavedExercises();
       saved.splice(idx, 1);
-      localStorage.setItem(SAVED_EX_KEY, JSON.stringify(saved));
+      WorkoutStore.setItem(SAVED_EX_KEY, JSON.stringify(saved));
       renderSavedList();
     }
 
@@ -871,7 +883,7 @@
     }];
 
     function getSavedWorkouts() {
-      try { return JSON.parse(localStorage.getItem(SAVED_WORKOUTS_KEY)) || []; }
+      try { return JSON.parse(WorkoutStore.getItem(SAVED_WORKOUTS_KEY)) || []; }
       catch { return []; }
     }
 
@@ -897,10 +909,11 @@
       const index = saved.findIndex(w => w.name.toLowerCase() === workout.name.toLowerCase());
       if (index < 0) saved.push(workout);
       else saved[index] = workout;
-      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      WorkoutStore.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
       loadedWorkoutSignature = currentWorkoutSignature();
       renderWorkoutUpdate();
       renderSavedWorkoutList();
+      renderWorkoutPicker();
       showToast(`Updated "${workout.name}"`);
     }
 
@@ -942,7 +955,7 @@
     }
 
     function getDefaultWorkoutName() {
-      return localStorage.getItem(DEFAULT_WORKOUT_KEY) || '';
+      return WorkoutStore.getItem(DEFAULT_WORKOUT_KEY) || '';
     }
 
     function getCurrentWorkoutSnapshot() {
@@ -979,16 +992,18 @@
       if (existingIndex >= 0) saved[existingIndex] = workout;
       else saved.push(workout);
 
-      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      WorkoutStore.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
       loadedWorkoutName = workout.name;
       loadedWorkoutSignature = currentWorkoutSignature();
       renderWorkoutUpdate();
       showToast(`Saved workout "${workout.name}"`);
       renderSavedWorkoutList();
+      renderWorkoutPicker();
     }
 
     function loadWorkout(workout, showLoadedToast = true) {
       if (!workout) return;
+      switchTab('workout');
       exercises = workout.exercises.map(ex => ({
         id: nextExerciseId++,
         name: ex.name,
@@ -1006,6 +1021,12 @@
       loadedWorkoutName = workout.name;
       loadedWorkoutSignature = currentWorkoutSignature();
       renderWorkoutUpdate();
+      const picker = document.getElementById('workout-picker');
+      if (picker) {
+        renderWorkoutPicker();
+        picker.value = getSavedWorkouts().some(w => w.name === workout.name) ? 'saved:' + workout.name
+          : workout.name === 'Full-body kettlebell circuit' ? 'full-body' : workout.name === 'Tennis workout' ? 'tennis' : 'current';
+      }
       if (showLoadedToast) showToast(`Loaded "${workout.name}"`);
     }
 
@@ -1023,7 +1044,7 @@
       const saved = getSavedWorkouts();
       const workout = saved[idx];
       if (!workout) return;
-      localStorage.setItem(DEFAULT_WORKOUT_KEY, workout.name);
+      WorkoutStore.setItem(DEFAULT_WORKOUT_KEY, workout.name);
       showToast(`Default workout set to "${workout.name}"`);
       renderSavedWorkoutList();
     }
@@ -1031,11 +1052,12 @@
     function deleteSavedWorkout(idx) {
       const saved = getSavedWorkouts();
       const [removed] = saved.splice(idx, 1);
-      localStorage.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
+      WorkoutStore.setItem(SAVED_WORKOUTS_KEY, JSON.stringify(saved));
       if (removed && getDefaultWorkoutName() === removed.name) {
-        localStorage.removeItem(DEFAULT_WORKOUT_KEY);
+        WorkoutStore.removeItem(DEFAULT_WORKOUT_KEY);
       }
       renderSavedWorkoutList();
+      renderWorkoutPicker();
       if (removed) showToast(`Deleted "${removed.name}"`);
     }
 
@@ -1314,6 +1336,39 @@
       }, 3000);
     }
 
+    function renderWorkoutPicker() {
+      const picker = document.getElementById('workout-picker');
+      const value = picker.value || 'tennis';
+      picker.innerHTML = '<option value="tennis">Tennis workout</option><option value="full-body">Full-body kettlebell circuit</option><option value="rehab">Shoulder Rehab</option><option value="current">Current workout</option>' + getSavedWorkouts().map(w => `<option value="saved:${escapeHtml(w.name)}">${escapeHtml(w.name)}</option>`).join('');
+      picker.value = value;
+    }
+
+    function selectWorkout(value) {
+      if (workoutActive) { document.getElementById('workout-picker').value = 'current'; return; }
+      if (value === 'rehab') { switchTab('rehab'); initRehab(); return; }
+      switchTab('workout');
+      if (value === 'full-body') loadWorkoutOption(0);
+      else if (value.startsWith('saved:')) loadWorkout(getSavedWorkouts().find(w => w.name === value.slice(6)));
+      else if (value === 'tennis') {
+        const saved = getSavedWorkouts().find(w => w.name === 'Tennis workout');
+        if (saved) loadWorkout(saved);
+        else {
+          exercises = []; loadBuiltInWorkout(); loadedWorkoutName = 'Tennis workout';
+          loadedWorkoutSignature = currentWorkoutSignature(); renderWorkoutUpdate();
+        }
+      }
+    }
+
+    window.addEventListener('workout-data-changed', event => {
+      renderRecentWorkouts(); renderSavedWorkoutList(); renderSavedList(); renderWorkoutPicker(); initRehab();
+      if (event.detail.switched && !workoutActive) {
+        exercises = []; loadedWorkoutSignature = '';
+        switchTab('workout'); document.getElementById('workout-picker').value = 'tennis';
+        if (!loadDefaultWorkout()) { loadBuiltInWorkout(); loadedWorkoutName = 'Tennis workout'; }
+        initRestMode(); loadedWorkoutSignature = currentWorkoutSignature(); renderWorkoutUpdate();
+      }
+    });
+
     function loadBuiltInWorkout() {
       addExercise('KB Rot. Press (L)', 20, 0, 4);
       addExercise('KB Rot. Press (R)', 20, 15, 4);
@@ -1330,6 +1385,7 @@
     loadedWorkoutSignature = currentWorkoutSignature();
     renderWorkoutUpdate();
     renderRecentWorkouts();
+    renderWorkoutPicker();
     document.getElementById('log-link').href = logHref();
   </script>
 </body>

@@ -36,7 +36,7 @@ function timer() {
       getItem: key => storage.get(key) ?? null,
       setItem: (key, value) => storage.set(key, String(value))
     },
-    window: {},
+    window: { addEventListener() {} },
     // Rendering audio must not depend on ANY JavaScript timer.
     setTimeout() { throw new Error('Audio cue depends on a JavaScript timer'); },
     setInterval() { throw new Error('Audio cue depends on a JavaScript timer'); }
@@ -44,7 +44,7 @@ function timer() {
   const html = readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   const script = html.match(/<script>([\s\S]*?)<\/script>/)[1]
     .replace(/^    initRehab\(\);$/m, '')
-    .replace(/    if \(!loadDefaultWorkout\(\)\)[\s\S]*$/, '');
+    .replace(/^    if \(!loadDefaultWorkout\(\)\)[\s\S]*$/m, '');
   vm.runInContext(script, context);
   const run = source => vm.runInContext(source, context);
   run(`exercises = [
