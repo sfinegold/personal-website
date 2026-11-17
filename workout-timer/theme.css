@@ -27,3 +27,16 @@ button:disabled { opacity: .35; cursor: default; transform: none; }
 .account-import input { margin-top: 4px; accent-color: var(--accent); }
 #account-error { color: var(--danger); }
 #account-submit { width: 100%; background: var(--accent); color: white; border-color: var(--accent); }
+
+/* Accessible account controls on narrow screens and short landscape viewports. */
+.account-access button { color: var(--accent); background: white; border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; font: 500 .8rem 'DM Sans', sans-serif; cursor: pointer; }
+.account-access button[hidden] { display: none; }
+.account-dialog { max-height: calc(100dvh - 24px); overflow-y: auto; }
+.account-dialog input:not([type=checkbox]) { font-size: 16px; min-width: 0; }
+.account-dialog .account-heading h2 { min-width: 0; }
+.account-dialog #account-close { flex: none; min-width: 40px; min-height: 40px; }
+@media (max-width: 480px) {
+  .account-dialog { padding: 18px; }
+  .account-bar { flex-wrap: wrap; }
+  .account-info { overflow-wrap: anywhere; }
+}

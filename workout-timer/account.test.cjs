@@ -73,7 +73,7 @@ test('device import, offline retry, account switching and cross-device deletion 
   const ctx = vm.createContext({
     console, setTimeout: () => 0, clearTimeout() {}, setInterval() {}, CustomEvent: class { constructor(name, value) { Object.assign(this, value); } },
     localStorage: { getItem:k=>raw.get(k)??null, setItem:(k,v)=>raw.set(k,String(v)), removeItem:k=>raw.delete(k), key:i=>[...raw.keys()][i], get length(){return raw.size;} },
-    document: { getElementById:el, createElement:()=>({innerHTML:'',showModal(){},close(){}}), body:{append(){}}, querySelector:()=>({prepend(){}}), addEventListener:(name, cb)=>{if(name==='DOMContentLoaded')boot=cb;} },
+    document: { getElementById:el, createElement:()=>({innerHTML:'',showModal(){},close(){}}), body:{append(){}}, querySelector:selector=>selector === '.account-access' ? null : ({prepend(){}}), addEventListener:(name, cb)=>{if(name==='DOMContentLoaded')boot=cb;} },
     window: { addEventListener(){}, dispatchEvent(){} },
     async fetch(url, options) {
       if (offline) throw new Error('Offline');

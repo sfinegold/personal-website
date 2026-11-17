@@ -106,10 +106,12 @@
   async function boot() {
     const bar = document.createElement('div');
     bar.className = 'account-bar';
-    bar.innerHTML = `<div class="account-info"><strong id="account-name"></strong><span id="account-status"></span></div><div class="account-actions"><button id="account-signin" type="button">Sign in</button><button id="account-sync" type="button" hidden>Sync</button><button id="account-signout" type="button" hidden>Sign out</button></div>`;
+    bar.innerHTML = `<div class="account-info"><strong id="account-name"></strong><span id="account-status"></span></div><div class="account-actions"><button id="account-signin" type="button">Log in</button><button id="account-sync" type="button" hidden>Sync</button><button id="account-signout" type="button" hidden>Log out</button></div>`;
     (document.querySelector('.account-slot') || document.querySelector('.app')).prepend(bar);
+    const access = document.querySelector('.account-access');
+    if (access) access.append(document.getElementById('account-signin'), document.getElementById('account-signout'));
     const dialog = document.createElement('dialog'); dialog.className = 'account-dialog';
-    dialog.innerHTML = `<form id="account-form"><div class="account-heading"><h2>Your workout account</h2><button type="button" id="account-close" aria-label="Close sign in">×</button></div><p>Save routines and workout history across your devices.</p><label>Email<input type="email" name="email" required autocomplete="email" maxlength="120"></label><label>Password<input type="password" name="password" required autocomplete="current-password"></label><label class="account-import"><input type="checkbox" name="import"> Add this device’s existing workouts to my account</label><p id="account-error" role="alert"></p><button type="submit" id="account-submit">Sign in / create account</button></form>`;
+    dialog.innerHTML = `<form id="account-form"><div class="account-heading"><h2>Your workout account</h2><button type="button" id="account-close" aria-label="Close login">×</button></div><p>Save routines and workout history across your devices.</p><label>Email<input type="email" name="email" required autocomplete="email" maxlength="120"></label><label>Password<input type="password" name="password" required autocomplete="current-password"></label><label class="account-import"><input type="checkbox" name="import"> Add this device’s existing workouts to my account</label><p id="account-error" role="alert"></p><button type="submit" id="account-submit">Log in / create account</button></form>`;
     document.body.append(dialog);
     document.getElementById('account-signin').onclick = () => { if (window.WorkoutSessionActive?.()) { status('Stop your workout before changing accounts.'); return; } dialog.showModal(); };
     document.getElementById('account-close').onclick = () => dialog.close();
