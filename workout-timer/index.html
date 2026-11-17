@@ -14,7 +14,7 @@
   <title>Workout Timer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/workout-timer/theme.css">
   <style>
     .workout-picker { margin-bottom: 20px; }
@@ -171,13 +171,69 @@
     @media (max-width: 380px) { .exercise-row { padding: 8px 10px; } .exercise-fields { gap: 8px; } .stepper button { width: 32px; } .quick-btn { padding: 7px; font-size: .67rem; } .dose { white-space: normal; max-width: 75px; } }
     .btn-start, .btn-pause, .btn-go { background: white; color: var(--accent); }
     .quick-btn, .log-link, .saved-action-btn, .saved-toggle, .saved-default-btn, .btn-restart, .btn-restart-round { color: var(--accent); }
+
+    /* Page hierarchy: recent shortcuts, selected workout, then supporting controls. */
+    .page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+    .page-header h1 { font: 500 .95rem/1.3 'DM Sans', sans-serif; letter-spacing: -.02em; text-transform: none; }
+    .page-header .log-link { padding: 6px 0; background: none; border: 0; font-weight: 400; font-size: .8rem; }
+    .recent-workouts { margin-bottom: 24px; }
+    .recent-label { font-size: .72rem; text-transform: none; letter-spacing: 0; margin-bottom: 8px; }
+    .recent-pills { gap: 6px; padding: 2px 2px 5px; }
+    .recent-pill { min-height: 34px; padding: 7px 12px; background: white; font-weight: 400; }
+    .workout-picker { padding: 18px 16px; margin-bottom: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .workout-picker label { font-size: .72rem; margin-bottom: 7px; }
+    .workout-picker select { padding: 0 24px 0 0; border: 0; border-radius: 0; background: transparent; color: var(--accent); font-size: 1.3rem; font-weight: 600; line-height: 1.4; cursor: pointer; }
+    .setup-toolbar { margin-bottom: 9px; }
+    .setup-toolbar h2 { font-size: .85rem; font-weight: 600; }
+    .all-sets-label { color: var(--muted); font-size: .72rem; margin-right: 2px; }
+    .quick-btn { min-height: 30px; background: white; font-weight: 500; }
+    .all-sets .quick-btn { min-width: 34px; padding: 4px 8px; font-size: .8rem; }
+    .exercise-table input { font-weight: 400; }
+    .exercise-table th { font-weight: 500; }
+    .drag-handle { color: #8693a7; }
+    .table-row-actions .row-remove { color: #8693a7; }
+    .editor-add { gap: 16px; margin: 4px 0 20px; }
+    .editor-add .btn { flex: none; margin: 0; padding: 6px 0; border: 0; color: var(--accent); font-size: .78rem; font-weight: 400; }
+    .rest-mode { padding-top: 18px; margin-bottom: 22px; }
+    .rest-mode-label { font-size: .82rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .seg-btn { background: white; font-weight: 400; }
+    .seg-btn.active { background: var(--surface-raised); border-color: #abc5ff; font-weight: 500; }
+    .rest-hint { font-size: .72rem; }
+    .round-rest-row { color: var(--muted); font-size: .75rem; }
+    .saved-section { padding: 12px 0; }
+    .saved-toggle { font-size: .8rem; font-weight: 500; }
+    .saved-action-btn { background: white; font-weight: 400; padding: 8px 10px; }
+    .workout-update { padding: 8px 10px; background: var(--surface); border: 0; }
+    .audio-note { margin-top: 14px; font-size: .7rem; }
+    .account-slot { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; }
+    .account-slot .account-bar { margin: 0; padding: 0; border: 0; gap: 8px; align-items: flex-start; }
+    .account-slot .account-info strong { font-weight: 400; font-size: .75rem; }
+    .account-slot .account-info span { font-size: .65rem; line-height: 1.5; }
+    .account-slot .account-actions { gap: 10px; }
+    .account-slot button { padding: 0; border: 0; font-size: .72rem; font-weight: 400; }
+    .total-time { text-transform: none; letter-spacing: 0; font-size: .7rem; }
+    .total-time strong { font-family: 'DM Sans', sans-serif; font-size: 1.3rem; font-weight: 600; }
+    .btn-start { background: var(--surface-raised); font-weight: 600; border-color: #abc5ff; }
+    .app:has(.setup-view.hidden) .recent-workouts { display: none; }
+    .app:has(.setup-view.hidden) .workout-picker { display: none; }
+    #tab-rehab h1 { font: 600 1.4rem/1.3 'DM Sans', sans-serif; text-transform: none; letter-spacing: -.03em; }
+    @media (max-width: 400px) { .workout-picker { padding: 14px 12px; } .workout-picker select { font-size: 1.15rem; } .account-slot .account-bar { flex-wrap: wrap; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
-<body>
+<body class="workout-page">
   <div class="app">
+    <header class="page-header">
+      <h1>Workout timer</h1>
+      <a href="/workout-timer/log/" class="log-link" id="log-link">History <span aria-hidden="true">↗</span></a>
+    </header>
+      <div class="recent-workouts" id="recent-workouts" hidden>
+        <div class="recent-label">Recently completed</div>
+        <div class="recent-pills" id="recent-pills" role="group" aria-label="Recently completed workouts"></div>
+      </div>
+    <main class="workout-main">
     <div class="workout-picker">
-      <label for="workout-picker">Workout</label>
+      <label for="workout-picker">Selected workout</label>
       <select id="workout-picker" onchange="selectWorkout(this.value)">
         <option value="tennis">Tennis workout</option>
         <option value="full-body">Full-body kettlebell circuit</option>
@@ -188,15 +244,12 @@
     <div id="tab-workout">
     <!-- Setup -->
     <div class="setup-view" id="setup">
-      <div class="recent-workouts" id="recent-workouts" hidden>
-        <div class="recent-label">Recently completed</div>
-        <div class="recent-pills" id="recent-pills" role="group" aria-label="Recently completed workouts"></div>
-      </div>
       <div class="setup-toolbar">
-        <a href="/workout-timer/log/" class="log-link" id="log-link">Log</a>
+        <h2>Exercises</h2>
         <div class="all-sets" role="group" aria-label="Adjust sets for all exercises">
-          <button class="quick-btn" id="decrease-all" onclick="adjustAllSets(-1)">−1 set from all</button>
-          <button class="quick-btn" id="increase-all" onclick="adjustAllSets(1)" aria-label="Add one set to all exercises">+1 to all</button>
+          <span class="all-sets-label">All sets</span>
+          <button class="quick-btn" id="decrease-all" onclick="adjustAllSets(-1)" aria-label="Remove one set from all exercises">−1</button>
+          <button class="quick-btn" id="increase-all" onclick="adjustAllSets(1)" aria-label="Add one set to all exercises">+1</button>
         </div>
       </div>
       <div class="workout-update" id="workout-update" hidden>
@@ -211,21 +264,6 @@
         </table>
       </div>
       <div class="editor-add"><button class="btn btn-add" onclick="addEditorRow()">+ Add row</button><button class="btn btn-add" onclick="addEditorRow('rest')">+ Rest</button></div>
-      <div class="saved-section">
-        <button class="saved-toggle" onclick="toggleSavedWorkoutList()">
-          <span id="saved-workout-arrow">&#9654;</span> Workouts
-        </button>
-        <div class="saved-actions">
-          <button class="saved-action-btn" onclick="saveCurrentWorkoutSet()">Save Current Workout</button>
-        </div>
-        <div class="saved-list" id="saved-workout-list"></div>
-      </div>
-      <div class="saved-section">
-        <button class="saved-toggle" onclick="toggleSavedList()">
-          <span id="saved-arrow">&#9654;</span> Saved Exercises
-        </button>
-        <div class="saved-list" id="saved-list"></div>
-      </div>
       <div class="rest-mode">
         <div class="rest-mode-label">Rest</div>
         <div class="rest-seg">
@@ -238,6 +276,21 @@
           <input type="number" id="round-rest" value="30" min="0" max="1800" step="5" onchange="saveRoundRest()"> s
         </div>
         <div class="rest-hint" id="rest-hint"></div>
+      </div>
+      <div class="saved-section">
+        <button class="saved-toggle" onclick="toggleSavedWorkoutList()">
+          <span id="saved-workout-arrow">&#9654;</span> Workout library
+        </button>
+        <div class="saved-actions">
+          <button class="saved-action-btn" onclick="saveCurrentWorkoutSet()">Save as new workout</button>
+        </div>
+        <div class="saved-list" id="saved-workout-list"></div>
+      </div>
+      <div class="saved-section">
+        <button class="saved-toggle" onclick="toggleSavedList()">
+          <span id="saved-arrow">&#9654;</span> Saved exercises
+        </button>
+        <div class="saved-list" id="saved-list"></div>
       </div>
       <p class="audio-note">Audio cues keep your workout moving, even when you switch apps.</p>
       <div class="start-dock">
@@ -319,6 +372,8 @@
 
       <div class="rehab-foot">Tap an exercise to check it off &mdash; progress resets daily. Not medical advice; see a PT / sports-med if it&rsquo;s not improving in ~2 weeks, wakes you at night, or you notice weakness.</div>
     </div>
+    </main>
+    <footer class="account-slot" aria-label="Workout account"></footer>
   </div>
 
   <div class="toast" id="toast">Workout logged ✓</div>
@@ -902,7 +957,7 @@
     function renderWorkoutUpdate() {
       const changed = loadedWorkoutSignature && currentWorkoutSignature() !== loadedWorkoutSignature;
       document.getElementById('workout-update').hidden = !changed || !exercises.length;
-      document.getElementById('workout-update-name').textContent = loadedWorkoutName;
+      document.getElementById('workout-update-name').textContent = 'Unsaved changes';
     }
 
     function updateLoadedWorkout() {
@@ -949,7 +1004,7 @@
       document.getElementById('recent-pills').innerHTML = recent.map((entry, i) => {
         const name = entry.name || getWorkoutTitle(entry.exercises);
         const date = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        return `<button class="recent-pill" onclick="loadRecentWorkout(${i})" title="${escapeHtml(name)} · ${escapeHtml(date)}" aria-label="Load recent workout: ${escapeHtml(name)}">${escapeHtml(name)} <span aria-hidden="true">↗</span></button>`;
+        return `<button class="recent-pill" onclick="loadRecentWorkout(${i})" title="${escapeHtml(name)} · ${escapeHtml(date)}" aria-label="Load recent workout: ${escapeHtml(name)}">${escapeHtml(name)}</button>`;
       }).join('');
     }
 
@@ -1343,7 +1398,7 @@
     function renderWorkoutPicker() {
       const picker = document.getElementById('workout-picker');
       const value = picker.value || 'tennis';
-      picker.innerHTML = '<option value="tennis">Tennis workout</option><option value="full-body">Full-body kettlebell circuit</option><option value="rehab">Shoulder Rehab</option><option value="current">Current workout</option>' + getSavedWorkouts().map(w => `<option value="saved:${escapeHtml(w.name)}">${escapeHtml(w.name)}</option>`).join('');
+      picker.innerHTML = '<option value="tennis">Tennis workout</option><option value="full-body">Full-body kettlebell circuit</option><option value="rehab">Shoulder Rehab</option><option value="current">' + escapeHtml(loadedWorkoutName || 'Current workout') + '</option>' + getSavedWorkouts().map(w => `<option value="saved:${escapeHtml(w.name)}">${escapeHtml(w.name)}</option>`).join('');
       picker.value = value;
     }
 
