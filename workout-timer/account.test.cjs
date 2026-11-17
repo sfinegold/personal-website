@@ -63,8 +63,10 @@ test('sign-in attempts are rate limited', async () => {
   assert.equal((await call({ op: 'login', email: 'a@example.com', password: 'wrong' })).status, 429);
 });
 test('device import, offline retry, account switching and cross-device deletion stay isolated', async () => {
-  const { call } = backend(); let cookie = '', offline = false;
-  const raw = new Map([['sam_workout_log', JSON.stringify([{ id: 1, name: 'Existing', completed: true }])], ['sam_saved_workouts', JSON.stringify([{name:'Device routine',exercises:[]}])]]);
+  const { call, login: loginServer } = backend(); let cookie = '', offline = false;
+  const priorSession = await loginServer('a@example.com');
+  await call({op:'sync',mutations:{'setting:sam_rest_mode':'exercise'}}, priorSession);
+  const raw = new Map([['sam_rest_mode','round'],['sam_workout_log', JSON.stringify([{ id: 1, name: 'Existing', completed: true }])], ['sam_saved_workouts', JSON.stringify([{name:'Device routine',exercises:[]}])]]);
   const elements = new Map();
   const el = id => { if (!elements.has(id)) elements.set(id, { hidden:false, textContent:'', reset() {}, showModal() {}, close() {} }); return elements.get(id); };
   let boot;
@@ -89,6 +91,7 @@ test('device import, offline retry, account switching and cross-device deletion 
   };
   await login('a@example.com',true);
   assert.equal(JSON.parse(store.getItem('sam_workout_log'))[0].name,'Existing');
+  assert.equal(store.getItem('sam_rest_mode'),'round','explicit import preserves the source device rest preference');
   assert.match(el('account-status').textContent,/Saved/);
   offline=true;
   store.setItem('sam_saved_workouts',JSON.stringify([{name:'Offline routine',exercises:[]}]));

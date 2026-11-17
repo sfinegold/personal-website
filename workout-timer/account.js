@@ -99,7 +99,7 @@
         const workout = parse(value, null);
         workout.name += ' (from this device)'; key = 'workout:' + encodeURIComponent(workout.name.toLowerCase()); value = JSON.stringify(workout);
       }
-      if (!records[key]) cache.pending[key] = value;
+      if (!records[key] || key.startsWith('setting:')) cache.pending[key] = value;
     }
     persist();
   }

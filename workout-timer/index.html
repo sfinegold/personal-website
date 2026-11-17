@@ -43,26 +43,32 @@
     .recent-pills { display: flex; gap: 7px; overflow-x: auto; padding: 2px 2px 6px; }
     .recent-pill { flex: none; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 38px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--accent); font: 600 .75rem 'DM Sans', sans-serif; cursor: pointer; }
     .recent-pill:hover { border-color: var(--accent); background: var(--surface-raised); }
-    .exercise-row { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px 10px; margin-bottom: 8px; }
-    .exercise-top { display: grid; grid-template-columns: 22px minmax(0, 1fr) 32px 32px; align-items: center; gap: 4px; margin-bottom: 4px; }
-    .exercise-top input { min-width: 0; width: 100%; color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 6px; font: 600 .95rem 'DM Sans', sans-serif; padding: 6px 3px; }
-    .exercise-top input:focus { background: var(--surface-raised); border-color: var(--line); }
-    .drag-handle, .save-btn, .remove-btn { color: var(--muted); background: transparent; border: 0; cursor: pointer; height: 36px; font-size: 1.2rem; }
-    .drag-handle { cursor: grab; touch-action: none; }
-    .save-btn { font-size: 1rem; }
-    .save-btn:hover, .drag-handle:hover { color: var(--accent); }
-    .remove-btn:hover { color: var(--danger); }
-    .exercise-row.drag-over { border-color: var(--accent); }
+    .editor-wrap { padding-right: 56px; margin-bottom: 10px; }
+    .exercise-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; border: 1px solid var(--line); border-radius: 10px; background: white; }
+    .exercise-table .name-column { width: 49%; }
+    .exercise-table .sets-column { width: 15%; }
+    .exercise-table th { padding: 9px 5px; text-align: center; color: var(--muted); font-size: .67rem; font-weight: 600; line-height: 1.35; background: var(--surface); }
+    .exercise-table th:first-child { text-align: left; padding-left: 10px; border-radius: 10px 0 0 0; }
+    .exercise-table th:last-child { border-radius: 0 10px 0 0; }
+    .exercise-table td { position: relative; padding: 3px; border-top: 1px solid var(--line); vertical-align: middle; }
+    .exercise-table td + td { border-left: 1px solid var(--line); }
+    .exercise-table input { width: 100%; min-width: 0; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); padding: 8px 2px; font: 500 .85rem 'DM Sans', sans-serif; text-align: center; font-variant-numeric: tabular-nums; }
+    .exercise-table input:focus { background: var(--surface-raised); border-color: var(--accent); outline: none; }
+    .exercise-table input[readonly] { color: var(--muted); }
+    .table-name { display: flex; align-items: center; min-width: 0; }
+    .table-name input { text-align: left; flex: 1; }
+    .drag-handle { flex: none; width: 16px; height: 32px; border: 0; background: transparent; color: var(--muted); cursor: grab; font-size: 1.05rem; }
+    .exercise-row.drag-over td { border-top-color: var(--accent); background: var(--surface-raised); }
     .exercise-row.dragging { opacity: .4; }
-    .insert-actions { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 5px; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
-    .insert-label { color: var(--muted); font: 600 .8rem/1.2 'DM Sans', sans-serif; }
-    .insert-label.rest-label { margin-left: 5px; }
-    .insert-actions button { min-width: 0; min-height: 36px; padding: 5px 3px; background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 7px; font: 600 1rem/1.2 'DM Sans', sans-serif; cursor: pointer; }
-    .insert-actions button:hover { background: var(--surface-raised); border-color: var(--accent); }
-    .rest-entry { border-left: 3px solid var(--rest); }
-    .rest-entry .exercise-fields { grid-template-columns: 1fr 1.35fr; }
-    .rest-entry .exercise-rest-field { display: none; }
-    .exercise-fields { display: grid; grid-template-columns: 1fr 1fr 1.35fr; gap: 8px; }
+    .rest-entry td { background: var(--surface-raised); }
+    .table-row-actions { position: absolute; left: calc(100% + 4px); top: 50%; transform: translateY(-50%); display: flex; gap: 2px; }
+    .table-row-actions button { width: 25px; height: 34px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--accent); cursor: pointer; font: 500 1.2rem 'DM Sans', sans-serif; }
+    .table-row-actions .row-remove { color: var(--muted); font-size: 1rem; }
+    .table-row-actions button:hover { background: var(--surface-raised); }
+    .table-row-actions .row-remove:hover { color: var(--danger); }
+    .editor-add { display: flex; gap: 8px; }
+    .editor-add .btn { width: auto; flex: 1; }
+    @media (max-width: 400px) { .exercise-table input { font-size: .75rem; } .exercise-table th { font-size: .58rem; padding-inline: 2px; } .exercise-table .name-column { width: 46%; } }
     .field-label { display: block; color: var(--muted); font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
     .value-field, .stepper { display: flex; align-items: center; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 8px; height: 36px; overflow: hidden; }
     .value-field input, .stepper input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--text); font: 600 .95rem 'DM Sans', sans-serif; font-variant-numeric: tabular-nums; text-align: center; padding: 8px 0; appearance: textfield; -moz-appearance: textfield; }
@@ -197,8 +203,14 @@
         <span id="workout-update-name"></span>
         <button class="quick-btn" onclick="updateLoadedWorkout()">Update workout</button>
       </div>
-      <div id="exercise-list"></div>
-      <button class="btn btn-add" onclick="addExercise()">+ Add Exercise</button>
+      <div class="editor-wrap">
+        <table class="exercise-table" aria-label="Workout exercises">
+          <colgroup><col class="name-column"><col><col><col class="sets-column"></colgroup>
+          <thead><tr><th scope="col">Name</th><th scope="col">Workout (s)</th><th scope="col">Rest after (s)</th><th scope="col">Sets</th></tr></thead>
+          <tbody id="exercise-list"></tbody>
+        </table>
+      </div>
+      <div class="editor-add"><button class="btn btn-add" onclick="addEditorRow()">+ Add row</button><button class="btn btn-add" onclick="addEditorRow('rest')">+ Rest</button></div>
       <div class="saved-section">
         <button class="saved-toggle" onclick="toggleSavedWorkoutList()">
           <span id="saved-workout-arrow">&#9654;</span> Workouts
@@ -633,7 +645,16 @@
       renderExercises();
     }
 
+    function addEditorRow(kind = 'exercise') {
+      if (exercises.length) insertEntry(exercises.length - 1, 'below', kind);
+      else {
+        addExercise(kind === 'rest' ? 'Rest' : '', 30, kind === 'rest' ? 0 : 15, 3, kind);
+        document.querySelector('.exercise-row input')?.focus();
+      }
+    }
+
     function removeExercise(id) {
+      syncExercisesFromRows();
       exercises = exercises.filter(e => e.id !== id);
       renderExercises();
     }
@@ -715,31 +736,14 @@
     function renderExercises() {
       const list = document.getElementById('exercise-list');
       list.innerHTML = exercises.map((e, i) => `
-        <div class="exercise-row ${e.kind === 'rest' ? 'rest-entry' : ''}" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
-          <div class="exercise-top">
-            <button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder" aria-label="Reorder exercise ${i + 1}">&#8942;</button>
-            <input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value; updateTotalTime()">
-            <button class="save-btn" onclick="saveExercise(${i})" title="Save for later" aria-label="Save exercise ${i + 1}">&#9734;</button>
-            <button class="remove-btn" onclick="removeExercise(${e.id})" aria-label="Remove exercise ${i + 1}">&times;</button>
-          </div>
-          <div class="exercise-fields">
-            <label><span class="field-label">${e.kind === 'rest' ? 'Rest duration' : 'Work'}</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} ${e.kind === 'rest' ? 'rest duration' : 'work'} seconds" value="${e.work}" min="5" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
-            <label class="exercise-rest-field"><span class="field-label">Rest</span><span class="value-field"><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"><span>s</span></span></label>
-            <div><label class="field-label" for="sets-${e.id}">Sets</label><div class="stepper">
-              <button onclick="adjustSets(${i}, -1)" aria-label="Decrease sets for exercise ${i + 1}">−</button>
-              <input class="sets-input" id="sets-${e.id}" type="number" aria-label="Exercise ${i + 1} sets" value="${e.sets}" min="1" max="99" inputmode="numeric" onchange="updateTotalTime()">
-              <button onclick="adjustSets(${i}, 1)" aria-label="Increase sets for exercise ${i + 1}">+</button>
-            </div></div>
-          </div>
-          <div class="insert-actions" role="group" aria-label="Insert near exercise ${i + 1}">
-            <span class="insert-label">Exercise:</span>
-            <button onclick="insertEntry(${i}, 'above')" aria-label="Add exercise above exercise ${i + 1}" title="Add above">↑</button>
-            <button onclick="insertEntry(${i}, 'below')" aria-label="Add exercise below exercise ${i + 1}" title="Add below">↓</button>
-            <span class="insert-label rest-label">Rest:</span>
-            <button onclick="insertEntry(${i}, 'above', 'rest')" aria-label="Add rest above exercise ${i + 1}" title="Add above">↑</button>
-            <button onclick="insertEntry(${i}, 'below', 'rest')" aria-label="Add rest below exercise ${i + 1}" title="Add below">↓</button>
-          </div>
-        </div>
+        <tr class="exercise-row ${e.kind === 'rest' ? 'rest-entry' : ''}" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
+          <td><div class="table-name"><button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder" aria-label="Reorder exercise ${i + 1}">⋮</button><input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value; updateTotalTime()"></div></td>
+          <td><input type="number" aria-label="Exercise ${i + 1} ${e.kind === 'rest' ? 'rest duration' : 'work'} seconds" value="${e.work}" min="5" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"></td>
+          <td><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()" ${e.kind === 'rest' ? 'readonly' : ''}></td>
+          <td><input id="sets-${e.id}" type="number" aria-label="Exercise ${i + 1} sets" value="${e.sets}" min="1" max="99" inputmode="numeric" onchange="updateTotalTime()">
+            <div class="table-row-actions"><button class="row-plus" onclick="insertEntry(${i}, 'below')" aria-label="Add row below exercise ${i + 1}" title="Add row below">+</button><button class="row-remove" onclick="removeExercise(${e.id})" aria-label="Remove exercise ${i + 1}" title="Remove row">×</button></div>
+          </td>
+        </tr>
       `).join('');
       updateTotalTime();
     }
@@ -1360,7 +1364,11 @@
     }
 
     window.addEventListener('workout-data-changed', event => {
+      const wasClean = !loadedWorkoutSignature || currentWorkoutSignature() === loadedWorkoutSignature;
       renderRecentWorkouts(); renderSavedWorkoutList(); renderSavedList(); renderWorkoutPicker(); initRehab();
+      if (!event.detail.switched && !workoutActive && wasClean) {
+        initRestMode(); loadedWorkoutSignature = currentWorkoutSignature(); renderWorkoutUpdate();
+      }
       if (event.detail.switched && !workoutActive) {
         exercises = []; loadedWorkoutSignature = '';
         switchTab('workout'); document.getElementById('workout-picker').value = 'tennis';
