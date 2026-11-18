@@ -55,6 +55,7 @@
     .exercise-table input { width: 100%; min-width: 0; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); padding: 8px 2px; font: 500 .85rem 'DM Sans', sans-serif; text-align: center; font-variant-numeric: tabular-nums; }
     .exercise-table input:focus { background: var(--surface-raised); border-color: var(--accent); outline: none; }
     .exercise-table input[readonly] { color: var(--muted); }
+    .exercise-table input.rest-unused { text-decoration: line-through; opacity: .55; cursor: not-allowed; }
     .table-name { display: flex; align-items: center; min-width: 0; }
     .table-name input { text-align: left; flex: 1; }
     .drag-handle { flex: none; width: 16px; height: 32px; border: 0; background: transparent; color: var(--muted); cursor: grab; font-size: 1.05rem; }
@@ -504,13 +505,36 @@
     const ROUND_REST_KEY = 'sam_round_rest';
     const REST_HINTS = {
       exercise: "Rests after each exercise, using its Rest value.",
-      round: "Exercises run back-to-back — one rest between rounds. Faster.",
-      none: "No rests — fully continuous.",
+      round: "The final row’s Rest after sets the break between rounds. Other row rests are off; added Rest rows still run.",
+      none: "Per-exercise rests are off. Added Rest rows still run.",
     };
 
     function getRoundRest() {
       const el = document.getElementById('round-rest');
       return el ? boundedNumber(el.value, 0, 1800, 30) : 30;
+    }
+
+    // Both controls edit the same between-round duration. Inactive row values
+    // remain available if the user switches back to per-exercise rest.
+    function refreshRestInputs() {
+      document.querySelectorAll('.exercise-row').forEach((row, i) => {
+        const input = row.querySelectorAll('input')[2];
+        const isRest = exercises[i]?.kind === 'rest';
+        const isRoundEnd = restMode === 'round' && i === exercises.length - 1 && !isRest;
+        if (isRoundEnd) input.value = getRoundRest();
+        input.readOnly = isRest || (restMode !== 'exercise' && !isRoundEnd);
+        input.classList.toggle('rest-unused', !isRest && input.readOnly);
+        input.title = isRoundEnd ? 'Rest between rounds (linked to the setting below)'
+          : input.readOnly ? 'Not used in this rest mode' : 'Rest after this exercise';
+      });
+    }
+
+    function editExerciseRest(index, value) {
+      const seconds = boundedNumber(value, 0, 1800, 0);
+      if (restMode === 'round' && index === exercises.length - 1) {
+        document.getElementById('round-rest').value = seconds;
+        saveRoundRest();
+      } else updateTotalTime();
     }
 
     function saveRoundRest() {
@@ -519,16 +543,19 @@
         el.value = getRoundRest();
         WorkoutStore.setItem(ROUND_REST_KEY, el.value);
       }
+      refreshRestInputs();
       updateTotalTime();
     }
 
     function setRestMode(mode, persist = true) {
+      syncExercisesFromRows();
       restMode = mode;
       if (persist) WorkoutStore.setItem(REST_MODE_KEY, mode);
       document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
       document.getElementById('round-rest-row').style.display = mode === 'round' ? 'flex' : 'none';
       const hint = document.getElementById('rest-hint');
       if (hint) hint.textContent = REST_HINTS[mode] || '';
+      refreshRestInputs();
       updateTotalTime();
     }
 
@@ -806,12 +833,13 @@
         <tr class="exercise-row ${e.kind === 'rest' ? 'rest-entry' : ''}" ondragover="dragExerciseOver(event, ${i})" ondragleave="this.classList.remove('drag-over')" ondrop="dropExercise(event, ${i})">
           <td><div class="table-name"><button class="drag-handle" draggable="true" ondragstart="dragExerciseStart(event, ${i})" ondragend="clearDragState()" title="Drag to reorder" aria-label="Reorder exercise ${i + 1}">⋮</button><input type="text" aria-label="Exercise ${i + 1} name" placeholder="Exercise ${i + 1}" value="${escapeHtml(e.name)}" onchange="exercises[${i}].name = this.value; updateTotalTime()"></div></td>
           <td><input type="number" aria-label="Exercise ${i + 1} ${e.kind === 'rest' ? 'rest duration' : 'work'} seconds" value="${e.work}" min="5" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()"></td>
-          <td><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="updateTotalTime()" ${e.kind === 'rest' ? 'readonly' : ''}></td>
+          <td><input type="number" aria-label="Exercise ${i + 1} rest seconds" value="${e.rest}" min="0" max="1800" step="5" inputmode="numeric" onchange="editExerciseRest(${i}, this.value)" ${e.kind === 'rest' ? 'readonly' : ''}></td>
           <td><input id="sets-${e.id}" type="number" aria-label="Exercise ${i + 1} sets" value="${e.sets}" min="1" max="99" inputmode="numeric" onchange="updateTotalTime()">
             <div class="table-row-actions"><button class="row-plus" onclick="insertEntry(${i}, 'below')" aria-label="Add row below exercise ${i + 1}" title="Add row below">+</button><button class="row-remove" onclick="removeExercise(${e.id})" aria-label="Remove exercise ${i + 1}" title="Remove row">×</button></div>
           </td>
         </tr>
       `).join('');
+      refreshRestInputs();
       updateTotalTime();
     }
 
@@ -1083,9 +1111,18 @@
         rest: ex.rest,
         sets: ex.sets
       }));
+      const hasRestMode = ['exercise', 'round', 'none'].includes(workout.restMode);
+      if (hasRestMode) {
+        restMode = workout.restMode;
+        const finalRow = workout.exercises[workout.exercises.length - 1];
+        // Older saved circuits could show a positive row rest that the separate
+        // round setting silently overrode. Honor the value the user entered.
+        const rowRest = finalRow?.kind !== 'rest' && Number(finalRow?.rest) > 0 ? finalRow.rest : null;
+        document.getElementById('round-rest').value = boundedNumber(
+          restMode === 'round' && rowRest !== null ? rowRest : workout.roundRest, 0, 1800, 30);
+      }
       renderExercises();
-      if (['exercise', 'round', 'none'].includes(workout.restMode)) {
-        document.getElementById('round-rest').value = boundedNumber(workout.roundRest, 0, 1800, 30);
+      if (hasRestMode) {
         saveRoundRest();
         setRestMode(workout.restMode);
       }

@@ -253,3 +253,50 @@ test('update appears after editing and replaces the loaded saved workout in plac
   assert.equal(run('getSavedWorkouts()[0].name'), 'Other routine');
   assert.equal(run('restMode'), 'round');
 });
+
+test('saved circuit honors 30s after Pushups instead of the old 60s round setting', () => {
+  const { run, element } = timer();
+  run(`loadWorkout({ name: 'Full-body kettlebell circuit', restMode: 'round', roundRest: 60,
+    exercises: [
+      {name:'Rows',work:25,rest:0,sets:4}, {name:'Cleans',work:20,rest:0,sets:4},
+      {name:'Swings',work:25,rest:0,sets:4}, {name:'Goblet squats',work:20,rest:30,sets:4},
+      {name:'Rest',kind:'rest',work:30,rest:0,sets:4}, {name:'Bicep curls',work:20,rest:0,sets:4},
+      {name:'Tricep extensions',work:20,rest:0,sets:4}, {name:'Pullovers',work:20,rest:0,sets:4},
+      {name:'Alternating halos',work:20,rest:0,sets:4}, {name:'Pushups',work:20,rest:30,sets:4}
+    ]}, false); buildQueue(); prepareWorkoutAudio();`);
+  const phases = JSON.parse(run('JSON.stringify(queue)'));
+  const boundaries = phases.map((phase,i) => phase.name === 'Pushups' ? phases[i+1] : null).filter(Boolean);
+  assert.equal(boundaries.length, 3);
+  assert.ok(boundaries.every(p => p.type === 'rest' && p.duration === 30));
+  assert.equal(phases.at(-1).name, 'Pushups');
+  assert.equal(phases.reduce((sum,p) => sum + p.duration,0), 970);
+  assert.match(element('total-time').innerHTML, /16:10/);
+  assert.equal(run('timeline.at(-1).end'), 975); // Includes the 5-second lead-in.
+  assert.equal(run('getRoundRest()'), 30);
+});
+
+test('final-row and round-rest edits stay linked, including zero, and save consistently', () => {
+  const { run, element } = timer();
+  run(`loadWorkout(BUILT_IN_WORKOUTS[0], false);
+    const restTestRows = exercises.map(ex => {
+      const fields = [ex.name,ex.work,ex.rest,ex.sets].map(value => ({value, classList:{toggle(){}}}));
+      return {querySelectorAll:()=>fields};
+    });
+    document.querySelectorAll = selector => selector === '.exercise-row' ? restTestRows : [];
+    refreshRestInputs();`);
+  assert.equal(run('restTestRows[0].querySelectorAll()[2].readOnly'), true);
+  assert.equal(run('restTestRows[8].querySelectorAll()[2].readOnly'), false);
+  run(`restTestRows[8].querySelectorAll()[2].value = 30; editExerciseRest(8,30); buildQueue();`);
+  assert.equal(Number(element('round-rest').value), 30);
+  assert.equal(run('exercises[8].rest'), 30);
+  assert.equal(run('queue.filter(p=>p.type === "rest").every(p=>p.duration===30)'), true);
+  element('round-rest').value = 45;
+  run('saveRoundRest();');
+  assert.equal(run('restTestRows[8].querySelectorAll()[2].value'),45);
+  run(`restTestRows[8].querySelectorAll()[2].value = 0; editExerciseRest(8,0); buildQueue();`);
+  assert.equal(run('queue.filter(p=>p.type === "rest").length'),0);
+  run(`showToast = () => {}; updateLoadedWorkout(); document.querySelectorAll = () => [];
+    loadWorkout(getSavedWorkouts()[0], false); buildQueue();`);
+  assert.equal(run('getRoundRest()'),0);
+  assert.equal(run('queue.filter(p=>p.type === "rest").length'),0);
+});
