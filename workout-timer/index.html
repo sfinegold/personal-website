@@ -1114,12 +1114,7 @@
       const hasRestMode = ['exercise', 'round', 'none'].includes(workout.restMode);
       if (hasRestMode) {
         restMode = workout.restMode;
-        const finalRow = workout.exercises[workout.exercises.length - 1];
-        // Older saved circuits could show a positive row rest that the separate
-        // round setting silently overrode. Honor the value the user entered.
-        const rowRest = finalRow?.kind !== 'rest' && Number(finalRow?.rest) > 0 ? finalRow.rest : null;
-        document.getElementById('round-rest').value = boundedNumber(
-          restMode === 'round' && rowRest !== null ? rowRest : workout.roundRest, 0, 1800, 30);
+        document.getElementById('round-rest').value = boundedNumber(workout.roundRest, 0, 1800, 30);
       }
       renderExercises();
       if (hasRestMode) {

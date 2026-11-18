@@ -254,7 +254,7 @@ test('update appears after editing and replaces the loaded saved workout in plac
   assert.equal(run('restMode'), 'round');
 });
 
-test('saved circuit honors 30s after Pushups instead of the old 60s round setting', () => {
+test('editing Pushups rest replaces the old 60s round setting in the timer and audio', () => {
   const { run, element } = timer();
   run(`loadWorkout({ name: 'Full-body kettlebell circuit', restMode: 'round', roundRest: 60,
     exercises: [
@@ -263,7 +263,7 @@ test('saved circuit honors 30s after Pushups instead of the old 60s round settin
       {name:'Rest',kind:'rest',work:30,rest:0,sets:4}, {name:'Bicep curls',work:20,rest:0,sets:4},
       {name:'Tricep extensions',work:20,rest:0,sets:4}, {name:'Pullovers',work:20,rest:0,sets:4},
       {name:'Alternating halos',work:20,rest:0,sets:4}, {name:'Pushups',work:20,rest:30,sets:4}
-    ]}, false); buildQueue(); prepareWorkoutAudio();`);
+    ]}, false); editExerciseRest(9, 30); buildQueue(); prepareWorkoutAudio();`);
   const phases = JSON.parse(run('JSON.stringify(queue)'));
   const boundaries = phases.map((phase,i) => phase.name === 'Pushups' ? phases[i+1] : null).filter(Boolean);
   assert.equal(boundaries.length, 3);
